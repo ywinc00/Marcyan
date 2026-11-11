@@ -1,0 +1,260 @@
+---
+// Esclusa de Marcy (W-ADV-02 · design/rediseno-workos.md §3.6, §2.10). Objeto de SISTEMA.
+// Burbuja de intención 288×61 → línea de 80 px → caja octogonal 338×215 (esquinas cortadas
+// a 40 px, SVG) con trazo 2 px crema al 30 % que pasa a teal al resolver; "MARCY" en mono
+// vertical a los lados; dos puertas (barras 130×3) que se separan → píldora mono 13 con la
+// intención entendida → veredicto ("Respondido" en teal, el acento de la página / "Te lo
+// pasa" en crema al 70 %) + explicación → abanico de 4 curvas → 4 canales.
+// v2 (rediseno-workos-v2.md §3 G06): canales = los que Marcy contesta de verdad (§5-14: web,
+// WhatsApp, Instagram, Messenger; fuera "Google"), con su logo a color (P06) y nombre a 13 px
+// (FI §4.7: eran diminutos); amanecer teal bajo la esclusa, como el horizonte azul de W-ADV-02.
+// Contrato de vida (§1.5, E-56 regla 7): ya no se detiene tras 2 ciclos; caso de ~4,5 s en
+// bucle MIENTRAS está a la vista (pausa fuera de vista, con la pestaña oculta y con el botón de
+// pausa 44×44 de loop.ts). El bucle se registra en la capa de ilustración, que no recibe
+// puntero: pasar el ratón por encima NO lo congela. Quieto (reducir movimiento): "Respondido".
+// Ilustración: aria-hidden + resumen sr-only. Firma de IA para pymes.
+import Ejemplo from '../Ejemplo.astro';
+import LogoMarca from '../marcas/LogoMarca.astro';
+import type { MarcaId } from '../marcas/datos';
+
+type Case = { ask: string; pill: string; ok: boolean; verdict: string; why: string; ch: number };
+interface Props {
+  lang?: 'es' | 'en';
+  size?: 'hero' | 'card' | 'mini';
+  cases?: Case[];
+  channels?: string[];
+  class?: string;
+}
+const { lang = 'es', size = 'hero', class: cls } = Astro.props;
+const en = lang === 'en';
+const channels = Astro.props.channels ?? (en ? ['WhatsApp', 'Website', 'Instagram', 'Messenger'] : ['WhatsApp', 'Web', 'Instagram', 'Messenger']);
+const LOGO: Record<string, MarcaId> = { WhatsApp: 'whatsapp', Instagram: 'instagram', Messenger: 'messenger' };
+const cases: Case[] = Astro.props.cases ?? (en
+  ? [
+      { ask: 'Do you have an opening this Saturday?', pill: 'book · sat 10:00 AM', ok: true, verdict: 'Answered', why: 'Booked it and confirmed it', ch: 0 },
+      { ask: 'I want to talk to someone', pill: 'person · summary', ok: false, verdict: 'Hands it to you', why: 'Passed you the case with a summary', ch: 1 },
+      { ask: 'How much is a haircut?', pill: 'price · haircut', ok: true, verdict: 'Answered', why: 'Gave the price from your list', ch: 2 },
+      { ask: 'Are you open early tomorrow?', pill: 'hours · tomorrow 8:00', ok: true, verdict: 'Answered', why: 'Answered after hours', ch: 3 },
+    ]
+  : [
+      { ask: '¿Tienen cita este sábado?', pill: 'agendar · sábado 10:00 a. m.', ok: true, verdict: 'Respondido', why: 'Apartó la cita y la confirmó', ch: 0 },
+      { ask: 'Quiero hablar con alguien', pill: 'persona · resumen', ok: false, verdict: 'Te lo pasa', why: 'Te pasó el caso con resumen', ch: 1 },
+      { ask: '¿Cuánto cuesta un corte?', pill: 'precio · corte', ok: true, verdict: 'Respondido', why: 'Dio el precio de tu lista', ch: 2 },
+      { ask: '¿Abren mañana temprano?', pill: 'horario · mañana 8:00', ok: true, verdict: 'Respondido', why: 'Contestó fuera de horario', ch: 3 },
+    ]);
+const c0 = cases[0];
+const sr = en
+  ? 'Example: each message goes through Marcy. She answers what she can (bookings, prices, hours) on WhatsApp, your website, Instagram or Messenger, and hands you what needs a person.'
+  : 'Ejemplo: cada mensaje pasa por Marcy. Contesta lo que puede (citas, precios, horario) en WhatsApp, tu web, Instagram o Messenger, y te pasa lo que necesita una persona.';
+const fan = [50, 150, 250, 350].map((x) => `M200 0 C200 46, ${x} 40, ${x} 90`);
+---
+<div
+  class:list={['wo-lock', `wo-lock--${size}`, 'is-pill', 'is-verdict', c0.ok && 'is-ok', cls]}
+  data-wo-lock
+  data-ch={c0.ch}
+  data-cases={JSON.stringify(cases)}
+>
+  <p class="sr-only">{sr}</p>
+  <Ejemplo lang={lang} on="dark" />
+  <span class="wo-lock__alba" aria-hidden="true"></span>
+  <div class="wo-lock__in" aria-hidden="true" data-wo-capa>
+    <p class="wo-lock__ask" data-ask>“{c0.ask}”</p>
+    <span class="wo-lock__line"></span>
+    <div class="wo-lock__oct">
+      <svg viewBox="0 0 338 215" preserveAspectRatio="none">
+        <polygon points="40,1 298,1 337,40 337,175 298,214 40,214 1,175 1,40" />
+      </svg>
+      <span class="wo-lock__door wo-lock__door--t"><i></i><i></i></span>
+      <span class="wo-lock__door wo-lock__door--b"><i></i><i></i></span>
+      <span class="wo-lock__side wo-lock__side--l">MARCY</span>
+      <span class="wo-lock__side wo-lock__side--r">MARCY</span>
+      <span class="wo-lock__pill" data-pill>{c0.pill}</span>
+      <p class="wo-lock__verdict"><b data-verdict>{c0.verdict}</b><span data-why>{c0.why}</span></p>
+    </div>
+    <svg class="wo-lock__fan" viewBox="0 0 400 90" preserveAspectRatio="none">
+      {fan.map((d, i) => <path d={d} data-i={i} />)}
+    </svg>
+    <ul class="wo-lock__chs">
+      {channels.map((c, i) => (
+        <li data-i={i}>
+          {LOGO[c]
+            ? <LogoMarca id={LOGO[c]} size={15} tono="mono" titulo="" />
+            : <svg class="wo-lock__web" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z" /></svg>}
+          <span>{c}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
+<script>
+  import { registerLoop } from '../loop';
+  type Case = { ask: string; pill: string; ok: boolean; verdict: string; why: string; ch: number };
+  document.querySelectorAll<HTMLElement>('[data-wo-lock]').forEach((el) => {
+    const cases: Case[] = JSON.parse(el.dataset.cases || '[]');
+    const $ = <T extends HTMLElement>(s: string) => el.querySelector<T>(s);
+    const ask = $('[data-ask]'), pill = $('[data-pill]'), verdict = $('[data-verdict]'), why = $('[data-why]');
+    if (!cases.length || !ask || !pill || !verdict || !why) return;
+    const STATES = ['is-doors-t', 'is-doors-b', 'is-pill', 'is-exit', 'is-ok', 'is-hand', 'is-verdict', 'is-ch', 'is-asking'];
+    let timers: number[] = [];
+    const later = (fn: () => void, ms: number) => { timers.push(window.setTimeout(fn, ms)); };
+    const clear = () => { timers.forEach((t) => window.clearTimeout(t)); timers = []; };
+    const set = (...on: string[]) => on.forEach((c) => el.classList.add(c));
+    const unset = (...off: string[]) => off.forEach((c) => el.classList.remove(c));
+    const fill = (c: Case) => {
+      ask.textContent = `“${c.ask}”`; pill.textContent = c.pill; verdict.textContent = c.verdict; why.textContent = c.why;
+      el.dataset.ch = String(c.ch);
+    };
+    const showFinal = (c: Case) => { el.classList.remove(...STATES); fill(c); set('is-pill', 'is-verdict', 'is-ch'); if (c.ok) set('is-ok'); else set('is-hand'); };
+
+    const run = (n: number) => {
+      const c = cases[n % cases.length];
+      el.classList.remove(...STATES);
+      fill(c);
+      set('is-asking');
+      later(() => set('is-doors-t'), 600);
+      later(() => set('is-pill'), 900);
+      later(() => { unset('is-doors-t'); set(c.ok ? 'is-ok' : 'is-hand'); }, 1500);
+      later(() => set('is-verdict'), 1800);
+      later(() => set('is-doors-b', 'is-exit', 'is-ch'), 2900);
+      later(() => unset('is-doors-b'), 3500);
+      // El veredicto se apaga ANTES de cambiar de caso: si se quitaba en run() a la vez que se
+      // cambiaba el texto, durante su fundido de 320 ms se leía el veredicto del caso siguiente.
+      later(() => unset('is-verdict'), 4100);
+      later(() => { n0 = (n + 1) % cases.length; run(n0); }, 4500);
+    };
+    // Bucle mientras está a la vista. Se registra en la capa de ilustración (sin puntero ni
+    // foco): pasar el ratón por encima no lo para; el botón de pausa cuelga de la raíz.
+    const capa = el.querySelector<HTMLElement>('[data-wo-capa]') || el;
+    let n0 = 0;
+    const okCase = cases.find((c) => c.ok) || cases[0];
+    registerLoop(capa, {
+      start: () => { clear(); el.classList.remove('is-still'); run(n0); },
+      stop: () => { clear(); n0 = 0; showFinal(okCase); },
+      still: () => { clear(); showFinal(okCase); el.classList.add('is-still'); },
+    }, { buttonHost: el, lang: el.closest('[lang]')?.getAttribute('lang') === 'en' ? 'en' : 'es' });
+  });
+</script>
+
+<style>
+  .wo-lock {
+    position: relative; width: min(100%, 420px); margin-inline: auto;
+    padding: 40px 10px 68px; font-family: var(--font-body);
+  }
+  .wo-lock__in { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+  /* Amanecer teal bajo la esclusa (W-ADV-02 lleva un horizonte azul al pie del panel): luz baja,
+     sin halo sobre el texto; solo trazo de color en el objeto (E-03). */
+  .wo-lock__alba {
+    position: absolute; z-index: 0; left: 0; right: 0; bottom: 0; height: 60%; pointer-events: none;
+    background:
+      radial-gradient(50% 85% at 50% 100%, rgba(79,195,161,.24) 0%, rgba(79,195,161,.09) 45%, transparent 72%),
+      radial-gradient(40% 30% at 50% 100%, rgba(240,237,232,.06), transparent 70%);
+  }
+  .wo-lock__ask {
+    margin: 0; width: min(100%, 288px); min-height: 61px; display: grid; place-items: center;
+    padding: 10px 16px; border-radius: var(--w-r-obj, 12px); text-align: center;
+    background: var(--w-s2, #181817); border: 1px solid var(--w-line-strong); box-shadow: var(--w-edge);
+    font: 400 15px/1.35 var(--font-display); color: var(--w-ink, #f0ede8);
+    transition: opacity 240ms var(--w-ease-ui);
+  }
+  .wo-lock__line { display: block; width: 1px; height: 80px; background: rgba(var(--star-rgb), .30); }
+  .wo-lock__oct { position: relative; width: min(100%, 338px); aspect-ratio: 338 / 215; }
+  .wo-lock__oct svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .wo-lock__oct polygon {
+    fill: var(--w-s1, #121211); stroke: rgba(var(--star-rgb), .30); stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+    transition: stroke 320ms var(--w-ease-ui), fill 320ms var(--w-ease-ui);
+  }
+  .wo-lock.is-ok .wo-lock__oct polygon { stroke: var(--accent-teal); fill: #121a17; }
+  .wo-lock.is-hand .wo-lock__oct polygon { stroke: rgba(var(--star-rgb), .60); }
+  .wo-lock__door {
+    position: absolute; left: 50%; width: 130px; height: 3px; margin-left: -65px; display: flex;
+  }
+  .wo-lock__door--t { top: -1px; }
+  .wo-lock__door--b { bottom: -1px; }
+  .wo-lock__door i {
+    flex: 1; height: 3px; background: var(--w-ink, #f0ede8); border-radius: 2px;
+    transition: transform 240ms var(--w-ease-ui);
+  }
+  .wo-lock.is-doors-t .wo-lock__door--t i:first-child,
+  .wo-lock.is-doors-b .wo-lock__door--b i:first-child { transform: translateX(-46px); }
+  .wo-lock.is-doors-t .wo-lock__door--t i:last-child,
+  .wo-lock.is-doors-b .wo-lock__door--b i:last-child { transform: translateX(46px); }
+  .wo-lock__side {
+    position: absolute; top: 50%; translate: 0 -50%; writing-mode: vertical-rl;
+    font: 500 10px/1 var(--font-mono); letter-spacing: 2.2px; color: rgba(var(--star-rgb), .45);
+  }
+  .wo-lock__side--l { left: 12px; transform: rotate(180deg); }
+  .wo-lock__side--r { right: 12px; }
+  .wo-lock__pill {
+    position: absolute; left: 50%; top: 34%; translate: -50% 0;
+    padding: 6px 14px; border-radius: 8px; white-space: nowrap;
+    background: var(--w-s-solid, #1c1c1c); border: 1px solid var(--w-line-strong);
+    font: 500 13px/1.3 var(--font-mono); color: var(--w-ink, #f0ede8);
+    opacity: 0; transform: translateY(-86px);
+    transition: opacity 600ms var(--w-ease-ui), transform 600ms var(--w-ease-ui);
+  }
+  .wo-lock.is-pill .wo-lock__pill { opacity: 1; transform: none; }
+  /* Sale hacia la puerta de abajo pero se funde antes de llegar a la explicación (control 1:
+     al bajar 96 px se montaba sobre ella). */
+  .wo-lock.is-pill.is-exit .wo-lock__pill { opacity: 0; transform: translateY(14px); transition-duration: 280ms; }
+  .wo-lock__verdict {
+    position: absolute; left: 0; right: 0; top: 58%; margin: 0; text-align: center;
+    display: flex; flex-direction: column; gap: 2px; padding: 0 30px;
+    opacity: 0; transition: opacity 320ms var(--w-ease-ui);
+  }
+  .wo-lock.is-verdict .wo-lock__verdict { opacity: 1; }
+  .wo-lock__verdict b { font-size: 13px; font-weight: 500; color: rgba(var(--star-rgb), .75); }
+  .wo-lock.is-ok .wo-lock__verdict b { color: var(--accent-teal); }
+  .wo-lock__verdict span { font-size: 13px; color: var(--w-ink-60); }
+  .wo-lock__fan { display: block; width: 100%; height: 90px; overflow: visible; }
+  .wo-lock__fan path {
+    fill: none; stroke: rgba(var(--star-rgb), .22); stroke-width: 1; vector-effect: non-scaling-stroke;
+    transition: stroke 320ms var(--w-ease-ui), fill 320ms var(--w-ease-ui);
+  }
+  .wo-lock__chs {
+    list-style: none; margin: 0; padding: 0; width: 100%;
+    display: grid; grid-template-columns: repeat(4, 1fr); justify-items: center;
+  }
+  .wo-lock__chs li {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 9px; border-radius: 8px; border: 1px solid var(--w-line-strong);
+    background: var(--w-s2, #181817);
+    font: 500 13px/1.2 var(--font-body); color: var(--w-ink-80, rgba(240,237,232,.8));
+    transition: color 200ms var(--w-ease-ui), border-color 200ms var(--w-ease-ui);
+  }
+  .wo-lock.is-ch[data-ch='0'] .wo-lock__fan path[data-i='0'],
+  .wo-lock.is-ch[data-ch='1'] .wo-lock__fan path[data-i='1'],
+  .wo-lock.is-ch[data-ch='2'] .wo-lock__fan path[data-i='2'],
+  .wo-lock.is-ch[data-ch='3'] .wo-lock__fan path[data-i='3'] { stroke: var(--accent-teal); }
+  .wo-lock.is-ch[data-ch='0'] .wo-lock__chs li[data-i='0'],
+  .wo-lock.is-ch[data-ch='1'] .wo-lock__chs li[data-i='1'],
+  .wo-lock.is-ch[data-ch='2'] .wo-lock__chs li[data-i='2'],
+  .wo-lock.is-ch[data-ch='3'] .wo-lock__chs li[data-i='3'] { color: var(--w-ink, #f0ede8); border-color: var(--accent-teal); }
+  @media (--lt-md) {
+    .wo-lock { width: min(100%, 335px); padding-inline: 0; }
+    .wo-lock__line { height: 56px; }
+    /* Móvil (v5, dueño 2026-11-07): nombre y logo juntos no caben. Cada canal enseña su NOMBRE y,
+       cuando la conexión llega a él (el abanico se enciende), el nombre se funde en su LOGO; al pasar
+       al caso siguiente vuelve el nombre. Los dos ocupan la misma celda: el botón no cambia de tamaño. */
+    .wo-lock__chs li { display: grid; place-items: center; padding: 6px 7px; font-size: 13px; }
+    .wo-lock__chs li > :global(*) { grid-area: 1 / 1; transition: opacity 320ms var(--w-ease-ui), transform 320ms var(--w-ease-ui); }
+    .wo-lock__chs li :global(svg) { width: 18px; height: 18px; opacity: 0; transform: scale(.6); }
+    .wo-lock.is-ch[data-ch='0'] .wo-lock__chs li[data-i='0'] :global(svg),
+    .wo-lock.is-ch[data-ch='1'] .wo-lock__chs li[data-i='1'] :global(svg),
+    .wo-lock.is-ch[data-ch='2'] .wo-lock__chs li[data-i='2'] :global(svg),
+    .wo-lock.is-ch[data-ch='3'] .wo-lock__chs li[data-i='3'] :global(svg) { opacity: 1; transform: none; }
+    .wo-lock.is-ch[data-ch='0'] .wo-lock__chs li[data-i='0'] span,
+    .wo-lock.is-ch[data-ch='1'] .wo-lock__chs li[data-i='1'] span,
+    .wo-lock.is-ch[data-ch='2'] .wo-lock__chs li[data-i='2'] span,
+    .wo-lock.is-ch[data-ch='3'] .wo-lock__chs li[data-i='3'] span { opacity: 0; transform: scale(.85); }
+  }
+  .wo-lock__chs li :global(svg) { flex: none; }
+  /* 320-359: 2 × 2 (cuatro columnas de 72 px no caben a 13 px). */
+  @media (max-width: 359px) {
+    .wo-lock__chs { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  }
+  @media (--motion-reduce) {
+    .wo-lock.wo-lock * { transition: none; }
+  }
+</style>

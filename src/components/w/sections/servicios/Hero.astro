@@ -1,0 +1,90 @@
+---
+// Servicios · cabecera partida del hub (design/rediseno-workos.md §4.3; A-04 + W-CONV-01 +
+// W-HOME-06). Izquierda (560): migas, eyebrow oro "Servicios", H1 hub VERBATIM (§2.14) y
+// una bajada de una línea, SIN botones (E-05: hub con cabecera compacta; el primer CTA
+// llega con el catálogo). Derecha (480×420): la pila de Interruptores con los 7 productos
+// de pricing en su orden, firma de la página (bucle de loop.ts, quieto con reduced-motion).
+// No usa HeroTexto porque ese componente siempre pinta botones (apuntado como [SISTEMA]);
+// reproduce su coreografía con las mismas clases y data-w-in de §2.9.
+import Eyebrow from '../../Eyebrow.astro';
+import Interruptores from '../../objetos/Interruptores.astro';
+
+interface Item { label: string; href: string }
+interface Props {
+  h1Html: string;
+  eyebrow: string;
+  tail?: string;
+  lead: string;
+  items: Item[];
+  lang?: 'es' | 'en';
+}
+const { h1Html, eyebrow, tail, lead, items, lang = 'es' } = Astro.props;
+---
+<section class="w-hero ws-hero">
+  <div class="w-container ws-hero__grid">
+    <div class="ws-hero__text" data-w-tone="gold">
+      <div class="ws-hero__crumbs"><slot name="crumbs" /></div>
+      <div data-w-in="1"><Eyebrow tone="gold">{eyebrow}</Eyebrow></div>
+      <h1 class="w-h1 w-h1--hub ws-hero__h1" data-w-in="1" set:html={h1Html} />
+      {tail && <p class="w-h1__tail w-h1__tail--hub" data-w-in="1">{tail}</p>}
+      <p class="w-lead ws-hero__lead" data-w-in="2">{lead}</p>
+    </div>
+    <div class="ws-hero__obj" data-w-in="obj">
+      <Interruptores items={items} lang={lang} size="card" />
+    </div>
+  </div>
+</section>
+
+<script>
+  // Pausa global (rev1 de G09, imp. 4): la pausa de los interruptores es la ÚNICA del hero (el
+  // fondo esconde la suya), así que también produce el contrato global y lo obedece: si otra pausa
+  // de la página (pedidos, cuidado) lo activa, este botón se pone en el mismo estado.
+  import { fijaPausa, pausaActiva } from './pausaGlobal';
+  const SEL = '.ws-hero__obj .w-loop-pause';
+  const pressed = (b: Element) => b.getAttribute('aria-pressed') === 'true';
+  let propio = false; // el clic en curso es del propio botón: él mismo cambiará de estado
+  // En captura: loop.ts repinta el icono del botón al pulsarlo y el destino del clic sale del DOM
+  // antes de burbujear; aquí aún no ha cambiado, así que el estado nuevo es el contrario.
+  document.addEventListener('click', (e) => {
+    const b = (e.target as Element | null)?.closest?.(SEL);
+    if (!b) return;
+    const p = !pressed(b);
+    propio = true; fijaPausa(p); propio = false;
+    // Tras el clic, el botón ya está en su estado: se repite el aviso (idempotente) para que el
+    // fondo, que mira también este botón, se vuelva a sincronizar.
+    window.setTimeout(() => document.dispatchEvent(new CustomEvent('w:pausa', { detail: { paused: p } })), 0);
+  }, true);
+  const align = (p: boolean) => {
+    if (propio) return;
+    const b = document.querySelector<HTMLButtonElement>(SEL);
+    if (b && pressed(b) !== p) b.click();
+  };
+  document.addEventListener('w:pausa', (e) => align(!!(e as CustomEvent).detail?.paused));
+  // El botón lo crea loop.ts al arrancar: se alinea con una pausa de la sesión cuando ya existe.
+  const boot = () => { if (pausaActiva()) { fijaPausa(true); align(true); } };
+  if (document.readyState === 'complete') boot(); else window.addEventListener('load', boot, { once: true });
+</script>
+
+<style>
+  .ws-hero { padding-bottom: 72px; }
+  .ws-hero__grid { display: grid; gap: 40px; align-items: center; }
+  .ws-hero__text { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; max-width: 560px; }
+  .ws-hero__crumbs { margin-bottom: 28px; }
+  .ws-hero__crumbs :global(ol) { padding-inline-start: 0; margin: 0; }
+  .ws-hero__h1 { margin: var(--w-gap-eyebrow) 0 0; }
+  .ws-hero__lead { margin: var(--w-gap-h1) 0 0; }
+  .ws-hero__obj { min-width: 0; display: flex; justify-content: center; }
+  @media (--lg) {
+    .ws-hero { padding-bottom: 96px; }
+    .ws-hero__grid { grid-template-columns: minmax(0, 560px) minmax(0, 480px); justify-content: space-between; gap: 64px; }
+    .ws-hero__obj { justify-content: flex-end; }
+  }
+  @media (--lt-md) {
+    /* La pausa de los interruptores baja bajo la pila (rev1 de G09, menor): tapaba "Listo" de SEO local. */
+    .ws-hero__obj { padding-bottom: 52px; }
+    .ws-hero__obj :global(.w-loop-pause) { bottom: -52px !important; right: 4px !important; }
+    .ws-hero { padding-bottom: 48px; }
+    .ws-hero__grid { gap: 24px; }
+    .ws-hero__crumbs { margin-bottom: 20px; }
+  }
+</style>

@@ -1,46 +1,67 @@
 ---
-// FREE TOOLS · /en/tools (ES mirror: /es/herramientas).
-// Hub with 2 client-side calculators (missed calls / no-shows) + a card to the
-// checkup. Compact header + BreadcrumbList. Pair in ROUTE_PAIRS (hreflang auto).
+// HERRAMIENTAS GRATIS · /en/tools (espejo ES: /es/herramientas). Página v3 del
+// rediseño WorkOS (design/rediseno-workos.md §4.10).
+// Cabecera compacta centrada (A-04 + W-CONV-01) · 2 calculadoras con piel W-CONV-03
+// (ToolsHub: contrato, fórmulas y eventos intactos) · cierre en dos tarjetas con el
+// trío · Contact (#contacto, destino del trío y del CTA de la barra) · BreadcrumbList.
+// Fondo (v2 1.3, G11): F12 Escaneo en ZonaFondo (cabecera; la capa baja tras la calculadora 1), sin
+// SpaceBackdrop. Contraste: la calculadora 1 en superficie elevada. Firma: ninguna. Degradado: el
+// total de la calculadora activa. Par en ROUTE_PAIRS (hreflang auto).
 import Layout from '../../layouts/Layout.astro';
 import SiteNav from '../../components/layout/SiteNav.astro';
 import SiteFooter from '../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
-import LandingHero from '../../components/sections/LandingHero.astro';
-import SpaceBackdrop from '../../components/SpaceBackdrop.astro';
+import Contact from '../../components/sections/Contact.astro';
 import ToolsHub from '../../components/growthos/ToolsHub.astro';
-import { content } from '../../i18n/content';
+import WStyles from '../../components/w/WStyles.astro';
+import Cabecera from '../../components/w/sections/herramientas/Cabecera.astro';
+import ZonaFondo from '../../components/w/sections/herramientas/ZonaFondo.astro';
+import CierreDosTarjetas from '../../components/w/CierreDosTarjetas.astro';
+import { content, nap } from '../../i18n/content';
 import { clusterNavEn } from '../../i18n/clusters';
 import { GOS } from '../../i18n/growth-os';
+import { herramientasCopy } from '../../i18n/w/herramientas';
 import { GROWTH_OS } from '../../flags';
 
 if (!GROWTH_OS) return Astro.redirect('/en/');
 
 const c = content.en;
 const tt = GOS.en.tools;
+const w = herramientasCopy.en;
 const breadcrumb = [
   { name: 'Home', path: '/en' },
   { name: 'Tools', path: '/en/tools' },
 ];
+const num = nap.houston;
 ---
-<Layout title={tt.metaTitle} description={tt.metaDesc} lang="en" path="tools">
-  <SiteNav nav={{ ...clusterNavEn, cta: { ...clusterNavEn.cta, href: '/en#contacto' } }} lang="en" homeHref="/en" currentPath={Astro.url.pathname} />
+<Layout title={tt.metaTitle} description={tt.metaDesc} lang="en" path="tools" ds="v3">
+  <WStyles />
+  <SiteNav nav={{ ...clusterNavEn, cta: { ...clusterNavEn.cta, href: '#contacto' } }} lang="en" homeHref="/en" currentPath={Astro.url.pathname} />
 
-  <main id="main">
-    <LandingHero
-      variant="header"
-      tone="gold"
-      kicker="Tools"
-      h1={tt.h1}
-      sub={tt.sub}
-      primary={{ label: tt.calcCta, href: '#calls' }}
-    >
-      <Breadcrumb slot="breadcrumb" items={breadcrumb} lang="en" />
-    </LandingHero>
+  <main id="main" class="w-rails" data-w data-w-tone="gold">
+    <ZonaFondo lang="en">
+    <Cabecera eyebrow={w.eyebrow} h1Html={tt.h1} tail={w.tail} lead={w.lead}>
+      <Breadcrumb slot="crumbs" items={breadcrumb} lang="en" />
+    </Cabecera>
+    </ZonaFondo>
 
     <ToolsHub lang="en" />
 
-    <SpaceBackdrop tone="gold" />
+    <div class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <CierreDosTarjetas
+          titleHtml={w.cierre.titleHtml}
+          proof={w.cierre.proof}
+          city="houston"
+          tel={'tel:' + num.replace(/[^\d+]/g, '')}
+          wa={'https://wa.me/' + num.replace(/\D/g, '')}
+          lang="en"
+          warm={{ kind: 'diagnostico', title: tt.diagCardTitle, text: tt.diagCardSub, cta: tt.diagCardCta, href: '/en/checkup' }}
+        />
+      </div>
+    </div>
+
+    <Contact contact={c.contact} />
   </main>
 
   <SiteFooter footer={c.footer} lang="en" />

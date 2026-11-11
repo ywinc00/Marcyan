@@ -12,11 +12,16 @@ import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
 import Icon from '../ui/Icon.astro';
 import { t, type Lang } from '../../i18n/ui';
+import { nap } from '../../i18n/content';
 
 interface Props { hero: any; lang?: Lang }
 const { hero, lang = 'es' } = Astro.props;
 const uih = t(lang).hero;
 const uid = 'hero' + Math.random().toString(36).slice(2, 7);
+// Llamar en la primera pantalla del teléfono (dueño, 2026-11-07): en móvil domina llamar.
+// Línea principal (Houston). Desde lg no se pinta: ahí el dock con el formulario es la acción.
+const callNum = nap.houston.replace(/^\+1\s*/, '');
+const callHref = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
 ---
 <section class="hero" id="top" data-hero data-hint-tap={uih.tapHint} data-hint-hover={uih.hoverHint}>
   <div class="hero__stars" data-hero-stars aria-hidden="true"></div>
@@ -26,6 +31,10 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       <Kicker>{hero.tag}</Kicker>
       <h1 class="display hero__h1" set:html={hero.h1} />
       <p class="lead hero__sub">{hero.sub}</p>
+      <Button href={callHref} variant="primary" size="lg" class="hero__call" data-track="call_clicked">
+        <Icon name="lucide:phone" />
+        <span>{uih.call} {callNum}</span>
+      </Button>
       <nav class="hero__moons" aria-label={uih.exploreSite} data-hero-moons>
         {hero.nodes.map((n: any, i: number) => (
           <a class="moon" href={n.href} data-accent={i % 2 ? 'teal' : 'gold'}>
@@ -111,6 +120,8 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
   .hero__h1 { margin-top: var(--space-1); }
   .hero__h1 :global(em) { color: var(--accent-gold); font-style: normal; }
   .hero__sub { max-width: 50ch; }
+  .hero__headline :global(.hero__call) { gap: 10px; width: 100%; max-width: 22rem; }
+  .hero__headline :global(.hero__call svg) { width: 18px; height: 18px; flex: 0 0 auto; stroke-width: 1.75; }
 
   .hero__moons { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-1); }
   .moon {
@@ -140,9 +151,10 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
     text-transform: uppercase; color: var(--fg-secondary); white-space: nowrap; pointer-events: none;
   }
-  .hero__hint-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-gold); box-shadow: 0 0 0 0 var(--accent-gold-glow); animation: hpulse 2.4s ease-out infinite; }
-  @keyframes hpulse { 0% { box-shadow: 0 0 0 0 var(--accent-gold-glow); } 70% { box-shadow: 0 0 0 12px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
-  @media (--motion-reduce) { .hero__hint-dot { animation: none; } }
+  .hero__hint-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-gold); }
+  .hero__hint-dot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--accent-gold-glow); animation: hpulse 2.4s ease-out infinite; }
+  @keyframes hpulse { 0% { transform: scale(1); opacity: 1; } 70%, 100% { transform: scale(4); opacity: 0; } }
+  @media (--motion-reduce) { .hero__hint-dot::after { animation: none; opacity: 0; } }
 
   /* ── CTA dock — abajo, centro ──────────────────────────── */
   .hero__dock { display: flex; flex-direction: column; align-items: center; gap: var(--space-3); margin-top: var(--space-7); }
@@ -155,9 +167,10 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
 
   /* ── ≥ lg: titular izq · planeta der · Caso0 abajo-dcha · dock abajo-centro ── */
   @media (--lg) {
-    .hero { padding-top: calc(var(--nav-h) + var(--space-8)); padding-bottom: var(--space-10); min-height: 92svh; }
+    .hero { padding-top: calc(var(--nav-h) + var(--space-8)); padding-bottom: var(--space-10); min-height: min(calc(92svh / var(--z, 1)), 900px); }
     .hero__inner { grid-template-columns: 1.05fr 0.95fr; gap: var(--space-8); }
     .hero__stage { max-width: 440px; }
+    .hero__headline :global(.hero__call) { display: none; }
     .hero__dock { position: absolute; left: 50%; bottom: var(--space-7); transform: translateX(-50%); flex-direction: row; align-items: center; gap: var(--space-4); margin-top: 0; }
   }
 </style>
@@ -173,6 +186,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     box-shadow: 0 8px 26px rgba(0, 0, 0, 0.5); opacity: 0; will-change: transform, opacity;
     transition: border-color var(--duration-fast), box-shadow var(--duration-fast), background var(--duration-fast);
   }
+  .hero__orbit .hero-node:focus-visible { opacity: 1 !important; z-index: 7 !important; outline: 2px solid var(--accent-gold); outline-offset: 3px; }
   .hero__orbit .hero-node.teal { border-color: var(--accent-teal-line); }
   .hero__orbit .hero-node svg { width: 15px; height: 15px; color: var(--accent-gold); flex: 0 0 auto; }
   .hero__orbit .hero-node.teal svg { color: var(--accent-teal); }
@@ -189,6 +203,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
 </style>
 
 <script>
+  import { zrect, zoom } from '../w/zoom';
   const hero = document.querySelector('[data-hero]') as HTMLElement | null;
   if (hero) {
     const stage = hero.querySelector('[data-hero-stage]') as HTMLElement;
@@ -219,7 +234,7 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       starsEl.appendChild(frag);
       if (!document.getElementById('hstar-kf')) {
         const st = document.createElement('style'); st.id = 'hstar-kf';
-        st.textContent = '@keyframes hstar{0%,100%{opacity:.12}50%{opacity:.6}}';
+        st.textContent = '@keyframes hstar{0%,100%{opacity:.12}50%{opacity:.6}}[data-hero-stars].is-off>span{animation-play-state:paused}';
         document.head.appendChild(st);
       }
     })();
@@ -229,11 +244,11 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     let cx = 0, cy = 0, maxR = 0, isAuto = auto(), lastAuto = isAuto, activated = false;
     let energy = 0, target = 0;
     let tiltX = 0, tiltY = 0, tTiltX = 0, tTiltY = 0;
-    let rafId = 0, last = 0, running = false;
+    let rafId = 0, last = 0, running = false, onScreen = true;
     let ro: ResizeObserver | null = null;
 
     function measure() {
-      const r = stage.getBoundingClientRect();
+      const r = zrect(stage);
       cx = r.width / 2; cy = r.height / 2;
       maxR = Math.min(r.width, r.height) * 0.5;
     }
@@ -267,8 +282,10 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
     function frame(now: number) {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       energy += (target - energy) * Math.min(1, dt * 8); // emergencia rápida y natural
-      // en reposo total no tocamos el DOM (ahorra CPU/batería); el loop sigue barato
-      if (energy < 0.004 && target < 0.004) { rafId = requestAnimationFrame(frame); return; }
+      // En reposo total el bucle se DUERME (no pide más fotogramas): lo despierta wake()
+      // al pasar el cursor, al tocar o al volver a pantalla. Antes seguía a la frecuencia
+      // de la pantalla para siempre, también con el hero fuera de vista.
+      if (energy < 0.004 && target < 0.004) { energy = 0; hint.style.opacity = '1'; rafId = 0; return; }
       if (!isAuto) {
         tiltX += (tTiltX - tiltX) * Math.min(1, dt * 5);
         tiltY += (tTiltY - tiltY) * Math.min(1, dt * 5);
@@ -296,16 +313,42 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       rafId = requestAnimationFrame(frame);
     }
 
-    const onEnter = () => { if (!isAuto) target = 1; };
+    function wake() {
+      if (!running || rafId || !onScreen || document.hidden) return;
+      last = performance.now();
+      rafId = requestAnimationFrame(frame);
+    }
+    function sleep() { if (rafId) { cancelAnimationFrame(rafId); rafId = 0; } }
+    // Fuera de pantalla o con la pestaña oculta: ni bucle ni parpadeo de estrellas.
+    const io = new IntersectionObserver(([e]) => {
+      onScreen = e.isIntersecting;
+      starsEl?.classList.toggle('is-off', !onScreen);
+      if (onScreen) wake(); else sleep();
+    });
+    io.observe(hero);
+    document.addEventListener('visibilitychange', () => {
+      starsEl?.classList.toggle('is-off', document.hidden || !onScreen);
+      if (document.hidden) sleep(); else wake();
+    });
+    const onEnter = () => { if (!isAuto) { target = 1; wake(); } };
     const onLeave = () => { if (!isAuto) target = 0; };
     const onMove = (e: PointerEvent) => {
       if (isAuto) return;
       const hr = hero.getBoundingClientRect();
       tTiltY = ((e.clientX - hr.left) / hr.width - 0.5) * 6;
       tTiltX = -((e.clientY - hr.top) / hr.height - 0.5) * 4;
+      if (target > 0) wake();
     };
     // primer toque (móvil): recién entonces sale la órbita
-    const onActivate = () => { if (isAuto && !activated) { activated = true; target = 1; } };
+    const onActivate = () => { if (isAuto && !activated) { activated = true; target = 1; wake(); } };
+
+    // Teclado (WCAG 2.4.7): al tabular a una luna la órbita sale entera, como con el cursor.
+    const onFocusIn = (e: FocusEvent) => {
+      if ((e.target as HTMLElement).closest?.('.hero-node')) { activated = true; target = 1; wake(); }
+    };
+    const onFocusOut = (e: FocusEvent) => {
+      if (!isAuto && !(e.relatedTarget as HTMLElement | null)?.closest?.('.hero-node')) target = 0;
+    };
 
     function enable() {
       if (running) return;
@@ -326,16 +369,17 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       hero.addEventListener('pointermove', onMove);
       hero.addEventListener('pointerdown', onActivate);
       hero.addEventListener('click', onActivate);
+      hero.addEventListener('focusin', onFocusIn);
+      hero.addEventListener('focusout', onFocusOut);
       ro = new ResizeObserver(() => measure());
       ro.observe(stage);
       if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (running) measure(); });
-      last = performance.now();
-      rafId = requestAnimationFrame(frame);
+      rafId = 0; wake();
     }
     function disable() {
       if (!running) return;
       running = false;
-      cancelAnimationFrame(rafId);
+      sleep();
       hero.classList.remove('hero--orbital');
       orbit.innerHTML = '';
       stage.style.transform = '';
@@ -346,6 +390,8 @@ const uid = 'hero' + Math.random().toString(36).slice(2, 7);
       hero.removeEventListener('pointermove', onMove);
       hero.removeEventListener('pointerdown', onActivate);
       hero.removeEventListener('click', onActivate);
+      hero.removeEventListener('focusin', onFocusIn);
+      hero.removeEventListener('focusout', onFocusOut);
       if (ro) { ro.disconnect(); ro = null; }
     }
     function sync() {

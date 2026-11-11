@@ -1,0 +1,18 @@
+---
+// Plato de Your Restaurant: FOTO real (Unsplash, licencia libre; ids en design/ejemplos-v8.md).
+// 2026-11-08: el dueño pidió fotos reales («la comida dibujada hace que el ejemplo se vea pobre y el
+// cliente lo relaciona con cómo diseñamos»). Se conserva la interfaz del dibujo anterior.
+//   tacos      · tacos de asada con aguacate y cebolla (apaisada, foto grande del teléfono)
+//   enchiladas · birria con su consomé (cuadrada)
+//   arroz      · orden de tacos al pastor con salsas (cuadrada)
+// Decorativa: alt vacío; el nombre del plato va en texto al lado.
+interface Props { v: 'tacos' | 'enchiladas' | 'arroz'; uid?: string; class?: string }
+const { v, class: cls } = Astro.props;
+const F = { tacos: 'plato-tacos', enchiladas: 'plato-birria', arroz: 'plato-orden' }[v];
+const ancho = v === 'tacos';
+const ws = ancho ? [480, 960] : [240, 480];
+---
+<img class:list={['pi', cls]} src={`/fotos/ejemplos/${F}-${ws[0]}.webp`} srcset={ws.map((w) => `/fotos/ejemplos/${F}-${w}.webp ${w}w`).join(', ')} sizes={ancho ? '260px' : '64px'} width={ancho ? 240 : 120} height={ancho ? 150 : 120} alt="" loading="lazy" decoding="async" />
+<style>
+  .pi { display: block; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+</style>

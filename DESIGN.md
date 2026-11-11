@@ -25,6 +25,16 @@ Fuente única de tokens: `src/styles/tokens.css`. Breakpoints: `src/styles/media
 
 **Solo tokens, nunca hardcode.** Excepción ya existente: maquetas realistas (laptop/teléfono en `Projects.astro`) usan grises de hardware crudos; no es plantilla a seguir en otros sitios.
 
+> **Enmienda 2026-11-01 · rediseño WorkOS (sistema v3).** Aprobado por el dueño; detalle y valores en
+> `design/rediseno-workos.md` (manda sobre este archivo SOLO en sus 11 cambios globales, §1.B).
+> - **Iconos-objeto propios (7)** para representar PRODUCTOS (uno por `id` de `pricing.ts`, en
+>   `src/components/w/IconoObjeto.astro` + sprite `w/objects/`): cuadrado en relieve con glifo propio
+>   dibujado en SVG con los tokens. **Lucide sigue para la UI funcional** (flechas, teléfono, check,
+>   menú, migas). `marcyan-ai` sigue siendo el único Lucide-like relleno.
+> - **Tokens nuevos aparte** en `src/styles/w-tokens.css` (`--w-*`, solo variables, derivados de
+>   `tokens.css`, que no se edita) y clases `.w-*` en `src/styles/w.css`, que solo cargan las páginas
+>   con `Layout ds="v3"`. Portada y hubs de ciudad no llevan `ds` y no cambian (cerrojos de §2.13).
+
 ---
 
 ## 1) El fondo (KEYSTONE) — `SpaceBackdrop`
@@ -82,6 +92,11 @@ no pintan fondo propio** → basta poner una atmósfera detrás del contenido.
   y guiones en titulares). Sin copy de relleno ("soluciones innovadoras"): claims reales con cifra/entregable.
 - **NO** stock / imágenes nuevas binarias → **SÍ** **ilustración inline SVG** line-art (oro/teal,
   baja opacidad, `aria-hidden`), en la línea del skyline/siluetas de `Locations.astro`.
+- **Enmienda v3 (rediseño WorkOS, G5):** en las páginas `ds="v3"` cada sección enseña el **objeto del
+  servicio** como mini-UI redibujada en HTML/CSS/SVG (web en móvil, ficha de mapa, chat de Marcy,
+  pedidos, plano de marca, respuesta de asistente…), con datos de EJEMPLO rotulados "Ejemplo". Las
+  capturas REALES de clientes solo en prueba y casos, nunca como arte de hero u objeto (E-32). Detalle
+  en `design/rediseno-workos.md` §2.4 y §3.6.
 
 ---
 
@@ -208,6 +223,10 @@ mismo pero no lo son"; `marcyan-ai` (marca, filled) reservado a **un solo** slot
   asignar el **icono Lucide preciso** de cada concepto (p. ej. automatizaciones `waypoints`; IA
   conversacional `messages-square`/`bot-message-square`; búsqueda/SEO `scan-search`/`search`; velocidad
   `gauge`; reseñas `star`; NAP/ficha `map-pinned`; multilingüe `languages`). Una sola familia Lucide 1.5px.
+- **Enmienda v3 (rediseño WorkOS, G6):** los 7 **productos** se representan con iconos-objeto propios
+  (`w/IconoObjeto.astro`, 40-80 px, acento oro; teal en IA conversacional y SEO para IA) en páginas v3,
+  megamenú y tarjetas de servicio de portada y hubs. Lucide queda para la interfaz funcional. Ver
+  `design/rediseno-workos.md` §2.8.
 
 ### 8.5 Blog — navegación + ilustraciones PROPIAS
 Referencia de **principios** (no clonar marca/look): onceonceagency.com/blog → tarjetas **image-forward**

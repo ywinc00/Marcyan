@@ -1,21 +1,43 @@
 ---
-// Hub de herramientas gratis (Growth OS): 2 calculadoras client-side puras (sin IA,
-// sin fetch) + card al diagnóstico. Ponen número a una sospecha con los inputs del
-// usuario y prefijo "≈" (nunca una cifra fabricada). Fórmulas documentadas abajo.
+// Calculadoras gratis (Growth OS) con la piel v3 del rediseño WorkOS
+// (design/rediseno-workos.md §4.10; W-CONV-03 + W-CORE-22 + W-CONV-05 + W-CONV-06).
+// 2 calculadoras client-side puras (sin IA, sin fetch): ponen número a una sospecha
+// con los datos del visitante y prefijo "≈" (nunca una cifra fabricada).
+//
+// CONTRATO (no cambia con la piel): data-calc, data-role, data-out, data-val, data-fmt,
+// data-marcy; ids #llamadas/#citas (ES) y #calls/#appointments (EN), que enlazan Marcy,
+// blog.ts y clusters.en.ts; fórmulas de lib/tools-formulas.mjs (fuente única, test de
+// paridad en scripts/test-chat-guard.mjs); eventos calculator_started/completed,
+// calc_marcy_opened (mrc:ask con los números del visitante, sin PII) y tool_cta_clicked.
+//
+// Piel: tarjeta de 1200 (radio 22, borde 1 px) con cabecera de 116 (icono-objeto 56,
+// título 24/500, descripción 16, "Revisar mi caso ›"), cuerpo 760/440: deslizadores
+// (carril 6 px, tirador 28 con anillo crema 3 px) y total vivo | panel con el desglose
+// de las MISMAS fórmulas. Banda W-CONV-05 dentro de la tarjeta (Marcy). La calculadora 1
+// va en superficie elevada (contraste de la página). Degradado (único de la página): el
+// total de la calculadora activa. Sin data-w-in / data-w-reveal: son campos (§2.9).
 import { GOS } from '../../i18n/growth-os';
+import { herramientasCopy } from '../../i18n/w/herramientas';
 import Icon from '../ui/Icon.astro';
-import { computeMissedCalls, computeNoShows } from '../../../lib/tools-formulas.mjs';
+import Button from '../ui/Button.astro';
+import IconoObjeto from '../w/IconoObjeto.astro';
+import { computeMissedCalls, computeNoShows, WEEKS_PER_MONTH, NOSHOW_RECOVERY } from '../../../lib/tools-formulas.mjs';
 import './range.css';
 
 interface Props { lang: 'es' | 'en' }
 const { lang } = Astro.props;
 const tt = GOS[lang].tools;
+const w = herramientasCopy[lang];
 const diagHref = lang === 'en' ? '/en/checkup' : '/es/diagnostico';
 // Ids de ancla por idioma para deep-links (Marcy y las landings enlazan aquí).
 const ids = lang === 'en' ? { calls: 'calls', appt: 'appointments' } : { calls: 'llamadas', appt: 'citas' };
 
-const nf = new Intl.NumberFormat(lang === 'en' ? 'en-US' : 'es-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+const loc = lang === 'en' ? 'en-US' : 'es-US';
+const nf = new Intl.NumberFormat(loc, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+const n0 = new Intl.NumberFormat(loc, { maximumFractionDigits: 0 });
+const n1 = new Intl.NumberFormat(loc, { maximumFractionDigits: 1 });
 const fmtVal = (v: number, kind: string) => (kind === 'cur' ? nf.format(v) : kind === 'pct' ? `${v}%` : String(v));
+const pct = (s: { min: number; max: number; val: number }) => ((s.val - s.min) / (s.max - s.min)) * 100;
 
 // Calc 1 — llamadas perdidas: perdidasMes = callsWeek·4.33·(missed/100);
 //          perdidaUSD = perdidasMes·ticket·(close/100).
@@ -35,125 +57,255 @@ const apptSliders = [
 // Valores iniciales desde la fuente única (mismos defaults que los sliders).
 const initCalls = computeMissedCalls({ llamadas_semana: 25, pct_sin_contestar: 20, ticket: 350, tasa_cierre: 30 }).monthly;
 const initAppt = computeNoShows({ citas_semana: 40, pct_no_show: 15, valor_cita: 65 }).monthly;
+// Desglose inicial (mismas cuentas que el script de abajo).
+const c1 = 25 * WEEKS_PER_MONTH, c2 = c1 * 0.2, c3 = c2 * 0.3;
+const a1 = 40 * WEEKS_PER_MONTH, a2 = a1 * 0.15, a3 = a2 * NOSHOW_RECOVERY;
+
+const cards = [
+  {
+    type: 'calls', id: ids.calls, title: tt.calcCallsTitle, sub: tt.calcCallsSub, sliders: callsSliders,
+    outLbl: tt.outCalls, init: initCalls, copy: w.calls, bd: [n0.format(c1), n0.format(c2), n1.format(c3), nf.format(350)],
+    icon: 'marcy', elevated: true,
+  },
+  {
+    type: 'appt', id: ids.appt, title: tt.calcApptTitle, sub: tt.calcApptSub, sliders: apptSliders,
+    outLbl: tt.outAppt, init: initAppt, copy: w.appt, bd: [n0.format(a1), n0.format(a2), n1.format(a3), nf.format(65)],
+    icon: 'calendar', elevated: false,
+  },
+];
 ---
-<section class="gtool">
-  <div class="container">
-    <div class="gtool__grid">
+<section class="tc-wrap" data-w-tone="gold">
+  <div class="w-container tc-stack">
+    {cards.map((c, i) => (
+      <article
+        class:list={['tc', c.elevated && 'tc--elevated']}
+        data-calc={c.type}
+        id={c.id}
+        data-active={i === 0 ? '' : undefined}
+        aria-labelledby={`${c.id}-t`}
+      >
+        <header class="tc__head">
+          {c.icon === 'marcy'
+            ? <IconoObjeto id="ia-conversacional" size={56} tone="gold" class="tc__icon" />
+            : <span class="tc__icon tc__icon--lucide" aria-hidden="true"><Icon name="lucide:calendar-check" /></span>}
+          <div class="tc__intro">
+            <h2 class="tc__title" id={`${c.id}-t`}>{c.title}</h2>
+            <p class="tc__sub">{c.sub}</p>
+          </div>
+          <a class="tc__case" href={diagHref} data-track="tool_cta_clicked">{tt.calcCta}<span class="tc__chev" aria-hidden="true">›</span></a>
+        </header>
 
-      <div class="gtcard" data-calc="calls" id={ids.calls}>
-        <h2 class="gtcard__title">{tt.calcCallsTitle}</h2>
-        <p class="gtcard__sub">{tt.calcCallsSub}</p>
-        <div class="gtcard__sliders">
-          {callsSliders.map((s) => (
-            <label class="gtsl">
-              <span class="gtsl__lbl">{s.label}<b data-val data-fmt={s.fmt}>{fmtVal(s.val, s.fmt)}</b></span>
-              <input class="gos-range" type="range" min={s.min} max={s.max} step={s.step} value={s.val} data-role={s.role} aria-label={s.label} />
-            </label>
-          ))}
-        </div>
-        <div class="gtcard__out">
-          <span class="gtcard__outlbl">{tt.outCalls}</span>
-          <strong class="gtcard__num" data-out>≈ {nf.format(initCalls)}</strong>
-        </div>
-        <p class="gtcard__disc">{tt.calcDisclaimer}</p>
-        <div class="gtcard__actions">
-          <a class="gtcard__cta" href={diagHref} data-track="tool_cta_clicked">{tt.calcCta} <Icon name="lucide:arrow-right" /></a>
-          <button type="button" class="gtcard__cta gtcard__cta--marcy" data-marcy>{tt.calcMarcy} <Icon name="lucide:messages-square" /></button>
-        </div>
-      </div>
+        <div class="tc__body">
+          <div class="tc__main">
+            <div class="tc__sliders">
+              {c.sliders.map((s) => (
+                <label class="tc-sl">
+                  <span class="tc-sl__row">
+                    <span class="tc-sl__lbl">{s.label}</span>
+                    <b class="tc-sl__val" data-val data-fmt={s.fmt}>{fmtVal(s.val, s.fmt)}</b>
+                  </span>
+                  <input class="gos-range" type="range" min={s.min} max={s.max} step={s.step} value={s.val} data-role={s.role} aria-label={s.label} style={`--p:${pct(s).toFixed(2)}%`} />
+                </label>
+              ))}
+            </div>
 
-      <div class="gtcard" data-calc="appt" id={ids.appt}>
-        <h2 class="gtcard__title">{tt.calcApptTitle}</h2>
-        <p class="gtcard__sub">{tt.calcApptSub}</p>
-        <div class="gtcard__sliders">
-          {apptSliders.map((s) => (
-            <label class="gtsl">
-              <span class="gtsl__lbl">{s.label}<b data-val data-fmt={s.fmt}>{fmtVal(s.val, s.fmt)}</b></span>
-              <input class="gos-range" type="range" min={s.min} max={s.max} step={s.step} value={s.val} data-role={s.role} aria-label={s.label} />
-            </label>
-          ))}
-        </div>
-        <div class="gtcard__out">
-          <span class="gtcard__outlbl">{tt.outAppt}</span>
-          <strong class="gtcard__num" data-out>≈ {nf.format(initAppt)}</strong>
-        </div>
-        <p class="gtcard__disc">{tt.calcDisclaimer}</p>
-        <div class="gtcard__actions">
-          <a class="gtcard__cta" href={diagHref} data-track="tool_cta_clicked">{tt.calcCta} <Icon name="lucide:arrow-right" /></a>
-          <button type="button" class="gtcard__cta gtcard__cta--marcy" data-marcy>{tt.calcMarcy} <Icon name="lucide:messages-square" /></button>
-        </div>
-      </div>
+            <div class="tc__out">
+              <span class="tc__outlbl">{c.outLbl}</span>
+              <strong class="tc__num" data-out>≈ {nf.format(c.init)}</strong>
+              <p class="tc__disc">{tt.calcDisclaimer}</p>
+            </div>
 
-      <a class="gtcard gtcard--diag" href={diagHref} data-track="tool_cta_clicked">
-        <span class="gtcard__diag-ic"><Icon name="lucide:scan-search" /></span>
-        <h2 class="gtcard__title">{tt.diagCardTitle}</h2>
-        <p class="gtcard__sub">{tt.diagCardSub}</p>
-        <span class="gtcard__cta gtcard__cta--ghost">{tt.diagCardCta} <Icon name="lucide:arrow-right" /></span>
-      </a>
+            <div class="tc__band">
+              <div class="tc__band-text">
+                <p class="tc__band-t">{c.copy.band.title}</p>
+                <p class="tc__band-x">{c.copy.band.text}</p>
+              </div>
+              <div class="tc__band-acts">
+                <Button variant="primary" size="md" href="#contacto" data-track="tool_cta_clicked">{w.bandCta}</Button>
+                <Button variant="link" data-marcy>{w.bandMarcy}</Button>
+              </div>
+            </div>
+          </div>
 
-    </div>
+          <aside class="tc__panel" aria-label={w.panelTitle}>
+            <p class="tc__panel-t">{w.panelTitle}</p>
+            <dl class="tc__bd">
+              {c.copy.rows.map((r, k) => (
+                <div class="tc__bdrow">
+                  <dt>{r}</dt>
+                  <dd>{k < 3 ? '≈ ' : '× '}<span data-bd={k + 1}>{c.bd[k]}</span></dd>
+                </div>
+              ))}
+              <div class="tc__bdrow tc__bdrow--total">
+                <dt>{w.totalRow}</dt>
+                <dd>≈ <span data-bd="total">{nf.format(c.init)}</span></dd>
+              </div>
+            </dl>
+            <p class="tc__note">{c.copy.note}</p>
+          </aside>
+        </div>
+      </article>
+    ))}
   </div>
 </section>
 
 <style>
-  .gtool { padding-block: var(--section-gap); }
-  .gtool__grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-6); align-items: start; }
-  .gtcard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-card); padding: clamp(var(--space-5), 3vw, var(--space-7));
-            display: flex; flex-direction: column;
-            scroll-margin-top: calc(var(--nav-h) + var(--space-4)); }
-  .gtcard__title { font-family: var(--font-display); font-size: var(--text-lg); color: var(--fg-primary);
-                   letter-spacing: var(--tracking-tight); margin: 0 0 var(--space-2); }
-  .gtcard__sub { color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); margin: 0 0 var(--space-5); }
-  .gtcard__sliders { display: grid; gap: var(--space-5); margin-bottom: var(--space-6); }
-  .gtsl { display: grid; gap: var(--space-3); }
-  .gtsl__lbl { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3);
-               font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
-               text-transform: uppercase; color: var(--fg-secondary); }
-  .gtsl__lbl b { color: var(--accent-gold); font-size: var(--text-sm); font-weight: 600; }
-  .gtcard__out { border-top: 1px solid var(--border-subtle); padding-top: var(--space-5); margin-top: auto; }
-  .gtcard__outlbl { display: block; font-family: var(--font-mono); font-size: var(--text-xs);
-                    letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); margin-bottom: var(--space-2); }
-  .gtcard__num { font-family: var(--font-mono); font-size: var(--text-3xl); font-weight: 600; color: var(--accent-gold);
-                 line-height: 1; letter-spacing: var(--tracking-tight); }
-  .gtcard__disc { font-size: var(--text-xs); color: var(--fg-subtle); line-height: var(--leading-normal); margin: var(--space-3) 0 var(--space-5); }
-  .gtcard__cta { display: inline-flex; align-items: center; gap: var(--space-2); align-self: flex-start;
-                 min-height: var(--tap-min); font-family: var(--font-mono); font-size: var(--text-sm);
-                 letter-spacing: var(--tracking-wide); color: var(--accent-gold); text-decoration: none;
-                 transition: gap var(--duration-base) var(--ease); }
-  .gtcard__cta svg { width: 16px; height: 16px; }
-  .gtcard__cta:hover { gap: var(--space-3); }
-  .gtcard__actions { display: flex; align-items: center; gap: var(--space-6); flex-wrap: wrap; }
-  /* Puente a Marcy: mismo lenguaje que el CTA, en teal (el color de Marcy). */
-  .gtcard__cta--marcy { background: none; border: 0; padding: 0; cursor: pointer; color: var(--accent-teal); }
+  /* Asoma a 80 px del hero (W-CONV-01): sin línea de celda encima, el hero la cierra. */
+  .tc-wrap { position: relative; z-index: 1; padding-block: 80px var(--w-section-y); }
+  .tc-stack { display: grid; gap: 32px; }
 
-  .gtcard--diag { grid-column: 1 / -1; text-decoration: none; align-items: flex-start;
-                  transition: border-color var(--duration-base) var(--ease), box-shadow var(--duration-base) var(--ease); }
-  .gtcard--diag:hover { border-color: var(--border-accent); box-shadow: var(--shadow-hover); }
-  .gtcard__diag-ic { display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--radius-md);
-                     background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); margin-bottom: var(--space-4); }
-  .gtcard__diag-ic svg { width: 22px; height: 22px; color: var(--accent-gold); }
-  .gtcard__cta--ghost { margin-top: var(--space-4); }
+  .tc {
+    max-width: var(--w-rail-max); width: 100%; margin-inline: auto;
+    background: var(--w-s2); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-tray); box-shadow: var(--w-edge); overflow: hidden;
+    scroll-margin-top: calc(var(--nav-h) + 24px);
+  }
+  /* Contraste de la página: la calculadora 1 en superficie elevada (§4.10). */
+  .tc--elevated { background: var(--w-contrast-bg); border-color: var(--w-line-strong); }
 
-  @media (max-width: 767px) {
-    .gtool__grid { grid-template-columns: 1fr; }
+  /* ── Cabecera 116 ── */
+  .tc__head {
+    display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center;
+    gap: 12px 24px; padding: 28px 32px; border-bottom: 1px solid var(--w-line);
+  }
+  .tc--elevated .tc__head { border-bottom-color: var(--w-line-strong); }
+  .tc__icon--lucide {
+    display: grid; place-items: center; width: 56px; height: 56px; border-radius: 14px;
+    background: linear-gradient(180deg, #232321, #141414);
+    border: 1.2px solid rgba(var(--accent-gold-rgb), .6); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12);
+  }
+  .tc__icon--lucide :global(svg) { width: 28px; height: 28px; color: var(--accent-gold); }
+  .tc__title {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: var(--w-h3); line-height: 1.2; letter-spacing: var(--w-tr-h3); color: var(--w-ink);
+  }
+  .tc__sub { margin: 4px 0 0; font-family: var(--font-body); font-size: 16px; line-height: 1.5; color: var(--w-ink-70); }
+  .tc__case {
+    grid-column: 1 / -1; justify-self: start;
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 0;
+    font: 500 16px/1 var(--font-body); color: var(--w-ink); text-decoration: none;
+    transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .tc__chev { font-size: 18px; line-height: 1; color: var(--accent-gold); transition: transform var(--w-dur-hover) var(--w-ease-ui); }
+  @media (--hover-fine) {
+    .tc__case:hover { color: var(--accent-gold); }
+    .tc__case:hover .tc__chev { transform: translateX(3px); }
+  }
+  .tc__case:focus-visible .tc__chev { transform: translateX(3px); }
+  @media (--md) {
+    .tc__head { grid-template-columns: auto minmax(0, 1fr) auto; min-block-size: 116px; padding-block: 24px; }
+    .tc__case { grid-column: auto; justify-self: end; }
+  }
+
+  /* ── Cuerpo 760 / 440 ── */
+  .tc__body { display: grid; grid-template-columns: 1fr; }
+  @media (--lg) { .tc__body { grid-template-columns: minmax(0, 760fr) minmax(0, 440fr); } }
+  .tc__main { padding: 32px; display: flex; flex-direction: column; min-width: 0; }
+
+  .tc__sliders { display: grid; gap: 22px; }
+  .tc-sl { display: grid; gap: 12px; cursor: pointer; }
+  .tc-sl__row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; }
+  .tc-sl__lbl { font-family: var(--font-body); font-size: 15px; line-height: 1.4; color: var(--w-ink-80); }
+  .tc-sl__val {
+    font-family: var(--font-display); font-weight: 500; font-size: 20px; line-height: 1;
+    letter-spacing: -0.01em; color: var(--w-ink); font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+
+  .tc__out { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--w-line); }
+  .tc--elevated .tc__out { border-top-color: var(--w-line-strong); }
+  .tc__outlbl { display: block; font-family: var(--font-body); font-size: 15px; line-height: 1.4; color: var(--w-ink-70); margin-bottom: 8px; }
+  .tc__num {
+    display: inline-block; font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(2.25rem, 1.6rem + 1.8vw, 3.25rem); line-height: 1.05; letter-spacing: -0.035em;
+    color: var(--w-ink); font-variant-numeric: tabular-nums;
+  }
+  /* Degradado único de la página: el total de la calculadora activa (§2.11). */
+  .tc[data-active] .tc__num {
+    background: var(--w-grad); -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+  }
+  @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+    .tc[data-active] .tc__num { color: var(--accent-gold); -webkit-text-fill-color: currentColor; }
+  }
+  .tc__disc { margin: 10px 0 0; max-width: 34rem; font-family: var(--font-body); font-size: 13px; line-height: 1.5; color: var(--w-ink-60); }
+
+  /* ── Banda W-CONV-05: un escalón distinto de la tarjeta con luz oro que sube desde la
+     esquina inferior derecha (degradado liso: nada con detalle detrás del texto, E-37). ── */
+  .tc__band {
+    position: relative; overflow: hidden; isolation: isolate;
+    margin-top: 28px; padding: 16px 16px 16px 24px; border-radius: var(--w-r-obj);
+    background: var(--w-s1); border: 1px solid var(--w-line);
+    display: flex; align-items: center; justify-content: space-between; gap: 16px 24px; flex-wrap: wrap;
+  }
+  .tc--elevated .tc__band { background: var(--w-s2); border-color: var(--w-line-strong); }
+  .tc__band::after {
+    content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(70% 140% at 100% 100%, rgba(var(--accent-gold-rgb), .16), rgba(var(--accent-gold-rgb), .05) 45%, transparent 75%);
+  }
+  .tc__band-text { min-width: 0; flex: 1 1 260px; }
+  .tc__band-t { margin: 0; font-family: var(--font-body); font-weight: 500; font-size: 16px; line-height: 1.35; color: var(--w-ink); }
+  .tc__band-x { margin: 2px 0 0; font-family: var(--font-body); font-size: 14px; line-height: 1.45; color: var(--w-ink-70); }
+  .tc__band-acts { display: flex; align-items: center; gap: 8px 20px; flex-wrap: wrap; }
+
+  /* ── Panel W-CONV-06: el desglose de las mismas fórmulas ── */
+  .tc__panel { background: var(--w-s1); padding: 32px; border-top: 1px solid var(--w-line); }
+  .tc--elevated .tc__panel { background: rgba(var(--star-rgb), .035); border-color: var(--w-line-strong); }
+  @media (--lg) { .tc__panel { border-top: 0; border-left: 1px solid var(--w-line); } .tc--elevated .tc__panel { border-left-color: var(--w-line-strong); } }
+  .tc__panel-t { margin: 0 0 12px; font-family: var(--font-display); font-weight: 500; font-size: 16px; line-height: 1.3; color: var(--w-ink); }
+  .tc__bd { margin: 0; }
+  .tc__bdrow {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+    min-block-size: 40px; padding-block: 10px;
+    font-family: var(--font-body); font-size: 15px; line-height: 1.4;
+  }
+  .tc__bdrow + .tc__bdrow { border-top: 1px solid var(--w-line); }
+  .tc__bdrow dt { color: var(--w-ink-80); min-width: 0; }
+  .tc__bdrow dd { margin: 0; white-space: nowrap; color: var(--w-ink-70); font-variant-numeric: tabular-nums; }
+  .tc__bdrow dd span { font-size: 16px; font-weight: 500; color: var(--w-ink); }
+  /* Fila del total: cierra la cuenta con una línea fuerte (sin degradado: ese es del total grande). */
+  .tc .tc__bdrow--total { border-top: 1px solid var(--w-line-strong); margin-top: 4px; }
+  .tc__bdrow--total dt { color: var(--w-ink); font-weight: 500; }
+  .tc__bdrow--total dd span { font-family: var(--font-display); font-size: 20px; letter-spacing: -0.01em; }
+  .tc__note {
+    margin: 20px 0 0; padding: 14px 16px; border: 1px solid var(--w-line-strong); border-radius: var(--w-r-cell);
+    font-family: var(--font-body); font-size: 14px; line-height: 1.5; color: var(--w-ink-70);
+  }
+
+  @media (--lt-md) {
+    .tc-wrap { padding-top: 56px; }
+    /* Móvil: el icono encima y el título a todo el ancho (sin sangría de 80 px). */
+    .tc__head { grid-template-columns: 1fr; gap: 16px; }
+    .tc__head :global(.tc__icon) { width: 48px; height: 48px; }
+    .tc__head, .tc__main, .tc__panel { padding-inline: 20px; }
+    .tc__main { padding-block: 24px; }
+    .tc__band { padding: 16px; }
+    .tc__band-acts { gap: 8px 16px; }
+  }
+  @media (--motion-reduce) {
+    .tc__chev { transition: none; }
+    .tc__case:hover .tc__chev, .tc__case:focus-visible .tc__chev { transform: none; }
   }
 </style>
 
 <script>
   import { track } from '../../lib/track.js';
-  import { computeMissedCalls, computeNoShows } from '../../../lib/tools-formulas.mjs';
+  import { computeMissedCalls, computeNoShows, WEEKS_PER_MONTH, NOSHOW_RECOVERY } from '../../../lib/tools-formulas.mjs';
 
   const lang = document.documentElement.lang === 'en' ? 'en' : 'es';
-  const nf = new Intl.NumberFormat(lang === 'en' ? 'en-US' : 'es-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+  const loc = lang === 'en' ? 'en-US' : 'es-US';
+  const nf = new Intl.NumberFormat(loc, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+  const n0 = new Intl.NumberFormat(loc, { maximumFractionDigits: 0 });
+  const n1 = new Intl.NumberFormat(loc, { maximumFractionDigits: 1 });
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const bucket = (v) => (v < 1000 ? '<1k' : v < 5000 ? '1-5k' : v < 15000 ? '5-15k' : '15k+');
+  const cards = [...document.querySelectorAll('[data-calc]')];
 
-  document.querySelectorAll('[data-calc]').forEach((card) => {
+  cards.forEach((card) => {
     const type = card.dataset.calc;
     const inputs = [...card.querySelectorAll('input[type=range]')];
     const out = card.querySelector('[data-out]');
     const get = (role) => Number(card.querySelector(`input[data-role=${role}]`)?.value || 0);
+    const bd = (k, v) => { const el = card.querySelector(`[data-bd="${k}"]`); if (el) el.textContent = v; };
     let started = false;
     let cur = numFromOut(out);
     let doneTimer = null;
@@ -165,11 +317,29 @@ const initAppt = computeNoShows({ citas_semana: 40, pct_no_show: 15, valor_cita:
       return computeNoShows({ citas_semana: get('apptWeek'), pct_no_show: get('noShow'), valor_cita: get('apptValue') }).monthly;
     }
 
+    // Desglose del panel: los mismos factores de la fórmula, paso a paso.
+    function breakdown() {
+      if (type === 'calls') {
+        const a = get('callsWeek') * WEEKS_PER_MONTH, b = a * get('missed') / 100, c = b * get('close') / 100;
+        bd(1, n0.format(a)); bd(2, n0.format(b)); bd(3, n1.format(c)); bd(4, nf.format(get('ticket')));
+      } else {
+        const a = get('apptWeek') * WEEKS_PER_MONTH, b = a * get('noShow') / 100, c = b * NOSHOW_RECOVERY;
+        bd(1, n0.format(a)); bd(2, n0.format(b)); bd(3, n1.format(c)); bd(4, nf.format(get('apptValue')));
+      }
+      bd('total', nf.format(compute()));
+    }
+
     function fmtLabel(input) {
-      const b = input.closest('.gtsl').querySelector('[data-val]');
+      const b = input.closest('.tc-sl').querySelector('[data-val]');
       const kind = b.dataset.fmt;
       const v = Number(input.value);
       b.textContent = kind === 'cur' ? nf.format(v) : kind === 'pct' ? `${v}%` : String(v);
+    }
+
+    // Carril recorrido en oro (variable --p del fondo del input).
+    function fill(input) {
+      const min = Number(input.min), max = Number(input.max), v = Number(input.value);
+      input.style.setProperty('--p', `${((v - min) / (max - min)) * 100}%`);
     }
 
     function animateTo(target) {
@@ -187,7 +357,11 @@ const initAppt = computeNoShows({ citas_semana: 40, pct_no_show: 15, valor_cita:
 
     inputs.forEach((input) => {
       input.addEventListener('input', () => {
+        // La calculadora que se toca pasa a ser la activa (lleva el degradado).
+        if (!card.hasAttribute('data-active')) { cards.forEach((c) => c.removeAttribute('data-active')); card.setAttribute('data-active', ''); }
         fmtLabel(input);
+        fill(input);
+        breakdown();
         animateTo(compute());
         if (!started) { started = true; track('calculator_started', { type }); }
         clearTimeout(doneTimer);

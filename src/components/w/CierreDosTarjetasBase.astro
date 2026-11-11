@@ -1,0 +1,313 @@
+---
+// Cierre en dos tarjetas por temperatura (design/rediseno-workos.md §3.2; W-CORE-15).
+// Sustituye a CtaBand en las páginas v3 (y en los hubs, ola 4).
+// · Grande (fría, decidida): titular 32/40, prueba real 16/24 en 340 px y el TRÍO
+//   contractual exactamente una vez: a.ctaband__act--form[proposal_requested] → #contacto,
+//   a.ctaband__act--wa[whatsapp_clicked], a.ctaband__act--call[call_clicked].
+//   Dominante por dispositivo SIN `order` (WCAG 1.3.2/2.4.3): el DOM es fijo
+//   (formulario · WhatsApp · llamar) y solo cambia la piel por punto de corte:
+//   escritorio = formulario como botón principal; móvil = Llamar como principal.
+// · Pequeña (templada): diagnóstico, "Pregúntale a Marcy" (evento mrc:ask con texto
+//   FIJO de la página, sin datos del visitante) o portafolio, con enlace con chevron.
+// · Tarjeta "Marcy" (v2, G00): deja de estar vacía. En su tercio inferior, ChatMarcy compacto
+//   (objeto de ejemplo, aria-hidden + resumen sr-only) con la MISMA pregunta fija que envía el
+//   botón y una respuesta que no promete nada; el botón sigue siendo el control real.
+//   `chat`: 'vivo' (bucle) por defecto; 'ligero' en los hubs (id vacío): los hubs ya van
+//   +10,2 KB sobre producción y su viaje admite ±40 px, así que ahí no se pinta ChatMarcy (su
+//   JS, su bucle y +190 px de alto): solo la cabecera de Marcy y su saludo, sin JS,
+//   en el hueco que ya tenía la tarjeta en escritorio, y nada en móvil (allí la tarjeta no
+//   tiene hueco). Hasta que G02 recupere margen (§4.6). 'no' = sin chat.
+// · Tarjeta "diagnóstico" (control v2 r1, M2): ranura `obj` con un objeto de producto al pie
+//   (el informe de ejemplo, ObjPerfil); la rellena CierreDosTarjetas, nunca los hubs (peso).
+// · tel/wa SIEMPRE por props (nunca calculados aquí).
+// El botón principal reproduce la piel de Button variant="primary" (intacta) y el
+// enlace la de variant="link": los dos estados viven en el mismo <a> porque cambian
+// por punto de corte. Cerrojo 5: sale de v3, TODO su CSS va aquí.
+import Button from '../ui/Button.astro';
+import { protegerNombres } from '../../lib/nombres-clientes';
+import { t, type Lang } from '../../i18n/ui';
+import Ejemplo from './Ejemplo.astro';
+// Ojo de peso: esta BASE no importa ChatMarcy, para que Astro no adjunte su CSS (~1,0 KB
+// comprimido) a las páginas que no lo pintan. La usan directamente los hubs (CityHub, chat
+// 'ligero'). El resto de páginas importa CierreDosTarjetas.astro, que envuelve esta base y mete
+// ChatMarcy en la ranura 'chat' cuando el modo es 'vivo' (pendiente de G00/G02, integración v2).
+import { cierreChat } from '../../i18n/w/globales';
+
+interface Warm {
+  kind: 'diagnostico' | 'marcy' | 'portafolio';
+  title: string;
+  text: string;
+  /** Rótulo del enlace de la tarjeta pequeña. */
+  cta: string;
+  href?: string;
+  /** Texto fijo que se envía a Marcy (solo kind="marcy"). */
+  ask?: string;
+}
+interface Props {
+  titleHtml: string;
+  proof: string;
+  city?: 'houston' | 'miami';
+  tel: string;
+  wa: string;
+  lang?: Lang;
+  warm: Warm;
+  grad?: boolean;
+  formLabel?: string;
+  /** id de la sección; vacío = sin id (hubs: el tramo del viaje no lo llevaba). */
+  id?: string;
+  /** id del titular si no vale el derivado `${id}-title` (hubs: hx-cta-t, el de antes). */
+  titleId?: string;
+  /** Chat de ejemplo en la tarjeta "Marcy": vivo (bucle), estático o sin chat. */
+  chat?: 'vivo' | 'ligero' | 'no';
+  class?: string;
+}
+const {
+  titleHtml, proof, city = 'houston', tel, wa, lang = 'es', warm, grad = false,
+  formLabel, id = 'cierre', titleId: titleIdProp, chat: chatProp, class: cls,
+} = Astro.props;
+const ui = t(lang);
+const form = formLabel ?? (lang === 'en' ? 'Get my free proposal' : 'Propuesta gratis');
+const titleId = titleIdProp ?? `${id || 'cierre'}-title`;
+const warmTrack = warm.kind === 'diagnostico' ? 'tool_cta_clicked' : undefined;
+// Hubs = id vacío (el tramo del viaje no lleva id): chat estático, sin bucle (peso y viaje).
+const chatMode = warm.kind !== 'marcy' ? 'no' : (chatProp ?? (id === '' ? 'ligero' : 'vivo'));
+const cc = cierreChat[lang === 'en' ? 'en' : 'es'];
+---
+<section class:list={['w-close', cls]} id={id || undefined} aria-labelledby={titleId} data-city={city}>
+  <div class="w-close__grid">
+    <article class="w-close__card w-close__card--big">
+      <div class="w-close__body">
+        <h2 class:list={['w-close__title', grad && 'w-grad-text']} id={titleId} set:html={titleHtml} />
+        <p class="w-close__proof" set:html={protegerNombres(proof)} />
+      </div>
+      <div class="w-close__acts">
+        <a class="w-close__act ctaband__act ctaband__act--form" href="#contacto" data-track="proposal_requested">
+          <span>{form}</span><span class="w-close__chev" aria-hidden="true">›</span>
+        </a>
+        <a class="w-close__act ctaband__act ctaband__act--wa" href={wa} data-track="whatsapp_clicked">
+          <span>WhatsApp</span><span class="w-close__chev" aria-hidden="true">›</span>
+        </a>
+        <a class="w-close__act ctaband__act ctaband__act--call" href={tel} data-track="call_clicked">
+          <span>{ui.cta.call}</span><span class="w-close__chev" aria-hidden="true">›</span>
+        </a>
+      </div>
+    </article>
+
+    <article class:list={['w-close__card w-close__card--warm', (chatMode !== 'no' || Astro.slots.has('obj')) && 'w-close__card--chat', chatMode === 'ligero' && 'w-close__card--ligero']}>
+      <div class="w-close__body">
+        <h3 class="w-close__wtitle">{warm.title}</h3>
+        <p class="w-close__wtext">{warm.text}</p>
+      </div>
+      {chatMode === 'no' && Astro.slots.has('obj') && (
+        <div class="w-close__chat" aria-hidden="true">
+          <slot name="obj" />
+        </div>
+      )}
+      {chatMode === 'vivo' && (
+        <div class="w-close__chat">
+          <slot name="chat" />
+        </div>
+      )}
+      {chatMode === 'ligero' && (
+        <div class="w-close__chat w-close__chat--ligero">
+          <p class="sr-only">{cc.srHola}</p>
+          <div class="w-close__mini" aria-hidden="true" data-nosnippet>
+            <Ejemplo lang={lang} on="light" />
+            <span class="w-close__mhead">
+              <img src="/assets/bot/marcy-mini-64.webp" srcset="/assets/bot/marcy-mini-32.webp 32w, /assets/bot/marcy-mini-64.webp 64w, /assets/bot/marcy-mini-96.webp 96w, /assets/bot/marcy-mini-128.webp 128w, /assets/bot/marcy-mini.webp 256w" sizes="28px" width="28" height="28" alt="" loading="lazy" decoding="async" />
+              <span><b>Marcy</b><span><i></i>{cc.online}</span></span>
+            </span>
+            <span class="w-close__mmsg">{cc.hola}</span>
+          </div>
+        </div>
+      )}
+      <div class="w-close__wacts">
+        {warm.kind === 'marcy'
+          ? <Button variant="link" data-w-ask={warm.ask ?? warm.title} data-track="marcy_ask_clicked">{warm.cta}</Button>
+          : <Button variant="link" href={warm.href} data-track={warmTrack}>{warm.cta}</Button>}
+      </div>
+    </article>
+  </div>
+</section>
+
+<script>
+  // "Pregúntale a Marcy": texto FIJO por página (data-w-ask), sin datos del
+  // visitante. ChatWidget lo envía al momento y consume un turno con sus topes.
+  document.querySelectorAll<HTMLElement>('.w-close [data-w-ask]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const text = btn.dataset.wAsk || '';
+      if (text) window.dispatchEvent(new CustomEvent('mrc:ask', { detail: { text } }));
+    });
+  });
+</script>
+
+<style>
+  .w-close { min-width: 0; }
+  .w-close__grid { display: grid; grid-template-columns: 1fr; gap: 18px; min-width: 0; }
+  @media (--lg) {
+    .w-close__grid { grid-template-columns: minmax(0, 728fr) minmax(0, 355fr); }
+  }
+
+  .w-close__card {
+    position: relative; isolation: isolate; overflow: hidden; min-width: 0;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 40px;
+    padding: 28px 24px; border: 1px solid var(--w-line); border-radius: var(--w-r-obj);
+    box-shadow: var(--w-edge);
+    transition: border-color var(--w-dur-hover) var(--w-ease-ui);
+  }
+  @media (--md) { .w-close__card { padding: 32px; min-height: 390px; } }
+  @media (--hover-fine) { .w-close__card:hover { border-color: var(--w-line-strong); } }
+
+  /* Grande: superficie de objeto con franjas de luz en el tercio inferior
+     (W-CORE-15), que se funden hacia arriba y se aclaran bajo los enlaces. */
+  .w-close__card--big { background: var(--w-s2); }
+  .w-close__card--big::before {
+    content: ''; position: absolute; inset: auto 0 0 0; height: 66%; z-index: -1; pointer-events: none;
+    background: var(--w-stripes);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.25) 30%, rgba(0,0,0,.9) 62%, rgba(0,0,0,.55) 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.25) 30%, rgba(0,0,0,.9) 62%, rgba(0,0,0,.55) 100%);
+  }
+  /* Móvil (control 2, E-37): la tarjeta es baja y el tercio con franjas caía justo debajo de
+     "Propuesta gratis" y "WhatsApp". Aquí las franjas son una banda en el hueco entre el texto y
+     los enlaces, que quedan sobre la superficie lisa. */
+  @media (--lt-md) {
+    .w-close__card--big { gap: 88px; }
+    .w-close__card--big::before { content: none; }
+    .w-close__card--big .w-close__acts { position: relative; }
+    .w-close__card--big .w-close__acts::before {
+      content: ''; position: absolute; left: -24px; right: -24px; bottom: calc(100% + 14px); height: 60px;
+      z-index: -1; pointer-events: none; background: var(--w-stripes);
+      -webkit-mask-image: linear-gradient(to bottom, transparent, #000 45%, #000 60%, transparent);
+              mask-image: linear-gradient(to bottom, transparent, #000 45%, #000 60%, transparent);
+    }
+  }
+  .w-close__card--warm { background: var(--w-s1); }
+
+  .w-close__body { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .w-close__title {
+    margin: 0; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: var(--w-h2-small); line-height: 1.25; letter-spacing: -0.03em; color: var(--w-ink);
+    text-wrap: balance;
+  }
+  .w-close__title :global(em) { font-style: normal; color: var(--w-accent); }
+  /* grad: la clase global .w-grad-text de styles/w.css (misma receta y su respaldo), no una copia aquí:
+     esta copia viajaba también a los hubs, que no la usan (control v2 r3, I-02). */
+  .w-close__title:global(.w-grad-text) :global(em) { color: inherit; }
+  .w-close__proof {
+    margin: 0; max-width: 340px; font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+    color: var(--w-ink-70);
+  }
+  .w-close__wtitle {
+    margin: 0; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: 24px; line-height: 1.3; letter-spacing: -0.02em; color: var(--w-ink);
+  }
+  @media (--md) { .w-close__wtitle { font-size: 27px; line-height: 36px; } }
+  .w-close__wtext {
+    margin: 0; font-family: var(--font-body); font-size: 16px; line-height: 1.5; color: var(--w-ink-70);
+  }
+
+  /* ── Trío ─────────────────────────────────────────────────────────
+     Piel de enlace (variant="link") por defecto; el dominante de cada
+     dispositivo toma la piel del botón principal. */
+  .w-close__acts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 24px; min-width: 0; }
+  .w-close__act {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: var(--tap-min); padding: 8px 0; white-space: nowrap; text-decoration: none;
+    font: 500 16px/1 var(--font-body); color: var(--w-ink); background: none; border: 0;
+    border-radius: var(--radius-md);
+    transition: color var(--w-dur-micro) var(--w-ease-ui), background var(--duration-fast) var(--ease-out-expo),
+                box-shadow var(--duration-base), transform var(--duration-fast);
+  }
+  .w-close__chev {
+    font-size: 18px; line-height: 1; color: var(--w-accent);
+    transition: transform var(--w-dur-hover) var(--w-ease-ui);
+  }
+  @media (--hover-fine) {
+    .w-close__act:hover { color: var(--w-accent); }
+    .w-close__act:hover .w-close__chev { transform: translateX(3px); }
+  }
+  .w-close__act:focus-visible { color: var(--w-accent); }
+  .w-close__act:focus-visible .w-close__chev { transform: translateX(3px); }
+
+  /* Piel del botón principal (= Button primary lg, intacto). */
+  .w-close__acts .ctaband__act--call {
+    padding: 14px 28px; font-weight: 600; letter-spacing: 0.01em;
+    background: var(--accent-gold); color: var(--fg-inverse);
+  }
+  /* Móvil: Llamar domina y ocupa la fila de abajo, a todo el ancho. */
+  .w-close__acts .ctaband__act--call { flex: 1 0 100%; margin-top: 8px; }
+  .w-close__acts .ctaband__act--call .w-close__chev { display: none; }
+  .w-close__acts .ctaband__act--call:focus-visible { color: var(--fg-inverse); }
+  .w-close__acts .ctaband__act--call:active { transform: scale(0.97); }
+  @media (--hover-fine) {
+    .w-close__acts .ctaband__act--call:hover {
+      color: var(--fg-inverse);
+      background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: var(--shadow-gold);
+    }
+  }
+
+  /* Escritorio: el formulario domina; Llamar vuelve a enlace. */
+  @media (--md) {
+    .w-close__acts .ctaband__act--call {
+      flex: 0 0 auto; margin-top: 0; padding: 8px 0; font-weight: 500; letter-spacing: 0;
+      background: none; color: var(--w-ink);
+    }
+    .w-close__acts .ctaband__act--call .w-close__chev { display: inline; }
+    .w-close__acts .ctaband__act--call:focus-visible { color: var(--w-accent); }
+    .w-close__acts .ctaband__act--form:focus-visible { color: var(--fg-inverse); }
+    .w-close__acts .ctaband__act--call:active { transform: none; }
+    .w-close__acts .ctaband__act--form {
+      padding: 14px 28px; font-weight: 600; letter-spacing: 0.01em;
+      background: var(--accent-gold); color: var(--fg-inverse);
+    }
+    .w-close__acts .ctaband__act--form .w-close__chev { display: none; }
+    .w-close__acts .ctaband__act--form:active { transform: scale(0.97); }
+  }
+  @media (--md) and (--hover-fine) {
+    .w-close__acts .ctaband__act--call:hover { color: var(--w-accent); background: none; box-shadow: none; }
+    .w-close__acts .ctaband__act--form:hover {
+      color: var(--fg-inverse);
+      background: color-mix(in srgb, var(--accent-gold), white 10%); box-shadow: var(--shadow-gold);
+    }
+  }
+
+  .w-close__wacts { min-width: 0; }
+
+  /* ── Tarjeta "Marcy" con su chat (v2, G00) ─────────────────────────
+     Texto arriba, el chat en el tercio inferior y el enlace debajo. El hueco
+     entre texto y chat es el que absorbe la diferencia de alto con la grande. */
+  .w-close__card--chat { gap: 20px; }
+  .w-close__chat { margin-top: auto; min-width: 0; }
+  .w-close__chat :global(.wo-chat) { width: 100%; }
+  .w-close__card--chat .w-close__wacts { margin-top: -8px; }
+
+  /* Ligera (hubs): ventana clara de Marcy con su saludo, sin JS. Mismos tonos que ChatMarcy. */
+  .w-close__mini {
+    position: relative; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px 12px;
+    border-radius: var(--w-r-obj, 12px); background: rgba(240, 237, 232, .96); color: var(--w-p-ink, #0e0e0d);
+    box-shadow: 0 0 0 1px var(--w-line), var(--w-edge);
+  }
+  .w-close__mhead { display: flex; align-items: center; gap: 8px; line-height: 1.2; }
+  .w-close__mhead img { width: 28px; height: 28px; border-radius: 50%; background: #e7e3dc; object-fit: cover; }
+  .w-close__mhead > span { display: flex; flex-direction: column; }
+  .w-close__mhead b { font: 600 13px/1.2 var(--font-display); }
+  .w-close__mhead > span > span { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: #5f5b56; }
+  .w-close__mhead i { width: 6px; height: 6px; border-radius: 50%; background: #2f8f6f; }
+  .w-close__mmsg {
+    align-self: flex-start; max-width: 92%; padding: 7px 12px; border-radius: 12px; border-bottom-left-radius: 4px;
+    background: rgba(79, 195, 161, .14); font: 400 14px/1.45 var(--font-body);
+  }
+  .w-close__mini :global(.w-example) { top: 10px; right: 10px; }
+  /* Móvil de hub: sin chat y la tarjeta exactamente como antes (mismo hueco de 40 px). */
+  @media (--lt-md) {
+    .w-close__chat--ligero { display: none; }
+    .w-close__card--ligero { gap: 40px; }
+    .w-close__card--ligero .w-close__wacts { margin-top: 0; }
+  }
+
+  @media (--motion-reduce) {
+    .w-close__card, .w-close__act, .w-close__chev { transition: none; }
+    .w-close__act:hover .w-close__chev, .w-close__act:focus-visible .w-close__chev { transform: none; }
+    .w-close__acts .ctaband__act--call:active, .w-close__acts .ctaband__act--form:active { transform: none; }
+  }
+</style>

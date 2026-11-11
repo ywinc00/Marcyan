@@ -1,0 +1,28 @@
+---
+// Cierre en dos tarjetas (W-CORE-15) CON el chat vivo de Marcy. Envuelve CierreDosTarjetasBase
+// (marcado, CSS y script del cierre) y le mete ChatMarcy compacto en la ranura 'chat' solo
+// cuando el modo es 'vivo'. Mismas props que la base; ver allí la documentación completa.
+// Los hubs importan la base directamente (chat 'ligero'), así no cargan el CSS de ChatMarcy.
+import CierreDosTarjetasBase from './CierreDosTarjetasBase.astro';
+import ChatMarcy from './objetos/ChatMarcy.astro';
+import ObjPerfil from './sections/servicios/ObjPerfil.astro';
+import { cierreChat } from '../../i18n/w/globales';
+import type { ComponentProps } from 'astro/types';
+
+type Props = ComponentProps<typeof CierreDosTarjetasBase>;
+const props = Astro.props;
+const { lang = 'es', warm, id = 'cierre', chat: chatProp } = props;
+const chatMode = warm.kind !== 'marcy' ? 'no' : (chatProp ?? (id === '' ? 'ligero' : 'vivo'));
+const cc = cierreChat[lang === 'en' ? 'en' : 'es'];
+const ask = warm.ask ?? warm.title;
+const chatTabs = [
+  { label: warm.cta, script: [{ from: 'c' as const, text: ask }, { from: 'm' as const, text: cc.reply }] },
+  { label: warm.cta, script: [{ from: 'c' as const, text: cc.q2 }, { from: 'm' as const, text: cc.a2 }] },
+];
+---
+<CierreDosTarjetasBase {...props}>
+  {warm.kind === 'diagnostico' && <ObjPerfil slot="obj" tipo="diagnostico" juego="b" lang={lang === 'en' ? 'en' : 'es'} />}
+  {chatMode === 'vivo' && (
+    <ChatMarcy slot="chat" lang={lang} mode="compacto" tabsBar={false} size="mini" tabs={chatTabs} sr={cc.sr(ask)} />
+  )}
+</CierreDosTarjetasBase>

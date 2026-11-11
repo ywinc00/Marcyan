@@ -1,0 +1,379 @@
+---
+// Conversación con Marcy (objeto de PRODUCTO · design/rediseno-workos.md §3.6, §2.4, §2.10).
+// Ventana en CLARO cálido dentro de un marco de noche (corrección del director, E-14:
+// un chat oscuro no se lee). Cabecera con el avatar real de Marcy (public/assets/bot),
+// nombre y "en línea". Burbujas del cliente #fff; de Marcy teal al 14 % (tone="teal")
+// o neutras #e7e3dc (tone="neutral", páginas oro: un acento por bloque). Hora 11 px.
+//   mode="estatico"  → primera pestaña completa, sin movimiento.
+//   mode="compacto"  → 2 pestañas, sin barra lateral, en bucle (W-ADV-19).
+//   mode="pestanas"  → pestañas + barra lateral de canales, en bucle (W-ADV-19).
+// Bucle (§2.10): mensaje del cliente → "Marcy está escribiendo" con destello (1,5 s) →
+// respuesta que se escribe (35 ms/carácter, máx 2,2 s) → 2.ª pregunta y respuesta;
+// la píldora activa se desliza a la siguiente pestaña (400 ms).
+// Dentro de un MarcoPestanas (tabsBar={false}), el marco lleva el ritmo: escucha sus
+// eventos wo:play / wo:stop / wo:still y le avisa con wo:done al terminar cada guion.
+// Ilustración: aria-hidden + resumen sr-only; sin roles tab ni aria-selected.
+// Quieto (reduced-motion o sin JS): "Agendar cita" con la conversación completa.
+import Ejemplo from '../Ejemplo.astro';
+
+type Msg = { from: 'c' | 'm'; text: string; time?: string; rel?: number };
+type Tab = { label: string; script: Msg[] };
+interface Props {
+  lang?: 'es' | 'en';
+  mode?: 'pestanas' | 'compacto' | 'estatico';
+  tabs?: Tab[];
+  tone?: 'teal' | 'neutral';
+  /** Pinta su propia fila de pestañas (false dentro de MarcoPestanas). */
+  tabsBar?: boolean;
+  size?: 'hero' | 'card' | 'mini';
+  example?: boolean;
+  sr?: string;
+  /** Pestaña con la que empieza (índice en `tabs`; p. ej. 2 = "Fuera de horario"). En modo
+   *  estático es la única que se ve. */
+  startAt?: number;
+  class?: string;
+}
+const en = Astro.props.lang === 'en';
+const DEFAULT_TABS: Tab[] = en
+  ? [
+      { label: 'Book an appointment', script: [
+        { from: 'c', text: 'Hi, do you have an opening this Saturday?', time: '10:02' },
+        { from: 'm', text: 'Hi! Saturday I have 10:00 or 12:30. Which one should I hold for you?', time: '10:02' },
+        { from: 'c', text: '10:00, please.', time: '10:03' },
+        { from: 'm', text: "Done, you're booked Saturday at 10:00. I just texted you the confirmation.", time: '10:03' },
+      ] },
+      { label: 'Give a quote', script: [
+        { from: 'c', text: 'How much to unclog a kitchen drain?', time: '13:15' },
+        { from: 'm', text: 'A basic drain clearing has a fixed price, and I will send it to you in writing right now. When do you need it?', time: '13:15' },
+        { from: 'c', text: 'Today if possible.', time: '13:16' },
+        { from: 'm', text: 'We have a tech in your area at 4:00 p.m. Want me to book it?', time: '13:16' },
+      ] },
+      { label: 'After hours', script: [
+        { from: 'c', text: 'Are you still open?', time: '23:40' },
+        { from: 'm', text: 'We are closed right now and open tomorrow at 8:00. Want me to hold the first visit for you?', time: '23:40' },
+        { from: 'c', text: 'Yes, 8 works.', time: '23:41' },
+        { from: 'm', text: 'All set. See you tomorrow at 8:00.', time: '23:41' },
+      ] },
+      { label: 'Hands it to you', script: [
+        { from: 'c', text: 'I have a question about my invoice.', time: '16:20' },
+        { from: 'm', text: 'I am passing you to someone on the team now. I left them a summary so you do not have to repeat anything.', time: '16:20' },
+        { from: 'c', text: 'Thanks.', time: '16:21' },
+        { from: 'm', text: 'You are welcome. They will write to you here in a few minutes.', time: '16:21' },
+      ] },
+    ]
+  : [
+      { label: 'Agendar cita', script: [
+        { from: 'c', text: 'Hola, ¿tienen cita este sábado?', time: '10:02' },
+        { from: 'm', text: '¡Hola! El sábado tengo a las 10:00 o a las 12:30. ¿Cuál te aparto?', time: '10:02' },
+        { from: 'c', text: 'La de las 10, porfa.', time: '10:03' },
+        { from: 'm', text: 'Listo, quedó apartada el sábado a las 10:00. Te mandé la confirmación por mensaje.', time: '10:03' },
+      ] },
+      { label: 'Dar precio', script: [
+        { from: 'c', text: '¿Cuánto cuesta destapar el drenaje de la cocina?', time: '13:15' },
+        { from: 'm', text: 'El destape básico tiene precio fijo y te lo mando por escrito ahora mismo. ¿Para cuándo lo necesitas?', time: '13:15' },
+        { from: 'c', text: 'Para hoy, si se puede.', time: '13:16' },
+        { from: 'm', text: 'Hoy tengo un técnico en tu zona a las 4:00 p. m. ¿Te lo agendo?', time: '13:16' },
+      ] },
+      { label: 'Fuera de horario', script: [
+        { from: 'c', text: '¿Siguen abiertos?', time: '23:40' },
+        { from: 'm', text: 'Ahora estamos cerrados, abrimos mañana a las 8:00. ¿Te aparto la primera visita?', time: '23:40' },
+        { from: 'c', text: 'Sí, a las 8 está bien.', time: '23:41' },
+        { from: 'm', text: 'Hecho. Mañana a las 8:00 te esperamos.', time: '23:41' },
+      ] },
+      { label: 'Te lo pasa', script: [
+        { from: 'c', text: 'Tengo una duda con mi factura.', time: '16:20' },
+        { from: 'm', text: 'Te paso con alguien del equipo ahora mismo. Ya le dejé el resumen para que no repitas nada.', time: '16:20' },
+        { from: 'c', text: 'Gracias.', time: '16:21' },
+        { from: 'm', text: 'Con gusto. Te escriben aquí mismo en unos minutos.', time: '16:21' },
+      ] },
+    ];
+const {
+  lang = 'es', mode = 'pestanas', tone = 'teal', tabsBar = true, size = 'hero', example = true, class: cls,
+} = Astro.props;
+const base = Astro.props.tabs ?? DEFAULT_TABS;
+const k = Math.max(0, Math.min(base.length - 1, Astro.props.startAt ?? 0));
+const all = k ? [...base.slice(k), ...base.slice(0, k)] : base;
+// Hora REAL de quien mira (regla del dueño, 2026-11-08): cada mensaje guarda sus minutos respecto
+// al último del guion (rel ≤ 0) y el reloj común pinta «ahora menos rel». Acepta «13:15» y «1:15 p. m.».
+const minutos = (t?: string) => {
+  const m = t?.match(/(\d{1,2}):(\d{2})\s*([ap])?/i); if (!m) return null;
+  let h = Number(m[1]) % 24; const ap = m[3]?.toLowerCase();
+  if (ap === 'p' && h < 12) h += 12; if (ap === 'a' && h === 12) h = 0;
+  return h * 60 + Number(m[2]);
+};
+const conRel = (sc: Msg[]): Msg[] => {
+  const ult = minutos([...sc].reverse().find((m) => minutos(m.time) !== null)?.time);
+  return sc.map((m) => { const v = minutos(m.time); return v === null || ult === null ? m : { ...m, rel: Math.min(0, v - ult) }; });
+};
+const tabs = (mode === 'compacto' ? all.slice(0, 2) : all).map((t) => ({ ...t, script: conRel(t.script) }));
+const first = tabs[0];
+const T = en
+  ? { online: 'online', typing: 'Marcy is typing', you: 'Customer', sr: 'Example: Marcy books an appointment, gives a quote, answers after hours and hands the case to a person.' }
+  : { online: 'en línea', typing: 'Marcy está escribiendo', you: 'Cliente', sr: 'Ejemplo: Marcy agenda una cita, da precio, contesta fuera de horario y pasa el caso a una persona.' };
+const channels = ['Web', 'WhatsApp', 'Instagram'];
+const live = mode !== 'estatico';
+const showBar = live && tabsBar;
+const data = JSON.stringify(tabs.map((t) => t.script));
+---
+<div
+  class:list={['wo-chat', `wo-chat--${mode}`, `wo-chat--${size}`, cls]}
+  data-tone={tone}
+  data-wo-chat={live ? '' : undefined}
+  data-wo-bar={showBar ? '' : undefined}
+  data-scripts={live ? data : undefined}
+>
+  <p class="sr-only">{Astro.props.sr ?? T.sr}</p>
+  <div class="wo-chat__frame" aria-hidden="true">
+    {showBar && (
+      <div class="wo-chat__tabs">
+        <span class="wo-chat__pill"></span>
+        {tabs.map((t, i) => (
+          <span class:list={['wo-chat__tab', i === 0 && 'is-on']}><i></i>{t.label}</span>
+        ))}
+      </div>
+    )}
+    <div class="wo-chat__win">
+      {example && <Ejemplo lang={lang} on="light" />}
+      <div class="wo-chat__head">
+        <img class="wo-chat__av" src="/assets/bot/marcy-mini-64.webp" srcset="/assets/bot/marcy-mini-32.webp 32w, /assets/bot/marcy-mini-64.webp 64w, /assets/bot/marcy-mini-96.webp 96w, /assets/bot/marcy-mini-128.webp 128w, /assets/bot/marcy-mini.webp 256w" sizes="32px" width="32" height="32" alt="" loading="lazy" decoding="async" />
+        <span class="wo-chat__who"><b>Marcy</b><span><i></i>{T.online}</span></span>
+      </div>
+      <div class="wo-chat__main">
+        {mode === 'pestanas' && (
+          <ul class="wo-chat__side">
+            {channels.map((c, i) => <li class:list={[i === 0 && 'is-on']}>{c}</li>)}
+          </ul>
+        )}
+        <div class="wo-chat__stage">
+          {/* Medidores invisibles: cada guion completo ocupa la misma celda, así el alto de la
+              ventana es el del guion más largo a ese ancho y la última burbuja nunca se corta (E-18). */}
+          {(live ? tabs : [first]).map((t) => (
+            <div class="wo-chat__msgs wo-chat__ghost">
+              {t.script.map((m) => (
+                <div class={`wo-chat__msg wo-chat__msg--${m.from}`}>
+                  <p>{m.text}</p>
+                  {m.time && <span class="wo-chat__time" data-reloj={m.rel !== undefined ? 'hora' : undefined} data-reloj-min={m.rel}>{m.time}</span>}
+                </div>
+              ))}
+            </div>
+          ))}
+          <div class="wo-chat__msgs" data-wo-msgs>
+            {first.script.map((m) => (
+              <div class={`wo-chat__msg wo-chat__msg--${m.from}`}>
+                <p>{m.text}</p>
+                {m.time && <span class="wo-chat__time" data-reloj={m.rel !== undefined ? 'hora' : undefined} data-reloj-min={m.rel}>{m.time}</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {live && <template data-wo-typing><div class="wo-chat__msg wo-chat__msg--m wo-chat__typing"><p>{T.typing}</p></div></template>}
+</div>
+
+<script>
+  import { registerLoop } from '../loop';
+  import { pintaRelojes, iniciaRelojes } from '../reloj';
+  iniciaRelojes();
+  const CHAR = 35, MAX_TYPE = 2200, TYPING = 1500, HOLD = 3500, GAP = 400;
+
+  document.querySelectorAll<HTMLElement>('[data-wo-chat]').forEach((el) => {
+    const scripts: { from: string; text: string; time?: string; rel?: number }[][] = JSON.parse(el.dataset.scripts || '[]');
+    const box = el.querySelector<HTMLElement>('[data-wo-msgs]');
+    const typingTpl = el.querySelector<HTMLTemplateElement>('template[data-wo-typing]');
+    const tabs = Array.from(el.querySelectorAll<HTMLElement>('.wo-chat__tab'));
+    // Fila de pestañas más ancha que su sitio: se desvanece por el lado que sigue (antes se cortaba en seco).
+    const fila = el.querySelector<HTMLElement>('.wo-chat__tabs');
+    if (fila) {
+      const marca = () => {
+        const sobra = fila.scrollWidth - fila.clientWidth;
+        fila.classList.toggle('is-sigue', sobra > 2 && fila.scrollLeft < sobra - 2);
+        fila.classList.toggle('is-vuelve', sobra > 2 && fila.scrollLeft > 2);
+      };
+      marca(); fila.addEventListener('scroll', marca, { passive: true }); addEventListener('resize', marca, { passive: true });
+    }
+    const pill = el.querySelector<HTMLElement>('.wo-chat__pill');
+    if (!box || !scripts.length) return;
+    const stillHTML = box.innerHTML;
+    let timers: number[] = [];
+    let idx = 0;
+    // La conversación anterior se queda hasta que entra el primer mensaje nuevo: la caja nunca queda vacía.
+    let viejos: Element[] = [];
+    const limpiar = () => { viejos.forEach((n) => n.remove()); viejos = []; };
+    const later = (fn: () => void, ms: number) => { timers.push(window.setTimeout(fn, ms)); };
+    const clear = () => { timers.forEach((t) => window.clearTimeout(t)); timers = []; };
+
+    const movePill = (i: number) => {
+      tabs.forEach((t, k) => t.classList.toggle('is-on', k === i));
+      const t = tabs[i];
+      if (pill && t) { pill.style.width = `${t.offsetWidth}px`; pill.style.transform = `translateX(${t.offsetLeft}px)`; }
+    };
+    const bubble = (m: { from: string; time?: string; rel?: number }, text = '') => {
+      const d = document.createElement('div');
+      limpiar();
+      d.className = `wo-chat__msg wo-chat__msg--${m.from} is-new`;
+      const p = document.createElement('p'); p.textContent = text; d.appendChild(p);
+      if (m.time) { const s = document.createElement('span'); s.className = 'wo-chat__time'; s.textContent = m.time; if (m.rel !== undefined) { s.dataset.reloj = 'hora'; s.dataset.relojMin = String(m.rel); } d.appendChild(s); pintaRelojes(d); }
+      box.appendChild(d);
+      return p;
+    };
+    const play = (i: number, done: () => void) => {
+      clear(); idx = i; viejos = Array.from(box.children);
+      const script = scripts[i] || [];
+      let t = 300;
+      script.forEach((m) => {
+        if (m.from === 'c') {
+          later(() => bubble(m, m.text), t); t += 500;
+        } else {
+          let typing: Element | null = null;
+          later(() => { typing = typingTpl?.content.firstElementChild?.cloneNode(true) as Element; if (typing) { limpiar(); box.appendChild(typing); } }, t);
+          t += TYPING;
+          const dur = Math.min(MAX_TYPE, m.text.length * CHAR);
+          const steps = Math.max(1, Math.round(dur / CHAR));
+          later(() => {
+            typing?.remove();
+            const p = bubble(m);
+            for (let s = 1; s <= steps; s++) {
+              later(() => { p.textContent = m.text.slice(0, Math.ceil((m.text.length * s) / steps)); }, s * CHAR);
+            }
+          }, t);
+          t += dur + GAP;
+        }
+      });
+      later(done, t);
+    };
+
+    const marco = el.closest<HTMLElement>('[data-wo-marco]');
+    if (marco) {
+      // El marco lleva el ritmo.
+      marco.addEventListener('wo:play', (e) => {
+        el.classList.remove('is-paused');
+        const i = (e as CustomEvent).detail?.index ?? 0;
+        play(i % scripts.length, () => marco.dispatchEvent(new CustomEvent('wo:done')));
+      });
+      // Parado (fuera de pantalla, pestaña oculta, pausa): el destello de "escribiendo" también.
+      marco.addEventListener('wo:stop', () => { clear(); el.classList.add('is-paused'); });
+      marco.addEventListener('wo:still', () => { clear(); box.innerHTML = stillHTML; });
+      return;
+    }
+    const next = () => later(() => { const n = (idx + 1) % scripts.length; movePill(n); later(() => play(n, next), 400); }, HOLD);
+    requestAnimationFrame(() => movePill(0));
+    registerLoop(el, {
+      start: () => { el.classList.remove('is-still', 'is-paused'); play(idx, next); },
+      stop: () => { clear(); el.classList.add('is-paused'); },
+      still: () => { clear(); idx = 0; movePill(0); box.innerHTML = stillHTML; el.classList.add('is-still'); },
+    }, { buttonTone: 'light' });
+  });
+</script>
+
+<style>
+  .wo-chat {
+    --wo-m: rgba(79, 195, 161, .14);
+    position: relative; width: min(100%, 760px);
+    font-family: var(--font-body); text-align: left;
+  }
+  .wo-chat[data-tone='neutral'] { --wo-m: #e7e3dc; }
+  .wo-chat--compacto, .wo-chat--estatico { width: min(100%, 440px); }
+  .wo-chat__frame {
+    padding: 10px; border-radius: var(--w-r-tray, 22px);
+    background: var(--w-s2, #181817); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  /* Píldoras de pestañas (ilustración). */
+  .wo-chat__tabs {
+    position: relative; display: flex; gap: 4px; margin-bottom: 10px; padding: 4px;
+    border-radius: 999px; background: rgba(255,255,255,.06);
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .wo-chat__tabs::-webkit-scrollbar { display: none; }
+  .wo-chat__tabs.is-sigue { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 40px), transparent); }
+  .wo-chat__tabs.is-vuelve { -webkit-mask-image: linear-gradient(90deg, transparent, #000 40px); mask-image: linear-gradient(90deg, transparent, #000 40px); }
+  .wo-chat__tabs.is-sigue.is-vuelve { -webkit-mask-image: linear-gradient(90deg, transparent, #000 40px, #000 calc(100% - 40px), transparent); mask-image: linear-gradient(90deg, transparent, #000 40px, #000 calc(100% - 40px), transparent); }
+  .wo-chat__pill {
+    position: absolute; left: 0; top: 4px; bottom: 4px; width: 0; border-radius: 999px;
+    background: var(--w-p-bg, #f0ede8);
+    transition: transform 400ms var(--w-ease-ui), width 400ms var(--w-ease-ui);
+  }
+  .wo-chat__tab {
+    position: relative; z-index: 1; flex: 1 0 auto; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    height: 36px; padding: 0 14px; border-radius: 999px; white-space: nowrap;
+    font-size: 14px; font-weight: 500; color: var(--w-ink-80);
+    transition: color 200ms var(--w-ease-ui);
+  }
+  .wo-chat__tab i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid currentColor; opacity: .7; }
+  .wo-chat__tab.is-on { color: var(--w-p-ink, #0e0e0d); }
+  .wo-chat__tab.is-on i { border-color: rgba(14,14,13,.25); border-top-color: var(--w-p-ink, #0e0e0d); opacity: 1; animation: wo-chat-spin 900ms linear infinite; }
+  @keyframes wo-chat-spin { to { transform: rotate(360deg); } }
+
+  /* Ventana clara. */
+  .wo-chat__win {
+    position: relative; border-radius: var(--w-r-obj, 12px); overflow: hidden;
+    background: rgba(240, 237, 232, .96); color: var(--w-p-ink, #0e0e0d);
+  }
+  .wo-chat__head {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    border-bottom: 1px solid var(--w-p-line, rgba(14,14,13,.08)); background: #f6f4f0;
+  }
+  .wo-chat__av { width: 32px; height: 32px; border-radius: 50%; background: #e7e3dc; object-fit: cover; }
+  .wo-chat__who { display: flex; flex-direction: column; line-height: 1.2; }
+  .wo-chat__who b { font: 600 14px/1.2 var(--font-display); }
+  .wo-chat__who span { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #5f5b56; }
+  .wo-chat__who i { width: 7px; height: 7px; border-radius: 50%; background: #2f8f6f; }
+  .wo-chat__main { display: flex; }
+  .wo-chat__side {
+    list-style: none; margin: 0; padding: 12px 8px; width: 150px; flex: none;
+    border-right: 1px solid var(--w-p-line, rgba(14,14,13,.08)); background: #ebe7e0;
+  }
+  .wo-chat__side li { padding: 7px 10px; border-radius: 6px; font-size: 13px; color: #4a4743; }
+  .wo-chat__side li::before { content: '# '; color: #8a857e; }
+  .wo-chat__side li.is-on { background: #fff; color: var(--w-p-ink, #0e0e0d); font-weight: 500; }
+  /* El alto sale del guion más largo (medidores invisibles en la misma celda), no de un número fijo. */
+  .wo-chat__stage { flex: 1; min-width: 0; display: grid; }
+  .wo-chat__msgs {
+    grid-area: 1 / 1; min-width: 0; display: flex; flex-direction: column; gap: 10px;
+    padding: 16px; min-height: 318px; overflow: hidden;
+  }
+  .wo-chat__ghost { visibility: hidden; }
+  .wo-chat--compacto .wo-chat__msgs, .wo-chat--estatico .wo-chat__msgs { min-height: 300px; }
+  .wo-chat--mini .wo-chat__msgs { min-height: 0; padding: 12px; }
+  .wo-chat :global(.wo-chat__msg) { max-width: 82%; display: flex; flex-direction: column; gap: 3px; }
+  .wo-chat :global(.wo-chat__msg) :global(p) {
+    margin: 0; padding: 9px 12px; border-radius: 12px; font-size: 14px; line-height: 1.45;
+    color: var(--w-p-ink, #0e0e0d);
+  }
+  .wo-chat :global(.wo-chat__msg--c) { align-self: flex-end; align-items: flex-end; }
+  .wo-chat :global(.wo-chat__msg--c) :global(p) { background: #fff; border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); border-bottom-right-radius: 4px; }
+  .wo-chat :global(.wo-chat__msg--m) { align-self: flex-start; }
+  .wo-chat :global(.wo-chat__msg--m) :global(p) { background: var(--wo-m); border-bottom-left-radius: 4px; }
+  .wo-chat :global(.wo-chat__time) { font-size: 13px; color: #5c5853; padding: 0 4px; }
+  .wo-chat :global(.wo-chat__msg.is-new) { animation: wo-chat-in 240ms var(--w-ease-ui) both; }
+  @keyframes wo-chat-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  /* "Marcy está escribiendo" con destello del texto. */
+  .wo-chat :global(.wo-chat__typing) :global(p) {
+    background: var(--wo-m);
+    color: transparent;
+    background-image: linear-gradient(90deg, #4a4743 0%, #4a4743 40%, #0e0e0d 50%, #4a4743 60%, #4a4743 100%), linear-gradient(var(--wo-m), var(--wo-m));
+    background-size: 200% 100%, 100% 100%;
+    -webkit-background-clip: text, padding-box; background-clip: text, padding-box;
+    animation: wo-chat-shine 1.5s linear infinite;
+    font-style: italic; font-size: 13px;
+  }
+  .wo-chat.is-paused :global(.wo-chat__typing) :global(p) { animation-play-state: paused; }
+  @keyframes wo-chat-shine { from { background-position: 100% 0, 0 0; } to { background-position: -100% 0, 0 0; } }
+  @media (--lt-md) {
+    /* v5: los canales no se esconden en móvil; pasan a una fila que se desliza encima del chat. */
+    .wo-chat__main { flex-direction: column; }
+    .wo-chat__side {
+      display: flex; gap: 4px; width: auto; padding: 8px; overflow-x: auto; scrollbar-width: none;
+      border-right: 0; border-bottom: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+    }
+    .wo-chat__side::-webkit-scrollbar { display: none; }
+    .wo-chat__side li { flex: none; white-space: nowrap; padding: 5px 9px; font-size: 12px; }
+    .wo-chat .wo-chat__msgs { min-height: 0; padding: 12px; }
+    .wo-chat :global(.wo-chat__msg) { max-width: 90%; }
+  }
+  @media (--motion-reduce) {
+    .wo-chat__pill { transition: none; }
+    .wo-chat__tab.is-on i, .wo-chat :global(.wo-chat__msg.is-new), .wo-chat :global(.wo-chat__typing) :global(p) { animation: none; }
+  }
+</style>

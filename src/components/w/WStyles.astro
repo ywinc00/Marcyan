@@ -1,0 +1,15 @@
+---
+// Carga el sistema v3 del rediseño WorkOS (design/rediseno-workos.md §2.1-§2.2).
+// Lo montan WLanding y las páginas v3 (Layout ds="v3"), NUNCA portada ni hubs:
+// con inlineStylesheets 'always' lo que se importa aquí se incrusta solo en las
+// páginas que montan este componente.
+// También arranca reveal.ts (coreografía de entrada y revelado de sección), que
+// toda página v3 necesita y que solo actúa dentro de main[data-w], y rails.ts (corte de
+// las líneas de margen en los bloques con data-w-sin-rail, v3).
+import '../../styles/w-tokens-v3.css';
+import '../../styles/w.css';
+---
+<script>
+  import './reveal';
+  import './rails';
+</script>

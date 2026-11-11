@@ -1,0 +1,131 @@
+---
+// Servicios · objeto de la celda ancha "Mantenimiento" (v2 G09; situación: "¿quién cuida mi web
+// cuando ya está publicada?"). Registro de cuidado de hoy de una web de ejemplo NEUTRA
+// (tunegocio.example): las cuatro tareas que nombra el servicio (respaldos, actualizaciones de
+// seguridad, chequeos de disponibilidad, soporte bilingüe) con su estado y su hora en 12 h.
+// Pantalla viva (§1.5): cada 3 s una tarea pasa a "Revisando…" (punto que late y una luz que
+// recorre la fila) y a los 1,8 s vuelve a su estado hecho; ronda sin fin mientras está a la vista
+// (loop.ts: pausa fuera de vista, pestaña oculta, puntero/foco, botón 44×44) y obedece la pausa
+// global (html[data-w-pausa] + `w:pausa`) y su botón la produce (pausaGlobal.ts). Reducir movimiento: todo hecho, quieto.
+// Contrato §1.6: aria-hidden + data-nosnippet + resumen sr-only; sin ids.
+interface Props { lang?: 'es' | 'en' }
+const { lang = 'es' } = Astro.props;
+const en = lang === 'en';
+const T = en
+  ? {
+      sr: 'Example: a website’s daily care log, with backups, security updates, uptime checks and bilingual support.',
+      dom: 'yourbusiness.example', title: 'Today’s care', checking: 'Checking…', next: 'Next backup · 3:00 AM',
+      rows: [
+        { k: 'backup', label: 'Backup', st: 'Done', t: '3:00 AM' },
+        { k: 'shield', label: 'Security updates', st: 'Up to date', t: '3:12 AM' },
+        { k: 'pulse', label: 'Site online', st: 'Checked', t: '9:00 AM' },
+        { k: 'chat', label: 'Support in Spanish and English', st: 'Answered', t: '10:20 AM' },
+      ],
+    }
+  : {
+      sr: 'Ejemplo: el registro de cuidado de hoy de una web, con copias de seguridad, actualizaciones, chequeos y soporte bilingüe.',
+      dom: 'tunegocio.example', title: 'Cuidado de hoy', checking: 'Revisando…', next: 'Próxima copia · 3:00 a. m.',
+      rows: [
+        { k: 'backup', label: 'Copia de seguridad', st: 'Hecha', t: '3:00 a. m.' },
+        { k: 'shield', label: 'Actualizaciones de seguridad', st: 'Al día', t: '3:12 a. m.' },
+        { k: 'pulse', label: 'Tu web en línea', st: 'Revisada', t: '9:00 a. m.' },
+        { k: 'chat', label: 'Soporte en español e inglés', st: 'Respondido', t: '10:20 a. m.' },
+      ],
+    };
+const ICON: Record<string, string> = {
+  backup: '<path d="M4 6.5C4 5.1 6.7 4 10 4s6 1.1 6 2.5S13.3 9 10 9 4 7.9 4 6.5Z"/><path d="M4 6.5v7C4 14.9 6.7 16 10 16s6-1.1 6-2.5v-7"/><path d="M4 10c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5"/>',
+  shield: '<path d="M10 3.5 15.5 5.5v4.2c0 3.4-2.3 5.6-5.5 6.8-3.2-1.2-5.5-3.4-5.5-6.8V5.5Z"/><path d="m7.6 10 1.7 1.7 3.2-3.4"/>',
+  pulse: '<path d="M3 10h3l1.8-4 2.6 8 1.8-4H17"/>',
+  chat: '<path d="M16.5 11.5a1.5 1.5 0 0 1-1.5 1.5H8.5L5 15.5V6a1.5 1.5 0 0 1 1.5-1.5H15A1.5 1.5 0 0 1 16.5 6Z"/>',
+};
+---
+<div class="ocu-wrap">
+  <p class="sr-only">{T.sr}</p>
+  <div class="ocu" data-w2-cuidado data-chk={T.checking}>
+    <div class="ocu__ui" aria-hidden="true" data-nosnippet>
+      <div class="ocu__top">
+        <span class="ocu__dom"><span class="ocu__lock"></span>{T.dom}</span>
+        <span class="ocu__title">{T.title}</span>
+      </div>
+      <ul class="ocu__list">
+        {T.rows.map((r) => (
+          <li class="ocu__row" data-done={r.st}>
+            <span class="ocu__ic"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" set:html={ICON[r.k]} /></span>
+            <span class="ocu__label">{r.label}</span>
+            <span class="ocu__st"><span class="ocu__dot"></span><span class="ocu__stx">{r.st}</span></span>
+            <span class="ocu__t">{r.t}</span>
+            <span class="ocu__sweep"></span>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div class="ocu__foot" data-w2-host><span aria-hidden="true">{T.next}</span></div>
+  </div>
+</div>
+
+<script>
+  import { registerLoop } from '../../loop';
+  import { enlazaPausa } from './pausaGlobal';
+  const EVERY = 3000, CHECK = 1800;
+  document.querySelectorAll<HTMLElement>('[data-w2-cuidado]').forEach((el) => {
+    const rows = Array.from(el.querySelectorAll<HTMLElement>('.ocu__row'));
+    const chk = el.dataset.chk || '';
+    let i = 0, t1 = 0, t2 = 0;
+    const label = (r: HTMLElement, txt: string) => { const x = r.querySelector('.ocu__stx'); if (x) x.textContent = txt; };
+    const clear = () => rows.forEach((r) => { r.classList.remove('is-chk'); label(r, r.dataset.done || ''); });
+    const tick = () => {
+      const r = rows[i % rows.length];
+      r.classList.add('is-chk'); label(r, chk);
+      t2 = window.setTimeout(() => { r.classList.remove('is-chk'); label(r, r.dataset.done || ''); }, CHECK);
+      i++;
+      t1 = window.setTimeout(tick, EVERY);
+    };
+    const ctrl = registerLoop(el, {
+      start: () => { el.classList.remove('is-still'); window.clearTimeout(t1); t1 = window.setTimeout(tick, 600); },
+      stop: () => { window.clearTimeout(t1); window.clearTimeout(t2); clear(); },
+      still: () => { window.clearTimeout(t1); window.clearTimeout(t2); clear(); el.classList.add('is-still'); },
+    }, { buttonTone: 'dark', buttonHost: el.querySelector<HTMLElement>('[data-w2-host]') ?? el });
+    enlazaPausa(ctrl, el);
+  });
+</script>
+
+<style>
+  .ocu-wrap { width: 100%; min-width: 0; }
+  .ocu { position: relative; width: 100%; container-type: inline-size; }
+  .ocu__foot { position: relative; height: 64px; display: flex; align-items: center; padding: 0 68px 0 16px; background: #171716; border: 1px solid rgba(240,237,232,.1); border-top: 0; border-radius: 0 0 14px 14px; font: 500 11px/1 var(--font-mono); letter-spacing: .04em; color: rgba(240,237,232,.6); }
+  .ocu__ui { border-radius: 14px 14px 0 0; overflow: hidden; background: #121211; border: 1px solid rgba(240,237,232,.1); font-family: var(--font-body); text-align: left; color: #F0EDE8; }
+  .ocu__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 16px; border-bottom: 1px solid rgba(240,237,232,.08); background: #171716; }
+  .ocu__dom { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; font: 500 12px/1 var(--font-mono); color: rgba(240,237,232,.78); }
+  .ocu__lock { width: 8px; height: 7px; border-radius: 1.5px; background: rgba(240,237,232,.6); position: relative; margin-top: 3px; }
+  .ocu__lock::before { content: ''; position: absolute; left: 1.5px; top: -4px; width: 5px; height: 5px; border: 1.3px solid rgba(240,237,232,.6); border-bottom: 0; border-radius: 3px 3px 0 0; box-sizing: border-box; }
+  .ocu__title { white-space: nowrap; font: 500 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: rgba(240,237,232,.6); }
+  .ocu__list { list-style: none; margin: 0; padding: 4px 0; }
+  .ocu__row {
+    position: relative; overflow: hidden;
+    display: grid; grid-template-columns: 32px minmax(0, 1fr) auto auto; align-items: center; column-gap: 12px;
+    min-height: 54px; padding: 0 16px;
+  }
+  .ocu__row + .ocu__row { border-top: 1px solid rgba(240,237,232,.06); }
+  .ocu__ic { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; background: rgba(240,237,232,.05); border: 1px solid rgba(240,237,232,.08); color: var(--w-accent, #C9A96E); }
+  .ocu__label { font-size: 14px; line-height: 1.3; color: #F0EDE8; min-width: 0; }
+  .ocu__st { display: inline-flex; align-items: center; gap: 7px; font: 500 12px/1 var(--font-body); color: #9FCBA9; white-space: nowrap; }
+  .ocu__dot { position: relative; width: 6px; height: 6px; border-radius: 50%; background: #6FBF86; }
+  .ocu__t { font: 500 12px/1 var(--font-mono); color: rgba(240,237,232,.55); white-space: nowrap; min-width: 72px; text-align: right; font-variant-numeric: tabular-nums; }
+  .ocu__sweep { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(90deg, transparent 0%, rgba(201,169,110,.09) 50%, transparent 100%); transform: translateX(-100%); }
+  .ocu__row.is-chk .ocu__st { color: var(--w-accent, #C9A96E); }
+  .ocu__row.is-chk .ocu__dot { background: var(--w-accent, #C9A96E); animation: ocu-beat 900ms ease-in-out infinite; }
+  .ocu__row.is-chk .ocu__sweep { opacity: 1; animation: ocu-sweep 1.8s cubic-bezier(.45,0,.55,1) both; }
+  @keyframes ocu-beat { 50% { opacity: .25; } }
+  @keyframes ocu-sweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+  /* Estrecho: etiqueta a todo el ancho; estado y hora debajo, en una línea. */
+  @container (max-width: 440px) {
+    .ocu__row { grid-template-columns: 32px minmax(0, 1fr) auto; row-gap: 4px; padding-block: 10px; }
+    .ocu__ic { grid-row: 1 / span 2; }
+    .ocu__label { grid-column: 2 / span 2; }
+    .ocu__st { grid-column: 2; grid-row: 2; }
+    .ocu__t { grid-column: 3; grid-row: 2; min-width: 0; }
+    .ocu__title { display: none; }
+  }
+  @container (max-width: 280px) { .ocu__t { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .ocu__row .ocu__dot, .ocu__row .ocu__sweep { animation: none !important; } }
+</style>

@@ -1,0 +1,166 @@
+---
+// Lista de pedidos de EJEMPLO (W-ADV-36 · design/rediseno-workos.md §3.6, §2.10).
+// Objeto de PRODUCTO (claro). Tarjeta de 400 px, padding 20: "Pedidos de hoy" 15/500,
+// subtítulo 13, 5 filas de 52 px (icono 28 en caja radio 6, producto + cliente,
+// estado "Preparar" en botón de contorno 64×24 o "Pagado" con punto de acento), pie
+// sobre franja. Campo de puntos oro (3 px cada 12 px) en óvalo detrás.
+// Bucle (firma de tienda): una fila pasa a "Pagado" cada 950 ms; con 3 pagadas arriba,
+// la lista sube 52 px en 600 ms (--w-ease-loop) y la de arriba se recicla al final.
+// Quieto (reduced-motion, sin JS o `static`): 2 "Pagado" y 3 "Preparar".
+// Ilustración: aria-hidden + resumen sr-only; nada de roles ni estados que cambien solos.
+import Icon from '../../ui/Icon.astro';
+import Ejemplo from '../Ejemplo.astro';
+
+interface Props {
+  lang?: 'es' | 'en';
+  size?: 'hero' | 'card' | 'mini';
+  /** true = sin bucle (p. ej. celda de bento de Servicios). */
+  static?: boolean;
+  tone?: 'gold' | 'teal';
+  class?: string;
+}
+const { lang = 'es', size = 'hero', static: isStatic = false, tone = 'gold', class: cls } = Astro.props;
+const en = lang === 'en';
+const ROWS = en
+  ? [
+      ['lucide:shirt', 'Embroidered T-shirt', 'Ana R.'], ['lucide:gift', 'Gift box', 'Luis M.'],
+      ['lucide:coffee', 'Ground coffee, 2 lb', 'Sofía G.'], ['lucide:package', 'Cleaning kit', 'Carlos D.'],
+      ['lucide:shopping-bag', 'Tote bag', 'Marta P.'], ['lucide:flower-2', 'Medium bouquet', 'Jorge T.'],
+      ['lucide:sparkles', 'Scented candle', 'Elena V.'], ['lucide:palette', 'Brush set', 'Diego S.'],
+    ]
+  : [
+      ['lucide:shirt', 'Camiseta bordada', 'Ana R.'], ['lucide:gift', 'Caja de regalo', 'Luis M.'],
+      ['lucide:coffee', 'Café de olla, 1 kg', 'Sofía G.'], ['lucide:package', 'Kit de limpieza', 'Carlos D.'],
+      ['lucide:shopping-bag', 'Bolsa de mandado', 'Marta P.'], ['lucide:flower-2', 'Ramo mediano', 'Jorge T.'],
+      ['lucide:sparkles', 'Vela aromática', 'Elena V.'], ['lucide:palette', 'Juego de pinceles', 'Diego S.'],
+    ];
+const T = en
+  ? { title: "Today's orders", sub: 'Paid online, ready to pack', prep: 'Pack', paid: 'Paid', foot: 'Example · your store', sr: 'Example: orders come into your online store already paid, one after another, ready to pack.' }
+  : { title: 'Pedidos de hoy', sub: 'Pagados en línea, listos para preparar', prep: 'Preparar', paid: 'Pagado', foot: 'Ejemplo · tu tienda', sr: 'Ejemplo: los pedidos entran a tu tienda en línea ya pagados, uno tras otro, listos para preparar.' };
+---
+<div class:list={['wo-orders', `wo-orders--${size}`, cls]} data-tone={tone} data-wo-orders={isStatic ? undefined : ''}>
+  <p class="sr-only">{T.sr}</p>
+  <div class="wo-orders__card" aria-hidden="true">
+    <Ejemplo lang={lang} on="light" />
+    <p class="wo-orders__t">{T.title}</p>
+    <p class="wo-orders__s">{T.sub}</p>
+    <div class="wo-orders__view">
+      <ul class="wo-orders__list">
+        {ROWS.map(([icon, p, c], i) => (
+          <li class:list={['wo-orders__row', i < 2 && 'is-paid']}>
+            <span class="wo-orders__ic"><Icon name={icon} /></span>
+            <span class="wo-orders__txt"><b>{p}</b><span>{c}</span></span>
+            <span class="wo-orders__st">
+              <span class="wo-orders__prep">{T.prep}</span>
+              <span class="wo-orders__paid"><i></i>{T.paid}</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <p class="wo-orders__foot">{T.foot}</p>
+  </div>
+</div>
+
+<script>
+  import { registerLoop } from '../loop';
+  const ROW = 52, TICK = 950, SHIFT = 600;
+  document.querySelectorAll<HTMLElement>('[data-wo-orders]').forEach((el) => {
+    const list = el.querySelector<HTMLElement>('.wo-orders__list');
+    if (!list) return;
+    let timer = 0;
+    const rows = () => Array.from(list.children) as HTMLElement[];
+    const paidTop = () => { let n = 0; for (const r of rows().slice(0, 5)) { if (r.classList.contains('is-paid')) n++; else break; } return n; };
+    const reset = () => {
+      list.style.transition = 'none'; list.style.transform = '';
+      rows().forEach((r, i) => r.classList.toggle('is-paid', i < 2));
+    };
+    const step = () => {
+      if (paidTop() >= 3) {
+        list.style.transition = `transform ${SHIFT}ms var(--w-ease-loop)`;
+        list.style.transform = `translateY(-${ROW}px)`;
+        timer = window.setTimeout(() => {
+          const first = list.firstElementChild as HTMLElement;
+          first.classList.remove('is-paid');
+          list.style.transition = 'none'; list.style.transform = '';
+          list.appendChild(first);
+          timer = window.setTimeout(step, TICK - SHIFT);
+        }, SHIFT);
+        return;
+      }
+      rows()[paidTop()]?.classList.add('is-paid');
+      timer = window.setTimeout(step, TICK);
+    };
+    registerLoop(el, {
+      start: () => { el.classList.remove('is-still'); timer = window.setTimeout(step, TICK); },
+      stop: () => window.clearTimeout(timer),
+      still: () => { window.clearTimeout(timer); reset(); el.classList.add('is-still'); },
+    }, { buttonTone: 'light' });
+  });
+</script>
+
+<style>
+  .wo-orders {
+    --wo-acc: var(--accent-gold);
+    position: relative; width: min(100%, 400px); padding: 0;
+    font-family: var(--font-body); text-align: left;
+  }
+  .wo-orders[data-tone='teal'] { --wo-acc: var(--accent-teal); }
+  /* Campo de puntos en óvalo, detrás y más ancho que la tarjeta. */
+  .wo-orders::before {
+    content: ''; position: absolute; z-index: 0; inset: -40px -90px;
+    background: radial-gradient(rgba(var(--accent-gold-rgb), .55) 1.5px, transparent 1.8px) 0 0 / 12px 12px;
+    -webkit-mask-image: radial-gradient(closest-side, #000 45%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 45%, transparent 100%);
+    pointer-events: none;
+  }
+  .wo-orders__card {
+    position: relative; z-index: 1;
+    background: var(--w-p-bg, #f0ede8); color: var(--w-p-ink, #0e0e0d);
+    border: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+    border-radius: var(--w-r-obj, 12px); overflow: hidden;
+    padding: 20px 20px 0;
+  }
+  .wo-orders__t { margin: 0; font: 500 15px/1.3 var(--font-display); letter-spacing: -0.01em; }
+  .wo-orders__s { margin: 2px 0 12px; font-size: 13px; color: var(--w-p-ink-2, #4a4743); }
+  .wo-orders__view {
+    height: 260px; overflow: hidden;
+    -webkit-mask-image: linear-gradient(180deg, #000 82%, transparent);
+    mask-image: linear-gradient(180deg, #000 82%, transparent);
+  }
+  .wo-orders__list { list-style: none; margin: 0; padding: 0; will-change: transform; }
+  .wo-orders__row {
+    display: flex; align-items: center; gap: 12px; height: 52px;
+    border-top: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+  }
+  .wo-orders__ic {
+    flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px;
+    background: #fff; border: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+  }
+  .wo-orders__ic :global(svg) { width: 15px; height: 15px; }
+  .wo-orders__txt { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+  .wo-orders__txt b { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wo-orders__txt span { font-size: 13px; color: var(--w-p-ink-2, #4a4743); }
+  .wo-orders__st { position: relative; flex: none; width: 76px; height: 26px; }
+  .wo-orders__prep, .wo-orders__paid {
+    position: absolute; inset: 0; display: inline-flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 500; transition: opacity 120ms var(--w-ease-ui);
+  }
+  .wo-orders__prep { border: 1px solid rgba(14,14,13,.18); border-radius: 6px; background: #fff; transition-delay: 120ms; }
+  .wo-orders__paid { gap: 6px; justify-content: flex-end; opacity: 0; }
+  .wo-orders__paid i { width: 7px; height: 7px; border-radius: 50%; background: var(--wo-acc); box-shadow: 0 0 0 1px rgba(14,14,13,.25); }
+  /* Cambio en secuencia (control global r2, menor 2): sale una palabra en 120 ms y
+     entra la otra en los 120 ms siguientes; nunca se leen las dos a la vez. */
+  .is-paid .wo-orders__prep { opacity: 0; transition-delay: 0ms; }
+  .is-paid .wo-orders__paid { opacity: 1; transition-delay: 120ms; }
+  .wo-orders__foot {
+    margin: 0 -20px; padding: 0 20px; min-height: 64px; display: flex; align-items: center; background: #e6e2db;
+    font-size: 12px; color: var(--w-p-ink-2, #4a4743);
+    border-top: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+  }
+  .wo-orders--mini .wo-orders__view { height: 156px; }
+  .wo-orders--mini .wo-orders__foot { min-height: 36px; justify-content: center; }
+  .wo-orders--mini::before { display: none; }
+  @media (--lt-md) { .wo-orders::before { inset: -24px -16px; } }
+  @media (--motion-reduce) { .wo-orders__prep, .wo-orders__paid { transition: none; } }
+</style>

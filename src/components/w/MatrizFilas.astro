@@ -1,0 +1,247 @@
+---
+// Matriz de casillas que se enciende por filas (W-ADV-52 · design/rediseno-workos.md §3.5, §2.10).
+// Panel --w-s1 radio 16 (token 12); llave Lucide gris a la izquierda de cada fila;
+// casillas de 24 px, enlazadas SOLO si la landing existe (href por props); si no,
+// casilla punteada sin enlace. La fila activa se aclara (--w-s3) y sus casillas
+// se rayan en el acento; su llave pasa a tinta. Todo por opacidad de capas ya
+// pintadas (§2.10: solo transform y opacity).
+// · Bucle: la fila activa cambia cada 1 s (200 ms --w-ease-ui), registrado en
+//   loop.ts (pausa fuera de pantalla / pestaña oculta / foco o puntero dentro, botón).
+// · `fixedRow`: fila fija, sin bucle (barrios). Reducir movimiento: 1.ª fila fija.
+// · Móvil: desplazamiento horizontal DENTRO de su caja.
+// Los nombres que se leen (filas, columnas, casillas) van en letra de texto ≥ 13 px (E-40).
+// · v2 (G00, FI ciudades): el encendido ya no es un fundido. Al fundir a la vez el fondo
+//   (noche → crema) y la letra (crema → tinta), a mitad de camino quedaba gris sobre gris y la
+//   fila se leía apagada ("SEO para IA" desaparecía). Ahora el nombre va en dos capas (crema al
+//   80 % y una copia en tinta #0e0e0d, aria-hidden) que NO se funden a la vez que el fondo: la
+//   clara se va en el primer tercio del encendido (con la crema aún por debajo del 35 %) y la
+//   tinta llega en el último (con la crema ya por encima del 65 %); al apagarse, al revés. En
+//   ningún fotograma hay letra gris sobre fondo gris. Solo opacity (§4.6). Se probó una cortina
+//   por celda (scaleX): a mitad de camino la fila se veía troceada, descartada.
+// · G00 ronda 1: con capas que se iban y llegaban por separado, unos 100-150 ms la fila no tenía
+//   nombre (parpadeo). Ahora las dos capas cambian DE GOLPE y a la vez, justo a mitad del fundido
+//   del fondo (lineal): la crema se lee sobre el fondo de 0 a 50 % y la tinta de 50 a 100 %. El
+//   peor fotograma (50 %) da ≈ 3,9:1 para las dos, y el nombre nunca desaparece.
+import Icon from '../ui/Icon.astro';
+
+interface CellDef {
+  label: string;
+  href?: string;
+  /** Página actual: casilla llena, sin enlace y con aria-current="page". */
+  current?: boolean;
+  /** Lectura completa para lectores de pantalla (p. ej. "Diseño web en Houston");
+   *  si falta, se compone "<casilla> en <fila>". */
+  aria?: string;
+}
+interface RowDef { label: string; cells: CellDef[] }
+interface Props {
+  rows: RowDef[];
+  /** Cabeceras de columna (p. ej. los servicios). */
+  columns?: string[];
+  /** Índice de la fila fija (sin bucle). */
+  fixedRow?: number;
+  /** Etiqueta accesible de la tabla. */
+  label: string;
+  tone?: 'gold' | 'teal';
+  lang?: 'es' | 'en';
+  id?: string;
+  class?: string;
+}
+const { rows, columns, fixedRow, label, tone = 'gold', lang = 'es', id, class: cls } = Astro.props;
+const en = lang === 'en';
+const loop = fixedRow === undefined && rows.length > 1;
+const active = fixedRow ?? 0;
+const nCols = Math.max(columns?.length ?? 0, ...rows.map((r) => r.cells.length));
+const inWord = en ? 'in' : 'en';
+const noPage = en ? 'not available yet' : 'todavía sin página';
+const herePage = en ? 'this page' : 'esta página';
+---
+<div
+  class:list={['wd-mx', cls]}
+  id={id}
+  data-w-tone={tone}
+  data-wd-mx={loop ? 'loop' : 'fixed'}
+  style={`--wd-cols:${nCols}`}
+>
+  <div class="wd-mx__scroll">
+    <table class="wd-mx__t">
+      <caption class="sr-only">{label}</caption>
+      {columns && (
+        <thead>
+          <tr>
+            <td class="wd-mx__key-h"></td>
+            <td></td>
+            {columns.map((c) => <th scope="col" class="wd-mx__ch">{c}</th>)}
+          </tr>
+        </thead>
+      )}
+      <tbody>
+        {rows.map((r, i) => (
+          <tr class:list={['wd-mx__row', i === active && 'is-on']} data-wd-row>
+            <td class="wd-mx__key" aria-hidden="true">
+              <span class="wd-mx__kbox">
+                <Icon name="lucide:key-round" class="wd-mx__ki wd-mx__ki--off" />
+                <Icon name="lucide:key-round" class="wd-mx__ki wd-mx__ki--on" />
+              </span>
+            </td>
+            <th scope="row" class="wd-mx__rh"><span class="wd-mx__rl">{r.label}</span><span class="wd-mx__ink" aria-hidden="true">{r.label}</span></th>
+            {Array.from({ length: nCols }, (_, j) => {
+              const c = r.cells[j];
+              if (!c) return <td class="wd-mx__td"></td>;
+              const read = c.aria ?? `${c.label} ${inWord} ${r.label}`;
+              return (
+                <td class="wd-mx__td">
+                  {c.current ? (
+                    <span class="wd-mx__cell wd-mx__cell--current" aria-current="page" title={`${c.label} · ${r.label}`}>
+                      <span class="wd-mx__fill" aria-hidden="true"></span>
+                      <span class="sr-only">{`${read}: ${herePage}`}</span>
+                    </span>
+                  ) : c.href ? (
+                    <a class="wd-mx__cell" href={c.href} aria-label={read} title={`${c.label} · ${r.label}`}>
+                      <span class="wd-mx__fill" aria-hidden="true"></span>
+                    </a>
+                  ) : (
+                    <span class="wd-mx__cell wd-mx__cell--empty" title={`${c.label} · ${r.label}`}>
+                      <span class="sr-only">{`${read}: ${noPage}`}</span>
+                    </span>
+                  )}
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  /* Escala de W-ADV-52 (control 1: con casillas de 12 px y llave pequeña se leía como una tabla
+     de comparación genérica): filas de 76 px, casillas de 44, llave en caja de 48 y la fila
+     activa CLARA (objeto de producto) con casillas rayadas grandes y la llave en relieve. */
+  .wd-mx {
+    --wd-acc: var(--w-accent, var(--accent-gold));
+    --wd-acc-rgb: var(--w-accent-rgb, var(--accent-gold-rgb));
+    position: relative; max-width: min(100%, calc(360px + var(--wd-cols) * 132px)); margin-inline: auto;
+    border-radius: var(--w-r-obj); background: var(--w-s1); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .wd-mx__scroll { overflow-x: auto; overscroll-behavior-x: contain; padding: 16px 0 20px; border-radius: inherit; }
+  /* Hueco para el botón de pausa del bucle (44×44, esquina inferior derecha). */
+  .wd-mx[data-wd-mx='loop'] .wd-mx__scroll { padding-bottom: 68px; }
+  .wd-mx__t { border-collapse: separate; border-spacing: 0; width: 100%; min-width: calc(240px + var(--wd-cols) * 84px); }
+  .wd-mx__ch {
+    padding: 8px 8px 14px; text-align: center; vertical-align: bottom;
+    font-family: var(--font-body); font-weight: 500; font-size: 14px; line-height: 1.3; color: var(--w-ink-70);
+    border-bottom: 1px solid var(--w-line);
+  }
+  .wd-mx__row { position: relative; }
+  .wd-mx__row > * { position: relative; height: 76px; border-bottom: 1px solid var(--w-line); }
+  .wd-mx__row:last-child > * { border-bottom: 0; }
+  /* Fondo CLARO de la fila activa: capa en cada celda que se funde (solo opacidad, 210 ms);
+     el nombre cambia de capa en los extremos del fundido (ver la cabecera, v2 G00). */
+  .wd-mx { --wd-fade: 210ms; }
+  .wd-mx__row > *::before {
+    content: ''; position: absolute; inset: 6px 0; background: var(--w-p-bg, #f0ede8);
+    box-shadow: inset 0 1px 0 #fff;
+    opacity: 0; transition: opacity var(--wd-fade) linear;
+    pointer-events: none; z-index: 0;
+  }
+  .wd-mx__row > :first-child::before { left: 84px; border-radius: 12px 0 0 12px; }
+  .wd-mx__row > :last-child::before { right: 10px; border-radius: 0 12px 12px 0; }
+  .wd-mx__row.is-on > *::before { opacity: 1; }
+  .wd-mx__row > * > * { position: relative; z-index: 1; }
+
+  .wd-mx__key, .wd-mx__key-h { width: 96px; padding: 0 0 0 18px; }
+  /* Llave: en reposo, glifo gris suelto; en la fila activa, caja en relieve con rayas de acento. */
+  .wd-mx__kbox { position: relative; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 10px; }
+  .wd-mx__kbox::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit;
+    background:
+      repeating-linear-gradient(180deg, var(--wd-acc) 0 1.5px, transparent 1.5px 4px) right 5px center / 6px 70% no-repeat,
+      linear-gradient(180deg, #23221f, var(--w-s0));
+    border: 1px solid var(--w-line-strong);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 10px 22px rgba(0,0,0,.45);
+    opacity: 0; transition: opacity var(--w-dur-hover) var(--w-ease-ui);
+  }
+  .wd-mx__row.is-on .wd-mx__kbox::before { opacity: 1; }
+  .wd-mx__ki { grid-area: 1 / 1; position: relative; width: 22px; height: 22px; transition: opacity var(--w-dur-hover) var(--w-ease-ui); }
+  .wd-mx__ki--off { color: var(--w-ink-30); }
+  .wd-mx__ki--on { color: var(--w-ink); opacity: 0; }
+  .wd-mx__row.is-on .wd-mx__ki--on { opacity: 1; }
+  .wd-mx__row.is-on .wd-mx__ki--off { opacity: 0; }
+  .wd-mx__rh {
+    text-align: left; padding: 0 16px 0 12px; white-space: nowrap;
+    font-family: var(--font-body); font-weight: 500; font-size: 16px; color: var(--w-ink-80);
+  }
+  /* Nombre en dos capas: la clara (en el flujo) y la tinta (encima, absoluta). Se cambian de golpe
+     y a la vez a mitad del fundido del fondo, al encender y al apagar (ronda 1: sin parpadeo). */
+  .wd-mx__row > .wd-mx__rh > .wd-mx__rl,
+  .wd-mx__row > .wd-mx__rh > .wd-mx__ink { transition: opacity 0s linear calc(var(--wd-fade) / 2); }
+  .wd-mx__row > .wd-mx__rh > .wd-mx__ink {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    display: flex; align-items: center; padding-left: 12px; color: var(--w-p-ink, #0e0e0d);
+    opacity: 0;
+  }
+  .wd-mx__row.is-on > .wd-mx__rh > .wd-mx__rl { opacity: 0; }
+  .wd-mx__row.is-on > .wd-mx__rh > .wd-mx__ink { opacity: 1; }
+  .wd-mx__td { text-align: center; padding: 0 10px; }
+  .wd-mx__cell {
+    position: relative; display: inline-grid; place-items: center; width: 44px; height: 44px; vertical-align: middle;
+    border-radius: 8px; background: rgba(var(--star-rgb), .06); box-shadow: inset 0 0 0 1px var(--w-line-ink);
+  }
+  .wd-mx__cell::after { content: ''; width: 18px; height: 18px; border-radius: 3px; background: rgba(var(--star-rgb), .2); }
+  .wd-mx__cell--empty { background: transparent; box-shadow: none; border: 1px dashed rgba(var(--star-rgb), .24); }
+  .wd-mx__cell--empty::after { display: none; }
+  .wd-mx__row.is-on .wd-mx__cell--empty { border-color: rgba(14,14,13,.28); }
+  /* Casilla activa: rayas de acento con barras de tinta en el centro (W-ADV-52), capa propia. */
+  .wd-mx__fill {
+    position: absolute; inset: 0; border-radius: inherit;
+    background:
+      linear-gradient(var(--w-p-ink, #0e0e0d), var(--w-p-ink, #0e0e0d)) center / 44% 10% no-repeat,
+      linear-gradient(var(--w-p-ink, #0e0e0d), var(--w-p-ink, #0e0e0d)) center 34% / 30% 8% no-repeat,
+      linear-gradient(var(--w-p-ink, #0e0e0d), var(--w-p-ink, #0e0e0d)) center 66% / 30% 8% no-repeat,
+      repeating-linear-gradient(180deg, var(--wd-acc) 0 2px, transparent 2px 5px),
+      #fff;
+    box-shadow: inset 0 0 0 1px rgba(var(--wd-acc-rgb), .7), 0 4px 10px rgba(14,14,13,.12);
+    opacity: 0; transition: opacity var(--w-dur-hover) var(--w-ease-ui);
+  }
+  .wd-mx__row.is-on .wd-mx__fill { opacity: 1; }
+  /* Página actual: llena siempre, esté o no encendida su fila. */
+  .wd-mx__cell--current .wd-mx__fill { opacity: 1; }
+  a.wd-mx__cell:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 3px; }
+  @media (--hover-fine) { a.wd-mx__cell:hover .wd-mx__fill { opacity: .7; } }
+  @media (--lt-md) {
+    .wd-mx__key, .wd-mx__key-h { width: 72px; padding-left: 12px; }
+    .wd-mx__kbox { width: 44px; height: 44px; }
+    .wd-mx__row > :first-child::before { left: 62px; }
+    .wd-mx__row > * { height: 68px; }
+    .wd-mx__cell { width: 40px; height: 40px; }
+    /* Zona táctil de 44 px sin cambiar el dibujo de 40 (§6.8). */
+    a.wd-mx__cell::before { content: ''; position: absolute; inset: -2px; }
+    .wd-mx__t { min-width: calc(196px + var(--wd-cols) * 62px); }
+    .wd-mx__td { padding: 0 6px; }
+    .wd-mx__rh { padding-left: 6px; font-size: 15px; }
+    .wd-mx__row > .wd-mx__rh > .wd-mx__ink { padding-left: 6px; }
+  }
+  @media (--motion-reduce) {
+    .wd-mx__row > *::before, .wd-mx__ki, .wd-mx__kbox::before, .wd-mx__fill { transition: none; }
+    .wd-mx__row > .wd-mx__rh > .wd-mx__rl, .wd-mx__row > .wd-mx__rh > .wd-mx__ink { transition: none; }
+  }
+</style>
+
+<script>
+  import { registerLoop } from './loop';
+  const TICK = 1000; // medido en W-ADV-52: la fila activa cambia cada ~1 s
+  document.querySelectorAll<HTMLElement>('[data-wd-mx="loop"]').forEach((el) => {
+    const rows = Array.from(el.querySelectorAll<HTMLElement>('[data-wd-row]'));
+    if (rows.length < 2) return;
+    let i = 0, timer = 0;
+    const paint = () => rows.forEach((r, j) => r.classList.toggle('is-on', j === i));
+    const tick = () => { i = (i + 1) % rows.length; paint(); timer = window.setTimeout(tick, TICK); };
+    registerLoop(el, {
+      start: () => { timer = window.setTimeout(tick, TICK); },
+      stop: () => window.clearTimeout(timer),
+      still: () => { window.clearTimeout(timer); i = 0; paint(); },
+    });
+  });
+</script>

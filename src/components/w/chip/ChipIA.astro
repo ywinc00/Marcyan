@@ -1,0 +1,425 @@
+---
+// P07 · Chip de la IA con Marcyan en el centro (design/rediseno-workos-v2.md §2 P07).
+// Original: W-HOME-12/13, portada de WorkOS ("Developer-first design"), C/02-chip-marca/FICHA.md.
+//
+//   <ChipIA variante="portada" lang="es">
+//     <PildorasMarcas slot="pildoras" filas={[…]} />
+//   </ChipIA>
+//
+// · variante 'portada': placa + chip 220 + horizonte curvo (arco SVG de radio fijo, más ancho
+//   que cualquier pantalla: nunca un borde recto a 1920+, E-36) y las píldoras BAJO el horizonte.
+//   Se monta FUERA de `.container`, a todo el ancho de su sección (el componente recorta).
+// · 'landing': sin horizonte; la placa se apoya en una línea de suelo de 1 px y debajo van las píldoras.
+// · 'sello': chip 180, sin píldoras, encendido único y luz de pistas en bucle.
+// · Móvil (< 640 px): chip 168 (sello 150), placa recortada al ancho con las pistas saliendo arriba y abajo.
+//
+// Coreografía (medida en C/02; t=0 cuando el 35 % del componente entra en vista, o al cargar con
+// encender="carga"): 0-530 ms la luz baja por la pista inferior · 530-1475 ms el borde aparece
+// mientras el cuadrado de luz gira 545° · 1475-2570 ms halo, logo y palabra se encienden ·
+// 1600 ms evento `w2:encender` (CustomEvent, bubbles) despachado en CADA hijo directo del slot
+// `pildoras` (PildorasMarcas escucha en su raíz) · desde 2570 ms bucle de luz por las pistas
+// (6 s lineal, superiores retraso 0, inferiores 1150 ms) mientras está a la vista, vía
+// registerLoop de loop.ts (pestaña oculta, fuera de vista, botón de pausa y estado global de
+// pausa cuando loop.ts lo tenga). Reentrada tras ≥ 8 s fuera: repite el encendido (no en 'sello').
+// El bucle se registra en un vigía invisible (sin puntero ni foco) que cubre la escena: pasar el
+// ratón por la sección NO lo para (E-56); se para con el botón, fuera de vista o con la pestaña oculta.
+// En 'portada' la luz de entrada y su brillo sobre el arco van en una capa ENCIMA del horizonte.
+// En 'landing' unas pistas salen del bus inferior y bajan hasta la primera fila de píldoras.
+// Reduced-motion: encendido completo, sin luz, `w2:encender` inmediato.
+// Sin JS: se pinta encendido (el estado apagado solo existe con la clase `is-armed`).
+//
+// Halo CREMA (nunca teal, E-03). Logo de EMPRESA (planeta ilustrado del schema redibujado en SVG,
+// como PlacaLogo; NO el BrandType de la nav ni el favicon: regla "logos no unificar").
+import PlacaCircuito from './PlacaCircuito.astro';
+
+interface Props {
+  variante?: 'portada' | 'landing' | 'sello';
+  lang?: 'es' | 'en';
+  encender?: 'vista' | 'carga';
+  class?: string;
+}
+const { variante = 'landing', lang = 'es', encender = 'vista', class: cls } = Astro.props;
+const uid = Math.random().toString(36).slice(2, 8);
+const conPildoras = variante !== 'sello' && Astro.slots.has('pildoras');
+const label = lang === 'en'
+  ? 'The Marcyan logo lighting up on a chip at the center of a circuit board'
+  : 'El logo de Marcyan encendido en un chip, en el centro de una placa de circuito';
+// Anillos finos del disco del logo (como el isotipo de empresa).
+const anillos = Array.from({ length: 11 }, (_, i) => 35.5 + i * 1.7);
+---
+<div
+  class:list={['chipia', `chipia--${variante}`, cls]}
+  data-w2-chip
+  data-variante={variante}
+  data-encender={encender}
+  lang={lang}
+>
+  <div class="chipia__escena" role="img" aria-label={label}>
+    <PlacaCircuito uid={uid} class="chipia__placa" />
+    {variante === 'portada' && (
+      <svg class="chipia__horizonte" viewBox="0 0 7272 900" width="7272" height="900" aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id={`chz-f-${uid}`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="420">
+            <stop offset="0" stop-color="#141413" stop-opacity=".62" />
+            <stop offset=".4" stop-color="#0c0c0b" stop-opacity=".8" />
+            <stop offset="1" stop-color="#080808" />
+          </linearGradient>
+        </defs>
+        <circle cx="3636" cy="3636" r="3636" fill={`url(#chz-f-${uid})`} />
+        <circle cx="3636" cy="3650" r="3636" fill="none" stroke="#f0ede8" stroke-opacity=".022" stroke-width="40" vector-effect="non-scaling-stroke" />
+        <circle cx="3636" cy="3642" r="3636" fill="none" stroke="#f0ede8" stroke-opacity=".05" stroke-width="16" vector-effect="non-scaling-stroke" />
+        <circle cx="3636" cy="3638" r="3636" fill="none" stroke="#f0ede8" stroke-opacity=".1" stroke-width="5" vector-effect="non-scaling-stroke" />
+        <circle cx="3636" cy="3636" r="3636" fill="none" stroke="#f0ede8" stroke-opacity=".3" stroke-width="1" vector-effect="non-scaling-stroke" />
+      </svg>
+    )}
+    {variante === 'portada' && <PlacaCircuito uid={uid} capa="entrada" class="chipia__entrada" />}
+    <span class="chipia__vigia" data-w2-vigia aria-hidden="true"></span>
+    <div class="chipia__chip" aria-hidden="true">
+      <span class="chipia__sombra"></span>
+      <span class="chipia__borde"><span class="chipia__giro"></span></span>
+      <span class="chipia__cara">
+        <span class="chipia__brillo"></span>
+        <svg class="chipia__logo" viewBox="0 0 126 120" width="126" height="120" aria-hidden="true" focusable="false">
+          <defs>
+            <radialGradient id={`chl-d-${uid}`} cx="50%" cy="50%" r="50%">
+              <stop offset="0" stop-color="#d8bd86" />
+              <stop offset=".78" stop-color="#c8a96e" />
+              <stop offset=".97" stop-color="#d9c17f" />
+              <stop offset="1" stop-color="#e8d48c" />
+            </radialGradient>
+            <radialGradient id={`chl-l-${uid}`} cx="30%" cy="35%" r="75%">
+              <stop offset="0" stop-color="#d3a95c" />
+              <stop offset=".55" stop-color="#8a6630" />
+              <stop offset="1" stop-color="#3e2c12" />
+            </radialGradient>
+            <radialGradient id={`chl-p-${uid}`} cx="40%" cy="32%" r="78%">
+              <stop offset="0" stop-color="#8c7c5a" />
+              <stop offset=".55" stop-color="#5c4a2a" />
+              <stop offset="1" stop-color="#2b1f0e" />
+            </radialGradient>
+            <clipPath id={`chl-c-${uid}`}><circle cx="59" cy="60" r="32.5" /></clipPath>
+          </defs>
+          <circle cx="59" cy="60" r="54" fill={`url(#chl-d-${uid})`} />
+          <g fill="none" stroke="#a9884f" stroke-width=".55" stroke-opacity=".55">
+            {anillos.map((r) => <circle cx="59" cy="60" r={r} />)}
+          </g>
+          <!-- mitad trasera del anillo -->
+          <path d="M8.5 60.5 A51 12 -2 0 1 109.5 57" fill="none" stroke="#c8a96e" stroke-width="2.6" />
+          <!-- planeta: cuarto creciente claro a la izquierda, cuerpo oscuro desplazado -->
+          <circle cx="59" cy="60" r="32.5" fill={`url(#chl-l-${uid})`} />
+          <circle cx="66" cy="63" r="31" fill={`url(#chl-p-${uid})`} clip-path={`url(#chl-c-${uid})`} />
+          <circle cx="59" cy="60" r="32.5" fill="none" stroke="#4a3a1c" stroke-width="1" />
+          <!-- mitad delantera del anillo -->
+          <path d="M8.5 60.5 A51 12 -2 0 0 109.5 57" fill="none" stroke="#c8a96e" stroke-width="2.6" />
+          <!-- luna teal -->
+          <circle cx="110" cy="59" r="13.5" fill="#4fc3a1" />
+        </svg>
+        <span class="chipia__palabra">Marcyan</span>
+      </span>
+    </div>
+    {variante === 'landing' && <span class="chipia__suelo" aria-hidden="true"></span>}
+  </div>
+  <div class="chipia__mando" data-w2-mando></div>
+  {conPildoras && (
+    <div class="chipia__pildoras" data-w2-chip-pildoras>
+      {variante === 'landing' && (
+        <svg class="chipia__conectores" viewBox="0 0 300 64" width="300" height="64" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id={`chc-g-${uid}`} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="64">
+              <stop offset="0" stop-color="#4fc3a1" stop-opacity=".05" />
+              <stop offset="1" stop-color="#4fc3a1" stop-opacity=".26" />
+            </linearGradient>
+          </defs>
+          <g fill="none" stroke={`url(#chc-g-${uid})`} stroke-width="1.25" class="chipia__con-d">
+            <path d="M84 0V16L98 30V64M64 0V20L88 44V64M24 0V22M216 0V16L202 30V64M236 0V20L212 44V64M276 0V22" />
+          </g>
+          <g fill="none" stroke={`url(#chc-g-${uid})`} stroke-width="1.25" class="chipia__con-m">
+            <path d="M100 0V14L104 18V64M85 0V18L96 29V64M54 0V22M200 0V14L196 18V64M215 0V18L204 29V64M246 0V22" />
+          </g>
+          <g fill="#4fc3a1" fill-opacity=".14" class="chipia__con-d"><rect x="21" y="22" width="6" height="8" rx="1" /><rect x="273" y="22" width="6" height="8" rx="1" /></g>
+          <g fill="#4fc3a1" fill-opacity=".14" class="chipia__con-m"><rect x="51" y="22" width="6" height="8" rx="1" /><rect x="243" y="22" width="6" height="8" rx="1" /></g>
+        </svg>
+      )}
+      <slot name="pildoras" />
+    </div>
+  )}
+</div>
+
+<style>
+  .chipia {
+    --k: 1;
+    --chip-t: .22, 1, .36, 1;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    width: 100%;
+    padding-block: 8px 0;
+  }
+  .chipia--sello { --k: calc(180 / 220); }
+  @media (max-width: 639.98px) {
+    .chipia { --k: calc(168 / 220); }
+    .chipia--sello { --k: calc(150 / 220); }
+  }
+
+  /* Escena: placa 860×480 escalada con el chip; centrada aunque sea más ancha que el hueco. */
+  .chipia__escena {
+    position: relative;
+    width: calc(860px * var(--k));
+    height: calc(480px * var(--k));
+    margin-left: calc(50% - 430px * var(--k));
+  }
+  /* PlacaCircuito no hereda el atributo de ámbito: sus clases se alcanzan con :global. */
+  .chipia :global(.chipia__placa) { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
+
+  /* Horizonte (portada): arco de radio 3636 px, 28 px por encima del pie del chip. */
+  .chipia__horizonte {
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: calc(322px * var(--k));
+    margin-left: -3636px;
+    transform-origin: 3636px 0;
+    transform: scale(var(--k));
+    max-width: none;
+    pointer-events: none;
+  }
+  @media (max-width: 639.98px) {
+    /* curvatura visible también a 390: radio más corto */
+    .chipia__horizonte { transform: scale(calc(var(--k) * .4)); }
+  }
+  /* Luz de entrada (portada): encima del horizonte, debajo del chip. */
+  .chipia :global(.chipia__entrada) { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; display: block; pointer-events: none; }
+  /* Vigía del bucle: invisible, sin puntero ni foco (el ratón encima no congela la placa). */
+  .chipia__vigia { position: absolute; inset: 0; pointer-events: none; }
+
+  /* Suelo (landing): 1 px que funde en los extremos. */
+  .chipia__suelo {
+    position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(240, 237, 232, .16) 30%, rgba(240, 237, 232, .16) 70%, transparent);
+  }
+
+  /* ── Chip (se construye a 220 y escala con --k) ── */
+  /* Mando de pausa: pegado al pie derecho del chip (el botón cae 16 px a su derecha, alineado con su base). */
+  .chipia__mando { position: absolute; z-index: 5; top: calc(8px + 350px * var(--k) - 56px); left: min(calc(50% + 110px * var(--k) + 4px), calc(100% - 72px)); width: 68px; height: 68px; }
+  .chipia__mando:empty { pointer-events: none; }
+  /* Sello: la pausa no va junto a la marca (parecía un error) sino en la esquina inferior derecha
+     de la placa, o del hueco visible si la placa es más ancha (móvil). El botón queda a 12 px. */
+  .chipia--sello .chipia__mando { top: calc(8px + 480px * var(--k) - 68px); left: min(calc(50% + 430px * var(--k) - 68px), calc(100% - 68px)); }
+  /* Móvil: la esquina derecha es el carril del botón flotante del chat (E-18); la pausa pasa a la
+     esquina inferior IZQUIERDA de la placa, o del hueco visible si la placa es más ancha. */
+  @media (max-width: 767.98px) {
+    .chipia--sello .chipia__mando { left: max(calc(50% - 430px * var(--k)), 0px); }
+  }
+
+  .chipia__chip {
+    position: absolute; z-index: 3;
+    left: 50%; top: 50%;
+    width: 220px; height: 220px;
+    margin: -110px 0 0 -110px;
+    transform: scale(var(--k));
+  }
+  .chipia__sombra {
+    position: absolute; inset: 0; border-radius: 2px;
+    box-shadow:
+      0 0 74px rgba(240, 237, 232, .10),
+      0 2px 3px rgba(0, 0, 0, .30),
+      0 6px 10px rgba(0, 0, 0, .26),
+      0 12px 20px rgba(0, 0, 0, .22),
+      0 22px 36px rgba(0, 0, 0, .19),
+      0 33px 54px rgba(0, 0, 0, .17),
+      0 58px 90px rgba(0, 0, 0, .15);
+  }
+  .chipia__borde {
+    position: absolute; inset: 0; border-radius: 2px; overflow: hidden;
+  }
+  .chipia__giro {
+    position: absolute; left: -55px; top: -55px; width: 330px; height: 330px;
+    background: linear-gradient(45deg, var(--accent-teal, #4fc3a1) 20%, #1d2b2a 50%, var(--accent-teal, #4fc3a1) 82%);
+    transform: rotate(545deg);
+  }
+  .chipia__cara {
+    position: absolute; inset: 1px; border-radius: 1px; overflow: hidden;
+    background: linear-gradient(#161917, #121513);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  }
+  .chipia__cara::before {
+    /* ruido estático (feTurbulence, se rasteriza una vez) */
+    content: ''; position: absolute; inset: 0; opacity: .06; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='218' height='218'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='218' height='218' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .chipia__cara::after {
+    /* filo de luz cenital muy leve, como un objeto físico */
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(240, 237, 232, .035), transparent 38%);
+  }
+  .chipia__cara > .chipia__brillo { position: absolute; left: 50%; top: 40%; width: 180px; height: 180px; margin: -90px 0 0 -90px; border-radius: 50%; background: radial-gradient(closest-side, rgba(200, 169, 110, .16), rgba(200, 169, 110, 0)); pointer-events: none; }
+  .chipia__logo { position: relative; z-index: 1; width: 126px; height: 120px; display: block; margin: 4px 0 0 6px; }
+  .chipia__palabra {
+    position: relative; z-index: 1;
+    font-family: var(--font-display, 'Space Grotesk', system-ui, sans-serif);
+    font-weight: 500; font-size: 38px; line-height: 38px; letter-spacing: -.04em;
+    background: linear-gradient(180deg, #f0ede8 18%, #9a9590 96%);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+
+  /* ── Luz por las pistas (bucle) ── */
+  .chipia :global(.cp-luz) { opacity: 0; }
+  .chipia :global(.cp-hl), .chipia :global(.cp-hl-arco) { opacity: 0; }
+
+  .chipia :global(.cp-luz--sup) {
+    animation: chipia-luz-sup 6s linear infinite paused;
+  }
+  .chipia :global(.cp-luz--inf) {
+    animation: chipia-luz-inf 6s linear 1150ms infinite paused;
+  }
+  .chipia.is-playing :global(.cp-luz) { animation-play-state: running; }
+  .chipia.is-still :global(.cp-luz) { animation: none; opacity: 0; }
+
+  @keyframes chipia-luz-sup {
+    /* el centro de la banda sale del chip (y 240) y sube hasta y 40: siempre hay luz cerca del chip */
+    0%   { transform: translateY(130px); opacity: 0; }
+    7%   { opacity: 1; }
+    88%  { opacity: 1; }
+    100% { transform: translateY(-70px); opacity: 0; }
+  }
+  @keyframes chipia-luz-inf {
+    0%   { transform: translateY(130px); opacity: 0; }
+    7%   { opacity: 1; }
+    88%  { opacity: 1; }
+    100% { transform: translateY(330px); opacity: 0; }
+  }
+
+  /* ── Encendido (solo con JS y movimiento: is-armed = apagado; is-lit = coreografía) ── */
+  .chipia.is-armed .chipia__sombra { opacity: 0; }
+  .chipia.is-armed .chipia__borde { opacity: 0; }
+  .chipia.is-armed .chipia__giro { transform: rotate(0deg); }
+  .chipia.is-armed .chipia__logo { opacity: .1; }
+  .chipia.is-armed .chipia__brillo { opacity: 0; }
+  .chipia.is-armed .chipia__palabra { opacity: .2; }
+
+  .chipia.is-armed.is-lit :global(.cp-hl) { animation: chipia-hl 700ms linear both; }
+  .chipia.is-armed.is-lit :global(.cp-hl-arco) { animation: chipia-arco 1100ms ease-out both; }
+  .chipia.is-armed.is-lit .chipia__borde { animation: chipia-on 945ms ease-out 530ms both; }
+  .chipia.is-armed.is-lit .chipia__giro { animation: chipia-giro 945ms cubic-bezier(var(--chip-t)) 530ms both; }
+  .chipia.is-armed.is-lit .chipia__sombra { animation: chipia-halo 1095ms ease-out 1475ms both; }
+  .chipia.is-armed.is-lit .chipia__brillo { animation: chipia-on 1095ms ease-out 1475ms both; }
+  .chipia.is-armed.is-lit .chipia__logo { animation: chipia-logo 1095ms ease-out 1475ms both; }
+  .chipia.is-armed.is-lit .chipia__palabra { animation: chipia-palabra 1040ms ease-out 1530ms both; }
+
+  /* La cresta de la luz (y 402 en reposo) sale del pie del chip (y 312) y baja hasta pasar el borde
+     de la placa (y 512) en 0-530 ms: siempre a la vista bajo el chip durante el primer tiempo. */
+  @keyframes chipia-hl {
+    0%    { transform: translateY(-90px); opacity: .85; }
+    75.7% { transform: translateY(110px); opacity: .85; }
+    100%  { transform: translateY(110px); opacity: 0; }
+  }
+  /* Brillo sobre el arco: se enciende al cruzar la luz el horizonte y se apaga cuando el borde gira. */
+  @keyframes chipia-arco {
+    0%   { opacity: 0; transform: scaleX(.55); }
+    18%  { opacity: 1; transform: scaleX(1); }
+    55%  { opacity: .55; }
+    100% { opacity: 0; transform: scaleX(1.15); }
+  }
+  .chipia :global(.cp-hl-arco) { transform-box: fill-box; transform-origin: center; }
+  @keyframes chipia-on { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes chipia-giro { from { transform: rotate(0deg); } to { transform: rotate(545deg); } }
+  @keyframes chipia-halo { from { opacity: .2; } to { opacity: 1; } }
+  @keyframes chipia-logo { from { opacity: .28; } to { opacity: 1; } }
+  @keyframes chipia-palabra { from { opacity: .36; } to { opacity: 1; } }
+
+  /* ── Píldoras: bajo el horizonte (portada) o bajo el suelo (landing) ── */
+  .chipia__pildoras { position: relative; z-index: 4; padding-inline: 16px; }
+  .chipia__pildoras > :global(*:not(svg)) { position: relative; z-index: 1; }
+  /* Pistas de la placa a la primera fila de píldoras (landing): cruzan el hueco y entran bajo la píldora. */
+  .chipia__conectores { position: absolute; z-index: 0; top: -32px; left: 50%; margin-left: -150px; width: 300px; height: 64px; pointer-events: none; }
+  .chipia__conectores .chipia__con-m { display: none; }
+  @media (max-width: 639.98px) {
+    .chipia__conectores .chipia__con-d { display: none; }
+    .chipia__conectores .chipia__con-m { display: inline; }
+  }
+  .chipia--portada .chipia__pildoras { margin-top: calc(-14px * var(--k)); padding-bottom: 72px; }
+  .chipia--landing .chipia__pildoras { margin-top: 32px; padding-bottom: 64px; }
+  .chipia--sello { padding-bottom: 8px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chipia :global(.cp-luz), .chipia :global(.cp-hl), .chipia :global(.cp-hl-arco) { animation: none !important; opacity: 0 !important; }
+    .chipia .chipia__brillo, .chipia .chipia__sombra, .chipia .chipia__borde, .chipia .chipia__logo, .chipia .chipia__palabra { animation: none !important; opacity: 1 !important; }
+    .chipia .chipia__giro { animation: none !important; transform: rotate(545deg) !important; }
+  }
+</style>
+
+<script>
+  import { registerLoop } from '../loop';
+
+  const ENTRADA = 0.35;          // umbral de entrada en vista (§1.5)
+  const T_PILDORAS = 1600;
+  const T_FIN = 2570;
+  const REENTRADA_MS = 8000;
+
+  function montar(root: HTMLElement) {
+    if (root.dataset.w2Montado) return;
+    root.dataset.w2Montado = '1';
+    const variante = root.dataset.variante;
+    const alCargar = root.dataset.encender === 'carga';
+    const lang = root.lang === 'en' ? 'en' : 'es';
+    const pildoras = root.querySelector<HTMLElement>('[data-w2-chip-pildoras]');
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const encenderPildoras = () => {
+      pildoras?.querySelectorAll<HTMLElement>(':scope > :not(svg)').forEach((el) =>
+        el.dispatchEvent(new CustomEvent('w2:encender', { bubbles: true })));
+    };
+
+    let introHecha = false;
+    let quiereBucle = false;
+    let timers: number[] = [];
+    const aplicarBucle = () => root.classList.toggle('is-playing', introHecha && quiereBucle);
+
+    // Vigía: cubre la escena pero no recibe puntero ni foco, así el bucle solo se para con el
+    // botón, fuera de vista o con la pestaña oculta (no al pasar el ratón: E-56).
+    const vigia = root.querySelector<HTMLElement>('[data-w2-vigia]') ?? root;
+    registerLoop(vigia, {
+      start: () => { quiereBucle = true; aplicarBucle(); },
+      stop: () => { quiereBucle = false; aplicarBucle(); },
+      still: () => { quiereBucle = false; root.classList.remove('is-playing', 'is-armed', 'is-lit'); root.classList.add('is-still'); },
+    }, { lang, buttonHost: root.querySelector<HTMLElement>('[data-w2-mando]') ?? root });
+
+    if (mq.matches) { introHecha = true; encenderPildoras(); return; }
+
+    const reproducir = () => {
+      timers.forEach(clearTimeout); timers = [];
+      introHecha = false; aplicarBucle();
+      root.classList.add('is-armed');
+      root.classList.remove('is-lit');
+      void root.offsetWidth;            // reinicia las animaciones CSS
+      root.classList.add('is-lit');
+      timers.push(window.setTimeout(encenderPildoras, T_PILDORAS));
+      timers.push(window.setTimeout(() => { introHecha = true; aplicarBucle(); }, T_FIN));
+    };
+
+    root.classList.add('is-armed');
+    if (alCargar) { reproducir(); }
+
+    let veces = alCargar ? 1 : 0;
+    let salida = 0;
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting && e.intersectionRatio >= ENTRADA) {
+          const fuera = salida ? performance.now() - salida : Infinity;
+          if (veces === 0 || (variante !== 'sello' && fuera >= REENTRADA_MS)) { veces++; reproducir(); }
+          salida = 0;
+        } else if (!e.isIntersecting && veces > 0 && !salida) {
+          salida = performance.now();
+        }
+      }
+    }, { threshold: [0, ENTRADA] });
+    io.observe(root);
+
+    mq.addEventListener?.('change', (ev) => {
+      if (ev.matches) { timers.forEach(clearTimeout); introHecha = true; encenderPildoras(); }
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-w2-chip]').forEach(montar);
+</script>

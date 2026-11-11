@@ -1,7 +1,6 @@
 ---
 // Navegación del sitio. Mobile-first:
 //  · < md  → marca + hamburguesa → drawer off-canvas (links + lang + CTA dentro)
-//            + barra de CTA fija inferior (aparece al pasar el hero).
 //  · ≥ md  → barra completa (links + lang ES|EN + CTA outline inline).
 // Sobre el hero la barra es TRANSPARENTE (se funde); al hacer scroll gana blur+fondo.
 // Accesible: aria-expanded, aria-hidden/inert, foco atrapado, Esc/overlay cierran,
@@ -11,6 +10,10 @@ import BrandType from '../brand/BrandType.astro';
 import Button from '../ui/Button.astro';
 import { toggleHref } from '../../i18n/routes';
 import { t, type Lang } from '../../i18n/ui';
+// Megamenú (design/rediseno-workos.md §2.12, G10) + sprite de iconos-objeto (§2.8).
+import MegaServicios from '../w/nav/MegaServicios.astro';
+import DrawerGrupos from '../w/nav/DrawerGrupos.astro';
+import { navW, navIcon, cubiertoPorGrupos } from '../../i18n/w/nav';
 
 interface Props {
   nav: any;
@@ -18,7 +21,8 @@ interface Props {
   homeHref?: string;
   hasEn?: boolean;
   currentPath?: string;
-  showCtaBar?: boolean;
+  /** Megamenú de Servicios + grupos del drawer. false = nav de siempre (plan B, §2.12). */
+  mega?: boolean;
 }
 const {
   nav,
@@ -26,7 +30,7 @@ const {
   homeHref = '/es',
   hasEn = true,
   currentPath,
-  showCtaBar = true,
+  mega = true,
 } = Astro.props;
 const otherHref = toggleHref(currentPath ?? '/', lang as Lang);
 const uin = t(lang as Lang);
@@ -37,6 +41,14 @@ const ctaTrack = nav.cta.track || 'proposal_requested';
 // aria-current: marca el link activo (no aplica al ancla de #contacto).
 const isActive = (href: string) =>
   !!currentPath && href !== '#contacto' && currentPath.startsWith(href);
+
+// Megamenú: se acopla al enlace cuyo href termina en /servicios o /services.
+const navLang = (lang === 'en' ? 'en' : 'es') as 'es' | 'en';
+const isServicesLink = (href: string) => /\/(servicios|services)\/?$/.test(href);
+const hasMega = mega && nav.links.some((l: any) => isServicesLink(l.href));
+const uiw = navW[navLang];
+// En el drawer, los enlaces que ya representan los grupos no se repiten.
+const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.href)) : nav.links;
 ---
 <header class="nav" data-nav>
   <div class="nav__bar container">
@@ -45,7 +57,21 @@ const isActive = (href: string) =>
     </a>
 
     <nav class="nav__links" aria-label={uin.nav.primary}>
-      {nav.links.map((l: any) => <a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
+      {nav.links.map((l: any) => hasMega && isServicesLink(l.href)
+        ? (
+          <span class="nav__mega" data-nav-mega-wrap>
+            <a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>
+            <button class="nav__mega-btn" type="button" aria-expanded="false" aria-controls="nav-mega" aria-label={uiw.megaBtn} data-nav-mega-btn>
+              {/* SVG propio (navIcon), no astro-icon: así ningún icono de la página
+                  (p. ej. el hero de portada) cambia de marcado por el megamenú. */}
+              <Fragment set:html={navIcon('lucide:chevron-down')} />
+            </button>
+            {/* Justo detrás del botón: el Tab entra en el panel. Posición absoluta
+                respecto al <header> (ningún ancestro intermedio está posicionado). */}
+            <MegaServicios lang={navLang} currentPath={currentPath} />
+          </span>
+        )
+        : <a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
     </nav>
 
     <div class="nav__actions">
@@ -82,18 +108,19 @@ const isActive = (href: string) =>
     </button>
   </div>
   <nav class="nav__drawer-links" aria-label={uin.nav.mobileMenu}>
-    {nav.links.map((l: any) => <a href={l.href} data-nav-link aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
+    {drawerLinks.map((l: any) => <a href={l.href} data-nav-link aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
   </nav>
-  <div class="nav__drawer-foot">
-    <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-nav-link data-track={ctaTrack}>{nav.cta.label}</Button>
-  </div>
+  {hasMega
+    ? <DrawerGrupos lang={navLang} currentPath={currentPath} />
+    : (
+      <div class="nav__drawer-foot">
+        <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-nav-link data-track={ctaTrack}>{nav.cta.label}</Button>
+      </div>
+    )}
 </aside>
 
-{showCtaBar && (
-  <div class="nav__cta-bar" data-nav-ctabar>
-    <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-track={ctaTrack}>{nav.cta.label}</Button>
-  </div>
-)}
+{/* v5 (dueño, 2026-11-07): sin barra fija de «Propuesta gratis» en móvil; el formulario normal
+    vive en el chat de Marcy («Formulario de contacto») y en la sección #contacto. */}
 
 <style>
   .nav {
@@ -123,7 +150,10 @@ const isActive = (href: string) =>
     font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
     color: var(--fg-secondary); transition: color var(--duration-fast);
     min-height: var(--tap-min); display: inline-flex; align-items: center;
+    position: relative;
   }
+  /* Zona táctil de 44 px de ancho sin mover el dibujo del conmutador (WCAG 2.5.8). */
+  .nav__lang-opt::before { content: ''; position: absolute; inset: 0 -12px; }
   .nav__lang-opt.is-on { color: var(--accent-gold); }
   .nav__lang-opt.is-disabled { color: var(--fg-subtle); opacity: .5; cursor: default; }
   a.nav__lang-opt:hover { color: var(--fg-primary); }
@@ -136,6 +166,7 @@ const isActive = (href: string) =>
     font-family: var(--font-body); font-size: var(--text-sm); font-weight: 600;
     color: var(--accent-gold); background: var(--accent-gold-dim);
     border: 1px solid var(--accent-gold-line);
+    white-space: nowrap;
     transition: background var(--duration-fast) var(--ease-out-expo), color var(--duration-fast);
   }
   .nav__cta:hover { background: var(--accent-gold); color: var(--fg-inverse); }
@@ -163,6 +194,30 @@ const isActive = (href: string) =>
     .nav__cta { display: inline-flex; }
     .nav__toggle { display: none; }
   }
+  /* Megamenú: "Servicios" sigue siendo enlace; a su lado, el botón-chevron.
+     16 px visibles y 44 de objetivo táctil con ::after. Entre 768 y 1024 el hueco
+     entre enlaces baja de 16 a 12: devuelve los ~18 px que ocupa el botón y la
+     barra mide lo mismo que antes (el CTA no se estrecha). */
+  .nav__mega { display: none; }
+  @media (--md) and (--lt-lg) { .nav__links:has(.nav__mega) { gap: var(--space-3); } .nav__cta { padding: 9px 12px; } }
+  @media (--md) {
+    .nav__mega { display: inline-flex; align-items: center; gap: 2px; }
+    .nav__mega-btn {
+      position: relative; display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: var(--tap-min); padding: 0; color: var(--fg-secondary);
+      transition: color var(--duration-fast);
+    }
+    .nav__mega-btn::after { content: ''; position: absolute; inset: 0 -12px; }
+    .nav__mega-btn :global(svg) {
+      flex: none; width: 14px; height: 14px; stroke-width: 2;
+      transition: transform 150ms var(--w-ease-ui, ease);
+    }
+    .nav__mega-btn[aria-expanded="true"] { color: var(--fg-primary); }
+    .nav__mega-btn[aria-expanded="true"] :global(svg) { transform: rotate(180deg); }
+    .nav__mega-btn:hover { color: var(--fg-primary); }
+  }
+  @media (--motion-reduce) { .nav__mega-btn :global(svg) { transition: none; } }
+
   /* ≥ lg: hay espacio de sobra → respira más entre enlaces */
   @media (--lg) { .nav__links { gap: var(--space-6); } }
 
@@ -219,24 +274,10 @@ const isActive = (href: string) =>
 
   @media (--md) { .nav__overlay, .nav__drawer { display: none; } }
 
-  /* ── Barra CTA fija inferior (móvil) ──────────────────── */
-  .nav__cta-bar {
-    position: fixed; inset: auto 0 0 0; z-index: var(--z-nav);
-    padding: var(--space-3) var(--container-pad) calc(var(--space-3) + env(safe-area-inset-bottom));
-    background: var(--bg-overlay); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid var(--border);
-    transform: translateY(110%); transition: transform var(--duration-slow) var(--ease-out-expo);
-  }
-  .nav__cta-bar.is-visible { transform: translateY(0); }
-  @media (--md) { .nav__cta-bar { display: none; } }
   @media (--motion-reduce) {
-    .nav, .nav__overlay, .nav__drawer, .nav__cta-bar { transition: none; }
+    .nav, .nav__overlay, .nav__drawer { transition: none; }
   }
 
-  /* reservar espacio para la barra CTA inferior (móvil) → no tapa el footer */
-  @media (--lt-md) {
-    :global(body) { padding-bottom: calc(var(--tap-min) + var(--space-3) * 2 + env(safe-area-inset-bottom)); }
-  }
 </style>
 
 <script>
@@ -247,20 +288,77 @@ const isActive = (href: string) =>
   const drawer = document.querySelector('[data-nav-drawer]') as HTMLElement;
   const overlay = document.querySelector('[data-nav-overlay]') as HTMLElement;
   const closeBtn = document.querySelector('[data-nav-close]') as HTMLButtonElement;
-  // Estado "scrolled" de la barra + barra CTA inferior. Va en su propio guard porque
-  // no depende del drawer: así un cambio en el menú no puede dejar la nav sin fondo
-  // ni sin barra CTA en todo el sitio.
+  // Estado "scrolled" de la barra. Va en su propio guard porque no depende del drawer:
+  // así un cambio en el menú no puede dejar la nav sin fondo en todo el sitio.
   if (root) {
-    const ctabar = document.querySelector('[data-nav-ctabar]') as HTMLElement;
+    // Solo se toca la clase cuando el estado CAMBIA (antes se tocaba en cada evento de scroll).
+    let estado: boolean | null = null;
     const onScroll = () => {
-      root.classList.toggle('is-scrolled', window.scrollY > 24);
-      const showBar = window.scrollY > 560;
-      if (ctabar) ctabar.classList.toggle('is-visible', showBar);
-      // señal global para que el FAB del chat suba por encima de la barra (solo móvil)
-      document.body.classList.toggle('has-ctabar', showBar);
+      // Con el megamenú abierto la barra conserva su fondo (data-mega-open).
+      const s = window.scrollY > 24 || root.hasAttribute('data-mega-open');
+      if (s !== estado) { estado = s; root.classList.toggle('is-scrolled', s); }
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  // ── Megamenú de Servicios (§2.12) ──────────────────────────
+  // Clic/Enter/Espacio siempre; hover con intención (120 ms entrar, 200 ms salir)
+  // solo con puntero fino; Esc cierra y devuelve el foco; clic fuera, foco fuera
+  // y pasar a < md cierran. Busca dentro de su propio nodo (E-51).
+  const megaWrap = root?.querySelector<HTMLElement>('[data-nav-mega-wrap]');
+  const megaBtn = root?.querySelector<HTMLButtonElement>('[data-nav-mega-btn]');
+  const megaPanel = root?.querySelector<HTMLElement>('[data-nav-mega]');
+  if (root && megaWrap && megaBtn && megaPanel) {
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const desk = window.matchMedia('(min-width: 768px)');
+    let tIn = 0, tOut = 0, raf = 0;
+    const isOpen = () => !megaPanel.hidden;
+    const inside = (n: Node | null) => !!n && (megaWrap.contains(n) || megaPanel.contains(n));
+    const openMega = () => {
+      clearTimeout(tOut);
+      if (isOpen()) return;
+      megaPanel.hidden = false;
+      megaBtn.setAttribute('aria-expanded', 'true');
+      root.setAttribute('data-mega-open', '');
+      root.classList.add('is-scrolled');
+      cancelAnimationFrame(raf);
+      // Dos fotogramas: el panel ya pintado en opacidad 0 antes del fundido.
+      raf = requestAnimationFrame(() => { raf = requestAnimationFrame(() => megaPanel.setAttribute('data-open', '')); });
+    };
+    const closeMega = (returnFocus = false) => {
+      clearTimeout(tIn); clearTimeout(tOut); cancelAnimationFrame(raf);
+      if (!isOpen()) return;
+      megaPanel.removeAttribute('data-open');
+      megaPanel.hidden = true;
+      megaBtn.setAttribute('aria-expanded', 'false');
+      root.removeAttribute('data-mega-open');
+      root.classList.toggle('is-scrolled', window.scrollY > 24);
+      if (returnFocus) megaBtn.focus();
+    };
+    megaBtn.addEventListener('click', () => (isOpen() ? closeMega() : openMega()));
+    [megaWrap, megaPanel].forEach((el) => {
+      el.addEventListener('pointerenter', (e) => {
+        if (e.pointerType !== 'mouse' || !fine.matches) return;
+        clearTimeout(tOut);
+        if (!isOpen()) tIn = window.setTimeout(openMega, 120);
+      });
+      el.addEventListener('pointerleave', (e) => {
+        if (e.pointerType !== 'mouse' || !fine.matches) return;
+        clearTimeout(tIn);
+        tOut = window.setTimeout(() => closeMega(), 200);
+      });
+      el.addEventListener('focusout', (e) => {
+        if (isOpen() && !inside(e.relatedTarget as Node | null)) closeMega();
+      });
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen()) closeMega(true);
+    });
+    document.addEventListener('pointerdown', (e) => {
+      if (isOpen() && !inside(e.target as Node)) closeMega();
+    });
+    desk.addEventListener('change', () => { if (!desk.matches) closeMega(); });
   }
 
   // Elección EXPLÍCITA de idioma (plan maestro 0.3): el conmutador ES|EN escribe
@@ -324,7 +422,7 @@ const isActive = (href: string) =>
       if (isContactLink(l)) requestAnimationFrame(focusContact);
     }));
 
-    // Cualquier otro enlace a #contacto (nav__cta inline, barra CTA inferior):
+    // Cualquier otro enlace a #contacto (nav__cta inline):
     // tras el scroll nativo del ancla, mover el foco al primer campo.
     document.addEventListener('click', (e) => {
       const a = (e.target as Element | null)?.closest?.('a[href$="#contacto"]');

@@ -1,0 +1,195 @@
+---
+// Interruptor sin / con (W-CORE-25 · design/rediseno-workos.md §3.5).
+// Interruptor 412×56 radio 42 (píldora) con role="switch"; "sin" = el caos de
+// mensajes sueltos (burbujas y avisos de EJEMPLO, sin cifras); "con" = tarjeta
+// 680×440 radio 44 con trama de puntos solo en la franja superior (E-37), que
+// recibe por slot `con` el contenido (p. ej. un panel de citas de ejemplo).
+// Al cambiar: el caos se desvanece en 300 ms y la tarjeta entra con fundido +
+// scale(.98 → 1) en 400 ms. Reducir movimiento: sin escala. Móvil: apilado.
+// La tarjeta "con" es objeto de PRODUCTO (claro cálido, §2.4); las burbujas del
+// caos también son producto (mensajes del cliente) y los avisos, sistema.
+import Ejemplo from './Ejemplo.astro';
+
+interface Mess { text: string; from?: string; time?: string; kind?: 'bubble' | 'notice' }
+interface Props {
+  /** Etiquetas del interruptor, p. ej. ["Sin Marcy", "Con Marcy"]. */
+  labels: [string, string];
+  sin: (string | Mess)[];
+  /** Título de la tarjeta "con" (opcional; el contenido va por slot). */
+  conTitle?: string;
+  /** Estado al cargar (por defecto "sin": primero el dolor, como en WorkOS). */
+  initial?: 'sin' | 'con';
+  tone?: 'gold' | 'teal';
+  lang?: 'es' | 'en';
+  id?: string;
+  class?: string;
+}
+const { labels, sin, conTitle, initial = 'sin', tone = 'gold', lang = 'es', id, class: cls } = Astro.props;
+const mess: Mess[] = sin.slice(0, 9).map((m) => (typeof m === 'string' ? { text: m } : m));
+const on = initial === 'con';
+const uid = `wd-sc-${id ?? 'x'}`;
+---
+<div class:list={['wd-sc', on && 'is-con', cls]} id={id} data-w-tone={tone} data-wd-sc>
+  <div class="wd-sc__switch-wrap">
+    <button
+      type="button"
+      class="wd-sc__switch"
+      role="switch"
+      aria-checked={on ? 'true' : 'false'}
+      aria-controls={`${uid}-sin ${uid}-con`}
+      data-wd-switch
+    >
+      <span class="wd-sc__thumb" aria-hidden="true"></span>
+      <span class="wd-sc__opt wd-sc__opt--sin">{labels[0]}</span>
+      <span class="wd-sc__opt wd-sc__opt--con">{labels[1]}</span>
+    </button>
+  </div>
+
+  <div class="wd-sc__stage">
+    <div class="wd-sc__sin" id={`${uid}-sin`} aria-hidden={on ? 'true' : undefined} inert={on ? true : undefined}>
+      <Ejemplo lang={lang} />
+      <ul class="wd-sc__cloud">
+        {mess.map((m, i) => (
+          <li class:list={['wd-sc__m', `wd-sc__m--${m.kind ?? (i % 3 === 1 ? 'notice' : 'bubble')}`, `wd-sc__m--p${i}`]}>
+            {(m.from || m.time) && (
+              <span class="wd-sc__mh">{m.from && <b>{m.from}</b>}{m.time && <span>{m.time}</span>}</span>
+            )}
+            <span class="wd-sc__mt">{m.text}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div class="wd-sc__con" id={`${uid}-con`} aria-hidden={on ? undefined : 'true'} inert={on ? undefined : true}>
+      <div class="wd-sc__card">
+        <Ejemplo lang={lang} on="light" />
+        {conTitle && <p class="wd-sc__ct">{conTitle}</p>}
+        <div class="wd-sc__body"><slot name="con" /></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .wd-sc {
+    --wd-acc: var(--w-accent, var(--accent-gold));
+    --wd-acc-rgb: var(--w-accent-rgb, var(--accent-gold-rgb));
+    max-width: var(--w-rail-max); margin-inline: auto;
+  }
+  .wd-sc__switch-wrap { display: flex; justify-content: center; }
+  .wd-sc__switch {
+    position: relative; display: grid; grid-template-columns: 1fr 1fr; align-items: center;
+    width: min(100%, 412px); height: 56px; padding: 4px; border-radius: 42px; cursor: pointer;
+    background: var(--w-s1); border: 1px solid var(--w-line-strong); box-shadow: inset 0 1px 3px rgba(0,0,0,.4), var(--w-edge);
+    font: inherit;
+  }
+  .wd-sc__switch:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 3px; }
+  .wd-sc__thumb {
+    position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 38px;
+    background: var(--w-ink); transition: transform 320ms var(--w-ease-ui);
+  }
+  .wd-sc.is-con .wd-sc__thumb { transform: translateX(100%); }
+  .wd-sc__opt {
+    position: relative; z-index: 1; text-align: center; padding: 0 8px;
+    font-family: var(--font-body); font-weight: 500; font-size: 15px; line-height: 1.2;
+    color: var(--w-ink-70); transition: color 200ms var(--w-ease-ui);
+  }
+  .wd-sc:not(.is-con) .wd-sc__opt--sin, .wd-sc.is-con .wd-sc__opt--con { color: var(--w-p-ink); }
+
+  .wd-sc__stage { display: grid; margin-top: 48px; }
+  .wd-sc__sin, .wd-sc__con { grid-area: 1 / 1; min-width: 0; }
+  /* Caos */
+  .wd-sc__sin {
+    position: relative; transition: opacity 300ms var(--w-ease-ui), visibility 0s linear 0s;
+  }
+  .wd-sc.is-con .wd-sc__sin { opacity: 0; visibility: hidden; transition: opacity 300ms var(--w-ease-ui), visibility 0s linear 300ms; }
+  .wd-sc__cloud { list-style: none; margin: 0; padding: 40px 0 0; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+  .wd-sc__m { max-width: 340px; display: grid; gap: 2px; padding: 10px 14px; border-radius: 16px; }
+  .wd-sc__m--bubble { background: var(--w-p-bg); color: var(--w-p-ink); border-bottom-left-radius: 4px; }
+  .wd-sc__m--notice {
+    align-self: flex-end; background: var(--w-s3); color: var(--w-ink-80); border: 1px solid var(--w-line); border-radius: var(--w-r-obj);
+  }
+  .wd-sc__mh { display: flex; gap: 8px; align-items: baseline; font-family: var(--font-body); font-size: 13px; line-height: 1.3; }
+  .wd-sc__mh b { font-weight: 600; }
+  .wd-sc__mh span { opacity: .75; }
+  .wd-sc__mt { font-family: var(--font-body); font-size: 14px; line-height: 1.4; }
+  /* Móvil: la pila se queda en 6 piezas para no alargar la sección. */
+  .wd-sc__m--p6, .wd-sc__m--p7, .wd-sc__m--p8 { display: none; }
+
+  /* Con */
+  .wd-sc__con {
+    display: grid; justify-items: center;
+    opacity: 0; transform: scale(.98); visibility: hidden;
+    transition: opacity 400ms var(--w-ease-ui), transform 400ms var(--w-ease-ui), visibility 0s linear 400ms;
+  }
+  .wd-sc.is-con .wd-sc__con {
+    opacity: 1; transform: none; visibility: visible;
+    transition: opacity 400ms var(--w-ease-ui) 120ms, transform 400ms var(--w-ease-ui) 120ms, visibility 0s;
+  }
+  .wd-sc__card {
+    position: relative; width: 100%; max-width: 680px; min-height: 360px; padding: 64px 24px 28px;
+    border-radius: var(--w-r-tray); background: var(--w-p-bg); color: var(--w-p-ink); border: 1px solid var(--w-p-line);
+  }
+  /* Trama de puntos SOLO en la franja superior sin texto (E-37). */
+  .wd-sc__card::before {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 52px; border-radius: inherit;
+    border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+    background: radial-gradient(rgba(14,14,13,.16) 1px, transparent 1.2px) 0 0 / 16px 16px;
+    -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent);
+    mask-image: linear-gradient(180deg, #000 40%, transparent);
+  }
+  .wd-sc__ct {
+    margin: 0 0 20px; font-family: var(--font-display); font-weight: 500; font-size: 26px; line-height: 1.2;
+    letter-spacing: -0.02em; color: var(--w-p-ink-2);
+  }
+  .wd-sc__body { min-width: 0; }
+
+  @media (--md) {
+    /* El escenario mide lo que la tarjeta "con" (misma celda): el caos ocupa ese alto entero,
+       sin dejar una franja de noche vacía debajo (control 2). */
+    .wd-sc__sin { display: flex; flex-direction: column; }
+    /* El caos va en su bandeja de noche, como la tarjeta "Con" va en la suya: sin ella las
+       burbujas quedaban sueltas y "Ejemplo" flotaba sin objeto al que pertenecer (ia, menor 10). */
+    .wd-sc__sin {
+      padding: 24px; border-radius: var(--w-r-tray);
+      background: var(--w-s1); border: 1px solid var(--w-line);
+    }
+    .wd-sc__cloud { position: relative; flex: 1; min-height: 440px; padding: 0; display: block; }
+    .wd-sc__m { position: absolute; }
+    /* Posiciones del caos (9 como máximo), repartidas en tres bandas densas como en W-CORE-25;
+       la última se funde por abajo (el caos sigue fuera de cuadro). */
+    .wd-sc__m--p0 { left: 2%;  top: 4%; }
+    .wd-sc__m--p1 { left: 33%; top: 0; }
+    .wd-sc__m--p2 { right: 2%; top: 6%; }
+    .wd-sc__m--p3 { left: 16%; top: 27%; }
+    .wd-sc__m--p4 { right: 10%; top: 30%; }
+    .wd-sc__m--p5 { left: 0;  top: 52%; }
+    .wd-sc__m--p6 { left: 36%; top: 55%; }
+    .wd-sc__m--p7 { right: 0; top: 58%; }
+    .wd-sc__m--p8 { left: 22%; top: 80%; opacity: .45; }
+    .wd-sc__m--p6, .wd-sc__m--p7, .wd-sc__m--p8 { display: grid; }
+    .wd-sc__card { min-height: 440px; padding: 76px 64px 48px; border-radius: var(--w-r-feature); }
+    .wd-sc__ct { font-size: 32px; }
+  }
+  @media (--motion-reduce) {
+    .wd-sc__thumb, .wd-sc__opt { transition: none; }
+    .wd-sc__con, .wd-sc.is-con .wd-sc__con { transform: none; transition: opacity 120ms linear, visibility 0s; }
+    .wd-sc__sin, .wd-sc.is-con .wd-sc__sin { transition: none; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-wd-sc]').forEach((el) => {
+    const sw = el.querySelector<HTMLButtonElement>('[data-wd-switch]');
+    const sin = el.querySelector<HTMLElement>('.wd-sc__sin');
+    const con = el.querySelector<HTMLElement>('.wd-sc__con');
+    if (!sw || !sin || !con) return;
+    const set = (on: boolean) => {
+      el.classList.toggle('is-con', on);
+      sw.setAttribute('aria-checked', on ? 'true' : 'false');
+      const show = on ? con : sin, hide = on ? sin : con;
+      show.removeAttribute('aria-hidden'); show.inert = false;
+      hide.setAttribute('aria-hidden', 'true'); hide.inert = true;
+    };
+    sw.addEventListener('click', () => set(sw.getAttribute('aria-checked') !== 'true'));
+  });
+</script>

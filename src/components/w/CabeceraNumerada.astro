@@ -1,0 +1,66 @@
+---
+// Cabecera numerada (W-NEW-32, §2.6): divisoria 1 px; 40 px debajo número mono
+// oro + filete de 24×1 px (un elemento, NO un carácter: E-12) + etiqueta mono;
+// a 12 px el H2 40/500 en 580 px y la bajada 16/1.6 en 430 px a la derecha
+// (x≈592), alineada a la línea base del H2. Numeración continua por página.
+// Sin `titleHtml` (sistema tras el piloto): solo divisoria + número + etiqueta; el H2 lo
+// lleva el componente de debajo en su propia columna (Escalera con título, como W-CORE-06:
+// título, bajada y opciones juntos). Sigue habiendo UN solo titular por sección.
+// `align="center"` (solo etiqueta, control global r1): cuando debajo va un titular centrado
+// (dilema, bandeja de pasos, capítulo conectado) la fila número + filete + etiqueta se centra
+// con él; la divisoria sigue a ancho completo. Un solo eje por bloque.
+interface Props {
+  n: number;
+  label: string;
+  titleHtml?: string;
+  lead?: string;
+  id?: string;
+  align?: 'start' | 'center';
+  class?: string;
+}
+const { n, label, titleHtml, lead, id, align = 'start', class: cls } = Astro.props;
+const num = String(n).padStart(2, '0');
+---
+<header class:list={['w-numhead', !titleHtml && 'w-numhead--tag', !titleHtml && align === 'center' && 'w-numhead--center', cls]}>
+  <p class="w-numhead__tag">
+    <span class="w-numhead__n">{num}</span>
+    <span class="w-numhead__rule" aria-hidden="true"></span>
+    <span class="w-numhead__label">{label}</span>
+  </p>
+  {titleHtml && (
+    <div class:list={['w-numhead__row', !lead && 'w-numhead__row--solo']}>
+      <h2 class="w-h2" id={id} set:html={titleHtml} />
+      {lead && <p class="w-numhead__lead">{lead}</p>}
+    </div>
+  )}
+</header>
+
+<style>
+  .w-numhead { border-top: 1px solid var(--w-line); padding-top: 40px; }
+  .w-numhead__tag {
+    display: flex; align-items: center; gap: 10px; margin: 0 0 12px;
+    font-family: var(--font-mono); font-weight: 500; font-size: 12px; line-height: 1.2;
+    letter-spacing: var(--w-tr-micro);
+  }
+  .w-numhead--tag .w-numhead__tag { margin-bottom: 0; }
+  .w-numhead--center .w-numhead__tag { justify-content: center; }
+  .w-numhead__n { color: var(--w-accent); }
+  .w-numhead__rule {
+    display: inline-block; inline-size: 24px; block-size: 1px; flex: none;
+    background: var(--w-accent); opacity: 0.6;
+  }
+  .w-numhead__label { color: var(--w-ink-60); text-transform: uppercase; }
+  .w-numhead__row { display: grid; gap: 12px; }
+  .w-numhead__row :global(.w-h2) { max-width: 580px; }
+  .w-numhead__lead {
+    margin: 0; max-width: 430px;
+    font-family: var(--font-body); font-size: 16px; line-height: 1.6; color: var(--fg-secondary);
+  }
+  @media (--lg) {
+    .w-numhead__row {
+      grid-template-columns: minmax(0, 580px) minmax(0, 430px);
+      column-gap: 12px; align-items: last baseline;
+    }
+    .w-numhead__row--solo { grid-template-columns: minmax(0, 580px); }
+  }
+</style>

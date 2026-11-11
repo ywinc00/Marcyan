@@ -1,0 +1,140 @@
+---
+// Dilema de dos caminos con la respuesta que aparece (W-ADV-03 + W-ADV-04 ·
+// design/rediseno-workos.md §3.5). Disparo ÚNICO (E-50): nada atado al recorrido.
+// H2 centrado en 2 frases + bajada; 2 tarjetas 425×232 radio 16 (token 12) con
+// título 20/500, frase 15 y caja de evidencia mono 13; en medio una casilla 72×72
+// (radio 16 → 12) con borde discontinuo al 25 % y "?" de 24 px que, al entrar la
+// sección, se sustituye por el icono-objeto (fundido 320 ms + translateY(-8px)→0),
+// una vez. Móvil: tarjetas apiladas y el icono sobre el H2. Reducir movimiento: icono ya puesto.
+import IconoObjeto from './IconoObjeto.astro';
+import Ejemplo from './Ejemplo.astro';
+import type { IconoId } from './objects/registry';
+
+/** evidence: el objeto de cada camino (W-ADV-03 lleva su caja en cada tarjeta). Sin él la tarjeta
+ *  queda con media caja vacía (control 1), así que se pide siempre. Es ilustrativo: lleva "Ejemplo". */
+interface Side { title: string; text: string; evidence: string[] }
+interface Props {
+  titleHtml: string;
+  lead?: string;
+  left: Side;
+  right: Side;
+  answerId: IconoId;
+  /** Frase puente opcional bajo las tarjetas (W-ADV-04), p. ej. "Con Marcy no eliges". */
+  bridge?: string;
+  /** Pinta el icono en línea si la página no monta el sprite de SiteNav. */
+  iconInline?: boolean;
+  tone?: 'gold' | 'teal';
+  lang?: 'es' | 'en';
+  id?: string;
+  class?: string;
+}
+const { titleHtml, lead, left, right, answerId, bridge, iconInline = false, tone = 'gold', lang = 'es', id, class: cls } = Astro.props;
+---
+<div class:list={['wd-dil', cls]} id={id} data-w-tone={tone} data-wd-dil>
+  <div class="wd-dil__mob" aria-hidden="true"><IconoObjeto id={answerId} size={56} inline={iconInline} /></div>
+  <header class="wd-dil__head">
+    <h2 class="wd-dil__h" set:html={titleHtml} />
+    {lead && <p class="wd-dil__lead">{lead}</p>}
+  </header>
+  <div class="wd-dil__row">
+    {[left, right].map((s, i) => (
+      <div class:list={['wd-dil__card', i === 1 && 'wd-dil__card--r']}>
+        <h3 class="wd-dil__t">{s.title}</h3>
+        <p class="wd-dil__x">{s.text}</p>
+        {s.evidence && s.evidence.length > 0 && (
+          <div class="wd-dil__ev" aria-hidden="true">
+            <Ejemplo lang={lang} />
+            {s.evidence.map((l, j) => <p class:list={['wd-dil__evl', j === 0 && 'wd-dil__evl--meta']}>{l}</p>)}
+          </div>
+        )}
+      </div>
+    ))}
+    <div class="wd-dil__q" aria-hidden="true">
+      <span class="wd-dil__mark">?</span>
+      <span class="wd-dil__ans"><IconoObjeto id={answerId} size={48} inline={iconInline} /></span>
+    </div>
+  </div>
+  {bridge && <p class="wd-dil__bridge">{bridge}</p>}
+</div>
+
+<style>
+  .wd-dil { --wd-acc: var(--w-accent, var(--accent-gold)); max-width: var(--w-rail-max); margin-inline: auto; }
+  .wd-dil__mob { display: grid; place-items: center; margin-bottom: 24px; }
+  .wd-dil__head { text-align: center; max-width: 640px; margin: 0 auto 48px; }
+  .wd-dil__h {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: var(--w-h2); line-height: var(--w-lh-h2); letter-spacing: var(--w-tr-h2); color: var(--w-ink); text-wrap: balance;
+  }
+  .wd-dil__lead { margin: 16px auto 0; max-width: 36rem; font-family: var(--font-body); font-size: 18px; line-height: 29px; color: var(--w-ink-80); }
+  .wd-dil__row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .wd-dil__card {
+    display: flex; flex-direction: column; min-width: 0; padding: 28px;
+    border-radius: var(--w-r-obj); background: var(--w-s2); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .wd-dil__t { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 20px; line-height: 1.25; letter-spacing: -0.01em; color: var(--w-ink); }
+  .wd-dil__x { margin: 8px 0 0; font-family: var(--font-body); font-size: 15px; line-height: 1.5; color: var(--fg-secondary); }
+  .wd-dil__ev {
+    position: relative; margin: auto 0 0; padding: 16px 18px; border-radius: var(--w-r-cell);
+    background: var(--w-s1); box-shadow: inset 0 0 0 1px var(--w-line), var(--w-edge);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .wd-dil__ev :global(.w-example--corner) { top: 10px; right: 10px; }
+  .wd-dil__evl { margin: 0; padding-right: 84px; font-family: var(--font-body); font-size: 14px; line-height: 1.45; color: var(--w-ink); }
+  .wd-dil__evl--meta { font-size: 13px; color: var(--w-ink-60); }
+  .wd-dil__evl + .wd-dil__evl { padding-right: 0; }
+  .wd-dil__x + .wd-dil__ev { margin-top: 24px; }
+  .wd-dil__q { display: none; }
+  .wd-dil__bridge {
+    margin: 40px auto 0; text-align: center; max-width: 36rem;
+    font-family: var(--font-display); font-weight: 500; font-size: 20px; line-height: 1.3; color: var(--w-ink);
+  }
+
+  @media (--md) {
+    .wd-dil__mob { display: none; }
+    .wd-dil__row { grid-template-columns: minmax(0, 425px) 72px minmax(0, 425px); justify-content: space-between; align-items: stretch; gap: 24px; }
+    /* Las dos tarjetas a la misma altura y en la misma línea; solo la casilla se centra. */
+    .wd-dil__card { min-height: 232px; }
+    .wd-dil__card--r { grid-column: 3; grid-row: 1; }
+    .wd-dil__q {
+      grid-column: 2; grid-row: 1; align-self: center; position: relative; display: grid; place-items: center;
+      width: 72px; height: 72px; border-radius: var(--w-r-obj);
+      border: 1px dashed rgba(var(--star-rgb), .35);
+      transition: border-color 200ms var(--w-ease-ui);
+    }
+    .wd-dil__mark, .wd-dil__ans { grid-area: 1 / 1; }
+    .wd-dil__mark { font-family: var(--font-display); font-weight: 500; font-size: 24px; line-height: 1; color: var(--w-ink-60); }
+    /* Estado final por defecto: el icono puesto. El script arma el "?" antes de entrar. */
+    .wd-dil__mark { opacity: 0; }
+    .wd-dil.is-armed .wd-dil__mark { opacity: 1; }
+    .wd-dil.is-armed .wd-dil__ans { opacity: 0; transform: translateY(-8px); }
+    .wd-dil__ans, .wd-dil__mark { transition: opacity 320ms var(--w-ease-ui), transform 320ms var(--w-ease-ui); }
+    /* Resuelta, la casilla sigue leyéndose: borde continuo en acento y fondo de objeto (control 1). */
+    .wd-dil:not(.is-armed) .wd-dil__q { border-style: solid; border-color: rgba(var(--w-accent-rgb, var(--accent-gold-rgb)), .45); background: var(--w-s2); box-shadow: var(--w-edge); }
+  }
+  @media (--motion-reduce) {
+    .wd-dil__q, .wd-dil__ans, .wd-dil__mark { transition: none; }
+  }
+</style>
+
+<script>
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('[data-wd-dil]').forEach((el) => {
+    if (reduced.matches || !('IntersectionObserver' in window)) return;
+    const q = el.querySelector<HTMLElement>('.wd-dil__row') ?? el;
+    let first = true;
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (first) {
+          first = false;
+          // Ya a la vista al cargar: queda resuelto, sin esconder nada.
+          if (e.isIntersecting && e.intersectionRatio > 0.05) { io.disconnect(); return; }
+          el.classList.add('is-armed');
+          continue;
+        }
+        if (e.isIntersecting && e.intersectionRatio >= 0.6) { io.disconnect(); el.classList.remove('is-armed'); }
+      }
+    }, { threshold: [0, 0.05, 0.6] });
+    io.observe(q);
+    reduced.addEventListener?.('change', (ev) => { if (ev.matches) { io.disconnect(); el.classList.remove('is-armed'); } });
+  });
+</script>

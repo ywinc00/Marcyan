@@ -1,0 +1,30 @@
+---
+// Sobre nosotros · 02 "Cómo es un proyecto" (#proceso, design/rediseno-workos-v2.md §3 G10).
+// v2: la TablaFases de la v1 se sustituye por LineaFases variante="compacta" (P11): los cinco
+// pasos de content.process (VERBATIM, Process.astro no se toca) a la izquierda y el panel fijo
+// de escenas a la derecha, gesto F-05 de WorkOS. La compacta no lleva slot final: la quinta
+// escena es la web publicada. En móvil cada escena cae bajo su paso (lo resuelve la pieza).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import LineaFases from '../../proceso/LineaFases.astro';
+import EscenaPublicada from '../../proceso/EscenaPublicada.astro';
+import type { Fase } from '../../proceso/proceso';
+
+interface Props {
+  n: number;
+  label: string;
+  titleHtml: string;
+  lead: string;
+  fases: Fase[];
+  lang?: 'es' | 'en';
+}
+const { n, label, titleHtml, lead, fases, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} titleHtml={titleHtml} lead={lead} />
+<div class="wsp">
+  <LineaFases fases={fases} lang={lang} variante="compacta" tono="gold"><EscenaPublicada slot="quinta" lang={lang} /></LineaFases>
+</div>
+
+<style>
+  .wsp { margin-top: var(--w-chapter-gap); min-width: 0; }
+  @media (--lt-md) { .wsp { margin-top: 40px; } }
+</style>

@@ -1,0 +1,361 @@
+---
+// Maquetas de "Tu Marca" para el personalizador de branding (G08 · design/rediseno-workos-v2.md §3).
+// Ronda 1 (B1): la opción "Tu web" deja WebEjemplo (se quedaba en barra, titular y botón, con el 60 %
+// de la tarjeta vacío y sin el signo en la barra) y pasa a ser `vista="web"`: la web real de la marca
+// (barra con signo, hero con lámina de aplicaciones dibujada, tres servicios y pie), con los mismos
+// controles vivos. Ronda 1 (I3/I4): signo nuevo (signo.ts) y la MISMA paleta que el plano del hero.
+// El plan pide `PlanoMarca vista="logo" | "paleta" | "tipo"` (P03); P03 aún no está integrado,
+// así que las tres láminas viven aquí, en la carpeta de la página, con la MISMA marca de ejemplo
+// (sello dentado de la v1 + paleta de negocios.ts → 'marca'). Pendiente [SISTEMA]: cuando P03
+// entregue las vistas de PlanoMarca, sustituir este archivo por ellas.
+//
+// Las tres leen el contrato del personalizador (WebEjemplo, P02a): el ancestro [data-ej-scope]
+// escribe --ej-s-bg/ink/ink-2/accent/on-accent/radius/font-display/display-weight y data-ej-mode;
+// aquí se resuelven en --vm-* con la paleta de la marca como valor por defecto. Así Color, Modo,
+// Marcos y Letra cambian de verdad cada lámina (nunca un control que no hace nada, E-56).
+// Los textos que dependen de la elección (valores hex, nombre de la letra) se pintan todos y se
+// muestran con :has() sobre el grupo del personalizador (data-i), sin JS propio.
+// Clases ej__marco / ej__btn / ej__tit: el motor del personalizador las busca para colocar su
+// etiqueta fina sobre la parte cambiada (detalle Pedestal).
+// Contrato §1.6: ilustración aria-hidden + data-nosnippet con resumen sr-only, sin h1-h6.
+import SelloMarca from './SelloMarca.astro';
+import { SIGNO } from './signo';
+import { negocios } from '../../objetos/ejemplos/negocios';
+
+interface Props { vista: 'logo' | 'paleta' | 'tipo' | 'web'; lang?: 'es' | 'en' }
+const { vista, lang = 'es' } = Astro.props;
+const en = lang === 'en';
+const n = negocios.marca;
+const brand = n.nombre[lang];
+const pals = [
+  { dia: n.paleta, noche: n.paletaNoche },
+  ...n.alternativas.map((a) => ({ dia: a as typeof n.paleta, noche: a.noche })),
+];
+const up = (h: string) => h.toUpperCase();
+const T = en
+  ? {
+      sr: { logo: `Example logo sheet for “${brand}”: main logo, horizontal version, icon and negative.`, paleta: `Example color palette for “${brand}”: main, background, text and support colors.`, tipo: `Example type specimen for “${brand}”.`, web: `Example website for “${brand}”: menu, headline, a sheet of brand applications, three services and footer, in the chosen colors, corners and type.` },
+      logo: { k: 'Logo', main: 'Main', vars: ['Horizontal', 'Icon', 'Negative'] },
+      paleta: { k: 'Palette', roles: ['Main', 'Background', 'Text', 'Support'], btn: 'Book now' },
+      tipo: { k: 'Type', h: 'Your Brand, everywhere', p: 'One voice on your sign, your social media and your website.', fuentes: ['Space Grotesk · Modern', 'Georgia · Classic', 'JetBrains Mono · Technical'] },
+      web: { nav: ['Services', 'Work', 'Contact'], k: 'Identity · Stationery · Social', h: n.textos.en.titular, p: 'Logo, colors and type that look the same on your sign, your cards and your website.', btn: n.textos.en.accion, link: 'See our work', srv: n.textos.en.servicios!.filas },
+      pie: 'Example',
+    }
+  : {
+      sr: { logo: `Lámina de logo de ejemplo para “${brand}”: logo principal, versión horizontal, icono y negativo.`, paleta: `Paleta de color de ejemplo para “${brand}”: principal, fondo, texto y apoyo.`, tipo: `Espécimen tipográfico de ejemplo para “${brand}”.`, web: `Web de ejemplo para “${brand}”: menú, titular, lámina de aplicaciones de la marca, tres servicios y pie, con los colores, marcos y letra elegidos.` },
+      logo: { k: 'Logo', main: 'Principal', vars: ['Horizontal', 'Icono', 'Negativo'] },
+      paleta: { k: 'Paleta', roles: ['Principal', 'Fondo', 'Texto', 'Apoyo'], btn: 'Reservar' },
+      tipo: { k: 'Tipografía', h: 'Tu Marca, en todos lados', p: 'Una sola voz en tu rótulo, en tus redes y en tu web.', fuentes: ['Space Grotesk · Moderna', 'Georgia · Clásica', 'JetBrains Mono · Técnica'] },
+      web: { nav: ['Servicios', 'Trabajos', 'Contacto'], k: 'Identidad · Papelería · Redes', h: n.textos.es.titular, p: 'Logo, colores y letra que se ven igual en tu rótulo, tus tarjetas y tu web.', btn: n.textos.es.accion, link: 'Ver trabajos', srv: n.textos.es.servicios!.filas },
+      pie: 'Ejemplo',
+    };
+// Valores hex por paleta (4) y modo (día/noche): [principal, fondo, texto, apoyo].
+const hexes = (k: number, modo: 'dia' | 'noche') => {
+  const p = pals[k][modo];
+  return [p.accent, p.bg, p.ink, p.ink2].map(up);
+};
+const style = [
+  `--vm-m-bg:${n.paleta.bg}`, `--vm-m-ink:${n.paleta.ink}`, `--vm-m-ink2:${n.paleta.ink2}`, `--vm-m-acc:${n.paleta.accent}`, `--vm-m-on:${n.paleta.onAccent}`,
+  `--vm-n-bg:${n.paletaNoche.bg}`, `--vm-n-ink:${n.paletaNoche.ink}`, `--vm-n-ink2:${n.paletaNoche.ink2}`, `--vm-n-acc:${n.paletaNoche.accent}`, `--vm-n-on:${n.paletaNoche.onAccent}`,
+  `--vm-m-r:${n.radio}px`,
+].join(';');
+// Guías de construcción del signo (lámina del logo). El lienzo de guías (0-100) cubre del −12 al 112 %
+// de la caja y el sello del 9 al 91 %: una coordenada c de signo.ts cae en 16,9 + c × 0,331.
+const g = (c: number) => (16.9 + c * 0.331).toFixed(1);
+const guias = [
+  ...SIGNO.astas.map((x) => `M${g(x)} 2V98`),
+  `M2 ${g(SIGNO.xAlto)}H98`, `M2 ${g(SIGNO.base)}H98`,
+].join('');
+---
+<div class:list={['vm', `vm--${vista}`]} style={style} data-nosnippet>
+  <p class="sr-only">{T.sr[vista]}</p>
+  <div class="vm__hoja ej__marco" aria-hidden="true">
+    {vista === 'logo' && (
+      <>
+        <p class="vm__k"><span>{T.logo.k}</span><span>{T.logo.main}</span></p>
+        <div class="vm-logo">
+          <svg class="vm-logo__guias" viewBox="0 0 100 100" aria-hidden="true">
+            <circle cx="50" cy="50" r="47" /><circle cx="50" cy="50" r="35" /><circle cx="50" cy="50" r="20" />
+            <path d={guias} />
+          </svg>
+          <span class="vm-logo__sello"><SelloMarca size={100} /></span>
+        </div>
+        <p class="vm-logo__palabra ej__tit" translate="no">{brand}</p>
+        <ul class="vm-vars">
+          <li>
+            <span class="vm-var"><span class="vm-var__h"><SelloMarca size={20} /><b translate="no">{brand}</b></span></span>
+            <span class="vm-cap">{T.logo.vars[0]}</span>
+          </li>
+          <li>
+            <span class="vm-var vm-var--acc ej__btn"><SelloMarca size={30} /></span>
+            <span class="vm-cap">{T.logo.vars[1]}</span>
+          </li>
+          <li>
+            <span class="vm-var vm-var--neg"><SelloMarca size={30} /></span>
+            <span class="vm-cap">{T.logo.vars[2]}</span>
+          </li>
+        </ul>
+      </>
+    )}
+
+    {vista === 'paleta' && (
+      <>
+        <p class="vm__k"><span>{T.paleta.k}</span><span class="vm-sello-k"><SelloMarca size={14} /><b translate="no">{brand}</b></span></p>
+        <div class="vm-pal">
+          {T.paleta.roles.map((rol, i) => (
+            <div class:list={['vm-pal__b', `vm-pal__b--${i}`, i === 0 && 'ej__btn']}>
+              <span class="vm-pal__n">{rol}</span>
+              <span class="vm-pal__v">
+                {pals.map((_, k) => (['dia', 'noche'] as const).map((m) => (
+                  <span class:list={['vm-hex', `vm-hex--${k}-${m}`]}>{hexes(k, m)[i]}</span>
+                )))}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div class="vm-pal__uso">
+          <span class="vm-pal__btn">{T.paleta.btn}</span>
+          <span class="vm-pal__aa ej__tit">Aa</span>
+          <span class="vm-pal__linea"><i></i><i></i></span>
+        </div>
+      </>
+    )}
+
+    {vista === 'tipo' && (
+      <>
+        <p class="vm__k"><span>{T.tipo.k}</span><span class="vm-fuente">{T.tipo.fuentes.map((f, k) => <span class:list={['vm-fu', `vm-fu--${k}`]}>{f}</span>)}</span></p>
+        <div class="vm-ty">
+          <span class="vm-ty__aa">Aa</span>
+          <span class="vm-ty__g">Bb Cc Dd Ññ<br />0123456789</span>
+        </div>
+        <ol class="vm-ty__escala">
+          <li><span>48</span><b class="vm-ty__s1 ej__tit">{T.tipo.h}</b></li>
+          <li><span>16</span><b class="vm-ty__s2">{T.tipo.p}</b></li>
+        </ol>
+      </>
+    )}
+
+    {vista === 'web' && (
+      <div class="vm-web">
+        <p class="vm-web__nav">
+          <span class="vm-web__logo"><SelloMarca size={22} /><b translate="no">{brand}</b></span>
+          <span class="vm-web__links">{T.web.nav.map((l, i) => <span class:list={[i === 0 && 'is-on']}>{l}</span>)}</span>
+        </p>
+        <p class="vm-web__k">{T.web.k}</p>
+        <p class="vm-web__h ej__tit">{T.web.h}</p>
+        <p class="vm-web__p">{T.web.p}</p>
+        <p class="vm-web__acts"><span class="vm-web__btn ej__btn">{T.web.btn}</span><span class="vm-web__lk">{T.web.link}<svg viewBox="0 0 16 16"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" /></svg></span></p>
+        <div class="vm-web__img">
+          <svg viewBox="0 0 320 150" preserveAspectRatio="xMidYMid slice">
+            <rect class="vm-i-fondo" width="320" height="150" />
+            <rect class="vm-i-mesa" y="128" width="320" height="22" />
+            <ellipse class="vm-i-sombra" cx="90" cy="139" rx="64" ry="6" />
+            <ellipse class="vm-i-sombra" cx="250" cy="137" rx="34" ry="4.5" />
+            <g>
+              <path class="vm-i-asa" d="M68 50c0-26 44-26 44 0" />
+              <path class="vm-i-acc" d="M42 48h96l8 90H34Z" />
+              <path class="vm-i-pliegue" d="M42 48l-8 90M138 48l8 90" />
+              <g transform="translate(67 70) scale(.23)"><circle cx="100" cy="100" r={SIGNO.r} class="vm-i-on" /><path d={SIGNO.m} class="vm-i-m" stroke-width={SIGNO.trazo} /><circle cx={SIGNO.punto.cx} cy={SIGNO.punto.cy} r={SIGNO.punto.r} class="vm-i-acc" /></g>
+            </g>
+            <g transform="rotate(-8 186 106)">
+              <rect class="vm-i-papel vm-i-tarjeta" x="140" y="80" width="92" height="56" rx="3" />
+              <g transform="translate(150 89) scale(.1)"><circle cx="100" cy="100" r={SIGNO.r} class="vm-i-acc" /><path d={SIGNO.m} class="vm-i-m2" stroke-width={SIGNO.trazo} /><circle cx={SIGNO.punto.cx} cy={SIGNO.punto.cy} r={SIGNO.punto.r} class="vm-i-acc" /></g>
+              <path class="vm-i-linea" d="M150 120h46M150 126h28" />
+              <path class="vm-i-palabra" d="M172 97h30" />
+            </g>
+            <g>
+              <path class="vm-i-asa2" d="M270 98c15 0 15 24 0 24" />
+              <path class="vm-i-tinta" d="M226 86h46l-5 50h-36Z" />
+              <rect class="vm-i-tapa" x="222" y="79" width="54" height="9" rx="2.5" />
+              <g transform="translate(238.5 100) scale(.105)"><circle cx="100" cy="100" r={SIGNO.r} class="vm-i-papel" /><path d={SIGNO.m} class="vm-i-m3" stroke-width={SIGNO.trazo} /><circle cx={SIGNO.punto.cx} cy={SIGNO.punto.cy} r={SIGNO.punto.r} class="vm-i-tinta" /></g>
+            </g>
+          </svg>
+        </div>
+        <ol class="vm-web__srv">
+          {T.web.srv.map((f, i) => (
+            <li><span class="vm-web__n">{String(i + 1).padStart(2, '0')}</span><b>{f.t}</b><span>{f.d}</span></li>
+          ))}
+        </ol>
+      </div>
+    )}
+    <p class="vm__pie"><span translate="no">{vista === 'web' ? n.dominio : brand}</span> · {T.pie}</p>
+  </div>
+</div>
+
+<style>
+  /* Resolución de variables: el scope del personalizador gana; si no hay, la marca (día o noche). */
+  .vm {
+    --vm-bg: var(--ej-s-bg, var(--vm-m-bg)); --vm-ink: var(--ej-s-ink, var(--vm-m-ink)); --vm-ink2: var(--ej-s-ink-2, var(--vm-m-ink2));
+    --vm-acc: var(--ej-s-accent, var(--vm-m-acc)); --vm-on: var(--ej-s-on-accent, var(--vm-m-on));
+    --vm-r: var(--ej-s-radius, var(--vm-m-r));
+    --vm-font: var(--ej-s-font-display, var(--font-display)); --vm-w: var(--ej-s-display-weight, 500);
+    --vm-t: 220ms cubic-bezier(.22, 1, .36, 1);
+    position: absolute; inset: 0; container-type: size;
+  }
+  :global([data-ej-scope][data-ej-mode='oscuro']) .vm {
+    --vm-bg: var(--ej-s-bg, var(--vm-n-bg)); --vm-ink: var(--ej-s-ink, var(--vm-n-ink)); --vm-ink2: var(--ej-s-ink-2, var(--vm-n-ink2));
+    --vm-acc: var(--ej-s-accent, var(--vm-n-acc)); --vm-on: var(--ej-s-on-accent, var(--vm-n-on));
+  }
+  .vm__hoja {
+    position: absolute; inset: 0; box-sizing: border-box; overflow: hidden;
+    display: flex; flex-direction: column; padding: 6.5cqw 6.5cqw 5cqw;
+    background: var(--vm-bg); color: var(--vm-ink);
+    border-radius: clamp(2px, var(--vm-r), 22px);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--vm-ink) 8%, transparent);
+    transition: background-color var(--vm-t), color var(--vm-t), border-radius var(--vm-t);
+    font-family: var(--font-body);
+  }
+  .vm__k {
+    margin: 0; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    font: 500 max(11px, 3.1cqw)/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--vm-ink2);
+    padding-bottom: 3.4cqw; border-bottom: 1px solid color-mix(in srgb, var(--vm-ink) 12%, transparent);
+  }
+  .vm__pie {
+    margin: auto 0 0; padding-top: 3cqw; font: 500 max(11px, 2.9cqw)/1.2 var(--font-mono); letter-spacing: .04em; color: var(--vm-ink2); opacity: .8;
+  }
+  .vm-cap { font: 500 max(11px, 2.9cqw)/1.2 var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--vm-ink2); }
+  .vm :global(.bm-seal) { --bm-ink: var(--vm-acc); --bm-paper: var(--vm-bg); }
+  .vm :global(.bm-seal *) { transition: fill var(--vm-t), stroke var(--vm-t); }
+
+  /* ── Logo: sello sobre sus guías de construcción, palabra, y las tres versiones ── */
+  .vm-logo { position: relative; width: 46cqw; aspect-ratio: 1; margin: 7cqw auto 0; }
+  .vm-logo__guias { position: absolute; inset: -12%; width: 124%; height: 124%; overflow: visible; }
+  .vm-logo__guias :is(circle, path) { fill: none; stroke: color-mix(in srgb, var(--vm-ink) 14%, transparent); stroke-width: .35; stroke-dasharray: 1.2 1.4; }
+  .vm-logo__sello { position: absolute; inset: 9%; }
+  .vm-logo__sello :global(svg) { width: 100%; height: 100%; }
+  .vm-logo__palabra {
+    margin: 4.5cqw 0 0; text-align: center; line-height: 1;
+    font-family: var(--vm-font); font-weight: var(--vm-w); font-size: 11cqw; letter-spacing: -0.035em;
+    transition: color var(--vm-t);
+  }
+  .vm-vars { list-style: none; margin: auto 0 0; padding: 0; display: grid; grid-template-columns: 1.55fr 1fr 1fr; gap: 2.6cqw; }
+  .vm-vars li { display: grid; justify-items: center; gap: 2.2cqw; }
+  .vm-var {
+    box-sizing: border-box; width: 100%; height: 15.5cqw; display: grid; place-items: center;
+    border-radius: clamp(2px, calc(var(--vm-r) * .5), 12px);
+    background: color-mix(in srgb, var(--vm-ink) 4%, var(--vm-bg)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--vm-ink) 10%, transparent);
+    transition: background-color var(--vm-t), border-radius var(--vm-t);
+  }
+  .vm-var__h { display: inline-flex; align-items: center; gap: 1.8cqw; }
+  .vm-var__h b { font-family: var(--vm-font); font-weight: var(--vm-w); font-size: max(11px, 3.7cqw); letter-spacing: -0.02em; white-space: nowrap; }
+  .vm-var--acc { background: var(--vm-acc); box-shadow: none; }
+  .vm-var--acc :global(.bm-seal) { --bm-ink: var(--vm-on); --bm-paper: var(--vm-acc); }
+  .vm-var--neg { background: var(--vm-ink); box-shadow: none; }
+  .vm-var--neg :global(.bm-seal) { --bm-ink: var(--vm-bg); --bm-paper: var(--vm-ink); }
+
+  /* ── Paleta: cuatro bloques con nombre y valor (Palette Supply) ── */
+  .vm-sello-k { display: inline-flex; align-items: center; gap: 6px; text-transform: none; letter-spacing: 0; }
+  .vm-sello-k b { font: 600 max(11px, 3.1cqw)/1 var(--font-display); color: var(--vm-ink); }
+  .vm-pal { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: 1.45fr 1fr; gap: 2.4cqw; margin-top: 4.5cqw; height: 74cqw; }
+  .vm-pal__b {
+    position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 3.4cqw 3.6cqw;
+    border-radius: clamp(2px, var(--vm-r), 20px); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--vm-ink) 10%, transparent);
+    transition: background-color var(--vm-t), color var(--vm-t), border-radius var(--vm-t);
+  }
+  .vm-pal__b--0 { grid-column: 1 / -1; background: var(--vm-acc); color: var(--vm-on); box-shadow: none; }
+  .vm-pal__b--1 { background: var(--vm-bg); color: var(--vm-ink); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--vm-ink) 24%, transparent); }
+  .vm-pal__b--2 { background: var(--vm-ink); color: var(--vm-bg); box-shadow: none; }
+  .vm-pal__b--3 { background: var(--vm-ink2); color: var(--vm-bg); box-shadow: none; }
+  .vm-pal__n { font: 500 max(12px, 3.8cqw)/1.1 var(--font-display); letter-spacing: -0.01em; }
+  .vm-pal__b--0 .vm-pal__n { font-size: 6.4cqw; letter-spacing: -0.03em; }
+  .vm-pal__v { font: 500 max(11px, 3cqw)/1 var(--font-mono); letter-spacing: .04em; opacity: .85; }
+  .vm-pal__uso {
+    display: flex; align-items: center; gap: 3cqw; margin-top: 3.4cqw; padding: 3cqw; border-radius: clamp(2px, calc(var(--vm-r) * .75), 16px);
+    background: color-mix(in srgb, var(--vm-ink) 4%, var(--vm-bg)); transition: border-radius var(--vm-t), background-color var(--vm-t);
+  }
+  .vm-pal__btn {
+    padding: 2.2cqw 3.6cqw; border-radius: clamp(2px, calc(var(--vm-r) * .5), 999px); background: var(--vm-acc); color: var(--vm-on);
+    font: 600 max(11px, 3.3cqw)/1 var(--font-body); white-space: nowrap; transition: background-color var(--vm-t), color var(--vm-t), border-radius var(--vm-t);
+  }
+  .vm-pal__aa { font-family: var(--vm-font); font-weight: var(--vm-w); font-size: 7cqw; line-height: 1; color: var(--vm-ink); }
+  .vm-pal__linea { flex: 1; display: grid; gap: 1.6cqw; }
+  .vm-pal__linea i { display: block; height: 1px; background: color-mix(in srgb, var(--vm-ink2) 45%, transparent); }
+  .vm-pal__linea i + i { width: 62%; }
+
+  /* Valores hex: se pinta el de la paleta y el modo elegidos (grupo color data-i; modo en el scope). */
+  .vm-hex { display: none; }
+  .vm-hex--0-dia { display: inline; }
+  :global([data-ej-scope][data-ej-mode='oscuro']) .vm-hex--0-dia { display: none; }
+  :global([data-ej-scope][data-ej-mode='oscuro']) .vm-hex--0-noche { display: inline; }
+  :global([data-ej-scope]:has([data-pz-g='color'][data-i='1'])) .vm-hex { display: none; }
+  :global([data-ej-scope]:has([data-pz-g='color'][data-i='2'])) .vm-hex { display: none; }
+  :global([data-ej-scope]:has([data-pz-g='color'][data-i='3'])) .vm-hex { display: none; }
+  :global([data-ej-scope][data-ej-mode='claro']:has([data-pz-g='color'][data-i='1'])) .vm-hex--1-dia,
+  :global([data-ej-scope][data-ej-mode='claro']:has([data-pz-g='color'][data-i='2'])) .vm-hex--2-dia,
+  :global([data-ej-scope][data-ej-mode='claro']:has([data-pz-g='color'][data-i='3'])) .vm-hex--3-dia,
+  :global([data-ej-scope][data-ej-mode='oscuro']:has([data-pz-g='color'][data-i='1'])) .vm-hex--1-noche,
+  :global([data-ej-scope][data-ej-mode='oscuro']:has([data-pz-g='color'][data-i='2'])) .vm-hex--2-noche,
+  :global([data-ej-scope][data-ej-mode='oscuro']:has([data-pz-g='color'][data-i='3'])) .vm-hex--3-noche { display: inline; }
+
+  /* ── Tipografía: espécimen con la letra elegida ── */
+  .vm-fuente { text-transform: none; letter-spacing: .02em; }
+  .vm-fu { display: none; }
+  .vm-fu--0 { display: inline; }
+  :global([data-ej-scope]:has([data-pz-g='letra'][data-i='1'])) .vm-fu--0,
+  :global([data-ej-scope]:has([data-pz-g='letra'][data-i='2'])) .vm-fu--0 { display: none; }
+  :global([data-ej-scope]:has([data-pz-g='letra'][data-i='1'])) .vm-fu--1,
+  :global([data-ej-scope]:has([data-pz-g='letra'][data-i='2'])) .vm-fu--2 { display: inline; }
+  .vm-ty { display: flex; align-items: flex-end; justify-content: space-between; gap: 3cqw; margin-top: 4cqw; padding-bottom: 4cqw; border-bottom: 1px solid color-mix(in srgb, var(--vm-ink) 12%, transparent); }
+  .vm-ty__aa { font-family: var(--vm-font); font-weight: var(--vm-w); font-size: 40cqw; line-height: .82; letter-spacing: -0.05em; color: var(--vm-ink); }
+  .vm-ty__g { font-family: var(--vm-font); font-weight: var(--vm-w); font-size: max(12px, 4.4cqw); line-height: 1.5; text-align: right; color: var(--vm-ink2); padding-bottom: 1cqw; }
+  .vm-ty__escala { list-style: none; margin: 4.5cqw 0 0; padding: 0; display: grid; gap: 4cqw; }
+  .vm-ty__escala li { display: grid; grid-template-columns: 7.5cqw 1fr; gap: 2.4cqw; align-items: baseline; }
+  .vm-ty__escala span { font: 500 max(11px, 2.9cqw)/1 var(--font-mono); color: var(--vm-acc); transition: color var(--vm-t); }
+  .vm-ty__s1 { font-family: var(--vm-font); font-weight: var(--vm-w); font-size: 8.4cqw; line-height: 1.02; letter-spacing: -0.035em; text-wrap: balance; }
+  .vm-ty__s2 { font: 400 max(12px, 3.9cqw)/1.5 var(--font-body); color: var(--vm-ink2); }
+  /* ── Web: la página de la marca, con su signo, su lámina de aplicaciones y sus servicios ── */
+  .vm--web .vm__hoja { padding: 4.6cqw 5.2cqw 4cqw; }
+  .vm-web { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+  .vm-web__nav {
+    margin: 0; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    padding-bottom: 3.4cqw; border-bottom: 1px solid color-mix(in srgb, var(--vm-ink) 10%, transparent);
+  }
+  .vm-web__logo { display: inline-flex; align-items: center; gap: 2cqw; }
+  .vm-web__logo :global(svg) { width: 6.2cqw; height: 6.2cqw; }
+  .vm-web__logo b { font-family: var(--vm-font); font-weight: 600; font-size: max(12px, 4.2cqw); letter-spacing: -0.02em; white-space: nowrap; }
+  .vm-web__links { display: flex; gap: 3.4cqw; font: 500 max(11px, 3.1cqw)/1 var(--font-body); color: var(--vm-ink2); white-space: nowrap; }
+  .vm-web__links .is-on { color: var(--vm-ink); box-shadow: 0 1.5px 0 var(--vm-acc); padding-bottom: 1cqw; }
+  .vm-web__k { margin: 6cqw 0 0; font: 500 max(11px, 2.9cqw)/1.2 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--vm-acc); transition: color var(--vm-t); }
+  .vm-web__h {
+    margin: 2.4cqw 0 0; font-family: var(--vm-font); font-weight: var(--vm-w); font-size: 9.6cqw; line-height: 1.02; letter-spacing: -0.035em;
+    text-wrap: balance; transition: color var(--vm-t);
+  }
+  .vm-web__p { margin: 2.8cqw 0 0; max-width: 90%; font: 400 max(12px, 3.5cqw)/1.45 var(--font-body); color: var(--vm-ink2); }
+  .vm-web__acts { margin: 4cqw 0 0; display: flex; align-items: center; gap: 4cqw; }
+  .vm-web__btn {
+    padding: 2.6cqw 4.4cqw; border-radius: clamp(2px, calc(var(--vm-r) * .6), 999px); background: var(--vm-acc); color: var(--vm-on);
+    font: 600 max(11px, 3.4cqw)/1 var(--font-body); white-space: nowrap;
+    transition: background-color var(--vm-t), color var(--vm-t), border-radius var(--vm-t);
+  }
+  .vm-web__lk { display: inline-flex; align-items: center; gap: 1.2cqw; font: 600 max(11px, 3.4cqw)/1 var(--font-body); color: var(--vm-ink); white-space: nowrap; }
+  .vm-web__lk svg { width: 3.6cqw; height: 3.6cqw; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .vm-web__img {
+    flex: 1; min-height: 28cqw; margin-top: 5cqw; overflow: hidden;
+    border-radius: clamp(2px, calc(var(--vm-r) * .8), 18px); transition: border-radius var(--vm-t);
+  }
+  .vm-web__img svg { display: block; width: 100%; height: 100%; }
+  .vm-i-fondo { fill: color-mix(in srgb, var(--vm-acc) 16%, var(--vm-bg)); transition: fill var(--vm-t); }
+  .vm-i-mesa { fill: color-mix(in srgb, var(--vm-acc) 26%, var(--vm-bg)); transition: fill var(--vm-t); }
+  .vm-i-sombra { fill: color-mix(in srgb, var(--vm-ink) 16%, transparent); }
+  .vm-i-acc { fill: var(--vm-acc); transition: fill var(--vm-t); }
+  .vm-i-on { fill: var(--vm-on); transition: fill var(--vm-t); }
+  .vm-i-papel { fill: var(--vm-bg); transition: fill var(--vm-t); }
+  .vm-i-tarjeta { filter: drop-shadow(0 3px 4px color-mix(in srgb, var(--vm-ink) 24%, transparent)); }
+  .vm-i-tinta { fill: var(--vm-ink); transition: fill var(--vm-t); }
+  .vm-i-tapa { fill: color-mix(in srgb, var(--vm-ink) 78%, var(--vm-bg)); }
+  .vm-i-asa, .vm-i-asa2 { fill: none; stroke: color-mix(in srgb, var(--vm-acc) 70%, var(--vm-ink)); stroke-width: 4; stroke-linecap: round; }
+  .vm-i-asa2 { stroke: var(--vm-ink); stroke-width: 5; }
+  .vm-i-pliegue { fill: none; stroke: color-mix(in srgb, var(--vm-ink) 16%, transparent); stroke-width: 1; }
+  .vm-i-m, .vm-i-m2, .vm-i-m3 { fill: none; }
+  .vm-i-m { stroke: var(--vm-acc); }
+  .vm-i-m2 { stroke: var(--vm-on); }
+  .vm-i-m3 { stroke: var(--vm-ink); }
+  .vm-i-linea, .vm-i-palabra { fill: none; stroke: color-mix(in srgb, var(--vm-ink) 32%, transparent); stroke-width: 2; stroke-linecap: round; }
+  .vm-i-palabra { stroke: var(--vm-ink); stroke-width: 3.2; }
+  .vm-web__srv { list-style: none; margin: 4.2cqw 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3cqw; }
+  .vm-web__srv li { display: grid; align-content: start; gap: 1cqw; padding-top: 2.4cqw; border-top: 1px solid color-mix(in srgb, var(--vm-ink) 14%, transparent); }
+  .vm-web__n { font: 500 max(11px, 2.7cqw)/1 var(--font-mono); color: var(--vm-acc); transition: color var(--vm-t); }
+  .vm-web__srv b { font-family: var(--vm-font); font-weight: 600; font-size: max(12px, 3.6cqw); letter-spacing: -0.015em; line-height: 1.15; }
+  .vm-web__srv li > span:last-child { font: 400 max(11px, 2.9cqw)/1.3 var(--font-body); color: var(--vm-ink2); }
+  .vm--web .vm__pie { padding-top: 3.2cqw; }
+</style>

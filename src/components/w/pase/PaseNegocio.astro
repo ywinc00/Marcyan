@@ -1,0 +1,467 @@
+---
+// ─────────────────────────────────────────────────────────────
+// P10 · Pase del negocio holográfico (design/rediseno-workos-v2.md §2 P10).
+// Original: el pase de WorkOS (W2N-02 pase_hover_hoja.jpg, W-ADV-12). Situación:
+// presentar una identidad que leen las máquinas = la ficha de tu negocio que
+// leen los asistentes de IA (SEO para IA, garantías de portada).
+//
+// Composición: lienzo fuente 465×109 (1em = 10 px a 465) que escala con el
+// ancho de su contenedor hasta 620×146 (container queries, sin transform).
+// Por debajo de 440 px de ancho la ficha se apila (la zona de lectura baja bajo
+// el nombre) y la escala no baja de 1em = 10 px: ningún texto < 9 px.
+//
+// Contrato común de objetos de ejemplo (§1.6): todo el pase es aria-hidden +
+// data-nosnippet, sin h1-h6, sin tel:/wa.me/data-track; el resumen va en un
+// figcaption sr-only. Ids internos del SVG con sufijo por instancia.
+//
+// Interacción (§1.5 interactivo, §1.7): solo con puntero fino (hover: hover +
+// pointer: fine) guarda --px/--py (0-1) en un solo rAF por movimiento y
+// --holo (0/1; la opacidad de las capas transiciona 300 ms). Lavado radial con
+// mix-blend-mode: multiply SOLO en su capa; guilloché de 14 trazos cuyo color
+// gira con la posición. Si nadie toca en 6 s, un cursor fantasma hace un
+// recorrido cada 4 s, máximo 3 por visita, y se retira para siempre al primer
+// pointerenter/pointerdown/focusin/keydown dentro. En táctil, un recorrido
+// automático suave UNA vez al entrar en vista. Sin bucle en reposo; el sello
+// entra una vez (escala 1,3 → 1, 300 ms). Reducir movimiento: sin efecto,
+// guilloché en su color de reposo, sello quieto y visible.
+// Todo su CSS va aquí (Cerrojo 5): funciona dentro y fuera de v3.
+// ─────────────────────────────────────────────────────────────
+import LogoMark from '../../brand/LogoMark.astro';
+
+interface Props {
+  lang?: 'es' | 'en';
+  /** Ciudad de la zona de lectura (dato de ejemplo). */
+  ciudad?: 'houston' | 'miami';
+  /** Ancho máximo en px (465 = la escala del original a 1440; tope 620). */
+  ancho?: number;
+  class?: string;
+}
+
+const { lang = 'es', ciudad = 'houston', ancho = 465, class: cls } = Astro.props;
+const uid = 'pase' + Math.random().toString(36).slice(2, 8);
+const w = Math.min(620, Math.max(280, ancho));
+const en = lang === 'en';
+
+// Zona de lectura: el FORMATO de los datos que leen los asistentes (tipo de
+// negocio, nombre, ciudad · idiomas, días, horario en 12 h, canales). No es un
+// pasaporte. Relleno con "<" hasta 40 caracteres, como una línea mecánica.
+const L = 40;
+const pad = (s: string) => (s + '<'.repeat(L)).slice(0, L);
+const city = ciudad === 'miami' ? 'MIAMI<FL' : 'HOUSTON<TX';
+const mrz = en
+  ? [pad(`BIZ<YOUR<BUSINESS<<${city}<`), pad('EN<ES<MON-SAT<9AM-7PM<<WEB<MAP<CHAT<')]
+  : [pad(`NEG<TU<NEGOCIO<<${city}<`), pad('ES<EN<LUN-SAB<9AM-7PM<<WEB<MAPA<CHAT<')];
+
+const t = en
+  ? {
+      eyebrow: 'Business profile',
+      nombre: 'Your Business',
+      dominio: 'yourbusiness.example',
+      sello: 'AI-READABLE · MARCYAN · ',
+      ejemplo: 'Example',
+      sr: 'Example: your business profile, the one AI assistants read.',
+      loLeen: 'Read by',
+    }
+  : {
+      eyebrow: 'Ficha del negocio',
+      nombre: 'Tu Negocio',
+      dominio: 'tunegocio.example',
+      sello: 'LEGIBLE PARA IA · MARCYAN · ',
+      ejemplo: 'Ejemplo',
+      sr: 'Ejemplo: la ficha de tu negocio que leen los asistentes de IA.',
+      loLeen: 'Lo leen',
+    };
+
+// Guilloché: dos ondas maestras (familias que se cruzan) reutilizadas con <use>.
+// 14 trazos (grupos con --i), cada uno con 3 líneas paralelas = 42 líneas.
+// La onda se dibuja con curvas cúbicas por media onda (ligera en HTML).
+const onda = (periodo: number, amp: number, fase: number) => {
+  const half = periodo / 2;
+  const k = half * 0.3642; // control de una media senoide con cúbicas
+  let x = -periodo + fase;
+  let d = `M${x.toFixed(1)} 0`;
+  let s = 1;
+  while (x < 465 + periodo) {
+    d += `c${k.toFixed(1)} ${(-amp * s * 1.0).toFixed(1)} ${(half - k).toFixed(1)} ${(-amp * s * 1.0).toFixed(1)} ${half.toFixed(1)} 0`;
+    x += half;
+    s = -s;
+  }
+  return d;
+};
+const ondaA = onda(232, 3.4, 0);
+const ondaB = onda(196, 2.8, 61);
+const trazos = Array.from({ length: 14 }, (_, i) => ({
+  i,
+  fam: i % 2 === 0 ? 'a' : 'b',
+  ys: [0, 1, 2].map((k) => -10 + (i * 3 + k) * 3.15),
+}));
+---
+<figure
+  class:list={['w2-pase', cls]}
+  style={`--pase-w:${w}px`}
+  data-w2-pase
+  lang={lang}
+>
+  <div class="w2-pase__card" aria-hidden="true" data-nosnippet data-w2-pase-card>
+    <div class="w2-pase__fx">
+      <svg class="w2-pase__guil" viewBox="0 0 465 109" preserveAspectRatio="xMidYMid slice" focusable="false">
+        <defs>
+          <path id={`${uid}-a`} d={ondaA} />
+          <path id={`${uid}-b`} d={ondaB} />
+        </defs>
+        {trazos.map((tr) => (
+          <g class="w2-pase__trazo" style={`--i:${tr.i}`}>
+            {tr.ys.map((y) => <use href={`#${uid}-${tr.fam}`} y={y.toFixed(2)} />)}
+          </g>
+        ))}
+      </svg>
+      <div class="w2-pase__wash"></div>
+    </div>
+
+    <div class="w2-pase__body">
+      <p class="w2-pase__eyebrow">
+        <LogoMark size={17} decorative class="w2-pase__iso" />
+        <span>{t.eyebrow}</span>
+      </p>
+      <div class="w2-pase__id">
+        <span class="w2-pase__name">{t.nombre}</span>
+        <span class="w2-pase__dom">{t.dominio}</span>
+      </div>
+      <div class="w2-pase__mrz">
+        <span>{mrz[0]}</span>
+        <span>{mrz[1]}</span>
+      </div>
+    </div>
+
+    <div class="w2-pase__sello" data-w2-pase-sello>
+      <svg viewBox="0 0 80 80" focusable="false">
+        <defs>
+          <path id={`${uid}-c`} d="M40 40 m-27.5 0 a27.5 27.5 0 1 1 55 0 a27.5 27.5 0 1 1 -55 0" />
+        </defs>
+        <circle cx="40" cy="40" r="37.6" class="w2-pase__s-ring" stroke-width="2.2" />
+        <circle cx="40" cy="40" r="35.1" class="w2-pase__s-ring" stroke-width=".6" />
+        <text class="w2-pase__s-text">
+          <textPath href={`#${uid}-c`} textLength="171" lengthAdjust="spacing">{t.sello}</textPath>
+        </text>
+        <circle cx="40" cy="40" r="24" class="w2-pase__s-ring" stroke-width=".9" />
+        <circle cx="40" cy="40" r="13" class="w2-pase__s-ring" stroke-width="1.1" />
+        <path d="M33.5 40.5l4.3 4.2 8.7-9" class="w2-pase__s-check" />
+      </svg>
+    </div>
+
+    <svg class="w2-pase__cursor" viewBox="0 0 16 20" width="16" height="20" focusable="false" data-w2-pase-cursor>
+      <path d="M1.5 1.5v14.2l3.9-3.7 2.6 6 2.5-1.1-2.6-5.9 5.4-.3z" />
+    </svg>
+  </div>
+
+  <div class="w2-pase__pie" aria-hidden="true">
+    <span class="w2-pase__ej">{t.ejemplo}</span>
+  </div>
+  {Astro.slots.has('lo-leen') && (
+    <div class="w2-pase__leen">
+      <span class="w2-pase__leen-k">{t.loLeen}</span>
+      <slot name="lo-leen" />
+    </div>
+  )}
+  <figcaption class="w2-pase__sr">{t.sr}</figcaption>
+</figure>
+
+<style>
+  .w2-pase {
+    --pase-ink: #0e0e0d;
+    --pase-ink-2: #55606f;
+    --pase-dom: #3f5590;      /* dominio: azul pizarra, AA sobre crema (≈ 6.6:1) */
+    --pase-navy: #27317a;     /* tinta del sello y del eyebrow */
+    --px: .5; --py: .5; --holo: 0;
+    margin: 0;
+    width: 100%;
+    max-width: var(--pase-w, 465px);
+    container-type: inline-size;
+    container-name: pase;
+  }
+
+  .w2-pase__card {
+    /* 1em = 10 px a 465 de ancho; nunca baja de 10 px; tope 620 (13,33 px). */
+    font-size: clamp(10px, calc(100cqw / 46.5), 13.334px);
+    position: relative;
+    width: 100%;
+    aspect-ratio: 465 / 109;
+    border-radius: .8em;
+    background:
+      radial-gradient(60% 120% at 88% 10%, rgba(79, 195, 161, .18), transparent 70%),
+      radial-gradient(70% 140% at 8% 100%, rgba(214, 226, 196, .55), transparent 70%),
+      linear-gradient(180deg, #f9faf6, #f4f5ef);
+    box-shadow:
+      inset 0 0 0 1px rgba(14, 14, 13, .07),
+      inset 0 1px 0 rgba(255, 255, 255, .8),
+      0 1.8em 4em -2.4em rgba(0, 0, 0, .55);
+    color: var(--pase-ink);
+    font-family: var(--font-body, system-ui, sans-serif);
+    isolation: isolate;
+    -webkit-user-select: none; user-select: none;
+  }
+
+  /* ── capas del efecto ─────────────────────────────── */
+  .w2-pase__fx {
+    position: absolute; inset: 0; border-radius: inherit; overflow: hidden; z-index: 0;
+  }
+  .w2-pase__guil {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    fill: none; overflow: visible;
+    opacity: calc(.62 + var(--holo) * .38);
+    transition: opacity 300ms ease;
+  }
+  .w2-pase__trazo {
+    stroke: hsl(calc(var(--i) * 14deg + var(--px) * 90deg + var(--py) * 150deg) 55% 55%);
+    stroke-width: .6;
+    stroke-opacity: calc(.26 + .09 * sin(var(--px) * 6.2832rad + var(--i) * .45rad));
+  }
+  .w2-pase__trazo use { vector-effect: non-scaling-stroke; }
+  .w2-pase__wash {
+    position: absolute; inset: 0;
+    background: radial-gradient(
+      circle at calc(var(--px) * 100%) calc(var(--py) * 100%),
+      hsl(calc(170deg + var(--px) * 130deg) 62% 84%) 0,
+      hsl(calc(230deg + var(--py) * 80deg) 55% 90% / .55) 28%,
+      transparent 62%
+    );
+    mix-blend-mode: multiply;
+    opacity: calc(var(--holo) * .65);
+    transition: opacity 300ms ease;
+  }
+
+  /* ── contenido ────────────────────────────────────── */
+  .w2-pase__body {
+    position: absolute; inset: 0; z-index: 1;
+    padding: 1.7em 1.8em 1.75em;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr;
+    column-gap: 2em;
+  }
+  .w2-pase__eyebrow {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; gap: .55em;
+    margin: 0;
+    font-family: var(--font-display, sans-serif);
+    font-size: .9em; font-weight: 600; line-height: 1;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: var(--pase-navy);
+  }
+  .w2-pase__eyebrow :global(.w2-pase__iso) {
+    width: 1.7em; height: 1.7em; flex: none; margin: -.3em 0 -.3em -.15em;
+    /* El isotipo es temable (LogoMark lee tokens): aquí se imprime en la tinta
+       del documento, como el glifo del original; el satélite conserva el teal. */
+    --accent-gold: var(--pase-navy); --accent-gold-deep: #3a45a0; --planet-core: #161c52;
+    --accent-teal: #2a8f78;
+  }
+  .w2-pase__id { align-self: end; display: flex; flex-direction: column; gap: .35em; min-width: 0; }
+  .w2-pase__name {
+    font-family: var(--font-display, sans-serif);
+    font-size: 2.2em; font-weight: 500; line-height: 1; letter-spacing: -.025em;
+    white-space: nowrap;
+  }
+  .w2-pase__dom {
+    font-size: 1.1em; line-height: 1.2; color: var(--pase-dom); white-space: nowrap;
+  }
+  .w2-pase__mrz {
+    align-self: end; justify-self: end;
+    display: flex; flex-direction: column; gap: .55em;
+    padding-bottom: .1em;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: .9em; line-height: 1; letter-spacing: .02em;
+    color: var(--pase-ink-2);
+    white-space: pre;
+  }
+
+  /* ── sello ────────────────────────────────────────── */
+  .w2-pase__sello {
+    position: absolute; z-index: 2;
+    /* 7,2em: el texto del sello no baja de 9 px. Dentro del pase (sobre la
+       noche, la tinta azul que sobresale no se leería); pisa apenas la zona de
+       lectura, como un sello de verdad. */
+    width: 7.2em; height: 7.2em;
+    top: -.2em; right: 1em;
+    pointer-events: none;
+  }
+  .w2-pase__sello svg { width: 100%; height: 100%; transform: rotate(-14deg); overflow: visible; }
+  .w2-pase__s-ring { fill: none; stroke: var(--pase-navy); stroke-opacity: .82; }
+  .w2-pase__s-text {
+    fill: var(--pase-navy); fill-opacity: .88;
+    font-family: var(--font-display, sans-serif);
+    font-size: 10px; font-weight: 600; letter-spacing: .02em; /* 10 × 72/80 = 9 px */
+  }
+  .w2-pase__s-check {
+    fill: none; stroke: var(--pase-navy); stroke-opacity: .9;
+    stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .w2-pase[data-w2-armed] .w2-pase__sello { opacity: 0; }
+  .w2-pase.is-in .w2-pase__sello { animation: w2-pase-sello 300ms cubic-bezier(.2, .8, .2, 1) both; }
+  @keyframes w2-pase-sello {
+    from { opacity: 0; transform: scale(1.3); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── cursor fantasma (solo puntero fino) ──────────── */
+  .w2-pase__cursor {
+    position: absolute; left: 0; top: 0; z-index: 3;
+    width: 1.6em; height: 2em;
+    margin: -.15em 0 0 -.15em;
+    fill: #0e0e0d; stroke: #fff; stroke-width: 1.2; stroke-linejoin: round;
+    opacity: 0; transition: opacity 250ms ease;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .w2-pase.is-ghost .w2-pase__cursor { opacity: 1; }
+
+  /* ── pie: rótulo y "Lo leen" ──────────────────────── */
+  .w2-pase__pie { display: flex; justify-content: flex-end; margin-top: 10px; }
+  .w2-pase__ej {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 11px; line-height: 1.2; letter-spacing: .1em; text-transform: uppercase;
+    color: rgba(var(--star-rgb, 240, 237, 232), .6);
+  }
+  .w2-pase__leen { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 20px; }
+  .w2-pase__leen-k {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    color: rgba(var(--star-rgb, 240, 237, 232), .6);
+  }
+  .w2-pase__sr {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  /* ── apilado en contenedores estrechos ────────────── */
+  @container pase (max-width: 439px) {
+    .w2-pase__card { aspect-ratio: auto; min-height: 15em; }
+    .w2-pase__body {
+      position: relative;
+      grid-template-columns: 1fr; grid-template-rows: auto auto auto;
+      row-gap: 0; padding: 1.7em 1.8em 1.8em;
+    }
+    .w2-pase__id { margin-top: 2.6em; }
+    .w2-pase__mrz { justify-self: start; margin-top: 1.8em; }
+    .w2-pase__sello { top: .5em; right: .7em; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .w2-pase__wash, .w2-pase__cursor { display: none; }
+    .w2-pase__guil { transition: none; }
+    .w2-pase.is-in .w2-pase__sello { animation: none; }
+  }
+</style>
+
+<script>
+  // Un nodo por instancia; todo se busca dentro de su figura.
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const ease = (t: number) => (t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+  document.querySelectorAll<HTMLElement>('[data-w2-pase]').forEach((root) => {
+    if (root.dataset.w2Init) return;
+    root.dataset.w2Init = '1';
+    if (reduce.matches || !('IntersectionObserver' in window)) return;
+
+    const card = root.querySelector<HTMLElement>('[data-w2-pase-card]')!;
+    const cursor = root.querySelector<SVGElement>('[data-w2-pase-cursor]');
+    const set = (x: number, y: number) => {
+      root.style.setProperty('--px', x.toFixed(3));
+      root.style.setProperty('--py', y.toFixed(3));
+    };
+
+    // Sello: entra una vez al verse.
+    root.setAttribute('data-w2-armed', '');
+
+    // ── recorrido automático (fantasma en ratón, una vez en táctil) ──
+    let tourRaf = 0;
+    const tour = (dir: 1 | -1, ms: number, withCursor: boolean, done?: () => void) => {
+      const r = card.getBoundingClientRect();
+      const x0 = dir > 0 ? .1 : .9, x1 = dir > 0 ? .9 : .1;
+      const t0 = performance.now();
+      root.style.setProperty('--holo', '1');
+      if (withCursor) root.classList.add('is-ghost');
+      const step = (now: number) => {
+        const p = Math.min(1, (now - t0) / ms);
+        const e = ease(p);
+        const x = x0 + (x1 - x0) * e;
+        const y = .5 + .22 * Math.sin(e * Math.PI * 1.5 + (dir > 0 ? 0 : Math.PI));
+        set(x, y);
+        if (withCursor && cursor) cursor.style.transform = `translate(${(x * r.width).toFixed(1)}px, ${(y * r.height).toFixed(1)}px)`;
+        if (p < 1) { tourRaf = requestAnimationFrame(step); return; }
+        tourRaf = 0;
+        root.style.setProperty('--holo', '0');
+        root.classList.remove('is-ghost');
+        done?.();
+      };
+      tourRaf = requestAnimationFrame(step);
+    };
+    const stopTour = () => {
+      if (tourRaf) cancelAnimationFrame(tourRaf);
+      tourRaf = 0;
+      root.classList.remove('is-ghost');
+    };
+
+    if (fine.matches) {
+      // ── puntero fino: el visitante manda ──
+      let raf = 0, tx = .5, ty = .5;
+      let retired = false, ghosts = 0, timer = 0, visible = false;
+      const retire = () => {
+        if (retired) return;
+        retired = true;
+        clearTimeout(timer);
+        stopTour();
+      };
+      const flush = () => { raf = 0; set(tx, ty); };
+      card.addEventListener('pointerenter', (e) => {
+        retire();
+        root.style.setProperty('--holo', '1');
+        const r = card.getBoundingClientRect();
+        tx = (e.clientX - r.left) / r.width; ty = (e.clientY - r.top) / r.height;
+        if (!raf) raf = requestAnimationFrame(flush);
+      });
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        tx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+        ty = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+        if (!raf) raf = requestAnimationFrame(flush);
+      });
+      card.addEventListener('pointerleave', () => root.style.setProperty('--holo', '0'));
+      ['pointerdown', 'focusin', 'keydown'].forEach((ev) => root.addEventListener(ev, retire));
+
+      // Cursor fantasma: tras 6 s sin tocar, un recorrido cada 4 s, máx. 3 por visita.
+      const schedule = (ms: number) => {
+        clearTimeout(timer);
+        if (retired || ghosts >= 3 || !visible || document.hidden) return;
+        timer = window.setTimeout(() => {
+          if (retired || !visible || document.hidden) return;
+          ghosts++;
+          tour(ghosts % 2 ? 1 : -1, 2400, true, () => schedule(1600));
+        }, ms);
+      };
+      const io = new IntersectionObserver((es) => {
+        const e = es[es.length - 1];
+        visible = e.isIntersecting && e.intersectionRatio >= .35;
+        if (visible) {
+          root.classList.add('is-in');
+          if (!tourRaf) schedule(ghosts === 0 ? 6000 : 4000);
+        } else {
+          clearTimeout(timer);
+        }
+      }, { threshold: [0, .35] });
+      io.observe(card);
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) clearTimeout(timer); else if (visible && !tourRaf) schedule(4000);
+      });
+    } else {
+      // ── táctil: un recorrido suave una vez al entrar en vista ──
+      const io = new IntersectionObserver((es) => {
+        if (!es.some((e) => e.isIntersecting && e.intersectionRatio >= .5)) return;
+        io.disconnect();
+        root.classList.add('is-in');
+        window.setTimeout(() => tour(1, 2800, false), 450);
+      }, { threshold: [0, .5] });
+      io.observe(card);
+    }
+  });
+</script>

@@ -1,0 +1,327 @@
+---
+// "A dónde te avisa" · IA conversacional (design/rediseno-workos-v2.md §3 G06).
+// W-CORE-30 (hero de Multi-Factor Authentication de WorkOS): navegador central con el producto
+// en uso y dos tarjetas satélite que sobresalen por los lados y entran desde abajo ("moveUp"
+// 0,8 s con 0,6 y 0,9 s de retraso). Calzado a "¿y tú cómo te enteras?": en el navegador, la
+// conversación en la web de Tu Negocio con Marcy; a la izquierda el CORREO del dueño (la cita
+// nueva) y a la derecha su WHATSAPP (lo que necesita una persona). Cada satélite se une con una
+// línea de 1 px que NACE de la respuesta de Marcy que lo provoca (arregla la línea sin origen de
+// FI §3-9): los extremos se miden en el DOM, así la línea sale siempre del globo correcto.
+// Composición equivalente de NavegadorSatelites variante="aviso" (P03); P03 no está integrado en
+// la rama, así que vive aquí y se sustituye por la pieza compartida cuando llegue ([SISTEMA]).
+// Vida (§1.5, demo con guion): se reproduce una vez al entrar (35 %): mensajes uno a uno, la
+// línea se dibuja (stroke-dashoffset 700 ms) y el satélite sube translateY(8px)→0; queda quieto
+// con micro-vida (punto "en línea" que late y una luz que recorre cada línea) mientras está a la
+// vista; vuelve a reproducirse tras ≥ 8 s fuera. Sin JS o con reducir movimiento: estado final.
+// Contrato §1.6: escena aria-hidden + data-nosnippet + resumen sr-only; sin h1-h6 dentro; sin
+// tel:/wa.me/data-track. Los textos de destino (h3) quedan fuera de la escena, como texto real.
+// Móvil (< 1024): navegador a ancho completo y los satélites debajo, cada uno con su línea
+// vertical que baja desde el globo de Marcy que lo provoca.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import LogoMarca from '../../marcas/LogoMarca.astro';
+import type { IaChatCopy } from '../../../../i18n/w/ia-chat';
+
+interface Props { copy: IaChatCopy['aviso']; n: number; lang?: 'es' | 'en' }
+const { copy, n } = Astro.props;
+const uid = 'av' + Math.random().toString(36).slice(2, 7);
+---
+<CabeceraNumerada n={n} label={copy.label} align="center" />
+<div class="av">
+  <div class="av__text">
+    <h2 class="w-h2 av__h" set:html={copy.title} />
+    <p class="av__p">{copy.text}</p>
+  </div>
+
+  <div class="av__stage" data-w2-aviso data-av="final" data-nosnippet>
+    <p class="sr-only">{copy.sr}</p>
+    <div class="av__scene" aria-hidden="true">
+      <svg class="av__lines" viewBox="0 0 1080 560" preserveAspectRatio="none" focusable="false">
+        <defs>
+          <linearGradient id={`${uid}-g`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="var(--accent-teal)" stop-opacity="0" />
+            <stop offset=".5" stop-color="var(--accent-teal)" stop-opacity="1" />
+            <stop offset="1" stop-color="var(--accent-teal)" stop-opacity="0" />
+          </linearGradient>
+        </defs>
+        <path class="av__ln" data-av-ln="a" pathLength="100" d="M366 220 C 300 220 300 330 262 330" />
+        <path class="av__ln" data-av-ln="b" pathLength="100" d="M600 340 C 680 340 690 300 760 300" />
+        <path class="av__glow" data-av-gl="a" pathLength="100" d="M366 220 C 300 220 300 330 262 330" />
+        <path class="av__glow" data-av-gl="b" pathLength="100" d="M600 340 C 680 340 690 300 760 300" />
+      </svg>
+
+      <div class="av__browser">
+        <div class="av__bar">
+          <span class="av__dots"><i></i><i></i><i></i></span>
+          <span class="av__url"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>Tu Negocio</span>
+          <span class="av__tag">{copy.ejemplo}</span>
+        </div>
+        <div class="av__page">
+          <div class="av__chat">
+            <div class="av__chead">
+              <img src="/assets/bot/marcy-mini-128.webp" srcset="/assets/bot/marcy-mini-32.webp 32w, /assets/bot/marcy-mini-64.webp 64w, /assets/bot/marcy-mini-96.webp 96w, /assets/bot/marcy-mini-128.webp 128w, /assets/bot/marcy-mini.webp 256w" sizes="34px" width="34" height="34" alt="" loading="lazy" decoding="async" />
+              <span><b>Marcy</b><small><i class="av__online"></i>{copy.enLinea}</small></span>
+            </div>
+            <div class="av__msgs">
+              {copy.chat.map((m, i) => (
+                <p class:list={['av__m', m.m ? 'av__m--marcy' : 'av__m--c']} data-av-m={i} data-av-o={m.o}>
+                  <span class="av__b">{m.t}</span><span class="av__h">{m.h}</span>
+                </p>
+              ))}
+            </div>
+            <div class="av__input"><span>{copy.escribe}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="av__sat av__sat--a" data-av-sat="a">
+        <div class="av__shead">
+          <span class="av__ico av__ico--mail"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5" /><path d="m4 7 8 6 8-6" /></svg></span>
+          <b>{copy.mail.channel}</b><small>{copy.mail.time}</small>
+        </div>
+        <p class="av__from">{copy.mail.from}</p>
+        <p class="av__subj">{copy.mail.subject}</p>
+        <p class="av__body">{copy.mail.body}</p>
+      </div>
+
+      <div class="av__sat av__sat--b" data-av-sat="b">
+        <div class="av__shead">
+          <span class="av__ico"><LogoMarca id="whatsapp" size={18} tono="color" titulo="" /></span>
+          <b>{copy.wa.channel}</b><small>{copy.wa.time}</small>
+        </div>
+        <p class="av__bub">{copy.wa.body}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="av__dests">
+    <div class="av__dest"><h3 class="av__h3">{copy.destA.title}</h3><p class="av__d">{copy.destA.text}</p></div>
+    <div class="av__dest"><h3 class="av__h3">{copy.destB.title}</h3><p class="av__d">{copy.destB.text}</p></div>
+  </div>
+</div>
+
+<script>
+  import { secuencia, vigilar, reducido } from '../../mac/mac';
+
+  // Rendimiento (revisión G06 r1): medir los globos al cargar forzaba un trazado de toda la
+  // página en plena carga (≈ 380 ms con CPU ×4). Ahora la escena se prepara cuando se acerca
+  // (1.000 px antes), y hasta entonces el HTML trae el estado final.
+  const arrancar = (st: HTMLElement) => {
+    if (st.dataset.listo) return;
+    st.dataset.listo = '1';
+    const scene = st.querySelector<HTMLElement>('.av__scene');
+    const svg = st.querySelector<SVGSVGElement>('.av__lines');
+    if (!scene || !svg) return;
+    const msgs = [...st.querySelectorAll<HTMLElement>('[data-av-m]')];
+    const sat = { a: st.querySelector<HTMLElement>('[data-av-sat="a"]'), b: st.querySelector<HTMLElement>('[data-av-sat="b"]') };
+    const ln = { a: st.querySelectorAll<SVGPathElement>('[data-av-ln="a"],[data-av-gl="a"]'), b: st.querySelectorAll<SVGPathElement>('[data-av-ln="b"],[data-av-gl="b"]') };
+
+    // Trazado de cada línea: sale del globo de Marcy que provoca el aviso (data-av-o) y llega
+    // al satélite. Escritorio: curva horizontal hacia el lado del satélite. Móvil: baja.
+    const trazar = () => {
+      const r0 = scene.getBoundingClientRect();
+      const k = scene.offsetWidth ? r0.width / scene.offsetWidth : 1; // escala del lienzo
+      svg.setAttribute('viewBox', `0 0 ${scene.offsetWidth} ${scene.offsetHeight}`);
+      const rel = (r: DOMRect) => ({ l: (r.left - r0.left) / k, t: (r.top - r0.top) / k, r: (r.right - r0.left) / k, b: (r.bottom - r0.top) / k });
+      const movil = !matchMedia('(min-width: 1024px)').matches;
+      for (const lado of ['a', 'b'] as const) {
+        const o = st.querySelector<HTMLElement>(`[data-av-o="${lado}"] .av__b`);
+        const s = sat[lado];
+        if (!o || !s) continue;
+        const bo = rel(o.getBoundingClientRect()), bs = rel(s.getBoundingClientRect());
+        let d: string;
+        if (movil) {
+          // Por el margen: el correo por la izquierda, el WhatsApp por la derecha; la línea
+          // nunca cruza un texto (sale del globo hacia el borde, baja y entra al satélite).
+          const W = scene.offsetWidth, izq = lado === 'a';
+          const g = izq ? 6 : W - 6, sg = izq ? 1 : -1;
+          const x0 = izq ? bo.l : bo.r, y0 = (bo.t + bo.b) / 2, x1 = izq ? bs.l : bs.r, y1 = bs.t + 44;
+          d = `M${x0} ${y0} H${g + sg * 12} Q${g} ${y0} ${g} ${y0 + 12} V${y1 - 12} Q${g} ${y1} ${g + sg * 12} ${y1} H${x1}`;
+        } else if (lado === 'a') {
+          const x0 = bo.l, y0 = (bo.t + bo.b) / 2, x1 = bs.r, y1 = bs.t + 44;
+          d = `M${x0} ${y0} C ${x0 - 40} ${y0} ${x1 + 40} ${y1} ${x1} ${y1}`;
+        } else {
+          const x0 = bo.r, y0 = (bo.t + bo.b) / 2, x1 = bs.l, y1 = bs.t + 44;
+          d = `M${x0} ${y0} C ${x0 + 50} ${y0} ${x1 - 50} ${y1} ${x1} ${y1}`;
+        }
+        ln[lado].forEach((p) => p.setAttribute('d', d));
+      }
+    };
+    trazar();
+    let rz = 0;
+    new ResizeObserver(() => { cancelAnimationFrame(rz); rz = requestAnimationFrame(trazar); }).observe(scene);
+
+    // Estado global de pausa (§1.5; contrato de agente.ts: sessionStorage 'w2:pausa' y evento
+    // 'w2:pausa' en window): la micro-vida obedece sin botón propio.
+    const pausada = () => { try { return sessionStorage.getItem('w2:pausa') === '1'; } catch { return false; } };
+    const sync = () => st.classList.toggle('is-pausa', pausada());
+    window.addEventListener('w2:pausa', sync); sync();
+    const vida = (si: boolean) => st.classList.toggle('is-vivo', si && st.dataset.av === 'final');
+    if (reducido()) { st.dataset.av = 'final'; vigilar(st, { alEntrar: () => {}, vivo: () => {} }); return; }
+
+    const on = (el: Element | null | undefined) => el?.classList.add('is-on');
+    const pasos: Array<[number, () => void]> = [
+      [0, () => { st.dataset.av = 'juega'; st.querySelectorAll('.is-on').forEach((e) => e.classList.remove('is-on')); trazar(); }],
+      [200, () => on(msgs[0])],
+      [800, () => on(msgs[1])],
+      [1000, () => ln.a.forEach(on)],
+      [1600, () => on(sat.a)],
+      [2200, () => on(msgs[2])],
+      [2800, () => on(msgs[3])],
+      [3000, () => ln.b.forEach(on)],
+      [3500, () => on(sat.b)],
+      [4400, () => { st.dataset.av = 'final'; vida(!document.hidden); }],
+    ];
+    const sec = secuencia(pasos);
+    // Antes de entrar en vista se prepara el estado vacío (la sección está bajo el pliegue: sin
+    // destello). Si el guion no carga, el HTML ya trae el estado final.
+    st.dataset.av = 'pre';
+    vigilar(st, {
+      alEntrar: () => sec.play(),
+      alSalir: () => { if (sec.corriendo) { sec.stop(); st.dataset.av = 'final'; } },
+      vivo: vida,
+    });
+  };
+  const etapas = [...document.querySelectorAll<HTMLElement>('[data-w2-aviso]')];
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => {
+      for (const e of es) if (e.isIntersecting) { io.unobserve(e.target); arrancar(e.target as HTMLElement); }
+    }, { rootMargin: '1000px 0px' });
+    etapas.forEach((st) => io.observe(st));
+  } else etapas.forEach(arrancar);
+</script>
+
+<style>
+  /* Bajo el pliegue: el navegador no pinta esta escena hasta acercarse (§1.8, TBT). */
+  .av { margin-top: 12px; content-visibility: auto; contain-intrinsic-size: auto 1000px; }
+  .av__text { text-align: center; max-width: 720px; margin-inline: auto; }
+  .av__h { margin: 0; }
+  .av__p { margin: 16px auto 0; max-width: 560px; font: 400 var(--w-lead)/1.5 var(--font-body); color: var(--w-ink-70); }
+
+  /* ── escena ── */
+  .av__stage { position: relative; margin-top: 56px; container-type: inline-size; }
+  .av__scene { position: relative; }
+  /* viewBox de serie = lienzo de escritorio (1080×560): sin él, los trazos del HTML (en px de
+     escritorio, hasta x = 760) desbordaban la escena en móvil antes de que el guion los
+     recalculase, y el navegador del teléfono ensanchaba TODA la página a 681 px (v3: "el hero
+     se rompe en móvil"). trazar() reescribe viewBox y trazos al medir. */
+  .av__lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; z-index: 3; pointer-events: none; }
+  .av__ln { fill: none; stroke: var(--accent-teal); stroke-width: 1.25; vector-effect: non-scaling-stroke; stroke-dasharray: 100; stroke-dashoffset: 0; }
+  .av__glow { fill: none; stroke: var(--accent-teal); stroke-width: 3; stroke-linecap: round; vector-effect: non-scaling-stroke; stroke-dasharray: 16 84; stroke-dashoffset: 100; opacity: 0; }
+
+  .av__browser {
+    position: relative; z-index: 1; overflow: hidden;
+    background: var(--w-p-bg); color: var(--w-p-ink);
+    border-radius: 20px; box-shadow: 0 40px 80px -40px rgba(0,0,0,.65), 0 0 0 1px rgba(240,237,232,.06);
+  }
+  .av__bar { display: flex; align-items: center; gap: 14px; height: 44px; padding: 0 16px; border-bottom: 1px solid var(--w-p-line); }
+  .av__dots { display: flex; gap: 7px; flex: none; }
+  .av__dots i { width: 11px; height: 11px; border-radius: 50%; background: #ff5f57; box-shadow: inset 0 0 0 .5px rgba(0,0,0,.18); }
+  .av__dots i:nth-child(2) { background: #febc2e; }
+  .av__dots i:nth-child(3) { background: #28c840; }
+  .av__url {
+    flex: 1; max-width: 360px; margin-inline: auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: 26px; border-radius: 8px; background: rgba(14,14,13,.06); font: 500 12.5px/1 var(--font-body); color: var(--w-p-ink-2);
+  }
+  .av__tag { flex: none; font: 500 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--w-p-ink-2); }
+  .av__page {
+    position: relative; padding: 40px 24px 44px; display: flex; justify-content: center;
+    background:
+      radial-gradient(70% 90% at 50% 0%, rgba(79,195,161,.10), transparent 70%),
+      repeating-linear-gradient(90deg, transparent 0 79px, rgba(14,14,13,.035) 79px 80px);
+  }
+  .av__chat {
+    width: min(100%, 380px); background: #fff; border-radius: 18px;
+    box-shadow: 0 1px 0 rgba(14,14,13,.04), 0 18px 40px -22px rgba(14,14,13,.35), 0 0 0 1px rgba(14,14,13,.06);
+  }
+  .av__chead { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--w-p-line); }
+  .av__chead img { width: 34px; height: 34px; border-radius: 50%; background: #e9ecea; object-fit: cover; }
+  .av__chead span { display: grid; gap: 2px; }
+  .av__chead b { font: 600 15px/1.1 var(--font-display); }
+  .av__chead small { display: inline-flex; align-items: center; gap: 6px; font: 400 12.5px/1 var(--font-body); color: var(--w-p-ink-2); }
+  .av__online { width: 7px; height: 7px; border-radius: 50%; background: #22a06b; }
+  .av__msgs { display: grid; gap: 10px; padding: 16px; }
+  .av__m { margin: 0; display: grid; gap: 3px; max-width: 82%; transition: opacity .32s var(--w-ease-ui), transform .32s var(--w-ease-ui); }
+  .av__m--c { justify-self: end; justify-items: end; }
+  .av__b { display: block; padding: 9px 13px; border-radius: 15px; font: 400 14.5px/1.38 var(--font-body); }
+  .av__m--c .av__b { background: #0e0e0d; color: #f0ede8; border-bottom-right-radius: 5px; }
+  .av__m--marcy .av__b { background: #e3f3ed; color: #0c3d2f; border-bottom-left-radius: 5px; }
+  .av__h { font: 400 11.5px/1 var(--font-body); color: var(--w-p-ink-2); font-variant-numeric: tabular-nums; }
+  .av__input { margin: 0 16px 16px; height: 40px; display: flex; align-items: center; padding: 0 14px; border-radius: 12px; background: rgba(14,14,13,.05); font: 400 13px/1 var(--font-body); color: var(--w-p-ink-2); }
+
+  .av__sat {
+    position: relative; z-index: 2; background: #fbfaf7; color: var(--w-p-ink); border-radius: 26px; padding: 18px 20px 20px;
+    box-shadow: 0 30px 60px -28px rgba(0,0,0,.7), 0 0 0 1px rgba(14,14,13,.06);
+    transition: opacity .8s var(--w-ease-ui), transform .8s var(--w-ease-ui);
+  }
+  .av__shead { display: flex; align-items: center; gap: 9px; }
+  .av__shead b { font: 600 14.5px/1 var(--font-display); }
+  .av__shead small { margin-left: auto; font: 400 12px/1 var(--font-body); color: var(--w-p-ink-2); }
+  .av__ico { position: relative; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: #fff; box-shadow: inset 0 0 0 1px rgba(14,14,13,.08); flex: none; }
+  .av__ico--mail { color: #0c3d2f; background: #e3f3ed; box-shadow: none; }
+  .av__from { margin: 14px 0 0; font: 600 13.5px/1.2 var(--font-body); }
+  .av__subj { margin: 4px 0 0; font: 500 15px/1.3 var(--font-display); }
+  .av__body { margin: 4px 0 0; font: 400 13.5px/1.35 var(--font-body); color: var(--w-p-ink-2); }
+  .av__bub { margin: 14px 0 0; padding: 10px 13px; border-radius: 15px; border-top-left-radius: 5px; background: #d9fdd3; color: #0b2e14; font: 400 14.5px/1.38 var(--font-body); }
+
+  .av__dests { display: grid; gap: 24px; margin-top: 48px; }
+  .av__h3 { margin: 0; font: 500 19px/1.3 var(--font-display); color: var(--w-ink); }
+  .av__d { margin: 6px 0 0; font: 400 15.5px/1.55 var(--font-body); color: var(--w-ink-70); max-width: 380px; }
+
+  /* Móvil y tableta: navegador arriba, satélites debajo; la línea baja desde el globo. */
+  @media (max-width: 1023px) {
+    .av__stage { margin-top: 40px; }
+    .av__page { padding: 24px 14px 28px; }
+    .av__browser { margin-inline: 14px; }
+    .av__sat { width: min(calc(100% - 28px), 380px); margin: 40px 0 0 14px; }
+    .av__sat--b { margin: 20px 14px 0 auto; }
+    .av__dests { grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 36px; }
+  }
+  @media (max-width: 560px) {
+    .av__dests { grid-template-columns: 1fr; }
+    .av__tag { display: none; }
+  }
+
+  /* Escritorio: composición de W-CORE-30 en un lienzo fijo de 1080×560 que escala con el
+     contenedor (nunca por debajo de 0,88 en 1024: textos ≥ 12 px). */
+  @media (min-width: 1024px) {
+    .av__stage { height: calc(560px * min(1, 100cqw / 1080px)); }
+    .av__scene {
+      position: absolute; left: 50%; top: 0; width: 1080px; height: 560px;
+      transform-origin: top center; transform: translateX(-50%) scale(min(1, 100cqw / 1080px));
+    }
+    .av__browser { position: absolute; left: 190px; top: 0; width: 700px; height: 560px; }
+    .av__sat { position: absolute; width: 290px; }
+    .av__sat--a { left: 0; top: 236px; }
+    .av__sat--b { right: 0; top: 400px; }
+    .av__dests { grid-template-columns: 1fr 1fr; max-width: 1080px; margin-inline: auto; gap: 40px; }
+    .av__dest:last-child { justify-self: end; text-align: right; }
+    .av__dest:last-child .av__d { margin-left: auto; }
+  }
+
+  /* ── estados del guion ── */
+  .av__stage[data-av="pre"] .av__m,
+  .av__stage[data-av="juega"] .av__m:not(.is-on) { opacity: 0; transform: translateY(6px); }
+  .av__stage[data-av="pre"] .av__sat,
+  .av__stage[data-av="juega"] .av__sat:not(.is-on) { opacity: 0; transform: translateY(8px); }
+  .av__stage[data-av="pre"] .av__ln,
+  .av__stage[data-av="juega"] .av__ln:not(.is-on) { stroke-dashoffset: 100; }
+  .av__stage[data-av="juega"] .av__ln.is-on { transition: stroke-dashoffset .7s var(--w-ease-ui); }
+  /* micro-vida: luz que recorre cada línea (2,8 s) y punto "en línea" que late, solo a la vista */
+  .av__stage.is-vivo .av__glow { animation: av-luz 2.8s linear infinite; }
+  .av__stage.is-vivo .av__glow[data-av-gl="b"] { animation-delay: 1.4s; }
+  .av__stage.is-vivo .av__online { animation: av-late 2s ease-in-out infinite; }
+  /* Cada vez que la luz llega al satélite, su icono "suena": un aro que se abre y se apaga. */
+  .av__ico::after {
+    content: ''; position: absolute; inset: -1px; border-radius: 9px; pointer-events: none;
+    box-shadow: 0 0 0 1.5px var(--accent-teal); opacity: 0;
+  }
+  .av__stage.is-vivo .av__sat .av__ico::after { animation: av-ping 2.8s ease-out infinite; }
+  .av__stage.is-vivo .av__sat--b .av__ico::after { animation-delay: 1.4s; }
+  @keyframes av-ping { 0%, 78% { opacity: 0; transform: scale(1); } 82% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.7); } }
+  @keyframes av-luz { 0% { stroke-dashoffset: 100; opacity: 0; } 12% { opacity: .9; } 88% { opacity: .9; } 100% { stroke-dashoffset: 0; opacity: 0; } }
+  @keyframes av-late { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  .av__stage.is-pausa .av__glow, .av__stage.is-pausa .av__online, .av__stage.is-pausa .av__ico::after { animation-play-state: paused; }
+  @media (prefers-reduced-motion: reduce) {
+    .av__stage *, .av__stage *::before { transition: none !important; animation: none !important; }
+  }
+</style>

@@ -1,0 +1,144 @@
+---
+// Portada tipo WorkOS /passport (dueño, 2026-11-08), medida en vivo:
+//   · El paisaje es UNO solo, a sangre detrás de toda la portada; la pantalla del portátil es
+//     TRANSPARENTE y deja ver ese mismo paisaje (el horizonte sigue dentro de la pantalla).
+//   · Coreografía: el portátil sube 32 px (1 s, retardo .6 s); la ventana entra nítida (escala .96 → 1
+//     y 12 px, .6 s); llega el aviso del negocio y, con él, amanece fuera y dentro de la pantalla a la
+//     vez (fundido noche → alba, 1,6 s). La hora de la barra pasa de 5:48 a 6:12 a. m.
+//   · Katy (taller): su propia capa anclada al portátil (planeta frío que asoma sobre la tapa y
+//     horizonte de llanura dentro de la pantalla), así nunca invade el texto a ningún tamaño.
+// El cielo a sangre lo pinta HeroBarrio; este guion le pone data-alba="true" a la portada.
+// Sin JS o con movimiento reducido se ve el estado final. El estado inicial se pone ANTES de pintar
+// (guion en línea justo detrás del nodo), sin parpadeo.
+import Portatil from '../../mac/Portatil.astro';
+import Escritorio from '../../mac/Escritorio.astro';
+import VentanaApp from '../../mac/VentanaApp.astro';
+import WebClinica from '../webs/WebClinica.astro';
+import WebTaller from '../webs/WebTaller.astro';
+
+interface Props { web: 'clinica' | 'taller'; lang?: 'es' | 'en' }
+const { web, lang = 'es' } = Astro.props;
+const D = {
+  clinica: { url: 'tuclinica.example', app: 'Navegador', ico: 'diente',
+    aviso: { app: 'Tu Clínica', t: 'Nueva cita pedida', b: 'Martes 10:00 a. m.' },
+    sr: 'Ejemplo: en la pantalla de un portátil se abre la web de una clínica dental de First Colony, en Sugar Land, y llega el aviso de una cita nueva.' },
+  taller: { url: 'tutaller.example', app: 'Navegador', ico: 'pin',
+    aviso: { app: 'Tu Taller', t: 'Alguien pidió cómo llegar', b: 'Desde Cinco Ranch' },
+    sr: 'Ejemplo: en la pantalla de un portátil se abre la web de un taller mecánico de Katy y llega el aviso de que un cliente pidió cómo llegar.' },
+}[web];
+const capa = (m: string, f: string) => [2400, 4800].map((w) => `/assets/w/paisajes/katy-capa-${m}-${w}.${f} ${w}w`).join(', ');
+---
+<div class:list={['ep', `ep--${web}`]} data-ep>
+  <p class="sr-only">{D.sr}</p>
+  {web === 'taller' && (
+    <div class="ep__capa" aria-hidden="true">
+      {(['noche', 'alba'] as const).map((m) => (
+        <picture class:list={['ep__cp', `ep__cp--${m}`]}>
+          <source type="image/avif" srcset={capa(m, 'avif')} sizes="(max-width: 767px) 680vw, 280vw" />
+          <img src={`/assets/w/paisajes/katy-capa-${m}-2400.webp`} srcset={capa(m, 'webp')} sizes="(max-width: 767px) 680vw, 280vw" alt="" width="4800" height="940" decoding="async" fetchpriority={m === 'noche' ? 'high' : 'low'} />
+        </picture>
+      ))}
+    </div>
+  )}
+  <div class="ep__pt" data-nosnippet>
+    <Portatil ancho={1180} base={false} transparente>
+      <Escritorio lang={lang} dock={false} fondo={false} app={D.app} fase="escritorio" hora="5:48 a. m." horaDia="6:12 a. m.">
+        <VentanaApp id="web" url={`${D.url} · Ejemplo`} x={96} y={74} w={900} h={640} z={2} estado="lista" on={true}>
+          {web === 'clinica' ? <WebClinica /> : <WebTaller />}
+        </VentanaApp>
+        <div class="ep__aviso" data-ep-aviso>
+          <span class="ep__ico" aria-hidden="true">
+            {D.ico === 'diente'
+              ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M7.5 3.5c-2.4 0-4 1.8-4 4.4 0 2.3.9 3.6 1.4 5.6.6 2.4.8 6.9 2.6 6.9 1.6 0 1.5-4.4 2.4-5.6.5-.6 1.7-.6 2.2 0 .9 1.2.8 5.6 2.4 5.6 1.8 0 2-4.5 2.6-6.9.5-2 1.4-3.3 1.4-5.6 0-2.6-1.6-4.4-4-4.4-1.7 0-2.6 1-3.5 1s-1.8-1-3.5-1z" /></svg>
+              : <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z" /><circle cx="12" cy="9.5" r="2.5" /></svg>}
+          </span>
+          <span class="ep__av-txt"><b>{D.aviso.app}</b><span>{D.aviso.t}</span><em>{D.aviso.b}</em></span>
+          <span class="ep__ahora">ahora</span>
+        </div>
+      </Escritorio>
+    </Portatil>
+  </div>
+</div>
+<script is:inline>
+  (function (s) {
+    var r = s.previousElementSibling;
+    if (r && !matchMedia('(prefers-reduced-motion: reduce)').matches) r.classList.add('is-prep');
+  })(document.currentScript);
+</script>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ep]').forEach((root) => {
+    const hero = root.closest<HTMLElement>('[data-hb]');
+    const aviso = root.querySelector<HTMLElement>('[data-ep-aviso]');
+    const esc = root.querySelector<HTMLElement>('[data-w2-escritorio]');
+    const fin = () => {
+      root.classList.add('is-arriba', 'is-abierta');
+      aviso?.classList.add('is-on');
+      hero?.setAttribute('data-alba', 'true');
+      if (esc) esc.dataset.escDia = 'true';
+    };
+    if (!root.classList.contains('is-prep')) { fin(); return; }
+    const t = (ms: number, f: () => void) => window.setTimeout(f, ms);
+    const correr = () => {
+      root.classList.add('is-arriba');                        // el portátil sube (CSS, 1 s, retardo .6 s)
+      t(1500, () => root.classList.add('is-abierta'));        // la ventana entra nítida
+      t(2700, fin);                                           // llega el aviso y amanece
+    };
+    const io = new IntersectionObserver((es2) => {
+      if (es2.some((e) => e.isIntersecting)) { io.disconnect(); correr(); }
+    }, { threshold: 0.15 });
+    io.observe(root);
+  });
+</script>
+
+<style>
+  .ep { position: relative; width: 100%; display: flex; justify-content: center; }
+  .ep__pt { position: relative; z-index: 1; width: 100%; transition: opacity 1s cubic-bezier(.22, 1, .36, 1) .6s, transform 1s cubic-bezier(.22, 1, .36, 1) .6s; }
+  .ep.is-prep:not(.is-arriba) .ep__pt { opacity: 0; transform: translateY(32px); }
+  /* la ventana entra nítida, sin desenfoque ni pantalla de carga */
+  .ep :global([data-w2-ventana="web"]) { transition: opacity .6s ease, transform .6s cubic-bezier(.22, 1, .36, 1); }
+  .ep.is-prep:not(.is-abierta) :global([data-w2-ventana="web"]) { opacity: 0; transform: scale(.96) translateY(12px); }
+  /* barra de menús oscura y translúcida sobre el paisaje */
+  .ep :global(.esc-menu) { background: rgba(8, 10, 16, .5); }
+  .ep--taller :global(.esc-menu) { background: rgba(8, 10, 16, .62); }
+
+  /* Katy: capa anclada al portátil. Unidades de la capa: L = ancho del portátil = 1200 px fuente;
+     la capa mide 4L y la tapa empieza en y = 260 px fuente (21,67 % de L). */
+  .ep__capa { position: absolute; z-index: 0; left: 50%; top: 0; width: 400%; margin-left: -200%; margin-top: -21.67%; pointer-events: none; }
+  .ep__cp, .ep__cp img { display: block; width: 100%; height: auto; }
+  /* el suelo sigue hasta el borde de la portada (tabletas en vertical) */
+  .ep__capa::after { content: ''; position: absolute; left: 0; right: 0; top: calc(100% - 2px); height: 300vh; background: #06090d; }
+  .ep__cp--alba { position: absolute; inset: 0; opacity: 0; transition: opacity 1.6s ease; }
+  :global(.hb[data-alba="true"]) .ep__cp--alba { opacity: 1; }
+
+  /* aviso del negocio (px de la pantalla fuente: a 1440 se ve a ~0,6) */
+  .ep__aviso {
+    /* en el hueco de fondo de pantalla a la derecha de la ventana: no tapa nada de la web */
+    position: absolute; top: 96px; right: 16px; z-index: 40; width: 344px;
+    display: grid; grid-template-columns: 46px 1fr auto; gap: 14px; align-items: center;
+    padding: 16px 18px; border-radius: 20px;
+    background: #f5f5f7; color: #1d1d1f;
+    box-shadow: 0 0 0 .5px rgba(0, 0, 0, .12), 0 18px 40px -12px rgba(0, 0, 0, .45);
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+  .ep.is-prep .ep__aviso { opacity: 0; transform: translateX(28px); transition: opacity .5s ease, transform .6s cubic-bezier(.22, 1, .36, 1); }
+  .ep.is-prep .ep__aviso.is-on { opacity: 1; transform: none; }
+  .ep__ico { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; }
+  .ep--clinica .ep__ico { background: #1f4a3a; color: #f7f4ee; }
+  .ep--taller .ep__ico { background: #141414; color: #fafaf8; }
+  .ep__av-txt { display: flex; flex-direction: column; gap: 2px; font-size: 19px; line-height: 1.25; }
+  .ep__av-txt b { font-weight: 650; }
+  .ep__av-txt em { font-style: normal; color: #5f5f66; font-size: 18px; }
+  .ep__ahora { align-self: start; font-size: 15px; color: #8e8e93; }
+  /* teléfono: el portátil desborda por los lados; el aviso se centra en la parte visible */
+  /* teléfono: el portátil desborda por los lados. La ventana vuelve al centro y baja para dejar,
+     entre la barra y la ventana, el hueco del aviso; la barra de menús no enseña palabras cortadas. */
+  @media (max-width: 767.98px) {
+    .ep :global([data-w2-ventana="web"]) { left: 239px !important; top: 176px !important; }
+    .ep__aviso { top: 52px; right: auto; left: 50%; translate: -50% 0; width: 420px; }
+    .ep :global(.esc-menu-izq), .ep :global(.esc-menu-der) { visibility: hidden; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ep__pt, .ep__aviso, .ep__cp--alba, .ep :global([data-w2-ventana="web"]) { transition: none; }
+  }
+</style>

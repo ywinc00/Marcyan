@@ -1,0 +1,162 @@
+---
+// Índice del blog v3 (design/rediseno-workos.md §4.7, W-CONT-01/02/05/06/09/50, W-NEW-08).
+// Lo montan /es/blog y /en/blog con su copy congelado (meta, H1 verbatim, migas, nombre
+// del Blog del JSON-LD) y su colección ya filtrada por idioma.
+// Orden: cabecera compacta → destacada (único contraste) → pareja → 01 listado con filtro
+// (#articulos) → cierre en dos tarjetas (trío contractual una vez) → Contact (#contacto).
+// Sin guías: cabecera → celda punteada → cierre → Contact. Firma: ninguna. Degradado: ninguno.
+// Fondo (v3): vuelve el de la v1 (SpaceBackdrop oro); la hoja pautada F13 de la v2 se retiró
+// (el dueño: «el fondo rayado no se ve bien»). El BlogListingLd (Blog con sus BlogPosting, orden por fecha) y el BreadcrumbList no cambian.
+import Layout from '../../../../layouts/Layout.astro';
+import SiteNav from '../../../layout/SiteNav.astro';
+import SiteFooter from '../../../layout/SiteFooter.astro';
+import Breadcrumb from '../../../ui/Breadcrumb.astro';
+import Contact from '../../../sections/Contact.astro';
+import BlogListingLd from '../../../seo/BlogListingLd.astro';
+import WStyles from '../../WStyles.astro';
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Cabecera from './Cabecera.astro';
+import SpaceBackdrop from '../../../SpaceBackdrop.astro';
+import Destacada from './Destacada.astro';
+import Pareja from './Pareja.astro';
+import Lista from './Lista.astro';
+import Cierre from './Cierre.astro';
+import Vacio from './Vacio.astro';
+import { content, nap } from '../../../../i18n/content';
+import { clusterNav, clusterNavEn } from '../../../../i18n/clusters';
+import { blogW, type BlogLang, type PostCard } from '../../../../i18n/w/blog';
+import type { CrumbItem } from '../../../../lib/schema';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  lang: BlogLang;
+  meta: { title: string; description: string };
+  h1Html: string;
+  breadcrumb: CrumbItem[];
+  /** Nombre del Blog en el JSON-LD (congelado). */
+  ldName: string;
+  /** Guías del idioma, ya ordenadas por fecha (la más nueva primero). */
+  posts: CollectionEntry<'blog'>[];
+  /** Texto del estado vacío congelado (ES: blogIndex.empty). */
+  emptyTitle?: string;
+}
+const { lang, meta, h1Html, breadcrumb, ldName, posts, emptyTitle } = Astro.props;
+const w = blogW[lang];
+const c = content[lang];
+const base = `/${lang}/blog`;
+
+const fmt = (d: Date) => new Intl.DateTimeFormat(lang, { dateStyle: 'long', timeZone: 'UTC' }).format(d);
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+const STRIP_DIACRITICS = /[̀-ͯ]/g;
+const slugify = (s: string) =>
+  s.toLowerCase().normalize('NFD').replace(STRIP_DIACRITICS, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+const cards: PostCard[] = posts.map((p) => {
+  const words = (p.body ?? '').trim().split(/\s+/).filter(Boolean).length;
+  return {
+    href: `${base}/${p.id}`,
+    title: p.data.title,
+    description: p.data.description,
+    tags: p.data.tags,
+    cats: p.data.tags.map(slugify),
+    dateISO: iso(p.data.datePublished),
+    dateLabel: fmt(p.data.datePublished),
+    reading: `${Math.max(1, Math.round(words / 200))} ${w.readingSuffix}`,
+  };
+});
+
+// Temas reales con su frecuencia (como antes): el filtro solo enseña los que existen.
+const catCount = new Map<string, number>();
+for (const p of posts) for (const tg of p.data.tags) catCount.set(tg, (catCount.get(tg) ?? 0) + 1);
+const categories = [...catCount.entries()]
+  .sort((a, z) => z[1] - a[1] || a[0].localeCompare(z[0]))
+  .map(([label]) => ({ label, id: slugify(label) }));
+
+const [featured, ...rest] = cards;
+const pair = rest.slice(0, 2);
+const topHrefs = [featured, ...pair].filter(Boolean).map((p) => p.href);
+const hasList = cards.length > topHrefs.length;
+
+const postRefs = posts.map((p) => ({
+  headline: p.data.title,
+  path: `${base}/${p.id}`,
+  description: p.data.description,
+  datePublished: iso(p.data.datePublished),
+}));
+
+const num = nap.houston;
+const tel = 'tel:' + num.replace(/[^\d+]/g, '');
+const wa = 'https://wa.me/' + num.replace(/\D/g, '');
+---
+<Layout title={meta.title} description={meta.description} lang={lang} path="blog" ds="v3">
+  {lang === 'en'
+    ? <BlogListingLd slot="head" posts={postRefs} name={ldName} description={meta.description} path={base} inLanguage="en" />
+    : <BlogListingLd slot="head" posts={postRefs} name={ldName} description={meta.description} path={base} />}
+  <WStyles />
+
+  <SiteNav nav={lang === 'en' ? clusterNavEn : clusterNav} lang={lang} homeHref={`/${lang}`} currentPath={base} />
+
+  <main id="main" class="w-rails" data-w data-w-tone="gold">
+    <Cabecera h1Html={h1Html} pill={w.pill}>
+      <Breadcrumb slot="crumbs" items={breadcrumb} lang={lang} />
+    </Cabecera>
+
+    {featured ? (
+      <section class="bx-top">
+        <div class="w-container">
+          <Destacada post={featured} team={w.team} readMore={w.readMore} />
+          {pair.length > 0 && <div class="bx-pair" data-w-reveal><Pareja posts={pair} /></div>}
+        </div>
+      </section>
+    ) : (
+      <section class="bx-top bx-top--empty">
+        <div class="w-container" data-w-reveal>
+          <Vacio
+            title={emptyTitle ?? w.empty.title}
+            text={w.empty.text}
+            link={{ label: w.empty.link, href: w.empty.linkHref }}
+          />
+        </div>
+      </section>
+    )}
+
+    {hasList && (
+      <section class="bx-list">
+        <div class="w-container" data-w-reveal>
+          <CabeceraNumerada n={1} label={w.list.label} titleHtml={w.list.titleHtml} />
+          <Lista
+            posts={cards}
+            topHrefs={topHrefs}
+            categories={categories}
+            filterAria={w.list.filterAria}
+            all={w.list.all}
+            none={w.list.none}
+          />
+        </div>
+      </section>
+    )}
+
+    <section class="w-cell bx-close">
+      <div class="w-container" data-w-reveal>
+        <Cierre copy={w.close} tel={tel} wa={wa} lang={lang} />
+      </div>
+    </section>
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SiteFooter footer={c.footer} lang={lang} />
+  <SpaceBackdrop tone="gold" />
+</Layout>
+
+<style>
+  .bx-top { position: relative; z-index: 1; padding-bottom: var(--w-section-y); }
+  .bx-top--empty { padding-top: 24px; }
+  .bx-pair { margin-top: 96px; }
+  /* La lista lleva su cabecera numerada, que ya trae la divisoria de 1 px: no es .w-cell
+     para no pintar dos líneas seguidas. */
+  .bx-list { position: relative; z-index: 1; padding-bottom: var(--w-section-y); }
+  @media (--lt-md) {
+    .bx-pair { margin-top: 64px; }
+  }
+</style>

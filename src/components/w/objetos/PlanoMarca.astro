@@ -1,0 +1,230 @@
+---
+// Plano técnico de marca (W-NEW-12 · design/rediseno-workos.md §3.6). Objeto de SISTEMA.
+// Marco radio 6 con regla perimetral (1-6, A-D, mono 10 al 40 %) y cuadrícula de 1 px al 6 %.
+// Izquierda: marca de EJEMPLO "Tu Marca" (isotipo abstracto de sello + palabra, diseñada
+// por nosotros, nunca la de un cliente: E-32, E-47) en vista frontal (círculo con trazo
+// doble) y vista de aplicación con cotas ("Ø52", "15.5"); llamadas numeradas en círculos
+// de 22 px. Derecha: 8 filas = entregables reales del servicio de marca (clusters.ts,
+// "Qué incluye"); cajetín mono con los datos del encargo (E-13).
+// Hover/foco de fila → la fila y su pieza del dibujo en oro, 200 ms (CSS :has, sin bucle).
+// size="mini": solo el dibujo (celda de bento de Servicios). Móvil: plano arriba, lista debajo.
+import Ejemplo from '../Ejemplo.astro';
+
+interface Row { name: string; detail: string; part: number }
+interface Props {
+  lang?: 'es' | 'en';
+  size?: 'hero' | 'card' | 'mini';
+  rows?: Row[];
+  brand?: string;
+  class?: string;
+}
+const { lang = 'es', size = 'hero', class: cls } = Astro.props;
+const en = lang === 'en';
+const brand = Astro.props.brand ?? (en ? 'Your Brand' : 'Tu Marca');
+const rows: Row[] = Astro.props.rows ?? (en
+  ? [
+      { name: 'Custom logo', detail: 'Designed from scratch around your business', part: 1 },
+      { name: 'Logo versions', detail: 'Horizontal, stacked and icon', part: 5 },
+      { name: 'Color palette', detail: 'Works on screen and in print', part: 4 },
+      { name: 'Typefaces', detail: 'The written voice of your brand', part: 3 },
+      { name: 'Usage guide', detail: 'So it looks the same everywhere', part: 6 },
+      { name: 'Vector file', detail: 'For signs and shirts at any size', part: 2 },
+      { name: 'PNG files', detail: 'For your website and social media', part: 5 },
+      { name: 'PDF file', detail: 'Ready for the print shop', part: 6 },
+    ]
+  : [
+      { name: 'Logo a medida', detail: 'Diseñado desde cero para tu negocio', part: 1 },
+      { name: 'Variantes del logo', detail: 'Horizontal, vertical e icono', part: 5 },
+      { name: 'Paleta de color', detail: 'Para pantalla e impresión', part: 4 },
+      { name: 'Tipografías', detail: 'La voz escrita de tu marca', part: 3 },
+      { name: 'Guía de uso', detail: 'Para que se vea igual en todos lados', part: 6 },
+      { name: 'Archivo vectorial', detail: 'Para rótulos y camisetas a cualquier tamaño', part: 2 },
+      { name: 'Archivos PNG', detail: 'Para tu web y tus redes', part: 5 },
+      { name: 'Archivo PDF', detail: 'Listo para la imprenta', part: 6 },
+    ]
+// Orden por pieza del plano (1 → 6): así cada fila apunta a la siguiente llamada del dibujo
+// en cualquier uso (hero de branding, mini del hub de servicios, muestrario).
+).slice().sort((a, b) => a.part - b.part);
+const T = en
+  ? { front: 'FRONT VIEW', app: 'APPLICATION', title: 'TITLE', manual: 'Brand guide', deliv: 'DELIVERY', delivV: 'logo, colors, typefaces', sheet: 'SHEET', sheetV: '1 of 1', list: 'What you get', sr: `Example brand blueprint for “${brand}”: logo, versions, colors, typefaces and usage guide.` }
+  : { front: 'VISTA FRONTAL', app: 'APLICACIÓN', title: 'TÍTULO', manual: 'Manual de marca', deliv: 'ENTREGA', delivV: 'logo, colores, tipografía', sheet: 'HOJA', sheetV: '1 de 1', list: 'Lo que recibes', sr: `Plano de marca de ejemplo para “${brand}”: logo, variantes, colores, tipografías y guía de uso.` };
+// Dientes del sello (16) y estrella de 4 puntas.
+const cx = 230, cy = 240;
+const teeth = Array.from({ length: 32 }, (_, i) => {
+  const a = (i / 32) * Math.PI * 2 - Math.PI / 2, r = i % 2 ? 84 : 94;
+  return `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`;
+}).join(' ');
+const s = 40;
+const star = `M${cx} ${cy - s} Q${cx + 7} ${cy - 7} ${cx + s} ${cy} Q${cx + 7} ${cy + 7} ${cx} ${cy + s} Q${cx - 7} ${cy + 7} ${cx - s} ${cy} Q${cx - 7} ${cy - 7} ${cx} ${cy - s}Z`;
+const mini = size === 'mini';
+---
+<div class:list={['wo-plan', `wo-plan--${size}`, cls]}>
+  <p class="sr-only">{T.sr}</p>
+  <Ejemplo lang={lang} on="dark" />
+  <div class="wo-plan__ruler wo-plan__ruler--t" aria-hidden="true">{[1, 2, 3, 4, 5, 6].map((n) => <span>{n}</span>)}</div>
+  <div class="wo-plan__ruler wo-plan__ruler--b" aria-hidden="true">{[1, 2, 3, 4, 5, 6].map((n) => <span>{n}</span>)}</div>
+  <div class="wo-plan__ruler wo-plan__ruler--l" aria-hidden="true">{['A', 'B', 'C', 'D'].map((n) => <span>{n}</span>)}</div>
+  <div class="wo-plan__ruler wo-plan__ruler--r" aria-hidden="true">{['A', 'B', 'C', 'D'].map((n) => <span>{n}</span>)}</div>
+
+  <div class="wo-plan__grid">
+    <svg class="wo-plan__draw" viewBox="0 0 660 600" aria-hidden="true">
+      <!-- Ejes de la vista frontal -->
+      <path class="wo-plan__axis" d={`M${cx} 40V470M20 ${cy}H420`} />
+      <!-- Vista frontal: círculo de trazo doble -->
+      <circle class="wo-plan__ln" cx={cx} cy={cy} r="160" />
+      <circle class="wo-plan__ln" cx={cx} cy={cy} r="152" />
+      <g data-part="1"><polygon class="wo-plan__ln" points={teeth} /><circle class="wo-plan__ln" cx={cx} cy={cy} r="70" /></g>
+      <g data-part="2"><path class="wo-plan__fill" d={star} /></g>
+      <g data-part="3"><text class="wo-plan__word" x={cx} y="462" text-anchor="middle">{brand}</text></g>
+      <g data-part="4">
+        <circle class="wo-plan__sw" cx="166" cy="530" r="16" style="fill:#f0ede8" />
+        <circle class="wo-plan__sw" cx="214" cy="530" r="16" style="fill:#c8a96e" />
+        <circle class="wo-plan__sw" cx="262" cy="530" r="16" style="fill:#2f5266" />
+        <circle class="wo-plan__sw" cx="310" cy="530" r="16" style="fill:#0e0e0d" />
+      </g>
+      <text class="wo-plan__lab" x="20" y="30">{T.front}</text>
+      <!-- Vista de aplicación con cotas -->
+      <g data-part="5">
+        <rect class="wo-plan__ln" x="430" y="150" width="180" height="108" rx="6" />
+        <circle class="wo-plan__ln" cx="476" cy="204" r="26" />
+        <path class="wo-plan__fill" d="M476 188 Q479 201 492 204 Q479 207 476 220 Q473 207 460 204 Q473 201 476 188Z" />
+        <path class="wo-plan__ln" d="M514 196H588M514 212H570" />
+      </g>
+      <path class="wo-plan__dim" d="M450 130H502M450 124V136M502 124V136" />
+      <text class="wo-plan__num" x="476" y="120" text-anchor="middle">Ø52</text>
+      <path class="wo-plan__dim" d="M630 150V258M624 150H636M624 258H636" />
+      <text class="wo-plan__num" x="648" y="204" text-anchor="middle" transform="rotate(-90 648 204)">15.5</text>
+      <text class="wo-plan__lab" x="430" y="290">{T.app}</text>
+      <!-- Llamadas -->
+      {[
+        { n: 1, x: 420, y: 70, tx: 300, ty: 168 },
+        { n: 2, x: 92, y: 120, tx: 205, ty: 222 },
+        { n: 3, x: 420, y: 430, tx: 320, ty: 450 },
+        { n: 4, x: 92, y: 560, tx: 152, ty: 540 },
+        { n: 5, x: 580, y: 330, tx: 570, ty: 258 },
+      ].map((k) => (
+        <g class="wo-plan__call" data-part={k.n}>
+          <path class="wo-plan__lead" d={`M${k.x} ${k.y}L${k.tx} ${k.ty}`} />
+          <circle cx={k.x} cy={k.y} r="11" />
+          <text x={k.x} y={k.y + 4} text-anchor="middle">{k.n}</text>
+        </g>
+      ))}
+    </svg>
+
+    {!mini && (
+      <div class="wo-plan__side">
+        <p class="wo-plan__lt">{T.list}</p>
+        <ol class="wo-plan__rows">
+          {rows.map((r, i) => (
+            <li class="wo-plan__row" data-part={r.part}>
+              <span class="wo-plan__n">{String(i + 1).padStart(2, '0')}</span>
+              <span class="wo-plan__rt"><b>{r.name}<i aria-hidden="true"></i></b><span>{r.detail}</span></span>
+            </li>
+          ))}
+        </ol>
+        <dl class="wo-plan__box" data-part="6">
+          <div class="wo-plan__cell wo-plan__cell--w"><dt>{T.title}</dt><dd><b translate="no">{brand}</b> · {T.manual}</dd></div>
+          <div class="wo-plan__cell"><dt>{T.deliv}</dt><dd>{T.delivV}</dd></div>
+          <div class="wo-plan__cell"><dt>{T.sheet}</dt><dd>{T.sheetV}</dd></div>
+        </dl>
+      </div>
+    )}
+  </div>
+</div>
+
+<style>
+  .wo-plan {
+    --ink: rgba(var(--star-rgb), .72);
+    --hl: var(--accent-gold);
+    position: relative; width: 100%; max-width: 1136px; margin-inline: auto;
+    padding: 34px; border-radius: 6px;
+    background:
+      linear-gradient(rgba(var(--star-rgb), .06) 1px, transparent 1px) 0 0 / 40px 40px,
+      linear-gradient(90deg, rgba(var(--star-rgb), .06) 1px, transparent 1px) 0 0 / 40px 40px,
+      var(--w-s1, #121211);
+    border: 1px solid var(--w-line-strong);
+    font-family: var(--font-body);
+  }
+  .wo-plan :global(.w-example--corner) { top: 40px; right: 40px; }
+  .wo-plan__ruler { position: absolute; display: flex; justify-content: space-around; font: 500 10px/1 var(--font-mono); color: rgba(var(--star-rgb), .40); }
+  .wo-plan__ruler--t, .wo-plan__ruler--b { left: 34px; right: 34px; height: 34px; align-items: center; }
+  .wo-plan__ruler--t { top: 0; border-bottom: 1px solid var(--w-line); }
+  .wo-plan__ruler--b { bottom: 0; border-top: 1px solid var(--w-line); }
+  .wo-plan__ruler--l, .wo-plan__ruler--r { top: 34px; bottom: 34px; width: 34px; flex-direction: column; align-items: center; }
+  .wo-plan__ruler--l { left: 0; border-right: 1px solid var(--w-line); }
+  .wo-plan__ruler--r { right: 0; border-left: 1px solid var(--w-line); }
+  .wo-plan__grid { display: grid; grid-template-columns: minmax(0, 660fr) minmax(0, 340fr); gap: 40px; padding: 36px 32px 28px; }
+  .wo-plan__draw { width: 100%; height: auto; display: block; }
+  .wo-plan__ln, .wo-plan__axis, .wo-plan__dim, .wo-plan__lead { fill: none; stroke: var(--ink); stroke-width: 1.5; transition: stroke 200ms var(--w-ease-ui); }
+  .wo-plan__axis { stroke: rgba(var(--star-rgb), .22); stroke-width: 1; stroke-dasharray: 10 6 2 6; }
+  .wo-plan__dim, .wo-plan__lead { stroke-width: 1; stroke: rgba(var(--star-rgb), .45); }
+  .wo-plan__fill { fill: var(--ink); transition: fill 200ms var(--w-ease-ui); }
+  .wo-plan__word { font: 500 34px var(--font-display); letter-spacing: -0.03em; fill: var(--w-ink, #f0ede8); transition: fill 200ms var(--w-ease-ui); }
+  .wo-plan__sw { stroke: rgba(var(--star-rgb), .35); stroke-width: 1; transition: stroke 200ms var(--w-ease-ui); }
+  .wo-plan__lab { font: 500 11px var(--font-mono); letter-spacing: .1em; fill: rgba(var(--star-rgb), .55); }
+  .wo-plan__num { font: 500 13px var(--font-mono); fill: var(--w-ink, #f0ede8); }
+  .wo-plan__call circle { fill: var(--w-s1, #121211); stroke: rgba(var(--star-rgb), .55); stroke-width: 1; transition: stroke 200ms; }
+  .wo-plan__call text { font: 500 12px var(--font-mono); fill: var(--w-ink, #f0ede8); }
+
+  .wo-plan__side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .wo-plan__lt { margin: 0; font: 500 12px/1.2 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-60); }
+  .wo-plan__rows { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--w-line); }
+  .wo-plan__row {
+    display: flex; gap: 14px; align-items: flex-start; min-height: 60px; padding: 11px 6px;
+    border-bottom: 1px solid var(--w-line); cursor: default; outline: none;
+    transition: background-color 200ms var(--w-ease-ui);
+  }
+  .wo-plan__n { font: 500 12px/1.6 var(--font-mono); color: var(--w-ink-60); transition: color 200ms; }
+  .wo-plan__rt { display: flex; flex-direction: column; gap: 2px; }
+  .wo-plan__rt b { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--w-ink, #f0ede8); transition: color 200ms; }
+  .wo-plan__rt b i { width: 6px; height: 6px; border-radius: 50%; background: rgba(var(--star-rgb), .35); transition: background-color 200ms; }
+  .wo-plan__rt > span { font-size: 13px; color: var(--w-ink-60); }
+  .wo-plan__row:hover, .wo-plan__row:focus-visible { background: rgba(var(--accent-gold-rgb), .06); }
+  .wo-plan__row:focus-visible { box-shadow: inset 0 0 0 2px var(--accent-gold); }
+  .wo-plan__row:hover .wo-plan__rt b, .wo-plan__row:focus-visible .wo-plan__rt b,
+  .wo-plan__row:hover .wo-plan__n, .wo-plan__row:focus-visible .wo-plan__n { color: var(--hl); }
+  .wo-plan__row:hover .wo-plan__rt b i, .wo-plan__row:focus-visible .wo-plan__rt b i { background: var(--hl); }
+  .wo-plan__box {
+    margin: 4px 0 0; display: grid; grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--w-line-strong); border-radius: 4px; transition: border-color 200ms;
+  }
+  .wo-plan__cell { padding: 10px 12px; border-top: 1px solid var(--w-line-strong); }
+  .wo-plan__cell + .wo-plan__cell + .wo-plan__cell { border-left: 1px solid var(--w-line-strong); }
+  .wo-plan__cell--w { grid-column: 1 / -1; border-top: 0; }
+  .wo-plan__cell dt { font: 500 11px/1.2 var(--font-mono); letter-spacing: .1em; color: rgba(var(--star-rgb), .55); }
+  .wo-plan__cell dd { margin: 4px 0 0; font: 500 13px/1.35 var(--font-mono); color: var(--w-ink, #f0ede8); }
+  .wo-plan__cell dd b { font-weight: 500; font-family: var(--font-display); font-size: 16px; }
+
+  /* Fila ⇄ pieza del dibujo (1-6). */
+  .wo-plan:has(.wo-plan__row[data-part='1']:is(:hover, :focus-visible)) [data-part='1'] :is(.wo-plan__ln, circle),
+  .wo-plan:has(.wo-plan__row[data-part='5']:is(:hover, :focus-visible)) [data-part='5'] :is(.wo-plan__ln, circle) { stroke: var(--hl); }
+  .wo-plan:has(.wo-plan__row[data-part='2']:is(:hover, :focus-visible)) [data-part='2'] .wo-plan__fill,
+  .wo-plan:has(.wo-plan__row[data-part='5']:is(:hover, :focus-visible)) [data-part='5'] .wo-plan__fill { fill: var(--hl); }
+  .wo-plan:has(.wo-plan__row[data-part='3']:is(:hover, :focus-visible)) [data-part='3'] .wo-plan__word { fill: var(--hl); }
+  .wo-plan:has(.wo-plan__row[data-part='4']:is(:hover, :focus-visible)) [data-part='4'] .wo-plan__sw { stroke: var(--hl); stroke-width: 2; }
+  .wo-plan:has(.wo-plan__row[data-part='6']:is(:hover, :focus-visible)) .wo-plan__box[data-part='6'] { border-color: var(--hl); }
+  .wo-plan:has(.wo-plan__row:is(:hover, :focus-visible)) .wo-plan__call:is([data-part]) circle { stroke: rgba(var(--star-rgb), .55); }
+  .wo-plan:has(.wo-plan__row[data-part='1']:is(:hover, :focus-visible)) .wo-plan__call[data-part='1'] circle,
+  .wo-plan:has(.wo-plan__row[data-part='2']:is(:hover, :focus-visible)) .wo-plan__call[data-part='2'] circle,
+  .wo-plan:has(.wo-plan__row[data-part='3']:is(:hover, :focus-visible)) .wo-plan__call[data-part='3'] circle,
+  .wo-plan:has(.wo-plan__row[data-part='4']:is(:hover, :focus-visible)) .wo-plan__call[data-part='4'] circle,
+  .wo-plan:has(.wo-plan__row[data-part='5']:is(:hover, :focus-visible)) .wo-plan__call[data-part='5'] circle { stroke: var(--hl); }
+
+  .wo-plan--mini { padding: 22px; max-width: 520px; }
+  .wo-plan--mini .wo-plan__grid { grid-template-columns: 1fr; padding: 16px 8px 8px; }
+  .wo-plan--mini .wo-plan__ruler--t, .wo-plan--mini .wo-plan__ruler--b { left: 22px; right: 22px; height: 22px; }
+  .wo-plan--mini .wo-plan__ruler--l, .wo-plan--mini .wo-plan__ruler--r { top: 22px; bottom: 22px; width: 22px; }
+  .wo-plan--mini :global(.w-example--corner) { top: 30px; right: 30px; }
+  @media (--lt-md) {
+    .wo-plan { padding: 22px; }
+    .wo-plan__ruler--t, .wo-plan__ruler--b { left: 22px; right: 22px; height: 22px; }
+    .wo-plan__ruler--l, .wo-plan__ruler--r { top: 22px; bottom: 22px; width: 22px; }
+    .wo-plan__grid { grid-template-columns: 1fr; gap: 20px; padding: 28px 6px 14px; }
+    .wo-plan :global(.w-example--corner) { top: 30px; right: 30px; }
+    /* Cotas y rótulos del dibujo: a este tamaño se leían a ~5 px (E-40). Son decorativos. */
+    .wo-plan__lab, .wo-plan__num { display: none; }
+  }
+  @media (--motion-reduce) {
+    .wo-plan *, .wo-plan__row { transition: none; }
+  }
+</style>

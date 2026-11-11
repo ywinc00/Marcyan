@@ -13,10 +13,17 @@ import Icon from '../ui/Icon.astro';
 import Breadcrumb from '../ui/Breadcrumb.astro';
 import Contact from '../sections/Contact.astro';
 import GrowthTeaser from '../sections/GrowthTeaser.astro';
-import { faqPage } from '../../lib/schema';
-import { t, type Lang } from '../../i18n/ui';
+import IconoObjeto from '../w/IconoObjeto.astro';
+import FranjaEnPocasPalabras from '../w/FranjaEnPocasPalabras.astro';
+import PreguntasFrecuentes from '../w/PreguntasFrecuentes.astro';
+import TresGarantias from '../w/TresGarantias.astro';
+import CierreDosTarjetas from '../w/CierreDosTarjetasBase.astro'; // sin ChatMarcy: chat 'ligero'
+import Ejemplo from '../w/Ejemplo.astro';
+import { type Lang } from '../../i18n/ui';
+import { hubs, HUB_PRODUCTOS, FILA, HUB_SERVICIOS, DOMINIOS } from '../../i18n/w/hubs';
 import { nap } from '../../i18n/content';
 import './city.css';
+import { protegerNombres } from '../../lib/nombres-clientes';
 
 interface Props { lang: Lang; city: 'houston' | 'miami'; h: any; c: any; projects: any[] }
 const { lang, city, h, c } = Astro.props;
@@ -24,16 +31,32 @@ const j = h.journey;
 // los trabajos de esta ciudad, en el orden que fija su bloque de textos
 const projects = (j.projects.slugs as string[]).map((s) => Astro.props.projects.find((p: any) => p.slug === s)).filter(Boolean)
   .map((p: any) => ({ ...p, ...(j.projects.over?.[p.slug] ?? {}) }));
-const ui = t(lang);
 const svc = h.services.links;
-const faqLd = faqPage(h.faq.items);
+// detalles permitidos (§4.2): copy nuevo de i18n/w/hubs.ts
+const w = hubs[lang][city];
+// bandeja de servicios: los 7 productos; la landing de la ciudad si esta página ya la enlaza, si no su capítulo del hub de servicios
+const tray = HUB_PRODUCTOS.map((id) => {
+  const i = FILA[city][id];
+  const l = i == null ? null : svc[i];
+  return l?.href
+    ? { id, label: l.label, href: l.href, price: w.tray.precio[id] }
+    : { id, label: w.tray.nombre[id], href: `${HUB_SERVICIOS[lang]}#${id}`, price: w.tray.precio[id] };
+});
 const phone: string = (nap as any)[city];
 const telHref = 'tel:' + phone.replace(/[^\d+]/g, '');
 const waHref = 'https://wa.me/' + phone.replace(/\D/g, '');
 const defaultCity = city === 'miami' ? 'Miami, FL' : 'Houston, TX';
-const shot = (slug: string, mh: number) => ({ pc: `/Galeria/${slug}-pc-900.webp`, mv: `/Galeria/${slug}-movil-520.webp`, mvh: Math.round(520 * mh / 1320) });
-const names = projects.map((p) => p.name).join('|');
+// v4 (E-58): escalera de anchos (scripts/imagenes/variantes.py) para que nunca se reduzca de más.
+const shot = (slug: string, mh: number) => ({
+  pc: `/Galeria/${slug}-pc-900.webp`, mv: `/Galeria/${slug}-movil-520.webp`, mvh: Math.round(520 * mh / 1320),
+  pcSet: [480, 640, 900, 1280].map((w) => `/Galeria/${slug}-pc-${w}.webp ${w}w`).join(', ') + `, /Galeria/${slug}-pc.webp 1920w`,
+  mvSet: [160, 260, 390, 520, 780].map((w) => `/Galeria/${slug}-movil-${w}.webp ${w}w`).join(', ') + `, /Galeria/${slug}-movil.webp 1320w`,
+});
+// barra del navegador: solo dominios verificados (los demás, barra sin texto; nunca enlace)
+const domains = projects.map((p) => DOMINIOS[p.slug] ?? '');
 // sectores con página propia (la fila la enlaza); los demás quedan como fila sin enlace
+// "Sigue explorando": siempre tres tarjetas (las de la página y, si faltan, las herramientas gratis)
+const explore = [...h.related.links, w.recurso].slice(0, 3);
 const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.links ?? []).map((l: any) => [l.label, l.href]));
 ---
 <script is:inline>document.documentElement.classList.add('hx-js')</script>
@@ -98,8 +121,25 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
             )}
             {st.vig === 'web' && (
               <div class="vig vig--web" data-vig="web" aria-hidden="true">
-                <div class="vb"><div class="vb__bar"><i></i><i></i><i></i><span class="vb__lang"><b class="es">ES</b><b class="en">EN</b><s></s></span></div>
-                  <div class="vb__body"><div class="vb__l"><b></b><b></b><s></s><s></s><u></u></div><div class="vb__r"><em></em></div></div></div>
+                {/* web de ejemplo de verdad (E-56): marca, titular, horario y botón; el idioma cambia ES ⇄ EN mientras se ve */}
+                <div class="vb">
+                  <div class="vb__bar"><i></i><i></i><i></i><span class="vb__url">{j.services.vig.web.url}</span><Ejemplo lang={lang} pos="inline" class="vb__ej" /><span class="vb__lang"><b class="es">ES</b><b class="en">EN</b><s></s></span></div>
+                  <div class="vb__body">
+                    <div class="vb__l">
+                      <span class="vb__brand"><svg viewBox="0 0 38 38"><rect width="38" height="38" rx="10" fill="#203a31"/><path d="M11.5 25 A7.5 7.5 0 0 1 26.5 25 Z" fill="#dcc089"/><path d="M8.5 25h21" stroke="#f3ecdf" stroke-width="2.4" stroke-linecap="round"/></svg>{j.services.vig.result}</span>
+                      <p class="vb__h vb__x"><span class="vb-es">{j.services.vig.web.h[0]}</span><span class="vb-en">{j.services.vig.web.h[1]}</span></p>
+                      <p class="vb__m vb__x"><span class="vb-es"><i></i>{j.services.vig.web.m[0]}</span><span class="vb-en"><i></i>{j.services.vig.web.m[1]}</span></p>
+                      <span class="vb__cta vb__x"><span class="vb-es">{j.services.vig.web.b[0]} →</span><span class="vb-en">{j.services.vig.web.b[1]} →</span></span>
+                    </div>
+                    <div class="vb__r" style={j.services.vig.web.art === 'cafe' ? '--vb-art:#2a1d15' : '--vb-art:#1d3229'}>
+                      {j.services.vig.web.art === 'cafe' ? (
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="50" cy="56" r="44" fill="#3a281c"/><ellipse cx="50" cy="76" rx="31" ry="7" fill="#e9e1d3"/><ellipse cx="50" cy="75" rx="21" ry="4" fill="#d3c8b6"/><path d="M71 52a8 8 0 1 1 0 14" fill="none" stroke="#f4eee4" stroke-width="3.2"/><path d="M29 48h42v8a21 21 0 0 1-42 0z" fill="#f4eee4"/><path d="M30 57h40" stroke="#dcc089" stroke-width="1.6"/><ellipse cx="50" cy="48" rx="21" ry="4.2" fill="#f4eee4"/><ellipse cx="50" cy="48.4" rx="18" ry="3.2" fill="#6b4127"/><g class="vb__steam" fill="none" stroke="rgba(244,238,228,.55)" stroke-width="1.8" stroke-linecap="round"><path d="M42 40c-4-5 4-8 0-14"/><path d="M50 38c-4-5 4-8 0-14"/><path d="M58 40c-4-5 4-8 0-14"/></g></svg>
+                      ) : (
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><circle cx="50" cy="54" r="46" fill="#24402f"/><g class="vb__disc"><circle cx="50" cy="54" r="34" fill="#e6dfd1"/><circle cx="50" cy="54" r="30.5" fill="none" stroke="#c9bfae" stroke-width=".8"/><circle cx="50" cy="54" r="25" fill="none" stroke="#cfc6b6" stroke-width=".8"/><g fill="#1d3229"><circle cx="80" cy="54" r="1.8"/><circle cx="71.2" cy="75.2" r="1.8"/><circle cx="50" cy="84" r="1.8"/><circle cx="28.8" cy="75.2" r="1.8"/><circle cx="20" cy="54" r="1.8"/><circle cx="28.8" cy="32.8" r="1.8"/><circle cx="50" cy="24" r="1.8"/><circle cx="71.2" cy="32.8" r="1.8"/></g><circle cx="50" cy="54" r="13" fill="#bdb3a1"/><circle cx="50" cy="54" r="4.2" fill="#1d3229"/><g fill="#8f8676"><circle cx="50" cy="45.6" r="1.7"/><circle cx="58" cy="51.4" r="1.7"/><circle cx="54.9" cy="60.8" r="1.7"/><circle cx="45.1" cy="60.8" r="1.7"/><circle cx="42" cy="51.4" r="1.7"/></g></g><path d="M64.4 23.2A34 34 0 0 1 80.8 39.6" fill="none" stroke="#dcc089" stroke-width="7.5" stroke-linecap="round"/><path d="M65.6 25.9A31 31 0 0 1 78.2 38.4" fill="none" stroke="#a88648" stroke-width="1.1" stroke-linecap="round"/></svg>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
             {st.vig === 'chat' && (
@@ -107,18 +147,19 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
                 <div class="vc"><span class="vc__t">{j.services.vig.time}</span><p class="me">{j.services.vig.me1}</p><p class="dots"><i></i><i></i><i></i></p><p class="bot">{j.services.vig.bot}</p><p class="me me2">{j.services.vig.me2}</p><span class="ok"><i></i>{j.services.vig.ok}</span></div>
               </div>
             )}
-            <ul class="svc__rows">
-              {st.links.map((i: number) => svc[i]).map((l: any) => (
-                <li>{l.href
-                  ? <a href={l.href}><span class="svc__name">{l.label}</span><Icon name="lucide:arrow-right" class="arr" /></a>
-                  : <div class="row"><span class="svc__name">{l.label}</span>{l.price && <span class="svc__price">{l.price}</span>}</div>}</li>
-              ))}
-            </ul>
             {st.note && <p class="svc__note">{st.note}</p>}
           </li>
         ))}
+        {/* bandeja de hermanos (W-ADV-40): los servicios de cada paso, con su precio de arranque */}
+        <li class="svc__tray" data-rev>
+          <ul class="w-htray" aria-label={w.tray.label}>
+            {tray.map((x) => (
+              <li><a class="w-htray__card" href={x.href}><IconoObjeto id={x.id} size={48} /><span class="w-htray__txt"><span class="w-htray__name">{x.label}</span><span class="w-htray__price">{x.price}</span></span></a></li>
+            ))}
+            <li class="w-htray__all"><a href={j.services.all.href}>{j.services.all.label}<span class="w-htray__chev" aria-hidden="true">›</span></a></li>
+          </ul>
+        </li>
       </ol>
-      <p class="svc__more"><a class="more" href={j.services.all.href}>{j.services.all.label} <Icon name="lucide:arrow-right" class="arr" /></a></p>
     </div>
   </section>
 
@@ -134,15 +175,14 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
         <div class="pf__stage" aria-hidden="true">
           <div class="pf__light"></div>
           <div class="pf__laptop">
-            <div class="pf__bar"><i></i><i></i><i></i><span class="pf__url"><Icon name="lucide:lock" /><b data-names={names}>{projects[0].name}</b></span></div>
+            <div class="pf__bar"><i></i><i></i><i></i><span class="pf__url" translate="no"><b data-names={domains.join('|')}>{domains[0]}</b></span></div>
             <div class="pf__screen">
-              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).pc} width="900" height="506" alt="" loading="lazy" decoding="async" />)}
+              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).pc} srcset={shot(p.slug, p.mh).pcSet} sizes="(min-width: 1024px) 620px, 90vw" width="900" height="506" alt="" loading="lazy" decoding="async" />)}
             </div>
           </div>
           <div class="pf__phone">
-            <div class="pf__notch"></div>
             <div class="pf__pscreen">
-              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).mv} width="520" height={shot(p.slug, p.mh).mvh} alt="" loading="lazy" decoding="async" />)}
+              {projects.map((p, i) => <img class={i === 0 ? 'is-on' : ''} src={shot(p.slug, p.mh).mv} srcset={shot(p.slug, p.mh).mvSet} sizes="158px" width="520" height={shot(p.slug, p.mh).mvh} alt="" loading="lazy" decoding="async" />)}
             </div>
           </div>
           <p class="pf__count"><b>01</b> / {String(projects.length).padStart(2, '0')}</p>
@@ -151,20 +191,22 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
           {projects.map((p, i) => (
             <li class:list={['pf__step', i === 0 && 'is-on']} data-i={i}>
               <figure class="pf__mini" data-rev>
-                <img src={shot(p.slug, p.mh).pc} width="900" height="506" alt={`${p.name}, ${j.projects.shotPc}`} loading="lazy" decoding="async" />
-                <img class="pf__mph" src={shot(p.slug, p.mh).mv} width="520" height={shot(p.slug, p.mh).mvh} alt={`${p.name}, ${j.projects.shotMovil}`} loading="lazy" decoding="async" />
+                <img src={shot(p.slug, p.mh).pc} srcset={shot(p.slug, p.mh).pcSet} sizes="(min-width: 1024px) 560px, 92vw" width="900" height="506" alt={`${p.name}, ${j.projects.shotPc}`} loading="lazy" decoding="async" />
+                <img class="pf__mph" src={shot(p.slug, p.mh).mv} srcset={shot(p.slug, p.mh).mvSet} sizes="(min-width: 1024px) 150px, 28vw" width="520" height={shot(p.slug, p.mh).mvh} alt={`${p.name}, ${j.projects.shotMovil}`} loading="lazy" decoding="async" />
               </figure>
-              <p class="pf__cat"><span>{String(i + 1).padStart(2, '0')}</span>{p.cat}</p>
-              <h3 class="pf__name" translate="no">{p.name}</h3>
-              <dl class="pf__dl"><dt>{j.projects.did}</dt><dd>{p.did}</dd><dt>{j.projects.result}</dt><dd>{p.result}</dd></dl>
-              <ul class="pf__tags"><li>{p.badge}</li>{p.tags.map((tg: string) => <li>{tg}</li>)}</ul>
-              {p.serviceHref !== h.path && <a class="more" href={p.serviceHref}>{p.serviceLabel} <Icon name="lucide:arrow-right" class="arr" /></a>}
+              <div class="w-hcase" style={`--case-acc:var(--accent-${p.accent === 'teal' ? 'teal' : 'gold'})`}>
+                <p class="pf__cat"><span>{String(i + 1).padStart(2, '0')}</span>{p.cat}</p>
+                <h3 class="pf__name" translate="no">{p.name}</h3>
+                <dl class="pf__dl"><dt>{j.projects.did}</dt><dd>{p.did}</dd><dt>{j.projects.result}</dt><dd>{p.result}</dd></dl>
+                <ul class="pf__tags"><li>{p.badge}</li>{p.tags.map((tg: string) => <li>{tg}</li>)}</ul>
+                {p.serviceHref !== h.path && <a class="w-hcase__link" href={p.serviceHref}>{p.serviceLabel}<span class="w-hcase__chev" aria-hidden="true">›</span></a>}
+              </div>
             </li>
           ))}
         </ol>
       </div>
       <div class="pf__foot" data-rev>
-        <p>{j.projects.note}</p>
+        <p set:html={protegerNombres(j.projects.note)} />
         <a class="more" href={j.projects.more.href}>{j.projects.more.label} <Icon name="lucide:arrow-right" class="arr" /></a>
       </div>
     </div>
@@ -210,13 +252,18 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
         <h2 class="h2" id="hx-sectors-t" set:html={j.sectors.title} />
         <p class="lead">{j.sectors.lead}</p>
       </header>
-      <ul class="sectors__list" data-rev-list>
+      {/* ¿Dónde está tu negocio? (W-CONV-33): cada sector con la búsqueda de su cliente; los que tienen página y los barrios con página, enlazados */}
+      <ul class="w-hwhere" data-rev-list>
         {j.sectors.rows.map((r: any) => {
           const href = sectorHref[r.label];
-          const body = <><span class="sic"><Icon name={r.icon} /></span>
-            <span><span class="sname">{r.label}</span><span class="squery"><Icon name="lucide:search" /><span lang={r.lang ?? (r.en ? 'en' : undefined)}>{r.q}</span>{r.en && <span class="en">EN</span>}</span></span></>;
-          return <li>{href ? <a href={href}>{body}<Icon name="lucide:arrow-right" class="arr" /></a> : <div class="row">{body}</div>}</li>;
+          const body = <><span class="w-hwhere__txt"><span class="w-hwhere__name">{r.label}{href && <span class="w-hwhere__chev" aria-hidden="true">›</span>}</span>
+            <span class="w-hwhere__q"><Icon name="lucide:search" /><span lang={r.lang ?? (r.en ? 'en' : undefined)}>{r.q}</span>{r.en && <span class="en">EN</span>}</span></span>
+            <span class="w-hwhere__ic"><Icon name={r.icon} /></span></>;
+          return <li>{href ? <a class="w-hwhere__card" href={href}>{body}</a> : <div class="w-hwhere__card">{body}</div>}</li>;
         })}
+        {w.barrios.map((b) => (
+          <li class="w-hwhere__barrio"><a class="w-hwhere__card" href={b.href}><span class="w-hwhere__txt"><span class="w-hwhere__name">{b.name}<span class="w-hwhere__chev" aria-hidden="true">›</span></span><span class="w-hwhere__q">{b.text}</span></span><span class="w-hwhere__ic w-hwhere__ic--pin"><Icon name="lucide:map-pin" /></span></a></li>
+        ))}
       </ul>
     </div>
   </section>
@@ -225,64 +272,46 @@ const sectorHref: Record<string, string> = Object.fromEntries((h.industries?.lin
   <div class="diag" data-atmo="mid|night:1 glow:0.3"><GrowthTeaser lang={lang} city={city} /></div>
 
   {/* 7 · Respuesta directa (texto citable, literal) */}
-  <section class="sec answer" aria-labelledby="answer-q" data-atmo="mid|night:1 glow:0.25">
+  {/* franja "En pocas palabras" (W-CORE-23) en su sitio del viaje; las cifras citan la misma fuente que la respuesta */}
+  <div class="sec answer" data-atmo="mid|night:1 glow:0.25">
     <div class="hx-wrap">
-      <div class="answer__grid">
-        <div class="answer__main" data-rev>
-          <Kicker>{ui.answer.directAnswer}</Kicker>
-          <h2 class="answer__q" id="answer-q">{h.answer.q}</h2>
-          <p class="answer__a">{h.answer.a}</p>
-          <p class="answer__src"><Icon name="lucide:bar-chart-3" />{ui.answer.source}: {h.answer.source}</p>
-        </div>
+      <div class="w-hanswer" data-rev>
+        <FranjaEnPocasPalabras q={h.answer.q} a={h.answer.a} source={h.answer.source} lang={lang} />
         <div class="answer__figs" aria-hidden="true">
           {j.answer.figs.map((f: any) => <div class="fig"><p class="fig__n"><b data-count={f.n}>{f.n}</b>%</p><p>{f.txt}</p></div>)}
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
   {/* 8 · Preguntas frecuentes: todas cerradas al cargar */}
-  <section class="sec faq" id="faq" aria-labelledby="hx-faq-t" data-atmo="top|night:1 glow:0.25;end|night:1 glow:0.3">
+  <div class="sec faq" data-atmo="top|night:1 glow:0.25;end|night:1 glow:0.3">
     <div class="clouds" data-clouds="edges" aria-hidden="true"></div>
-    <div class="hx-wrap faq__grid">
-      <header class="faq__head">
-        <Kicker>{h.faq.tag}</Kicker>
-        <h2 class="h2" id="hx-faq-t" set:html={h.faq.title} />
-      </header>
-      <div class="faq__list">
-        {h.faq.items.map((it: any) => (
-          <details class="qa"><summary>{it.q}<i aria-hidden="true"></i></summary><div class="qa__a"><p>{it.a}</p></div></details>
-        ))}
-      </div>
-    </div>
-    <script type="application/ld+json" is:inline set:html={JSON.stringify(faqLd)} />
-  </section>
+    <div class="hx-wrap"><PreguntasFrecuentes id="faq" titleId="hx-faq-t" tag={h.faq.tag} titleHtml={h.faq.title} items={h.faq.items} lang={lang} /></div>
+  </div>
 
-  {/* 9 · Sigue explorando */}
+  {/* 9 · Sigue explorando (W-CORE-23): cabecera a la izquierda y debajo, a ancho del contenedor, las tres garantías
+       y tres tarjetas de recurso en fila, alineadas con sus columnas. Si la página trae dos enlaces, el tercero son las herramientas gratis. */}
   <section class="explore" aria-labelledby="hx-ex-t">
-    <div class="hx-wrap explore__in">
+    <div class="hx-wrap">
       <div class="explore__head"><Kicker>{h.related.tag}</Kicker><h2 class="explore__t" id="hx-ex-t">{h.related.title}</h2></div>
+      <TresGarantias items={w.garantias.items} class="w-hg3" />
       <ul class="explore__row">
-        {h.related.links.map((l: any) => (
-          <li><a href={l.href}><span class="exic"><Icon name={l.icon ?? 'lucide:arrow-up-right'} /></span><span><b>{l.label}</b><small>{l.desc}</small></span><Icon name="lucide:arrow-right" class="arr" /></a></li>
+        {explore.map((l: any) => (
+          <li><a href={l.href}><span class="exic"><Icon name={l.icon ?? 'lucide:arrow-up-right'} /></span><span><b>{l.label}<span class="explore__chev" aria-hidden="true">›</span></b><small>{l.desc}</small></span></a></li>
         ))}
       </ul>
     </div>
   </section>
 
   {/* 10 · Cierre: la noche de la ciudad (trío de conversión con sus nombres de seguimiento) */}
-  <section class="cta" aria-labelledby="hx-cta-t" data-atmo="top-0.15|night:1 glow:0.4 dawn:0;mid|night:1 glow:1">
-    <div class="hx-wrap cta__in">
-      <h2 class="cta__t" id="hx-cta-t" set:html={h.cta.title} />
-      <p class="lead">{h.cta.sub}</p>
-      <div class="actions">
-        <Button href={h.cta.primary.href} size="lg" class="ctaband__act ctaband__act--form" data-track="proposal_requested">{h.cta.primary.label}</Button>
-        <Button href={telHref} variant="ghost" size="lg" class="call ctaband__act ctaband__act--call" data-track="call_clicked"><Icon name="lucide:phone" class="call__ic" />{j.cta.call}</Button>
-        <a class="wa ctaband__act ctaband__act--wa" href={waHref} data-track="whatsapp_clicked"><Icon name="lucide:message-circle" />{j.cta.wa}</a>
-      </div>
-      <p class="reassure">{h.reassure}</p>
+  {/* cierre en dos tarjetas (W-CORE-15) dentro del tramo del horizonte encendido; el trío sale una vez, con el teléfono de la ciudad */}
+  <div class="cta" data-atmo="top-0.15|night:1 glow:0.4 dawn:0;mid|night:1 glow:1">
+    <div class="hx-wrap">
+      <CierreDosTarjetas id="" titleId="hx-cta-t" titleHtml={h.cta.title} proof={w.cierre.proof} city={city} tel={telHref} wa={waHref} lang={lang}
+        formLabel={h.cta.primary.label} warm={{ kind: 'marcy', ...w.cierre.warm }} />
     </div>
-  </section>
+  </div>
 
   {/* 11 · Contacto: el formulario real del sitio (envío, validación y seguimiento intactos) */}
   <div class="contact-wrap" data-atmo="top|night:1 glow:0.6 calm:1;end|night:1 glow:0.5">

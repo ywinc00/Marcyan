@@ -1,0 +1,37 @@
+---
+// Servicios · niveles con su precio dentro de cada celda del capítulo (arreglo rev1, importante 1).
+// El OfferCatalog de la página declara TODOS los niveles con su precio; aquí se ven los mismos,
+// leídos de `catalog` (pricing.ts / pricing.en.ts), nunca escritos a mano: lo marcado = lo visible.
+// Filas "nivel · precio" separadas por líneas de 1 px, como una ficha de especificaciones; el
+// precio en letra de texto 15/500 oro (E-40: un precio se lee, no es adorno).
+// Página de hub v3: solo lee --w-*.
+interface Tier { name: string; display: string }
+interface Props { tiers: Tier[]; label: string }
+const { tiers, label } = Astro.props;
+---
+<ul class="ws-niv" role="list" aria-label={label}>
+  {tiers.map((t) => (
+    <li class="ws-niv__row">
+      <span class="ws-niv__name">{t.name}</span>
+      <span class="ws-niv__price">{t.display}</span>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .ws-niv {
+    list-style: none; margin: 0; padding: 0; width: 100%; max-width: 503px; justify-self: start;
+    border-top: 1px solid var(--w-line);
+  }
+  .ws-niv__row {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 16px;
+    min-height: 44px; padding: 11px 0; border-bottom: 1px solid var(--w-line);
+  }
+  .ws-niv__name {
+    min-width: 0; font-family: var(--font-body); font-size: 15px; line-height: 1.4; color: var(--w-ink-80);
+  }
+  .ws-niv__price {
+    flex: none; font-family: var(--font-body); font-weight: 500; font-size: 15px; line-height: 1.4;
+    color: var(--accent-gold); font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+</style>

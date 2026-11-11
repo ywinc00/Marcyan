@@ -1,0 +1,102 @@
+---
+// Abanico de webs de EJEMPLO (W-CORE-01 · design/rediseno-workos.md §3.6).
+// Central 400×478 (plomería) + laterales 264×381 a 50 px más abajo, asomando 180 px
+// a cada lado (salón a la izquierda, restaurante a la derecha). Tres objetos de
+// PRODUCTO claros y opacos: las franjas oro de detrás nunca se ven a través de su
+// texto (E-37). Las franjas cubren el ancho de la ventana (E-36): el hero que lo
+// monte debe recortar en horizontal (overflow: clip, como LandingHero/Hero).
+// El corte inferior lo hace el propio objeto (overflow-y: clip).
+// Coreografía (§2.9): central data-w-in="obj"; laterales "sat" saliendo de DETRÁS.
+// Ojo: lo que lleva data-w-in no usa transform para colocarse (se coloca con left).
+import WebEjemplo from './WebEjemplo.astro';
+import Ejemplo from '../Ejemplo.astro';
+
+interface Props {
+  lang?: 'es' | 'en';
+  city?: string;
+  size?: 'hero' | 'card' | 'mini';
+  class?: string;
+}
+const { lang = 'es', city = 'Houston', size = 'hero', class: cls } = Astro.props;
+const sr = lang === 'en'
+  ? 'Example: three websites we could build, a plumbing company, a salon and a restaurant.'
+  : 'Ejemplo: tres webs que podríamos hacer, una plomería, un salón y un restaurante.';
+---
+<div class:list={['wo-fan', `wo-fan--${size}`, cls]}>
+  <p class="sr-only">{sr}</p>
+  <div class="wo-fan__stripes" aria-hidden="true"></div>
+  <div class="wo-fan__side wo-fan__side--l" data-w-in="sat" style="--w-sat-x:120px;--w-sat-y:30px" aria-hidden="true">
+    <Ejemplo lang={lang} on="light" />
+    <WebEjemplo kind="salon" frame="tarjeta" lang={lang} city={city} example={false} size="mini" />
+  </div>
+  <div class="wo-fan__side wo-fan__side--r" data-w-in="sat" style="--w-sat-x:-120px;--w-sat-y:30px" aria-hidden="true">
+    <Ejemplo lang={lang} on="light" />
+    <WebEjemplo kind="restaurante" frame="tarjeta" lang={lang} city={city} example={false} size="mini" />
+  </div>
+  <div class="wo-fan__main" data-w-in="obj" aria-hidden="true">
+    <Ejemplo lang={lang} on="light" />
+    <WebEjemplo kind="plomeria" frame="tarjeta" lang={lang} city={city} example={false} />
+  </div>
+</div>
+
+<style>
+  .wo-fan {
+    position: relative;
+    /* Corte entre bloques de la web central (control 2: a 400 partía "Abierto ahora"). */
+    height: 452px;
+    overflow-x: visible; overflow-y: clip;
+    isolation: isolate;
+  }
+  /* Franjas de luz a ventana completa, con fundido en los cuatro bordes. */
+  .wo-fan__stripes {
+    position: absolute; z-index: -1;
+    left: 50%; width: 100vw; margin-left: -50vw;
+    top: 22%; bottom: 0;
+    background: var(--w-stripes);
+    -webkit-mask-image:
+      linear-gradient(180deg, transparent 0%, #000 50%, #000 100%),
+      linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(180deg, transparent 0%, #000 50%, #000 100%),
+      linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    mask-composite: intersect;
+    pointer-events: none;
+  }
+  .wo-fan__main, .wo-fan__side {
+    position: absolute;
+    background: var(--w-p-bg, #f0ede8);
+    border: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+    border-radius: var(--w-r-obj, 12px);
+    overflow: hidden;
+  }
+  .wo-fan__main {
+    z-index: 2; top: 0; left: calc(50% - 200px);
+    width: 400px; height: 478px; padding: 44px 48px 48px;
+    box-shadow: inset 0 1px 0 #fff;
+  }
+  .wo-fan__side {
+    z-index: 1; top: 50px; width: 264px; height: 381px; padding: 40px 28px;
+    background: #e8e4dd;
+  }
+  .wo-fan__side--l { left: calc(50% - 200px - 180px); }
+  .wo-fan__side--r { left: calc(50% + 200px - 84px); }
+  /* Cada web inventada lleva su "Ejemplo" en la esquina que queda a la vista: la izquierda
+     tiene la derecha tapada por la central, así que va arriba a la izquierda. */
+  .wo-fan__side--l :global(.w-example--corner) { left: 12px; right: auto; }
+  /* Cada web inventada lleva su "Ejemplo" en la esquina que queda a la vista: la izquierda
+     tiene la derecha tapada por la central, así que va arriba a la izquierda. */
+  .wo-fan__side--l :global(.w-example--corner) { left: 12px; right: auto; }
+  /* Las laterales se leen como segundo plano (como en W-CORE-01), sin opacidad sobre el texto. */
+  .wo-fan__side :global(.wo-web) { --wo-ink2: #5c5853; zoom: .78; } /* fondo del abanico, medio tapado: decorativo */
+
+  @media (--lt-md) {
+    .wo-fan { height: 340px; }
+    .wo-fan__main { width: 280px; height: 400px; left: calc(50% - 140px); padding: 40px 22px 22px; }
+    .wo-fan__main :global(.wo-web__h) { font-size: 20px; }
+    .wo-fan__side { width: 200px; height: 320px; top: 46px; padding: 30px 20px; }
+    .wo-fan__side--l { left: calc(50% - 140px - 150px); }
+    .wo-fan__side--r { left: calc(50% + 90px); }
+  }
+  .wo-fan--card { height: 360px; }
+</style>

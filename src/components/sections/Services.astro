@@ -1,15 +1,23 @@
 ---
-// Sección Servicios — Variante C "Destacado + compactas".
-// 1 servicio ESTRELLA destacado (badge + icono + título + desc + Explorar→ + precio)
-// + lista vertical de servicios compactos (icono + título + precio + flecha).
-// Dirige la atención y muestra precios (citable para AEO). Equal-height + alineado.
-import Icon from '../ui/Icon.astro';
+// Sección Servicios · detalles permitidos de la portada (design/rediseno-workos.md §4.1, W-HOME-10 + G6).
+// La cabecera (kicker, titular, nota y botón) queda TAL CUAL. Las tarjetas "destacado +
+// compactas" pasan a la rejilla de WorkOS: 2 columnas de 552 (hueco 96 × 75), icono-objeto
+// de 80 + nombre 20/500 + texto 16/24, y el 7.º servicio (Mantenimiento) como fila ancha
+// final con icono 56 ("2×3 son 6"). Cada celda enlaza a su servicio con el href de
+// content.ts; el precio sigue visible (citable para AEO) en el acento del icono (E-14).
+// Sin fondos: la sección conserva data-fx="gold" y StarField pinta detrás.
 import Kicker from '../ui/Kicker.astro';
 import Button from '../ui/Button.astro';
+import IconoObjeto from '../w/IconoObjeto.astro';
+import { ICONOS } from '../w/objects/registry';
+import { servicioIcono } from '../../i18n/w/portada';
 
 interface Props { services: any }
 const { services } = Astro.props;
-const [featured, ...rest] = services.items;
+const items = (services.items as any[]).map((s, i) => {
+  const id = servicioIcono[s.n] ?? 'diseno-web';
+  return { ...s, id, tone: ICONOS[id].tone, wide: i === 6 };
+});
 ---
 <section class="section services" id="servicios" data-fx="gold">
   <div class="container">
@@ -22,33 +30,20 @@ const [featured, ...rest] = services.items;
       <Button href={services.cta.href} variant="secondary" class="services__head-cta">{services.cta.label}</Button>
     </header>
 
-    <div class="svc-c">
-      <a class="svc-hero" href={featured.href}>
-        {services.featuredBadge && <span class="svc-hero__badge">{services.featuredBadge}</span>}
-        <Icon name={featured.icon} class="svc-hero__icon" />
-        <h3 class="svc-hero__title">{featured.title}</h3>
-        <p class="svc-hero__desc">{featured.desc}</p>
-        <div class="svc-hero__foot">
-          <span class="svc-hero__explore">{services.explore} <Icon name="lucide:arrow-right" /></span>
-          <span class="svc-hero__price">{featured.price}</span>
-        </div>
-      </a>
-
-      <ul class="svc-list">
-        {rest.map((s: any) => (
-          <li>
-            <a class="svc-item" href={s.href} data-accent={s.icon?.includes('message') || s.icon?.includes('search') ? 'teal' : 'gold'}>
-              <span class="svc-item__ic"><Icon name={s.icon} /></span>
-              <span class="svc-item__tx">
-                <span class="svc-item__title">{s.title}</span>
-                <span class="svc-item__price">{s.price}</span>
-              </span>
-              <span class="svc-item__arr"><Icon name="lucide:arrow-up-right" /></span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul class="svc-w" role="list">
+      {items.map((s) => (
+        <li class:list={['svc-w__item', s.wide && 'svc-w__item--wide']}>
+          <a class="svc-w__cell" href={s.href} data-tone={s.tone}>
+            <span class="svc-w__ic"><IconoObjeto id={s.id} size={s.wide ? 56 : 80} /></span>
+            <div class="svc-w__tx">
+              <h3 class="svc-w__name">{s.title}</h3>
+              <p class="svc-w__desc">{s.desc}</p>
+              <span class="svc-w__price">{s.price}<span class="svc-w__chev" aria-hidden="true">›</span></span>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
   </div>
 </section>
 
@@ -62,59 +57,58 @@ const [featured, ...rest] = services.items;
     letter-spacing: var(--tracking-wide); color: var(--accent-teal); max-width: 56ch;
   }
 
-  .svc-c { display: grid; grid-template-columns: 1fr; gap: var(--space-4); align-items: stretch; }
-
-  /* Servicio estrella */
-  .svc-hero {
+  /* ── Rejilla W-HOME-10 ─────────────────────────────────── */
+  .svc-w { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr; row-gap: 40px; }
+  .svc-w__item { min-width: 0; }
+  .svc-w__cell {
     color: inherit; text-decoration: none;
-    display: flex; flex-direction: column; gap: var(--space-3);
-    background:
-      radial-gradient(120% 120% at 0% 0%, var(--accent-gold-dim), transparent 55%),
-      var(--bg-card);
-    border: 1px solid var(--accent-gold-line); border-radius: var(--radius-lg);
-    padding: var(--space-6); box-shadow: var(--shadow-card);
+    display: grid; grid-template-columns: 56px 1fr; column-gap: 20px; align-items: start;
+    border-radius: var(--w-r-obj, 12px);
   }
-  .svc-hero__badge {
-    align-self: flex-start; font-family: var(--font-mono); font-size: var(--text-xs);
-    letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--accent-gold);
-    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line);
-    border-radius: var(--radius-pill); padding: var(--space-1) var(--space-3);
+  .svc-w__ic { display: block; padding-top: 2px; }
+  /* El icono se pinta a 80; en móvil se lee a 56 con el oficio de 56 (IconoObjeto §2.8). */
+  .svc-w__ic :global(.wi) { width: 56px; height: 56px; --wi-sw: 2.5; --wi-tint: 0.2; --wi-edge-a: 0.6; --wi-edge-hover: 0.9; --wi-bw: 1.2; }
+  @media (--lt-lg) { .svc-w__ic :global(.wi--glow) { filter: none; } }
+  .svc-w__tx { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .svc-w__name {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 18px; line-height: 1.25; letter-spacing: -0.01em; color: var(--fg-primary);
   }
-  .svc-hero__icon { width: 34px; height: 34px; color: var(--accent-gold); stroke-width: 1.5; margin-top: var(--space-2); }
-  .svc-hero__title { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; line-height: var(--leading-snug); }
-  .svc-hero__desc { color: var(--fg-secondary); font-size: var(--text-base); line-height: var(--leading-normal); flex: 1; }
-  .svc-hero__foot { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-top: var(--space-3); padding-top: var(--space-4); border-top: 1px solid var(--border); }
-  .svc-hero__explore { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); font-weight: 600; color: var(--accent-gold); }
-  .svc-hero__explore :global(svg) { width: 16px; height: 16px; transition: transform var(--duration-base) var(--ease-out-expo); }
-  .svc-hero:hover .svc-hero__explore :global(svg) { transform: translateX(4px); }
-  .svc-hero__price { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--fg-secondary); }
+  .svc-w__desc { margin: 0; font-family: var(--font-body); font-size: 15px; line-height: 1.55; color: var(--fg-secondary); }
+  .svc-w__price {
+    margin-top: 4px; display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
+    font-family: var(--font-body); font-weight: 500; font-size: 14px; line-height: 1.3; color: var(--accent-gold);
+  }
+  .svc-w__cell[data-tone='teal'] .svc-w__price { color: var(--accent-teal); }
+  .svc-w__chev { font-size: 18px; line-height: 1; transition: transform var(--w-dur-hover, 200ms) var(--w-ease-ui, ease); }
+  .svc-w__name { transition: color var(--w-dur-micro, 150ms) var(--w-ease-ui, ease); }
+  @media (--hover-fine) {
+    .svc-w__cell:hover .svc-w__chev { transform: translateX(3px); }
+    .svc-w__cell:hover .svc-w__name { color: var(--accent-gold); }
+    .svc-w__cell[data-tone='teal']:hover .svc-w__name { color: var(--accent-teal); }
+  }
+  .svc-w__cell:focus-visible .svc-w__chev { transform: translateX(3px); }
+  @media (--motion-reduce) { .svc-w__chev { transition: none; } .svc-w__cell:hover .svc-w__chev, .svc-w__cell:focus-visible .svc-w__chev { transform: none; } }
 
-  /* Lista compacta */
-  .svc-list { list-style: none; display: flex; flex-direction: column; gap: var(--space-2); }
-  .svc-list li { min-width: 0; }
-  .svc-item {
-    color: inherit; text-decoration: none;
-    display: flex; align-items: center; gap: var(--space-4);
-    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-    padding: var(--space-4) var(--space-5); min-height: 64px;
-    transition: border-color var(--duration-base) var(--ease-out-expo);
-  }
-  .svc-item:hover { border-color: var(--border-accent); }
-  .svc-item__ic { display: inline-flex; flex: 0 0 auto; }
-  .svc-item__ic :global(svg) { width: 22px; height: 22px; color: var(--fg-secondary); stroke-width: 1.5; transition: color var(--duration-base); }
-  .svc-item:hover .svc-item__ic :global(svg) { color: var(--accent-gold); }
-  .svc-item__tx { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
-  .svc-item__title { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; }
-  .svc-item__price { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-secondary); }
-  .svc-item__arr { display: inline-flex; flex: 0 0 auto; color: var(--fg-subtle); transition: color var(--duration-base); }
-  .svc-item__arr :global(svg) { width: 16px; height: 16px; }
-  .svc-item:hover .svc-item__arr { color: var(--accent-gold); }
+  /* Mantenimiento: fila ancha final, tras un filete de 1 px. */
+  .svc-w__item--wide { padding-top: 40px; border-top: 1px solid var(--w-line, rgba(200,169,110,.09)); }
 
+  @media (--md) {
+    .svc-w { grid-template-columns: 1fr 1fr; column-gap: 48px; row-gap: 56px; }
+    .svc-w__item--wide { grid-column: 1 / -1; padding-top: 48px; }
+  }
   @media (--lg) {
     .services__head { flex-direction: row; align-items: flex-end; justify-content: space-between; }
-    .svc-c { grid-template-columns: 1.05fr 0.95fr; gap: var(--space-5); }
-    .svc-hero { padding: var(--space-7); }
-    /* la pila se reparte para cuadrar su alto con el del servicio destacado */
-    .svc-list { justify-content: space-between; }
+    .svc-w { column-gap: 96px; row-gap: 75px; }
+    .svc-w__cell { grid-template-columns: 80px 1fr; column-gap: 32px; }
+    .svc-w__item:not(.svc-w__item--wide) .svc-w__ic :global(.wi) { width: 80px; height: 80px; --wi-sw: 2; --wi-tint: 0.1; --wi-edge-a: 0.45; --wi-edge-hover: 0.8; --wi-bw: 1; }
+    .svc-w__name { font-size: 20px; line-height: 1.2; }
+    .svc-w__desc { font-size: 16px; line-height: 1.5; max-width: 440px; }
+    /* Fila ancha: icono 56, nombre y texto en una línea de lectura, precio al final. */
+    .svc-w__item--wide .svc-w__cell { grid-template-columns: 56px 1fr; column-gap: 32px; align-items: center; }
+    .svc-w__item--wide .svc-w__tx { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 48px; row-gap: 6px; align-items: center; }
+    .svc-w__item--wide .svc-w__name { grid-column: 1; }
+    .svc-w__item--wide .svc-w__desc { grid-column: 1; max-width: 640px; }
+    .svc-w__item--wide .svc-w__price { grid-column: 2; grid-row: 1 / span 2; margin-top: 0; align-self: center; }
   }
 </style>

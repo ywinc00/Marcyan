@@ -1,0 +1,193 @@
+---
+// Página de Ciudades v3 (design/rediseno-workos.md §4.13, ola 3), común a /es/ciudades y
+// /en/cities. Contraste: la matriz servicio × ciudad (.w-contrast). Firma: la matriz por
+// filas. Degradado: la cola del H1.
+// Orden: hero (+ tarjetas por ciudad asomando) → 01 matriz (contraste) → 02 sedes →
+// 03 barrios y sectores → 04 proyectos → "En pocas palabras" (no hay FAQ: va justo antes
+// del cierre, R1) → cierre en dos tarjetas → Contact.
+// Contratos (verify-extra): un H1 verbatim; ItemList de los 2 hubs + BreadcrumbList + el
+// @graph del Layout sin cambios; canonical/hreflang por `path`; #contacto; tel: de las dos
+// ciudades; wa.me SOLO el de Houston (el de la base); trío del cierre una vez.
+import Layout from '../../../../layouts/Layout.astro';
+import SiteNav from '../../../layout/SiteNav.astro';
+import SiteFooter from '../../../layout/SiteFooter.astro';
+import Breadcrumb from '../../../ui/Breadcrumb.astro';
+import Contact from '../../../sections/Contact.astro';
+import SpaceBackdrop from '../../../SpaceBackdrop.astro';
+import ItemListLd from '../../../seo/ItemListLd.astro';
+import WStyles from '../../WStyles.astro';
+import FranjaEnPocasPalabras from '../../FranjaEnPocasPalabras.astro';
+import CierreDosTarjetas from '../../CierreDosTarjetas.astro';
+import HeroCiudades from './HeroCiudades.astro';
+import Matriz from './Matriz.astro';
+import Sedes from './Sedes.astro';
+import Donde from './Donde.astro';
+import Proyectos from './Proyectos.astro';
+import { content, nap } from '../../../../i18n/content';
+import { clusterNav, clusterNavEn } from '../../../../i18n/clusters';
+import { megaServicios } from '../../../../i18n/w/nav';
+import { houstonHub as houstonEs } from '../../../../i18n/houston';
+import { houstonHub as houstonEn } from '../../../../i18n/houston.en';
+import { miamiHub as miamiEs } from '../../../../i18n/miami';
+import { ciudadesCopy, type CiudadesLang } from '../../../../i18n/w/ciudades';
+import type { IconoId } from '../../objects/registry';
+
+interface Props { lang: CiudadesLang }
+const { lang } = Astro.props;
+const en = lang === 'en';
+const t = ciudadesCopy[lang];
+const c = content[lang];
+const nav = en ? clusterNavEn : clusterNav;
+const pre = en ? '/en' : '/es';
+
+// ── Tarjetas por ciudad (hero) ──
+const cities = c.locations.items as { city: 'Houston' | 'Miami'; state: string; area: string; tel: string; links?: { label: string; href: string; sub?: string }[] }[];
+// Sin silueta: a la escala de la tarjeta (72-96 px) ninguna de las dos se entendía (E-53).
+type Card = { title: string; text: string; href: string; cta: string };
+const cards = cities.map((ct): Card => ({
+  title: `${ct.city}, ${ct.state}`,
+  text: t.perfiles.teaser[ct.city],
+  href: `${pre}/${ct.city.toLowerCase()}`,
+  cta: t.perfiles.cta(ct.city),
+})) as [Card, Card];
+// Teléfono de cada ciudad bajo su tarjeta (call_clicked): la tarjeta entera ya es un enlace
+// al hub y no admite otro enlace dentro (pendiente de sistema: `tel` por tarjeta).
+const phones = cities.map((ct) => ({ city: ct.city, tel: ct.tel }));
+const wide = {
+  icon: 'lucide:map-pinned', title: t.perfiles.wide.title, text: t.perfiles.wide.text,
+  href: '#contacto', cta: t.perfiles.wide.cta, track: 'proposal_requested',
+};
+
+// ── Matriz servicio × ciudad: solo landings que EXISTEN (src/pages/es/{houston,miami}/*).
+// En inglés no hay landings por ciudad: la casilla lleva a la sección de servicios del hub
+// EN, que lista exactamente esos servicios (Houston 6, Miami 4).
+const LANDING: Record<'houston' | 'miami', Partial<Record<IconoId, string>>> = {
+  houston: {
+    'diseno-web': '/es/houston/diseno-web', 'ia-conversacional': '/es/houston/ia-conversacional',
+    'seo-ia': '/es/houston/seo-para-ia', ecommerce: '/es/houston/ecommerce',
+    'seo-local': '/es/houston/seo-local', branding: '/es/houston/branding',
+  },
+  miami: {
+    'diseno-web': '/es/miami/diseno-web', 'ia-conversacional': '/es/miami/ia-conversacional',
+    ecommerce: '/es/miami/ecommerce', 'seo-local': '/es/miami/seo-local',
+  },
+};
+const cellHref = (city: 'houston' | 'miami', id: IconoId) =>
+  LANDING[city][id] ? (en ? `/en/${city}#servicios` : LANDING[city][id]) : undefined;
+// Nombre corto de cada servicio en la fila (el de los hubs): cabe en 390 sin desplazar la tabla.
+const ROW_NAME: Record<CiudadesLang, Partial<Record<IconoId, string>>> = {
+  es: { 'diseno-web': 'Diseño web', 'ia-conversacional': 'IA conversacional', 'seo-ia': 'SEO para IA', ecommerce: 'Tienda en línea', 'seo-local': 'SEO local', branding: 'Branding' },
+  en: { 'diseno-web': 'Web design', 'ia-conversacional': 'Conversational AI', 'seo-ia': 'AI SEO', ecommerce: 'Online store', 'seo-local': 'Local SEO', branding: 'Branding' },
+};
+const rows = megaServicios[lang]
+  .filter((s) => LANDING.houston[s.id] || LANDING.miami[s.id])
+  .map((s) => ({
+    label: ROW_NAME[lang][s.id] ?? s.name,
+    // La casilla es su CIUDAD; se lee en orden natural: "Diseño web en Houston" / "Web design in Houston".
+    cells: (['houston', 'miami'] as const).map((city) => {
+      const cityName = city === 'houston' ? 'Houston' : 'Miami';
+      const name = ROW_NAME[lang][s.id] ?? s.name;
+      return { label: cityName, href: cellHref(city, s.id), aria: `${name} ${en ? 'in' : 'en'} ${cityName}` };
+    }),
+  }));
+const columns = ['Houston', 'Miami'];
+
+// ── Sedes (content.locations: ciudad, área, teléfono y sus páginas) ──
+const sedes = cities.map((ct) => ({ city: ct.city, state: ct.state, area: ct.area, tel: ct.tel, links: ct.links }));
+
+// ── Barrios y sectores: landings existentes con la descripción que ya llevan en su hub ──
+type Where = { name: string; text: string; href: string; kind: 'barrio' | 'sector'; iconId?: IconoId };
+const SECTOR_ICON: Record<string, IconoId> = {
+  // Contratistas = IA (su página va de rescatar llamadas): el icono sale teal por registro; pasarlo
+  // a oro en esta página es de sistema (DondeEstaTuNegocio no deja elegir el tono, E-14).
+  '/es/houston/bienes-raices': 'seo-local', '/es/houston/contratistas': 'ia-conversacional',
+  '/en/houston/contractors': 'ia-conversacional', '/en/houston/restaurants': 'ecommerce',
+};
+const asBarrio = (l: { label: string; desc: string; href: string }): Where => ({ name: l.label, text: l.desc, href: l.href, kind: 'barrio' });
+const asSector = (l: { label: string; desc: string; href: string }): Where => ({ name: l.label, text: l.desc, href: l.href, kind: 'sector', iconId: SECTOR_ICON[l.href] });
+const donde: Where[] = en
+  ? houstonEn.industries.links.map(asSector)
+  : [
+      ...houstonEs.zonas.links.map(asBarrio),
+      ...miamiEs.barrios.links.map(asBarrio),
+      ...houstonEs.industries.links.map(asSector),
+    ];
+
+// ── Proyectos: TRR y MJA (mismo servicio, dos mercados), luego JLS y RN ──
+const proyectos = [{ name: 'Texas Rush Remove' }, { name: 'Move Junk Away' }, { name: "Julio's Landscape TX" }, { name: 'Rosy Nails & Care' }];
+
+const telOf = (n: string) => 'tel:' + n.replace(/[^\d+]/g, '');
+const waOf = (n: string) => 'https://wa.me/' + n.replace(/\D/g, '');
+---
+<Layout title={t.meta.title} description={t.meta.description} lang={lang} path={t.meta.path} ds="v3">
+  <ItemListLd slot="head" items={t.itemList} name={t.itemListName} />
+  <WStyles />
+
+  <SiteNav nav={nav} lang={lang} homeHref={pre} currentPath={Astro.url.pathname} />
+
+  <main id="main" class="w-rails" data-w data-w-tone="gold">
+    <HeroCiudades
+      eyebrow={t.hero.eyebrow}
+      h1Html={t.hero.h1}
+      tail={t.hero.tail}
+      lead={t.hero.lead}
+      perfilesTitle={t.perfiles.title}
+      cards={cards}
+      wide={wide}
+      phones={phones}
+      callLabel={t.sedes.callLabel}
+    >
+      <Breadcrumb slot="crumbs" items={t.breadcrumb} lang={lang} />
+    </HeroCiudades>
+
+    <section class="w-cell w-contrast">
+      <div class="w-container" data-w-reveal>
+        <Matriz n={1} label={t.matriz.label} title={t.matriz.title} lead={t.matriz.lead} tableLabel={t.matriz.tableLabel} columns={columns} rows={rows} lang={lang} />
+      </div>
+    </section>
+
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <Sedes n={2} label={t.sedes.label} title={t.sedes.title} lead={t.sedes.lead} more={t.sedes.more} callLabel={t.sedes.callLabel} items={sedes} />
+      </div>
+    </section>
+
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <Donde n={3} label={t.donde.label} title={t.donde.title} lead={t.donde.lead} items={donde} />
+      </div>
+    </section>
+
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <Proyectos n={4} label={t.proyectos.label} title={t.proyectos.title} lead={t.proyectos.lead} more={t.proyectos.more} items={proyectos} lang={lang} />
+      </div>
+    </section>
+
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <FranjaEnPocasPalabras q={t.answer.q} a={t.answer.a} lang={lang} />
+      </div>
+    </section>
+
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <CierreDosTarjetas
+          titleHtml={t.cta.title}
+          proof={t.cierre.proof}
+          city="houston"
+          tel={telOf(nap.houston)}
+          wa={waOf(nap.houston)}
+          lang={lang}
+          warm={{ kind: 'diagnostico', title: t.cierre.warmTitle, text: t.cierre.warmText, cta: t.cierre.warmCta, href: t.cierre.warmHref }}
+        />
+      </div>
+    </section>
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SpaceBackdrop tone="gold" />
+
+  <SiteFooter footer={c.footer} lang={en ? 'en' : undefined} />
+</Layout>

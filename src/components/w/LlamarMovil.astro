@@ -1,0 +1,41 @@
+---
+// Llamar en la primera pantalla del teléfono (dueño, 2026-11-07; política de conversión: en móvil
+// domina llamar). Va DENTRO del grupo de botones del hero, como primer hijo. Solo se pinta en las
+// landings de servicio: /houston/<slug> y /miami/<slug> (ES y EN) con el número de su ciudad, e IA
+// para pymes (sin ciudad en la ruta) con la línea principal de Houston. En el teléfono es la acción
+// sólida y el botón principal del hero pasa a contorno debajo; desde 768 no se pinta: ahí domina el
+// formulario y el teléfono sigue en el pie y en el chat.
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import { nap } from '../../i18n/content';
+
+interface Props { primaryHref?: string }
+const { primaryHref = '' } = Astro.props;
+const path = Astro.url.pathname;
+const cityM = path.match(/\/(houston|miami)\/[^/]+/);
+const sinCiudad = /^\/(es\/ia-para-pymes|en\/ai-for-small-business)\/?$/.test(path);
+const city = primaryHref.startsWith('tel:') ? null : cityM ? (cityM[1] as 'houston' | 'miami') : sinCiudad ? 'houston' : null;
+const num = city ? nap[city].replace(/^\+1\s*/, '') : '';
+const href = city ? 'tel:' + nap[city].replace(/[^\d+]/g, '') : '';
+const label = path.startsWith('/en') ? 'Call' : 'Llamar';
+---
+{city && (
+  <Button variant="primary" size="lg" href={href} data-track="call_clicked" class="w-llamar">
+    <Icon name="lucide:phone" />
+    <span>{`${label} ${num}`}</span>
+  </Button>
+)}
+
+<style is:global>
+  .btn.w-llamar { display: none; }
+  @media (max-width: 767.98px) {
+    .btn.w-llamar { display: inline-flex; gap: 10px; }
+    .btn.w-llamar svg { width: 18px; height: 18px; flex: 0 0 auto; stroke-width: 1.75; }
+    :has(> .btn.w-llamar) { flex-direction: column; align-items: stretch; gap: 12px; width: 100%; max-width: 22rem; }
+    :has(> .btn.w-llamar) > .btn { width: 100%; justify-content: center; }
+    :has(> .btn.w-llamar) > .btn--primary:not(.w-llamar) {
+      background: transparent; color: var(--fg-primary); border: 1px solid var(--border-accent); box-shadow: none;
+    }
+    :has(> .btn.w-llamar) > .btn--link { width: auto; align-self: center; }
+  }
+</style>

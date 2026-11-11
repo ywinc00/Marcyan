@@ -1,0 +1,207 @@
+---
+// Registro vivo (W-ADV-44 · design/rediseno-workos.md §3.5 y §2.10).
+// Tarjeta 1200×530 radio 48 (token 44) --w-s1; texto a la izquierda (H3 32/38,
+// párrafo 19/30, columna 420); la lista sangra al borde derecho tras una línea
+// vertical de 1 px; filas de 49 px (icono 18, nombre 16, chip 14/500).
+// · variant="loop": la lista sube una fila cada 1,5 s (600 ms, --w-ease-loop);
+//   la fila central al 100 %, el resto al 55 % (nunca menos); los chips NO se
+//   apagan (son estados, ≥ 4.5:1, E-40/E-42); máscara de 100 px arriba y abajo.
+//   La fila central se marca con una franja fija --w-s3 por la que pasan las filas
+//   (solo transform y opacidad). Registrado en loop.ts: pausa fuera de pantalla,
+//   con pestaña oculta, con foco o puntero dentro, y botón de pausa (> 5 s).
+// · variant="static": 5 filas al 100 %, la central con fondo --w-s3 como único realce.
+// Estados por VALOR (§2.11): `ok` en el acento de la página; `pass` ("Te lo pasa")
+// en crema al 70 %; `off` en gris con borde discontinuo.
+// La lista es ilustración: aria-hidden + resumen en sr-only. Etiqueta "Ejemplo".
+import Icon from '../ui/Icon.astro';
+import Ejemplo from './Ejemplo.astro';
+
+interface Row { icon: string; label: string; chip: string; tone: 'ok' | 'pass' | 'off' }
+interface Props {
+  titleHtml: string;
+  text: string;
+  rows: Row[];
+  variant?: 'loop' | 'static';
+  /** Resumen para lectores de pantalla (por defecto, la lista en una frase). */
+  sr?: string;
+  tone?: 'gold' | 'teal';
+  lang?: 'es' | 'en';
+  id?: string;
+  class?: string;
+}
+const { titleHtml, text, rows, variant = 'loop', tone = 'gold', lang = 'es', id, class: cls } = Astro.props;
+const en = lang === 'en';
+const loop = variant === 'loop';
+const CENTER = 5; // índice de la fila central en la ventana (bucle)
+// Bucle: la pista se rellena repitiendo las filas hasta cubrir la ventana y una de margen.
+const track: Row[] = loop ? [] : rows.slice(0, 5);
+if (loop) { while (track.length < 13) track.push(...rows); }
+const center = loop ? CENTER : Math.min(2, track.length - 1);
+const sr = Astro.props.sr ?? (en ? 'Example: ' : 'Ejemplo: ') + rows.map((r) => `${r.label}, ${r.chip}`).join('; ') + '.';
+---
+<div
+  class:list={['wd-log', `wd-log--${variant}`, cls]}
+  id={id}
+  data-w-tone={tone}
+  data-wd-log={loop ? 'loop' : undefined}
+  style={`--wd-center:${center}`}
+>
+  <div class="wd-log__copy">
+    <h3 class="wd-log__h" set:html={titleHtml} />
+    <p class="wd-log__p">{text}</p>
+  </div>
+  <div class="wd-log__list" data-wd-log-host>
+    <p class="sr-only">{sr}</p>
+    <Ejemplo lang={lang} />
+    <div class="wd-log__win" aria-hidden="true">
+      <span class="wd-log__lens"></span>
+      <ul class="wd-log__track" data-wd-track>
+        {track.map((r, i) => (
+          <li class:list={['wd-log__row', i === center && 'is-center']}>
+            <Icon name={r.icon} class="wd-log__ic" />
+            <span class="wd-log__lbl">{r.label}</span>
+            <span class:list={['wd-log__chip', `wd-log__chip--${r.tone}`]}>{r.chip}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  .wd-log {
+    --wd-acc: var(--w-accent, var(--accent-gold));
+    --wd-acc-rgb: var(--w-accent-rgb, var(--accent-gold-rgb));
+    --wd-row: 49px;
+    position: relative; overflow: hidden;
+    display: grid; grid-template-columns: minmax(0, 1fr);
+    max-width: var(--w-rail-max); margin-inline: auto;
+    border-radius: var(--w-r-tray);
+    background: var(--w-s1); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .wd-log__copy { padding: 40px 24px 28px; }
+  .wd-log__h {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 26px; line-height: 1.2; letter-spacing: -0.03em; color: var(--w-ink); text-wrap: balance;
+  }
+  .wd-log__p { margin: 16px 0 0; font-family: var(--font-body); font-size: 17px; line-height: 1.6; color: var(--w-ink-80); }
+
+  .wd-log__list { position: relative; border-top: 1px solid var(--w-line); }
+  /* Móvil (E-18): la etiqueta y el botón de pausa viven en franjas propias, encima y debajo
+     de la lista; nunca tapan un chip (control 1). */
+  /* Apilado hasta 1024 (rev. móvil 2026-11-08: a 768 la lista quedaba en 108 px y cortada). */
+  @media (max-width: 1023.98px) {
+    .wd-log__list { padding-top: 48px; }
+    .wd-log--loop .wd-log__list { padding-bottom: 64px; }
+    .wd-log__list > :global(.w-example--corner) { top: 14px; right: 16px; }
+  }
+  .wd-log__win { position: relative; overflow: hidden; height: calc(var(--wd-row) * 7); }
+  .wd-log--loop .wd-log__win {
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 100px, #000 calc(100% - 100px), transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 100px, #000 calc(100% - 100px), transparent 100%);
+  }
+  .wd-log--static .wd-log__win { height: auto; }
+  .wd-log__track {
+    list-style: none; margin: 0; padding: 0;
+    position: absolute; left: 0; right: 0;
+    top: calc(50% - var(--wd-row) * (var(--wd-center) + .5));
+  }
+  .wd-log--static .wd-log__track { position: relative; top: auto; }
+  .wd-log__lens {
+    position: absolute; left: 0; right: 0; height: var(--wd-row); top: calc(50% - var(--wd-row) / 2);
+    background: var(--w-s3); border-block: 1px solid var(--w-line-strong);
+  }
+  .wd-log--static .wd-log__lens { display: none; }
+  .wd-log__row {
+    position: relative; display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: center; gap: 14px;
+    height: var(--wd-row); padding: 0 24px 0 16px;
+    border-bottom: 1px solid var(--w-line-ink);
+  }
+  .wd-log--static .wd-log__row.is-center { background: var(--w-s3); }
+  .wd-log__ic { width: 18px; height: 18px; color: var(--w-ink); }
+  .wd-log__lbl {
+    font-family: var(--font-body); font-size: 14px; line-height: 1.3; color: var(--w-ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  /* Bucle: lo que no está en el centro baja al 55 % (icono y nombre; el chip no). */
+  .wd-log--loop .wd-log__ic, .wd-log--loop .wd-log__lbl { opacity: .55; transition: opacity 600ms var(--w-ease-loop); }
+  .wd-log--loop .is-center .wd-log__ic, .wd-log--loop .is-center .wd-log__lbl { opacity: 1; }
+  .wd-log__chip {
+    justify-self: start; padding: 3px 10px; border-radius: 999px; border: 1px solid transparent;
+    font-family: var(--font-body); font-weight: 500; font-size: 14px; line-height: 1.3; white-space: nowrap;
+  }
+  .wd-log__chip--ok { color: var(--wd-acc); background: rgba(var(--wd-acc-rgb), .12); border-color: rgba(var(--wd-acc-rgb), .32); }
+  .wd-log__chip--pass { color: var(--w-ink-80); background: rgba(var(--star-rgb), .06); border-color: var(--w-line-ink); }
+  .wd-log__chip--off { color: var(--w-ink-70); border: 1px dashed rgba(var(--star-rgb), .28); }
+
+  @media (--md) {
+    .wd-log__h { font-size: 32px; line-height: 38px; }
+    .wd-log__p { font-size: 19px; line-height: 30px; }
+    .wd-log__copy { padding: 48px 40px 32px; }
+  }
+  @media (--lg) {
+    .wd-log { grid-template-columns: minmax(0, 600px) minmax(0, 1fr); min-height: 530px; border-radius: var(--w-r-feature); }
+    .wd-log__copy { align-self: center; padding: 64px 60px 64px 64px; max-width: 548px; }
+    .wd-log__h { font-size: 32px; line-height: 38px; }
+    .wd-log__p { font-size: 19px; line-height: 30px; }
+    .wd-log__list { border-top: 0; border-left: 1px solid var(--w-line); }
+    .wd-log__win { height: 100%; min-height: 530px; }
+    /* En estático la tarjeta se ajusta a sus 5 filas: los 530 px son del modo en bucle y aquí
+       dejaban ~140 px de losa vacía arriba y abajo (ecommerce, rev1). */
+    .wd-log--static { min-height: 0; }
+    .wd-log--static .wd-log__win { min-height: 0; height: 100%; display: grid; align-content: center; padding-block: 48px; }
+    .wd-log__row { grid-template-columns: 18px minmax(0, 260px) auto; padding: 0 32px 0 24px; gap: 16px; }
+    .wd-log__lbl { font-size: 16px; }
+  }
+  @media (--lg) {
+    .wd-log__row { grid-template-columns: 18px 280px auto; }
+  }
+  @media (--motion-reduce) {
+    .wd-log--loop .wd-log__ic, .wd-log--loop .wd-log__lbl { transition: none; }
+  }
+</style>
+
+<script>
+  import { registerLoop } from './loop';
+  // Tiempos medidos en la tira de W-ADV-44: una fila cada 1,5 s, traslado 600 ms.
+  const TICK = 1500, SHIFT = 600;
+  document.querySelectorAll<HTMLElement>('[data-wd-log="loop"]').forEach((el) => {
+    const track = el.querySelector<HTMLElement>('[data-wd-track]');
+    const host = el.querySelector<HTMLElement>('[data-wd-log-host]') ?? el;
+    if (!track) return;
+    const C = Number(getComputedStyle(el).getPropertyValue('--wd-center')) || 5;
+    const rowH = () => (track.firstElementChild as HTMLElement | null)?.offsetHeight || 49;
+    const rows = () => Array.from(track.children) as HTMLElement[];
+    let timer = 0;
+    let shifting = false;
+    const finish = () => {
+      shifting = false;
+      track.style.transition = 'none';
+      track.appendChild(track.firstElementChild as HTMLElement);
+      track.style.transform = '';
+    };
+    const setCenter = (i: number) => rows().forEach((r, j) => r.classList.toggle('is-center', j === i));
+    const step = () => {
+      setCenter(C + 1); // la siguiente gana opacidad mientras sube
+      track.style.transition = `transform ${SHIFT}ms var(--w-ease-loop)`;
+      track.style.transform = `translateY(-${rowH()}px)`;
+      shifting = true;
+      timer = window.setTimeout(() => {
+        finish();
+        timer = window.setTimeout(step, TICK - SHIFT);
+      }, SHIFT);
+    };
+    const reset = () => {
+      window.clearTimeout(timer);
+      if (shifting) finish();
+      track.style.transition = 'none'; track.style.transform = '';
+      setCenter(C);
+    };
+    registerLoop(el, {
+      start: () => { el.classList.remove('is-still'); timer = window.setTimeout(step, TICK); },
+      // Si se para a mitad de un traslado, se completa al momento (sin salto al volver).
+      stop: () => { window.clearTimeout(timer); if (shifting) finish(); },
+      still: () => { reset(); el.classList.add('is-still'); },
+    }, { buttonHost: host });
+  });
+</script>

@@ -1,0 +1,11 @@
+---
+// Servicios · 02 "Catálogo" (§4.3-3): TarjetasHermanas con los 7 productos (sin currentId)
+// dentro de <div id="precios">, con data-track="pricing_card_clicked" en CADA tarjeta
+// (contrato de medición de la página de antes: 7 eventos). El atributo lo pone el propio
+// componente con su prop `cardTrack`; este envoltorio solo conserva el ancla #precios.
+---
+<div id="precios" class="ws-cat"><slot /></div>
+
+<style>
+  .ws-cat { scroll-margin-top: 96px; }
+</style>

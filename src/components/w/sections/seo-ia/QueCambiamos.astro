@@ -1,0 +1,173 @@
+---
+// SEO para IA · 03 "Qué cambiamos" (design/rediseno-workos.md §4.17-5, W-CORE-34 en su
+// versión ESTÁTICA en esta página). Los 6 trabajos de `seoIaPage.mechanics` (título y texto
+// VERBATIM, icono del dato) son las piezas de la izquierda; cada uno sale con una línea curva
+// de 1 px que converge en la ficha del negocio (objeto de PRODUCTO en claro, "Tu Plomería",
+// EJEMPLO), y de la ficha sale el resultado: la IA te cita. Las curvas se dibujan con la
+// posición real de cada pieza (script corto con ResizeObserver, sin animación); sin JS o en
+// móvil no hay curvas y la ficha va encima de la lista (W-CORE-34 móvil: diagrama arriba).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Ejemplo from '../../Ejemplo.astro';
+import Icon from '../../../ui/Icon.astro';
+
+interface Item { icon: string; title: string; desc: string }
+interface Props {
+  n: number;
+  label: string;
+  titleHtml: string;
+  items: Item[];
+  card: { name: string; kind: string; rows: { k: string; v: string }[]; result: string };
+}
+const { n, label, titleHtml, items, card } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} titleHtml={titleHtml} />
+
+<div class="qc" data-qc>
+  <ol class="qc__list">
+    {items.map((it) => (
+      <li class="qc__item" data-qc-item>
+        <span class="qc__ic"><Icon name={it.icon} /></span>
+        <div class="qc__txt">
+          <h3 class="qc__h">{it.title}</h3>
+          <p class="qc__p">{it.desc}</p>
+        </div>
+        <span class="qc__dot" data-qc-dot aria-hidden="true"></span>
+      </li>
+    ))}
+  </ol>
+
+  <svg class="qc__wires" data-qc-wires aria-hidden="true" focusable="false"></svg>
+
+  <div class="qc__hub" data-nosnippet>
+    <div class="qc__card" data-qc-card>
+      <Ejemplo on="light" />
+      <p class="qc__name" translate="no">{card.name}</p>
+      <p class="qc__kind">{card.kind}</p>
+      <dl class="qc__rows">
+        {card.rows.map((r) => (
+          <div class="qc__row">
+            <dt>{r.k}</dt>
+            <dd><span class="qc__ok" aria-hidden="true"></span>{r.v}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+    <span class="qc__stem" aria-hidden="true"></span>
+    <p class="qc__result">{card.result}</p>
+  </div>
+</div>
+
+<script>
+  import { zrect, zoom } from '../../zoom';
+  // Curvas de cada pieza a la ficha: se recalculan solo cuando cambia el tamaño del bloque
+  // (ResizeObserver). Nada se anima ni se redibuja en bucle.
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  document.querySelectorAll<HTMLElement>('[data-qc]').forEach((root) => {
+    const svg = root.querySelector<SVGSVGElement>('[data-qc-wires]');
+    const card = root.querySelector<HTMLElement>('[data-qc-card]');
+    const dots = [...root.querySelectorAll<HTMLElement>('[data-qc-dot]')];
+    if (!svg || !card || !dots.length) return;
+    const draw = () => {
+      const R = zrect(root);
+      if (getComputedStyle(svg).display === 'none') { svg.replaceChildren(); return; }
+      svg.setAttribute('viewBox', `0 0 ${R.width.toFixed(0)} ${R.height.toFixed(0)}`);
+      const C = zrect(card);
+      const tx = C.left - R.left;
+      const cy = C.top - R.top + C.height / 2;
+      const spread = Math.min(C.height * 0.5, 160);
+      const frag = document.createDocumentFragment();
+      dots.forEach((d, i) => {
+        const b = zrect(d);
+        const x0 = b.left - R.left + b.width / 2;
+        const y0 = b.top - R.top + b.height / 2;
+        // Llegan repartidas en la mitad central del borde de la ficha, en el mismo orden.
+        const y1 = cy - spread / 2 + (spread * i) / Math.max(1, dots.length - 1);
+        const mx = x0 + (tx - x0) * 0.55;
+        const p = document.createElementNS(SVGNS, 'path');
+        p.setAttribute('d', `M${x0.toFixed(1)} ${y0.toFixed(1)}C${mx.toFixed(1)} ${y0.toFixed(1)} ${mx.toFixed(1)} ${y1.toFixed(1)} ${tx.toFixed(1)} ${y1.toFixed(1)}`);
+        frag.appendChild(p);
+      });
+      svg.replaceChildren(frag);
+    };
+    draw();
+    if ('ResizeObserver' in window) new ResizeObserver(draw).observe(root);
+    document.fonts?.ready.then(draw);
+  });
+</script>
+
+<style>
+  .qc { position: relative; margin-top: 64px; display: grid; gap: 40px; }
+  @media (--lg) {
+    .qc { grid-template-columns: minmax(0, 600fr) minmax(0, 200fr) minmax(0, 340fr); align-items: center; column-gap: 0; }
+    .qc__list { grid-column: 1; grid-row: 1; }
+    .qc__hub { grid-column: 3; grid-row: 1; }
+  }
+
+  /* ── Las piezas (izquierda) ── */
+  .qc__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; position: relative; z-index: 1; }
+  .qc__item {
+    position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 16px; align-items: start;
+    padding: 18px 28px 18px 18px; border-radius: var(--w-r-obj);
+    background: var(--w-s2); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .qc__ic {
+    display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 8px;
+    background: rgba(var(--w-accent-rgb), .12); color: var(--w-accent);
+  }
+  .qc__ic :global(svg) { width: 20px; height: 20px; }
+  .qc__h {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 18px; line-height: 1.3; letter-spacing: -0.01em; color: var(--w-ink);
+  }
+  .qc__p { margin: 6px 0 0; font-family: var(--font-body); font-size: 15px; line-height: 1.55; color: var(--fg-secondary); }
+  /* Punto de salida de la curva, en el borde derecho de cada pieza. */
+  .qc__dot {
+    display: none; position: absolute; right: -5px; top: 50%; width: 9px; height: 9px; margin-top: -4.5px;
+    border-radius: 50%; background: var(--w-s0); border: 1px solid var(--w-accent);
+  }
+
+  /* ── Curvas ── */
+  .qc__wires { display: none; position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 0; }
+  .qc__wires :global(path) { fill: none; stroke: rgba(var(--w-accent-rgb), .45); stroke-width: 1; }
+  @media (--lg) {
+    .qc__dot { display: block; }
+    .qc__wires { display: block; }
+  }
+
+  /* ── Ficha (objeto de producto en claro) + resultado ── */
+  .qc__hub { position: relative; z-index: 1; display: grid; justify-items: center; min-width: 0; }
+  .qc__card {
+    position: relative; width: 100%; max-width: 340px; box-sizing: border-box; padding: 22px;
+    background: var(--w-p-bg); color: var(--w-p-ink);
+    border: 1px solid var(--w-p-line); border-radius: var(--w-r-obj);
+    box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .7);
+  }
+  .qc__name { margin: 0; padding-right: 92px; font: 500 20px/1.2 var(--font-display); letter-spacing: -0.02em; }
+  .qc__kind { margin: 4px 0 0; font: 400 14px/1.4 var(--font-body); color: var(--w-p-ink-2); }
+  .qc__rows { margin: 18px 0 0; display: grid; }
+  .qc__row {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    padding: 10px 0; border-top: 1px solid var(--w-p-line);
+    font: 400 14px/1.4 var(--font-body);
+  }
+  .qc__row dt { color: var(--w-p-ink-2); }
+  .qc__row dd { margin: 0; display: inline-flex; align-items: center; gap: 6px; font-weight: 500; color: var(--w-p-ink); white-space: nowrap; }
+  .qc__ok { position: relative; width: 14px; height: 14px; border-radius: 50%; background: var(--w-accent); flex: none; }
+  .qc__ok::after {
+    content: ''; position: absolute; left: 4.5px; top: 2px; width: 4px; height: 7px;
+    border: solid #0e0e0d; border-width: 0 1.6px 1.6px 0; transform: rotate(45deg);
+  }
+  .qc__stem { width: 1px; height: 28px; background: rgba(var(--w-accent-rgb), .45); }
+  .qc__result {
+    margin: 0; padding: 10px 16px; border-radius: 999px;
+    border: 1px solid rgba(var(--w-accent-rgb), .55); background: var(--w-s1);
+    font: 500 15px/1.2 var(--font-body); color: var(--w-ink);
+  }
+
+  @media (--lt-lg) { .qc { margin-top: 40px; } }
+  @media (--lt-md) {
+    .qc__item { grid-template-columns: 36px minmax(0, 1fr); gap: 14px; padding: 16px; }
+    .qc__ic { width: 36px; height: 36px; }
+    .qc__h { font-size: 17px; }
+  }
+</style>

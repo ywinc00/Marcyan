@@ -1,0 +1,35 @@
+---
+// IA conversacional · "Lo que pasó hoy" (v2 §3 G06): RegistroVivo variant="loop" VIVO (E-56 regla 7)
+// (sube una fila cada 1,5 s mientras está a la vista, pausa global y botón 44×44) + chips de
+// memoria W-ADV-23 estáticos: lo que Marcy ya sabe del negocio, como franja de dos columnas
+// bajo el registro (texto a la izquierda en la línea del texto del registro, pila de chips a
+// la derecha, como la lista que sube bajo el robot de W-ADV-23). EJEMPLO.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import RegistroVivo from '../../RegistroVivo.astro';
+import ChipsVeredicto from '../../ChipsVeredicto.astro';
+import type { IaChatCopy } from '../../../../i18n/w/ia-chat';
+
+interface Props { copy: IaChatCopy['hoy']; n: number; lang?: 'es' | 'en' }
+const { copy, n, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} />
+<div class="ws-gap">
+  <RegistroVivo variant="loop" tone="teal" titleHtml={copy.title} text={copy.text} rows={copy.rows} lang={lang} />
+</div>
+<div class="ws-mem">
+  <div class="ws-mem__t">
+    <h3 class="w-h4 ws-mem__h">{copy.memoryLabel}</h3>
+    <p class="ws-mem__p">{copy.memoryText}</p>
+  </div>
+  <ChipsVeredicto memory items={copy.memory} tone="teal" label={copy.memoryLabel} />
+</div>
+<style>
+  .ws-gap { margin-top: 24px; }
+  .ws-mem { margin-top: 48px; display: grid; gap: 20px; align-items: center; }
+  @media (--md) { .ws-mem { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding-inline: 64px; gap: 48px; } }
+  /* Chips de memoria a todo el ancho de su columna; en escritorio, rejilla de 2 × 2. */
+  .ws-mem :global(.wd-chips--mem) { max-width: none; }
+  @media (--lg) { .ws-mem :global(.wd-chips--mem) { grid-template-columns: 1fr 1fr; } }
+  .ws-mem__h { margin: 0; }
+  .ws-mem__p { margin: 8px 0 0; max-width: 400px; font: 400 16px/1.6 var(--font-body); color: var(--w-ink-70); }
+</style>

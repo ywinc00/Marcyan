@@ -1,0 +1,83 @@
+---
+// Hero de las landings de tienda en línea (design/rediseno-workos.md §4.15, ola 2; v2 G04: la lista es
+// PedidosHoy, con productos ilustrados y raíl de estados, sobre el fondo F02 "Escaparate").
+// A-05 + W-ADV-36: hero PARTIDO. Izquierda, HeroTexto alineado a la izquierda (chip de
+// ciudad, eyebrow "Tienda", H1 verbatim, bajada y botones; coreografía §2.9). Derecha, la
+// lista "Pedidos de hoy" de EJEMPLO con su campo de puntos oro: firma de la página, en
+// bucle (una fila pasa a "Pagado" cada 950 ms; pausada fuera de pantalla, con pestaña
+// oculta y con reduced-motion en su estado quieto). Entra como objeto (data-w-in="obj").
+// Sin cola en el H1 (regla de longitud §2.14: el H1 ya ocupa 2 líneas a 1440).
+// Móvil: texto arriba y la lista debajo a ancho completo, nunca oculta (W-CORE-41).
+// v3 (E-57, dueño 2026-11-06): hero de la v1 (espacio de SpaceBackdrop y el campo de puntos oro en
+// óvalo detrás de la tarjeta, como hacía ListaPedidos) con la tarjeta PedidosHoy de la v2. Sin F02:
+// un solo motivo de fondo, los puntos.
+import HeroTexto from '../HeroTexto.astro';
+import PedidosHoy from '../sections/ecommerce/PedidosHoy.astro';
+import ProductoArte from '../sections/ecommerce/ProductoArte.astro';
+
+interface Cta { label: string; href: string; track?: string }
+interface Props {
+  h1Html: string;
+  chip: string;
+  eyebrow: string;
+  lead: string;
+  primary: Cta;
+  link?: Cta;
+  lang?: 'es' | 'en';
+}
+const { h1Html, chip, eyebrow, lead, primary, link, lang = 'es' } = Astro.props;
+---
+<section class="w-hero he">
+  <div class="w-container he__grid">
+    <div class="he__text">
+      <HeroTexto
+        eyebrow={eyebrow}
+        tone="gold"
+        chip={chip}
+        h1Html={h1Html}
+        lead={lead}
+        primary={primary}
+        link={link}
+        align="left"
+      >
+        <slot name="crumbs" slot="crumbs" />
+      </HeroTexto>
+    </div>
+    <div class="he__obj" data-w-in="obj">
+      <div class="he__campo"><PedidosHoy lang={lang} /></div>
+      <ProductoArte modo="sprite" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .he { overflow-x: clip; padding-bottom: 72px; }
+  .he__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 56px; align-items: center; }
+  .he__obj { display: flex; justify-content: center; padding-inline: 8px; }
+  /* Campo de puntos oro de la v1 (ListaPedidos): 3 px cada 12 px, óvalo más ancho que la tarjeta. */
+  .he__campo { position: relative; isolation: isolate; display: flex; justify-content: inherit; width: min(100%, 440px); }
+  .he__campo::before {
+    content: ''; position: absolute; z-index: -1; inset: -40px -90px;
+    background: radial-gradient(rgba(var(--accent-gold-rgb), .55) 1.5px, transparent 1.8px) 0 0 / 12px 12px;
+    -webkit-mask-image: radial-gradient(closest-side, #000 45%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 45%, transparent 100%);
+    pointer-events: none;
+  }
+  /* El chip de ciudad va encima del eyebrow también a la izquierda (misma pila que el
+     centrado del piloto): el eyebrow es el nombre de producto y manda sobre el chip. */
+  .he__text :global(.w-herotext__top) { flex-direction: column; align-items: flex-start; gap: 14px; }
+  @media (--lg) {
+    .he { padding-bottom: 80px; }
+    /* Columna de texto 600 (el H1 de 58 cabe en 2 líneas) y objeto a la derecha. */
+    .he__grid { grid-template-columns: minmax(0, 600px) minmax(0, 1fr); gap: 48px; min-height: 520px; }
+    .he__text :global(.w-herotext--left) { max-width: 600px; }
+    .he__obj { justify-content: flex-end; padding-inline: 0 56px; }
+  }
+  @media (--lt-md) {
+    .he { padding-bottom: 64px; }
+    /* En móvil la tarjeta ocupa el ancho: el campo asoma arriba y abajo, como en la v1. */
+    .he__campo::before { inset: -44px -16px; }
+    .he__grid { gap: 48px; }
+    /* Texto a la izquierda también en móvil, como los demás heros partidos (control global r1). */
+  }
+</style>

@@ -1,0 +1,84 @@
+---
+// Diseño web · 02 "Hazla tuya" (§4.14-5): CabeceraNumerada (H2 + bajada) + Escalera en
+// modo bajo cabecera (W-CORE-06 + B-08) Landing / Rediseño / A medida con sus anclas de
+// pricing.ts. Control 2: la MISMA web de ejemplo en las tres opciones, cambiando de
+// alcance para que la maqueta exprese la opción (como W-CORE-06, cada opción su variante):
+//   Landing   → una página.
+//   Rediseño  → antes y después (la mitad izquierda, la web vieja; la derecha, la nueva).
+//               La vieja es MÁS POBRE, no la misma en gris (control 2 ronda 2): sin botón
+//               de llamar, sin tarjeta de servicios ni horario, sin idiomas.
+//   A medida  → sitio de varias páginas (menú de páginas en la cabecera).
+// Decisión del director (control 2): los tres precios se ven siempre, no solo el de la
+// opción activa (precio legible antes que escondido); queda apuntada para el dueño.
+// Sistema tras el piloto: CabeceraNumerada solo de etiqueta y la Escalera con su título
+// (H2 de sección), bajada y opciones juntos a la izquierda y la maqueta a la derecha
+// (W-CORE-06; control 2 piloto r3: quedaba una columna vacía de ~420 px bajo las opciones).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Escalera from '../../Escalera.astro';
+import WebEjemplo from '../../objetos/WebEjemplo.astro';
+import { catalog, PRICE_ANCHORS } from '../../../../i18n/pricing';
+import type { WebCopy } from '../../../../i18n/w/web';
+
+interface Props { copy: WebCopy['escalera']; n: number; city: string; lang?: 'es' | 'en' }
+const { copy, n, city, lang = 'es' } = Astro.props;
+const web = catalog.find((p) => p.id === 'diseno-web')!;
+const desde = (v: number) => `Desde $${v.toLocaleString('en-US')}`;
+const [t0, t1, t2] = web.tiers;
+---
+<CabeceraNumerada n={n} label={copy.label} />
+<div class="ws-gap ht">
+  <Escalera
+    titleHtml={copy.title}
+    lead={copy.demoLead}
+    headSize="section"
+    chip={copy.chip}
+    lang={lang}
+    options={[
+      { id: 'landing', title: t0.name, text: t0.blurb, price: desde(PRICE_ANCHORS.webLanding) },
+      { id: 'rediseno', title: t1.name, text: t1.blurb, price: desde(PRICE_ANCHORS.webRedesign) },
+      { id: 'medida', title: t2.name, text: t2.blurb, price: desde(PRICE_ANCHORS.web) },
+    ]}
+  >
+    <WebEjemplo slot="screen-landing" frame="movil" kind="plomeria" city={city} lang={lang} class="ht-phone" />
+    <div slot="screen-rediseno" class="ht-ab">
+      <WebEjemplo frame="movil" kind="plomeria" city={city} lang={lang} class="ht-phone" />
+      <div class="ht-ab__antes" aria-hidden="true">
+        <WebEjemplo frame="movil" kind="plomeria" city={city} lang={lang} example={false} class="ht-phone ht-old" />
+      </div>
+      <span class="ht-ab__line" aria-hidden="true"></span>
+      <span class="ht-ab__tag ht-ab__tag--a">{copy.antes}</span>
+      <span class="ht-ab__tag ht-ab__tag--d">{copy.despues}</span>
+    </div>
+    <WebEjemplo slot="screen-medida" frame="movil" kind="plomeria" city={city} lang={lang} pages={copy.pages} class="ht-phone" />
+  </Escalera>
+</div>
+<style>
+  .ws-gap { margin-top: 12px; }
+  /* Móvil: el teléfono algo más pequeño para que opciones y maqueta quepan juntas. */
+  @media (--lt-md) { :global(.ht-phone.wo-web--movil) { width: 236px; } }
+
+  /* Rediseño: la misma web dos veces; la vieja recortada a la mitad izquierda. */
+  .ht-ab { position: relative; width: fit-content; margin-inline: auto; height: auto !important; }
+  .ht-ab__antes { position: absolute; inset: 0; clip-path: inset(0 50% 0 0); }
+  .ht-ab__line {
+    position: absolute; top: 9px; bottom: 9px; left: 50%; width: 2px; translate: -1px 0;
+    background: #fff; box-shadow: 0 0 0 1px rgba(14, 14, 13, .18);
+  }
+  .ht-ab__tag {
+    position: absolute; top: 16px; z-index: 3;
+    padding: 4px 8px; border-radius: 999px;
+    font: 500 11px/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase;
+    color: #f0ede8; background: #111110;
+  }
+  .ht-ab__tag--a { left: 20px; }
+  .ht-ab__tag--d { right: 20px; }
+  /* La web "antes": la misma cabecera, pero más pobre. Sin botón de llamar, sin tarjeta de
+     servicios ni "Abierto ahora", sin selector de idioma y en gris: la opción cuenta qué
+     mejora el rediseño. La letra es la misma para que las líneas casen en el corte. */
+  .ht-ab :global(.ht-old .wo-web__screen) { filter: grayscale(1) contrast(.85); background: #e4e2de; }
+  .ht-ab :global(.ht-old :is(.wo-web__cta, .wo-web__side, .wo-web__lang)) { visibility: hidden; }
+  .ht-ab :global(.ht-old .wo-web__logo) { border-radius: 0; }
+  /* Tres capas, no cuatro (control 2 ronda 2): el teléfono va directo sobre la bandeja, sin
+     el panel claro de la pantalla de la escalera. */
+  .ht :global(.wd-esc__screen) { background: transparent; padding: 0; display: grid; place-items: center; }
+</style>

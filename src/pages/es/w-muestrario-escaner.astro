@@ -1,0 +1,48 @@
+---
+// Muestrario P04 (rediseño WorkOS v2): escáner vivo en sus tres tamaños, 2 instancias de
+// cada uno (verify-extra detecta ids duplicados). noindex; se borra antes de mergear a main.
+import Layout from '../../layouts/Layout.astro';
+import WStyles from '../../components/w/WStyles.astro';
+import Escaner from '../../components/w/objetos/Escaner.astro';
+import '../../components/w/objetos/escaner-grande.css'; // tamaños hero y card del escáner (control v2 r3)
+---
+<Layout title="Muestrario · Escáner vivo" noindex={true} path="/w-muestrario-escaner" hasEn={false} ds="v3">
+  <WStyles />
+  <main id="main" class="mx" data-w>
+    <h1 class="mx__h1">Muestrario · Escáner vivo (P04)</h1>
+    <section class="mx__sec" id="mini">
+      <p class="mx__t">size="mini" · variant="compacto" (portada y hubs)</p>
+      <div class="mx__grid">
+        <a class="mx__link" href="/es/diagnostico"><Escaner lang="es" variant="compacto" motion="once" size="mini" /></a>
+        <a class="mx__link" href="/en/checkup"><Escaner lang="en" variant="compacto" motion="once" size="mini" /></a>
+      </div>
+    </section>
+    <section class="mx__sec" id="card">
+      <p class="mx__t">size="card"</p>
+      <div class="mx__grid">
+        <Escaner lang="es" size="card" />
+        <Escaner lang="en" size="card" />
+      </div>
+    </section>
+    <section class="mx__sec" id="hero">
+      <p class="mx__t">size="hero" (diagnóstico) · con un campo en la misma sección que lo pausa al escribir</p>
+      <div class="mx__grid">
+        <form class="mx__form" onsubmit="return false"><label>Tu web <input type="text" name="web" autocomplete="off" /></label></form>
+        <Escaner lang="es" motion="loop" size="hero" />
+      </div>
+      <div class="mx__grid">
+        <Escaner lang="en" motion="loop" size="hero" />
+      </div>
+    </section>
+  </main>
+</Layout>
+<style>
+  .mx { width: min(1200px, 100% - 32px); margin: 0 auto; padding: 120px 0 80px; }
+  .mx__h1 { font-family: var(--font-display); font-size: 28px; margin: 0 0 32px; }
+  .mx__sec { margin-bottom: 64px; }
+  .mx__t { font-family: var(--font-mono); font-size: 12px; color: var(--fg-secondary); margin: 0 0 16px; }
+  .mx__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 24px; margin-bottom: 24px; }
+  .mx__link { display: block; text-decoration: none; color: inherit; }
+  .mx__form label { display: grid; gap: 8px; color: var(--fg-secondary); }
+  .mx__form input { height: 44px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--w-line-strong); background: transparent; color: inherit; }
+</style>

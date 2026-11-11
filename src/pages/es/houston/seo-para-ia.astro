@@ -1,89 +1,349 @@
 ---
-// LANDING · /es/houston/seo-para-ia — "SEO para IA / Visibilidad en IA" (AEO).
-// El mayor wedge: que ChatGPT/Gemini/Meta AI te RECOMIENDEN a TI. Página
-// bespoke (patrón /es/servicios) que reusa los componentes del DS + PriceGrid
-// para los 3 niveles (diagnóstico gratis · cimientos $500 · monitoreo $200/mes).
-// Schema: Service con Offer×3 (ServiceLd con tiers) + FAQPage (Faq) +
-// BreadcrumbList (Breadcrumb). ES por ahora (hasEn=false).
+// LANDING · /es/houston/seo-para-ia · "SEO para IA / Visibilidad en IA" (AEO).
+// Página a medida v3 del rediseño WorkOS (design/rediseno-workos.md §4.17, tarea 2-seo-ia).
+// Fuera del verificador de landings: la vigila scripts/w/verify-extra.mjs (un H1 verbatim,
+// ServiceLd con tiers = Offer×3, FAQPage = texto visible, BreadcrumbList, trío, anclas).
+//
+// Contraste: el túnel del hero (W-ADV-28) es la superficie distinta de la página (no hay
+// .w-contrast ni .w-dawn). Firma: ninguna en bucle (la respuesta del asistente del hero se
+// escribe UNA vez). Degradado: el titular del cierre (sin cola en el H1, R2).
+// Orden: hero → prosa "no te confundas" → 01 cada asistente → 02 lo que dices y lo que
+// entiende → 03 qué cambiamos (#que-cambiamos) → 04 la ficha que leen → 05 cómo empezamos
+// (#precios) → prosa de casos → franja "En pocas palabras" → FAQ (#faq) → hermanas →
+// cierre → Contact (#contacto).
+// Lo congelado (H1, meta, path, breadcrumb, answer, faq, distinction, mechanics, caso0,
+// grid, cta.title, service, precios) se pinta TAL CUAL desde i18n/seo-ia.ts, que no se toca.
+// El copy nuevo (libre) vive aquí abajo, en `t`.
 import Layout from '../../../layouts/Layout.astro';
 import SiteNav from '../../../components/layout/SiteNav.astro';
 import SiteFooter from '../../../components/layout/SiteFooter.astro';
 import Breadcrumb from '../../../components/ui/Breadcrumb.astro';
-import LandingHero from '../../../components/sections/LandingHero.astro';
-import AnswerBlock from '../../../components/sections/AnswerBlock.astro';
-import Prose from '../../../components/sections/Prose.astro';
-import PriceGrid from '../../../components/sections/PriceGrid.astro';
-import FeatureGrid from '../../../components/sections/FeatureGrid.astro';
-import Faq from '../../../components/sections/Faq.astro';
-import CtaBand from '../../../components/sections/CtaBand.astro';
 import Contact from '../../../components/sections/Contact.astro';
 import ServiceLd from '../../../components/seo/ServiceLd.astro';
-import RelatedLinks from '../../../components/sections/RelatedLinks.astro';
-import { content } from '../../../i18n/content';
+import WStyles from '../../../components/w/WStyles.astro';
+import HeroTexto from '../../../components/w/HeroTexto.astro';
+import Fondo from '../../../components/w/fondos/Fondo.astro';
+import TunelRejilla from '../../../components/w/objetos/TunelRejilla.astro';
+import RespuestaAsistente from '../../../components/w/objetos/RespuestaAsistente.astro';
+import ProsaLocal from '../../../components/w/ProsaLocal.astro';
+import CabeceraNumerada from '../../../components/w/CabeceraNumerada.astro';
+import GratisDeVerdad from '../../../components/w/GratisDeVerdad.astro';
+import TarjetaPrecio from '../../../components/w/TarjetaPrecio.astro';
+import FranjaEnPocasPalabras from '../../../components/w/FranjaEnPocasPalabras.astro';
+import PreguntasFrecuentes from '../../../components/w/PreguntasFrecuentes.astro';
+import TarjetasHermanas from '../../../components/w/TarjetasHermanas.astro';
+import CierreDosTarjetas from '../../../components/w/CierreDosTarjetas.astro';
+import CadaAsistente from '../../../components/w/sections/seo-ia/CadaAsistente.astro';
+import DiceEntiende from '../../../components/w/sections/seo-ia/DiceEntiende.astro';
+import QueCambiamos from '../../../components/w/sections/seo-ia/QueCambiamos.astro';
+import FichaAgentes from '../../../components/w/sections/seo-ia/FichaAgentes.astro';
+import PreguntaleTu from '../../../components/w/sections/seo-ia/PreguntaleTu.astro';
+import { content, nap } from '../../../i18n/content';
 import { clusterNav } from '../../../i18n/clusters';
+import { catalog } from '../../../i18n/pricing';
+import { serviciosPara } from '../../../i18n/w/nav';
 import { seoIaPage as p, aeoTiers } from '../../../i18n/seo-ia';
+import { seoIaW } from '../../../i18n/w/seo-ia';
 
 const c = content.es;
+const usd = (n: number) => '$' + n.toLocaleString('en-US');
+
+/** "Desde $X" (o "al mes") del ancla baja de cada producto, desde pricing.ts (como el piloto). */
+const anchorOf = (id: string) => {
+  const s = catalog.find((x) => x.id === id);
+  if (!s) return undefined;
+  const tier = s.tiers.find((x) => x.anchor) ?? s.tiers[0];
+  if (tier.value === null) return undefined;
+  return tier.monthly ? `Desde ${usd(tier.value)} al mes` : `Desde ${usd(tier.value)}`;
+};
+
+// Títulos a dos tonos para ProsaLocal: mismo texto del dato, partido en dos frases.
+const splitTitle = (html: string, at: string): [string, string] => {
+  const i = html.indexOf(at);
+  return i < 0 ? [html, ''] : [html.slice(0, i).trim(), html.slice(i).trim()];
+};
+// Nombres de clientes sin traducir (E-24): solo se envuelven, el texto no cambia.
+const noTranslate = (html: string) =>
+  html.replace(/(Texas Rush Remove|Move Junk Away)/g, '<span translate="no">$1</span>');
+
+const [diag, cimientos, monitoreo] = aeoTiers;
+const telH = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
+const waH = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
+
+// Copy NUEVO (libre): src/i18n/w/seo-ia.ts (rediseño WorkOS v2, G07).
+const t = seoIaW;
+
+const [dTone1, dTone2] = splitTitle(p.distinction.title, '≠');
+const [cTone1, cTone2] = splitTitle(p.caso0.title, 'y en el de');
 ---
 <Layout
   title={p.meta.title}
   description={p.meta.description}
   lang="es"
   path="houston/seo-para-ia"
-
+  ds="v3"
 >
   <ServiceLd slot="head" {...p.service} />
+  <WStyles />
 
   <SiteNav nav={clusterNav} lang="es" homeHref="/es" currentPath={Astro.url.pathname} />
 
-  <main id="main">
-    <LandingHero
-      badge={p.hero.badge}
-      badgeIcon={p.hero.badgeIcon}
-      kicker={p.hero.kicker}
-      h1={p.hero.h1}
-      sub={p.hero.sub}
-      primary={p.hero.primary}
-      secondary={p.hero.secondary}
-      chips={p.hero.chips}
-      tone={p.hero.tone}
-    >
-      <Breadcrumb slot="breadcrumb" items={p.breadcrumb} lang="es" />
-    </LandingHero>
+  <main id="main" class="w-rails" data-w data-w-tone="teal" data-w-kind="seo-ia">
+    <!-- 1 · Hero: túnel de rejilla a ventana completa; texto en el rectángulo limpio; la
+         respuesta del asistente debajo del rectángulo, fuera del túnel. -->
+    <!-- v3 (E-57 regla 2): sin líneas de margen en el hero (cruzaban las líneas del túnel). -->
+    <section class="w-hero--bleed sh" data-w-sin-rail>
+      <div class="w-container sh__crumbs">
+        <Breadcrumb items={p.breadcrumb} lang="es" />
+      </div>
+      <div class="sh__room">
+        <TunelRejilla class="sh__tunnel" />
+        <div class="w-container sh__text">
+          <HeroTexto
+            eyebrow={t.eyebrow}
+            tone="teal"
+            h1Html={p.hero.h1}
+            lead={t.lead}
+            primary={{ label: t.primary, href: '/es/diagnostico', track: 'tool_cta_clicked' }}
+            size="night"
+          />
+        </div>
+      </div>
+      <div class="w-container sh__obj" data-w-in="obj">
+        <RespuestaAsistente variant="tarjeta" size="hero" business={t.business} class="sh__ans" />
+      </div>
+    </section>
 
-    <AnswerBlock q={p.answer.q} a={p.answer.a} source={p.answer.source} />
+    <!-- 2 · No te confundas (distinction, VERBATIM). -->
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <ProsaLocal titleTone1={dTone1} titleTone2={dTone2} paragraphs={p.distinction.paragraphs} />
+      </div>
+    </section>
 
-    <Prose
-      tag={p.distinction.tag}
-      title={p.distinction.title}
-      paragraphs={p.distinction.paragraphs}
-      tone={p.distinction.tone}
-    />
+    <!-- 3 · 01 Cada asistente, su respuesta (W-HOME-11). -->
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <CadaAsistente n={1} {...t.asistentes} titleHtml={t.asistentes.title} question={t.question} />
+      </div>
+    </section>
 
-    <PriceGrid tag={p.grid.tag} title={p.grid.title} intro={p.grid.intro} items={aeoTiers} />
+    <!-- 4 · 02 Pregúntale tú (W-NEW-04/05 auth.md: VentanaAgente "buscar", piel hueso). -->
+    <section class="w-cell sq" data-w-eco>
+      <Fondo tema="F09" eco />
+      <div class="w-container" data-w-reveal>
+        <PreguntaleTu n={2} label={t.pregunta.label} titleHtml={t.pregunta.title} lead={t.pregunta.lead} pasos={t.pregunta.pasos} />
+      </div>
+    </section>
 
-    <FeatureGrid tag={p.mechanics.tag} title={p.mechanics.title} items={p.mechanics.items} tone={p.mechanics.tone} />
+    <!-- 4 · 02 Lo que dices y lo que entiende la IA (W-CORE-28). -->
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <DiceEntiende
+          n={3}
+          label={t.dice.label}
+          cardTitle={t.dice.cardTitle}
+          colSay={t.dice.colSay}
+          colData={t.dice.colData}
+          rows={t.dice.rows}
+          titleHtml={t.dice.title}
+          lead={t.dice.lead}
+          link={{ label: t.dice.link, href: '#que-cambiamos' }}
+        />
+      </div>
+    </section>
 
-    <Prose
-      tag={p.caso0.tag}
-      title={p.caso0.title}
-      paragraphs={p.caso0.paragraphs}
-      tone={p.caso0.tone}
-    />
+    <!-- 5 · 03 Qué cambiamos (W-CORE-34 estático, mechanics VERBATIM). -->
+    <section class="w-cell" id="que-cambiamos">
+      <div class="w-container" data-w-reveal>
+        <QueCambiamos n={4} label={t.cambiamos.label} titleHtml={p.mechanics.title} items={p.mechanics.items} card={t.cambiamos.card} />
+      </div>
+    </section>
 
-    <Faq tag={p.faq.tag} title={p.faq.title} items={p.faq.items} />
+    <!-- 6 · 04 La ficha que leen los asistentes (W-NEW-38). -->
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <FichaAgentes n={5} label={t.ficha.label} titleHtml={t.ficha.title} lead={t.ficha.lead} loLeen={t.ficha.loLeen} file={t.ficha.file} notes={t.ficha.notes} />
+      </div>
+    </section>
 
-    <CtaBand
-      title={p.cta.title}
-      sub={p.cta.sub}
-      primary={p.cta.primary}
-      tone={p.cta.tone}
-    />
+    <!-- 7 · 05 Cómo empezamos (#precios): el diagnóstico gratis + las dos tarjetas de precio. -->
+    <section class="w-cell" id="precios">
+      <div class="w-container" data-w-reveal>
+        <CabeceraNumerada n={6} label={p.grid.tag} titleHtml={p.grid.title} lead={p.grid.intro} />
+        <div class="sp">
+          <GratisDeVerdad
+            items={t.gratis.items}
+            title={diag.displayPrice}
+            sub={diag.name}
+            checks={t.gratis.checks}
+            cta={{ label: diag.ctaLabel, href: diag.href, track: 'pricing_card_clicked' }}
+            tone="teal"
+            class="sp__free"
+          />
+          {[cimientos, monitoreo].map((tier, i) => (
+            <TarjetaPrecio
+              serviceId="seo-ia"
+              name={tier.name}
+              desc={tier.description}
+              tiers={[{ label: t.desde, price: tier.displayPrice!, unit: tier.monthly ? 'al mes' : tier.displayUnit }]}
+              includes={tier.includes}
+              cta={{ label: tier.ctaLabel!, href: tier.href! }}
+              note={i === 0 ? t.precioNote : undefined}
+              tone="teal"
+            />
+          ))}
+        </div>
+      </div>
+    </section>
 
-    <RelatedLinks tag={p.related.tag} title={p.related.title} links={p.related.links} />
+    <!-- 8 · Casos reales (caso0, VERBATIM). -->
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <ProsaLocal titleTone1={cTone1} titleTone2={cTone2} paragraphs={p.caso0.paragraphs.map(noTranslate)} />
+      </div>
+    </section>
 
+    <!-- 9 · En pocas palabras (answer VERBATIM), justo antes de la FAQ (R1). -->
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <FranjaEnPocasPalabras
+          q={p.answer.q}
+          a={p.answer.a}
+          source={p.answer.source}
+          lang="es"
+          cols={[
+            { title: t.franja.queEs, text: catalog.find((s) => s.id === 'seo-ia')!.tagline, link: { label: t.franja.verQue, href: '#que-cambiamos' } },
+            { title: t.franja.desdeT, text: t.franja.desde, link: { label: t.franja.verPrecios, href: '#precios' } },
+            { title: t.franja.tiempoT, text: t.franja.tiempo, link: { label: t.franja.pedir, href: '#contacto' } },
+          ]}
+        />
+      </div>
+    </section>
+
+    <!-- 9 · Preguntas frecuentes (#faq), VERBATIM, todas cerradas; emite FAQPage. -->
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <PreguntasFrecuentes id="faq" tag={p.faq.tag} titleHtml={p.faq.title} items={p.faq.items} lang="es" />
+      </div>
+    </section>
+
+    <!-- 10 · Hermanas de Houston (hrefs = los del megamenú de esta página, R5). -->
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <TarjetasHermanas
+          titleHtml={t.hermanas.title}
+          lead={t.hermanas.lead}
+          currentId="seo-ia"
+          lang="es"
+          items={serviciosPara('es', p.path).map((s) => ({ id: s.id, label: s.name, desc: s.promise, href: s.href, price: anchorOf(s.id) }))}
+          recursos={[
+            { icon: 'lucide:book-open', title: t.hermanas.guia.title, text: t.hermanas.guia.text, href: '/es/blog/como-aparecer-en-chatgpt-perplexity' },
+            { icon: 'lucide:scan-search', title: t.hermanas.diag.title, text: t.hermanas.diag.text, href: '/es/diagnostico', track: 'tool_cta_clicked' },
+            { icon: 'lucide:tag', title: t.hermanas.precios.title, text: t.hermanas.precios.text, href: '/es/precios' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <!-- 11 · Cierre en dos tarjetas (trío contractual, teléfono de Houston); degradado único. -->
+    <section class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <CierreDosTarjetas
+          titleHtml={p.cta.title}
+          proof={t.cierre.proof}
+          city="houston"
+          tel={telH}
+          wa={waH}
+          lang="es"
+          grad
+          warm={{ kind: 'diagnostico', title: t.cierre.warmTitle, text: t.cierre.warmText, cta: t.cierre.warmCta, href: '/es/diagnostico' }}
+        />
+      </div>
+    </section>
+
+    <!-- 12 · Contacto (#contacto): sin data-w-in ni data-w-reveal (§2.9). -->
     <Contact contact={c.contact} defaultCity="Houston, TX" defaultService="SEO para IA (visibilidad en IA)" />
   </main>
 
   <SiteFooter footer={c.footer} />
 </Layout>
+
+<style>
+  /* ── Hero (W-ADV-28) ──
+     El "cuarto" del túnel es el bloque de texto; el túnel se coloca alrededor con top/bottom
+     en % de ESE bloque, de modo que su rectángulo central (600/1080 del alto del túnel cuando
+     manda el alto) mide exactamente el texto + 96 px: alto del túnel = 1,8·T + 172,8 px, y
+     sobra (0,4·T + 86,4 px) arriba y abajo. A lo ancho cubre la ventana entera (E-36); en
+     pantallas anchas manda el ancho y el rectángulo crece (nunca queda texto sobre la rejilla).
+     En móvil las paredes laterales caen fuera de la pantalla: solo techo y suelo (§4.17). */
+  .sh { position: relative; overflow: clip; padding-top: calc(var(--nav-h) + 20px); }
+  .sh__crumbs { position: relative; z-index: 2; }
+  /* Las migas caen sobre el techo del túnel: van sobre una capa opaca de noche para que la
+     rejilla nunca corra detrás de su texto (E-37). El texto sigue en la línea del logo. */
+  .sh__crumbs :global(nav) {
+    display: inline-block; margin-left: -10px; padding: 4px 10px; border-radius: var(--w-r-cell);
+    background: var(--w-s0);
+    /* Velo de noche que se funde alrededor de la placa: ninguna línea del túnel llega a rozar
+       el texto de las migas (control rev1 m-5). */
+    box-shadow: 0 0 24px 18px var(--w-s0);
+  }
+  .sh__crumbs :global(ol) { padding-inline-start: 0; margin: 0; }
+  /* Margen superior algo más corto que en la ronda 1: a 1440×900 la tarjeta del hero entra
+     entera en la primera pantalla (control rev1 m-1). */
+  .sh__room { position: relative; margin-top: clamp(96px, 6vw + 20px, 140px); }
+  .sh__room :global(.sh__tunnel) {
+    inset: auto; left: calc(50% - 50vw); right: calc(50% - 50vw);
+    top: calc(-40% - 86.4px); bottom: calc(-40% - 86.4px);
+  }
+  .sh__text { position: relative; z-index: 1; }
+  .sh__text :global(.w-herotext) { max-width: 680px; }
+  .sh__text :global(.w-eyebrow) { font-size: clamp(1.125rem, 0.95rem + 0.45vw, 1.5rem); }
+  .sh__text :global(.w-lead) { max-width: 36rem; }
+  .sh__obj { position: relative; z-index: 1; display: flex; justify-content: center; margin-top: 64px; padding-bottom: 96px; }
+  .sh__obj :global(.sh__ans) { width: min(100%, 460px); }
+  /* La respuesta se escribe cuando la tarjeta ya terminó de entrar (coreografía §2.9:
+     el objeto entra a .5 s en 950 ms; sin este retraso se escribía a opacidad 0). */
+  .sh__obj :global(.wo-ans.is-run .wo-ans__step),
+  .sh__obj :global(.wo-ans.is-run .wo-ans__bub) { transition-delay: calc(var(--d) + 700ms); }
+  .sh__obj :global(.wo-ans.is-run .wo-ans__chk),
+  .sh__obj :global(.wo-ans.is-run .wo-ans__chk i) { transition-delay: calc(var(--d) + 1300ms); }
+  @media (--lt-md) {
+    .sh__crumbs { display: flex; justify-content: center; }
+    .sh__crumbs :global(nav) { margin-left: 0; }
+    .sh__room { margin-top: 96px; }
+    .sh__obj { margin-top: 64px; padding-bottom: 72px; }
+  }
+
+  /* 02 Pregúntale tú: el túnel del hero vuelve como eco quieto (F09) detrás de la sección. */
+  .sq { position: relative; }
+
+  /* El <em> de los titulares del dato (verbatim) sin cursiva sintética (Space Grotesk no
+     tiene itálica): en el acento de la página, igual que hace PreguntasFrecuentes. */
+  main :global(.w-numhead h2 em) { font-style: normal; color: var(--w-accent); }
+  /* Rótulos largos que parten en móvil: líneas equilibradas, sin palabra huérfana
+     ("LA IA" sola en el 02, control rev1 m-4). */
+  main :global(.w-numhead__label) { text-wrap: balance; }
+
+  /* ── 05 Cómo empezamos ──
+     Las tres piezas ocupan la columna entera: en la rejilla, el margin-inline:auto de la
+     tarjeta la encogía a su contenido y cada una salía de un ancho (control rev1 I-1). */
+  .sp { margin-top: 64px; display: grid; gap: 24px; }
+  .sp > :global(*) { width: 100%; }
+  .sp :global(.sp__free) { margin-bottom: 40px; }
+  /* Jerarquía del precio (§10.2, como la cifra del piloto): cada paso lleva su cifra grande
+     en el acento. "Gratis" en el diagnóstico; "Desde $500" y "Desde $200 al mes" en las
+     tarjetas, con el ancla "Desde" a la izquierda y la unidad detrás (control rev1 I-2). */
+  .sp :global(.free__title),
+  .sp :global(.tp__price) {
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(2.75rem, 2rem + 2.4vw, 4rem); line-height: 1; letter-spacing: -0.04em;
+    color: var(--w-accent);
+  }
+  .sp :global(.free__sub) { margin-top: 10px; }
+  .sp :global(.tp__row) { justify-content: flex-start; align-items: baseline; gap: 12px; padding-block: 4px 0; }
+  .sp :global(.tp__row dt) { font-size: 16px; font-weight: 500; color: var(--w-ink-80); }
+  .sp :global(.tp__row dd) { white-space: normal; }
+  .sp :global(.tp__unit) { margin-left: 4px; font-size: 15px; color: var(--w-ink-70); }
+  @media (--lt-md) { .sp { margin-top: 40px; gap: 16px; } .sp :global(.sp__free) { margin-bottom: 24px; } }
+</style>

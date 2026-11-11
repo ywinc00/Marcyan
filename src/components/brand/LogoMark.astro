@@ -11,6 +11,10 @@ interface Props {
 }
 const { size = 40, title = 'Marcyan', decorative = false, class: cls } = Astro.props;
 const uid = 'mk' + Math.random().toString(36).slice(2, 8);
+// La órbita nunca baja de ~1 px real (auditoría de iconos, 2026-11-08: a 15-20 px se perdía).
+const px = typeof size === 'number' ? size : parseFloat(String(size)) || 40;
+const k = Math.max(1, 64 / px);
+const swF = +(1.6 * k).toFixed(2), swB = +(1.4 * k).toFixed(2), opB = px < 32 ? 0.5 : 0.3;
 ---
 <svg
   class:list={['logo-mark', cls]}
@@ -35,12 +39,12 @@ const uid = 'mk' + Math.random().toString(36).slice(2, 8);
 
   <circle cx="40" cy="40" r="38" fill={`url(#${uid}-g)`} />
   {/* órbita · mitad trasera (pasa por DETRÁS del planeta) */}
-  <path d="M4 40 A36 10 0 0 0 76 40" fill="none" stroke="var(--accent-gold)" stroke-width="1.4" stroke-opacity="0.30" stroke-linecap="round" />
+  <path d="M4 40 A36 10 0 0 0 76 40" fill="none" stroke="var(--accent-gold)" stroke-width={swB} stroke-opacity={opB} stroke-linecap="round" />
   {/* planeta */}
   <circle cx="40" cy="40" r="22" fill={`url(#${uid}-p)`} />
   <ellipse cx="48" cy="43" rx="20" ry="20" fill="rgba(0,0,0,0.4)" clip-path={`url(#${uid}-c)`} />
   {/* órbita · mitad delantera (pasa por DELANTE) */}
-  <path d="M4 40 A36 10 0 0 1 76 40" fill="none" stroke="var(--accent-gold)" stroke-width="1.6" stroke-opacity="0.85" stroke-linecap="round" />
+  <path d="M4 40 A36 10 0 0 1 76 40" fill="none" stroke="var(--accent-gold)" stroke-width={swF} stroke-opacity="0.85" stroke-linecap="round" />
   {/* satélite = IA */}
   <circle cx="76" cy="40" r="4" fill="var(--accent-teal)" />
 </svg>

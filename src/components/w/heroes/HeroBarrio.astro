@@ -1,0 +1,190 @@
+---
+// Hero de las landings de barrio. Cada barrio con su portada y su fondo propios, y la portada mide
+// EXACTAMENTE la primera pantalla (dueño, 2026-11-07).
+// v7 (dueño, 2026-11-08):
+//   · Sugar Land y Katy: WorkOS /passport medido en vivo. Un paisaje propio a sangre (Sugar Land:
+//     dunas; Katy: salida de planeta sobre la llanura) que CONTINÚA dentro de la pantalla del
+//     portátil (pantalla transparente). La ventana se abre, amanece fuera y dentro a la vez y llega
+//     el aviso del negocio. Cada barrio con su web de ejemplo propia y minimalista.
+//   · Doral (franjas, WorkOS /authkit) y Hialeah (bruma): el producto a buen tamaño; si no cabe,
+//     lo corta el borde de la portada como en Passport, nunca se encoge.
+import HeroTexto from '../HeroTexto.astro';
+import PildoraFlujo from '../objetos/PildoraFlujo.astro';
+import ChatMarcy from '../objetos/ChatMarcy.astro';
+import EscenaPaisaje from './escenas/EscenaPaisaje.astro';
+import EscenaBilingueCarga from './escenas/EscenaBilingueCarga.astro';
+import Icon from '../../ui/Icon.astro';
+
+interface Cta { label: string; href: string; track?: string }
+interface Msg { from: 'c' | 'm'; text: string; time?: string }
+interface Props {
+  h1Html: string;
+  eyebrow: string;
+  lead: string;
+  primary: Cta;
+  link?: Cta;
+  name: string;
+  producto: 'planeta' | 'pasaporte' | 'bilingue' | 'chat';
+  pildora: { quien: string; que: string; resultado: string; icon?: string };
+  chat?: Msg[];
+  chatSr?: string;
+  /** Tarjetas inclinadas de los lados (Hialeah). */
+  lados?: { quien: string; texto: string }[];
+  lang?: 'es' | 'en';
+}
+const { h1Html, eyebrow, lead, primary, link, name, producto, pildora, chat, chatSr, lados = [], lang = 'es' } = Astro.props;
+const fondo = { planeta: 'paisaje', pasaporte: 'paisaje', bilingue: 'franjas', chat: 'bruma' }[producto];
+const escena = producto === 'planeta' ? 'llanura' : 'dunas';
+const img = (m: string, f: string) => [1280, 1920, 2560].map((w) => `/assets/w/paisajes/${escena}-${m}-${w}.${f} ${w}w`).join(', ');
+---
+<section class:list={['w-hero w-hero--bleed hb', `hb--${fondo}`]} data-hb>
+  {fondo === 'paisaje' && (
+    <div class="hb__paisaje" aria-hidden="true">
+      {(['noche', 'alba'] as const).map((m) => (
+        <picture class:list={['hb__p', `hb__p--${m}`]}>
+          <source type="image/avif" srcset={img(m, 'avif')} sizes="100vw" />
+          <img src={`/assets/w/paisajes/${escena}-${m}-1920.webp`} srcset={img(m, 'webp')} sizes="100vw" alt="" width="1920" height="1200" decoding="async" fetchpriority={m === 'noche' ? 'high' : 'low'} />
+        </picture>
+      ))}
+    </div>
+  )}
+  {fondo === 'franjas' && <div class="hb__franjas" aria-hidden="true"></div>}
+  {fondo === 'bruma' && (
+    <div class="hb__bruma" aria-hidden="true"><i></i><i></i><i></i></div>
+  )}
+  <div class="w-container hb__text">
+    <HeroTexto eyebrow={eyebrow} tone="gold" h1Html={h1Html} lead={lead} primary={primary} link={link} size="hub">
+      <slot name="crumbs" slot="crumbs" />
+    </HeroTexto>
+  </div>
+
+  {fondo === 'paisaje' ? (
+    <div class:list={['hb__laptop', producto === 'planeta' && 'hb__laptop--planeta']}><EscenaPaisaje web={producto === 'planeta' ? 'taller' : 'clinica'} lang={lang} /></div>
+  ) : (
+    <div class="w-container hb__escena" data-w-in="obj">
+      <PildoraFlujo {...pildora} class="hb__pf" />
+      <div class:list={['hb__prod', `hb__prod--${producto}`]}>
+        {producto === 'bilingue' && <EscenaBilingueCarga />}
+        {producto === 'chat' && (
+          <>
+            {lados.slice(0, 2).map((l, i) => (
+              <div class:list={['hb__lado', `hb__lado--${i + 1}`]} aria-hidden="true">
+                <span class="hb__lado-wa"><Icon name="lucide:message-circle" />{lang === 'en' ? 'New message' : 'Mensaje nuevo'}</span>
+                <b>{l.quien}</b>
+                <span>{l.texto}</span>
+              </div>
+            ))}
+            <ChatMarcy mode="compacto" tabsBar={false} tone="neutral" lang={lang} size="card" tabs={[{ label: name, script: chat ?? [] }]} sr={chatSr} />
+          </>
+        )}
+      </div>
+    </div>
+  )}
+</section>
+
+<style>
+  /* La portada mide la primera pantalla: el texto arriba y el objeto llena el resto (nunca más). */
+  .hb {
+    position: relative; overflow: clip; isolation: isolate;
+    display: flex; flex-direction: column;
+    min-height: calc(100svh / var(--z, 1)); height: calc(100svh / var(--z, 1)); max-height: 1400px;
+    padding-bottom: 0;
+  }
+  .hb > * { position: relative; z-index: 1; }
+  .hb > .hb__paisaje, .hb > .hb__franjas, .hb > .hb__bruma { position: absolute; z-index: 0; }
+  .hb > .hb__text { flex: 0 0 auto; z-index: 2; } /* por encima de la capa del planeta de Katy, que sube detrás del texto */
+  /* El producto va a buen tamaño, arriba, y lo que no cabe lo corta el borde de la portada (Passport):
+     nunca se encoge para caber (dueño, 2026-11-08: "muy pequeños y comprimidos"). */
+  .hb__escena {
+    flex: 1 1 auto; min-height: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 32px;
+    padding-top: 32px;
+  }
+  @media (min-width: 768px) and (max-height: 820px) {
+    .hb__escena { gap: 22px; padding-top: 22px; }
+    /* Doral en portátiles bajos (1366×768): la píldora cede su sitio para que se lea el titular y el
+       rastreo de la web; la historia la sigue contando el cambio ES | EN de la propia web. */
+    .hb--franjas :global(.hb__pf) { display: none; }
+  }
+  .hb__pf { position: relative; z-index: 2; flex: 0 0 auto; }
+  .hb__prod { position: relative; flex: 0 0 auto; width: min(100%, 440px); }
+
+  /* ── Sugar Land y Katy · paisaje que sigue dentro de la pantalla (Passport) ── */
+  .hb--paisaje { background: #05070f; }
+  .hb__paisaje { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .hb__p, .hb__p img { position: absolute; inset: 0; width: 100%; height: 100%; }
+  /* arriba a ras: así el horizonte cae detrás del portátil en pantallas anchas y bajas */
+  .hb__p img { object-fit: cover; object-position: 50% 0%; }
+  /* velo arriba para que el texto se lea igual de noche que al amanecer */
+  .hb__paisaje::after { content: ''; position: absolute; inset: 0; background:
+      radial-gradient(900px 480px at 50% 32%, rgba(5, 7, 15, .48), rgba(5, 7, 15, 0) 72%),
+      linear-gradient(180deg, rgba(5, 7, 15, .5) 0%, rgba(5, 7, 15, .38) 44%, rgba(5, 7, 15, .28) 54%, rgba(5, 7, 15, 0) 64%); }
+  /* el enlace secundario lleva una sombra suave para leerse sobre el amanecer */
+  .hb--paisaje :global(.btn--link) { text-shadow: 0 1px 12px rgba(5, 7, 15, .75), 0 0 2px rgba(5, 7, 15, .6); }
+  .hb__p--alba { opacity: 0; transition: opacity 1.6s ease; }
+  .hb[data-alba="true"] .hb__p--alba { opacity: 1; }
+  .hb__laptop { flex: 1 1 auto; min-height: 0; display: flex; justify-content: center; align-items: flex-start; padding-top: clamp(20px, 3svh, 40px); }
+  .hb__laptop > :global(.ep) { width: min(1120px, 70vw); }
+  .hb__laptop--planeta { padding-top: clamp(64px, 7svh, 84px); }
+  /* tableta en vertical: sobra alto, el portátil crece para llenar la portada */
+  @media (min-width: 768px) and (max-aspect-ratio: 1/1) { .hb__laptop > :global(.ep) { width: min(1120px, 96vw); } }
+  @media (prefers-reduced-motion: reduce) { .hb__p--alba { transition: none; } }
+
+  /* ── Doral · franjas (AuthKit) ──────────────────────────────────────── */
+  .hb--franjas { background: var(--w-bg, #0c0b09); }
+  /* líneas finas (1 px cada 9 px) en degradado oro → cobre → teal → noche, que se apagan arriba y abajo
+     y detrás de la columna de texto (AuthKit) */
+  .hb__franjas {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 58%; z-index: 0; pointer-events: none;
+    background:
+      repeating-linear-gradient(180deg, rgba(12, 11, 9, 0) 0 1px, rgba(12, 11, 9, 1) 1px 9px),
+      linear-gradient(180deg, rgba(var(--accent-gold-rgb), .85) 0%, rgba(214, 140, 96, .8) 34%, rgba(79, 195, 161, .7) 66%, rgba(40, 64, 110, .6) 100%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 82%, transparent 100%), radial-gradient(38% 40% at 50% 8%, transparent 0 60%, #000 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 82%, transparent 100%), radial-gradient(38% 40% at 50% 8%, transparent 0 60%, #000 100%);
+    mask-composite: intersect;
+  }
+  .hb--franjas .hb__prod { width: min(100%, 940px, 68vw); }
+
+  /* ── Hialeah · bruma (Suno) ─────────────────────────────────────────── */
+  .hb--bruma { background: #0b0806; }
+  .hb__bruma { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .hb__bruma i { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .75; will-change: transform; animation: hb-bruma 18s ease-in-out infinite alternate; }
+  .hb__bruma i:nth-child(1) { width: 62vw; height: 62vw; left: -12vw; top: -28vw; background: radial-gradient(circle, rgba(var(--accent-gold-rgb), .55), transparent 65%); }
+  .hb__bruma i:nth-child(2) { width: 52vw; height: 52vw; right: -16vw; top: -20vw; background: radial-gradient(circle, rgba(196, 120, 70, .32), transparent 65%); animation-duration: 22s; animation-delay: -6s; }
+  .hb__bruma i:nth-child(3) { display: none; }
+  @keyframes hb-bruma { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(3vw, 2vw, 0) scale(1.08); } }
+  @media (prefers-reduced-motion: reduce) { .hb__bruma i { animation: none; } }
+  .hb--bruma .hb__prod--chat { width: min(100%, 460px); }
+  /* el chat crece con sus mensajes, sin alto mínimo (cabe en la pantalla con la portada) */
+  .hb--bruma .hb__prod--chat :global(.wo-chat__msgs) { min-height: 0; padding-bottom: 52px; } /* la hora del último mensaje no queda bajo el botón de pausa */
+  /* tarjetas inclinadas que asoman por los lados, como en Suno */
+  .hb__lado {
+    position: absolute; top: 14%; width: 290px; padding: 16px 18px; border-radius: 16px;
+    background: rgba(26, 20, 16, .82); border: 1px solid rgba(255, 236, 210, .12);
+    box-shadow: 0 30px 60px -24px rgba(0, 0, 0, .8);
+    display: flex; flex-direction: column; gap: 7px; font-size: 15.5px; line-height: 1.45; color: var(--w-ink-80);
+  }
+  .hb__lado b { color: var(--w-ink); font-weight: 600; }
+  .hb__lado-wa { display: inline-flex; align-items: center; gap: 6px; font: 500 11px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: #6fd3a4; }
+  .hb__lado-wa :global(svg) { width: 13px; height: 13px; }
+  .hb__lado--1 { right: calc(100% + 56px); top: 4%; }
+  .hb__lado--2 { left: calc(100% + 56px); top: 14%; }
+  @media (max-width: 1100px) { .hb__lado { display: none; } }
+
+  /* ── teléfono: la portada sigue midiendo la pantalla; el objeto se adapta a lo que queda ── */
+  @media (--lt-md) {
+    .hb { height: auto; min-height: calc(100svh / var(--z, 1)); }
+    .hb__escena { padding-block: 28px 32px; gap: 24px; }
+    .hb--franjas .hb__prod, .hb--bruma .hb__prod--chat { width: 100%; }
+    .hb__laptop { padding-top: 28px; }
+    .hb__laptop { justify-content: center; }
+    .hb__laptop > :global(.ep) { width: 145vw; flex: 0 0 auto; }
+    /* la píldora en dos líneas compactas, no en una tarjeta de tres */
+    .hb :global(.hb__pf) { flex-direction: row !important; border-radius: 14px !important; font-size: 12.5px !important; gap: 4px 8px !important; padding: 7px 12px !important; }
+    .hb :global(.hb__pf .wo-pf__ar) { display: none !important; } /* sin flechas sueltas al final de línea */
+    .hb__laptop--planeta { padding-top: 56px; }
+    /* en vertical el paisaje se alarga hacia abajo para que el horizonte quede detrás del portátil */
+    .hb__p img { height: 124%; }
+  }
+</style>

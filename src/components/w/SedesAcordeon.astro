@@ -1,0 +1,124 @@
+---
+// Sedes en acordeón (W-EVT-38, design/rediseno-workos.md §3.4).
+// Filas con divisor de 1 px; SIN silueta (a 82 px no se entiende, E-53): pin
+// Lucide + ciudad 24/500, área 13 y teléfono (call_clicked). "Ver detalles ⌄"
+// abre un <details> nativo CERRADO al cargar (E-23); la flecha gira en 200 ms
+// (sin giro con movimiento reducido). Alimentada por content.locations.items.
+import Icon from '../ui/Icon.astro';
+
+interface Link { label: string; href: string; sub?: string }
+interface Item {
+  city: string;
+  state?: string;
+  area: string;
+  tel: string;
+  links?: Link[];
+}
+interface Props {
+  items: Item[];
+  /** Texto del resumen ("Ver detalles" / "See details"). */
+  more?: string;
+  /** Rótulo del teléfono para lectores de pantalla ("Llamar a" / "Call"). */
+  callLabel?: string;
+  tone?: 'gold' | 'teal';
+  id?: string;
+  class?: string;
+}
+const { items, more = 'Ver detalles', callLabel = 'Llamar a', tone = 'gold', id, class: cls } = Astro.props;
+const telHref = (t: string) => 'tel:+1' + t.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
+---
+<ul class:list={['sedes', cls]} id={id} data-w-tone={tone}>
+  {items.map((it) => (
+    <li class="sedes__row">
+      <div class="sedes__main">
+        <span class="sedes__pin"><Icon name="lucide:map-pin" /></span>
+        <div class="sedes__id">
+          <h3 class="sedes__city">{it.city}{it.state && <span class="sedes__state">, {it.state}</span>}</h3>
+          <p class="sedes__area">{it.area}</p>
+        </div>
+        <a class="sedes__tel" href={telHref(it.tel)} data-track="call_clicked" aria-label={`${callLabel} ${it.city}: ${it.tel}`}>
+          <Icon name="lucide:phone" />{it.tel}
+        </a>
+      </div>
+      {it.links && it.links.length > 0 && (
+        <details class="sedes__more">
+          <summary class="sedes__sum">
+            <span>{more}</span><Icon name="lucide:chevron-down" class="sedes__chev" />
+          </summary>
+          <ul class="sedes__links">
+            {it.links.map((l) => (
+              <li>
+                <a href={l.href}>{l.label}</a>
+                {l.sub && <span>{l.sub}</span>}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </li>
+  ))}
+</ul>
+
+<style>
+  .sedes { list-style: none; margin: 0 auto; padding: 0; max-width: var(--w-rail-max); }
+  .sedes__row { position: relative; border-top: 1px solid var(--w-line); padding-block: 24px; }
+  .sedes__row:last-child { border-bottom: 1px solid var(--w-line); }
+  .sedes__main {
+    display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 4px 16px; align-items: center;
+  }
+  .sedes__pin {
+    display: grid; place-items: center; inline-size: 40px; block-size: 40px;
+    border-radius: var(--w-r-cell); background: var(--w-s2); border: 1px solid var(--w-line);
+    box-shadow: var(--w-edge); color: var(--w-accent);
+  }
+  .sedes__pin :global(svg) { width: 20px; height: 20px; }
+  .sedes__city {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: var(--w-h3); line-height: 1.2; letter-spacing: var(--w-tr-h3); color: var(--w-ink);
+  }
+  .sedes__state { color: var(--w-ink-60); }
+  .sedes__area { margin: 4px 0 0; font-family: var(--font-body); font-size: 13px; line-height: 1.4; color: var(--w-ink-70); }
+  .sedes__tel {
+    grid-column: 2; justify-self: start;
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+    font-family: var(--font-body); font-weight: 500; font-size: 16px; color: var(--w-ink);
+    text-decoration: none; transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .sedes__tel :global(svg) { width: 16px; height: 16px; color: var(--w-accent); }
+  @media (--hover-fine) { .sedes__tel:hover { color: var(--w-accent); } }
+
+  .sedes__more { margin-top: 8px; padding-left: 56px; }
+  .sedes__sum {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; cursor: pointer;
+    list-style: none; font-family: var(--font-body); font-weight: 500; font-size: 15px; color: var(--w-ink-80);
+    transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .sedes__sum::-webkit-details-marker { display: none; }
+  @media (--hover-fine) { .sedes__sum:hover { color: var(--w-accent); } }
+  .sedes__sum :global(.sedes__chev) { width: 16px; height: 16px; transition: transform var(--w-dur-hover) var(--w-ease-ui); }
+  .sedes__more[open] .sedes__sum :global(.sedes__chev) { transform: rotate(180deg); }
+  @media (--motion-reduce) { .sedes__sum :global(.sedes__chev) { transition: none; } }
+
+  .sedes__links {
+    list-style: none; margin: 12px 0 8px; padding: 0;
+    display: grid; grid-template-columns: 1fr; gap: 16px 32px;
+  }
+  .sedes__links li { display: grid; gap: 2px; min-width: 0; }
+  .sedes__links a {
+    font-family: var(--font-body); font-weight: 500; font-size: 15px; line-height: 1.4; color: var(--w-ink);
+    text-decoration: none; transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  @media (--hover-fine) { .sedes__links a:hover { color: var(--w-accent); } }
+  .sedes__links span { font-family: var(--font-body); font-size: 14px; line-height: 1.45; color: var(--w-ink-70); }
+
+  @media (--md) {
+    /* "Ver detalles ⌄" a la derecha de la fila (como W-EVT-38); el contenido
+       abierto se despliega debajo, a todo el ancho de la fila. */
+    .sedes__main { padding-right: 200px; }
+    .sedes__sum { position: absolute; top: 24px; right: 0; min-block-size: 64px; }
+    .sedes__more { margin-top: 0; }
+    .sedes__more[open] .sedes__links { margin-top: 24px; }
+    .sedes__links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (--lg) { .sedes__links { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+</style>

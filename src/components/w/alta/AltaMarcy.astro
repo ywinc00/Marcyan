@@ -1,0 +1,607 @@
+---
+// ─────────────────────────────────────────────────────────────
+// P09 · Asistente de alta de Marcy con "Repetir" (design/rediseno-workos-v2.md §2 P09).
+// Original: W2N-05 de WorkOS (Passport, "Enroll once"), medido en
+// w2/ref/nuevo/W2N-05-asistente-alta/ (pantallas_hd.jpg, tira-1440.jpg, hd/medidas.json).
+//
+// Situación que resuelve: EMPEZAR. Enseña que arrancar con Marcy es corto y guiado.
+// Lienzo 528×488 radio 20 (medido en el original; a 390 se encoge y la ventana escala)
+// con UN acento (teal → crema sobre --w-s2); ventana clara 356×372 radio 14 con
+// 3 semáforos, puntos de paso y "Continuar" teal con tinta (AA).
+//
+// Secuencia (una vez al entrar en vista al 35 %, otra al reentrar tras ≥ 8 s fuera):
+//   0 s Conoce a Marcy · 2,5 s Hola, Tu Negocio · 4,8 s Tus canales (checks cada 250 ms
+//   y la lista baja sola) · 8,2 s Lista para contestar · 10,5 s la ventana se recoge en
+//   un PANEL WEB de ejemplo ("Ejemplo de configuración contigo"), sin app en la barra de
+//   menús ni "Ajustes…" (crítica de veracidad) · 11,2 s píldora "↻ Repetir".
+// Estado final (sin JS, reducir movimiento y al terminar): el panel con el interruptor
+// "Marcy contesta" encendido; micro-vida: el halo del interruptor y el punto "en línea" laten.
+//
+// Contrato de objetos de ejemplo (§1.6): la escena es aria-hidden + data-nosnippet con
+// resumen sr-only; sin h1-h6, sin tel:/wa.me/data-track. "Repetir" es un botón real.
+// Reducir movimiento: panel quieto; "Repetir" despliega los 4 pasos como lista.
+// Logos: vía LogoMarca de P06 (src/components/w/marcas/). Si aún no está integrado, la
+// carga es opcional (import.meta.glob) y se pinta un glifo genérico, nunca un logo dibujado.
+// Cerrojo 5: todo el CSS va aquí y solo lee variables --w-* y tokens.
+// ─────────────────────────────────────────────────────────────
+import Icon from '../../ui/Icon.astro';
+
+type Lang = 'es' | 'en';
+export type CanalAlta = 'whatsapp' | 'web' | 'calendario' | 'correo' | 'llamadas';
+
+interface Props {
+  lang?: Lang;
+  /** Solo los canales que la página nombra Y que Marcy contesta de verdad (§5-14). */
+  canales?: CanalAlta[];
+  /** Sufijo de ids por instancia (por defecto aleatorio). */
+  uid?: string;
+  class?: string;
+}
+
+const {
+  lang = 'es',
+  canales = ['whatsapp', 'web', 'calendario', 'correo', 'llamadas'],
+  uid = Math.random().toString(36).slice(2, 8),
+  class: cls,
+} = Astro.props;
+
+// LogoMarca (P06) opcional: si el archivo existe, se usa; si no, glifo genérico.
+const mods = import.meta.glob('../marcas/LogoMarca.astro', { eager: true }) as Record<string, { default: any }>;
+const LogoMarca = Object.values(mods)[0]?.default ?? null;
+
+const T = {
+  es: {
+    ejemplo: 'Ejemplo',
+    ejemploPanel: 'Ejemplo de configuración contigo',
+    negocio: 'Tu Negocio',
+    sr: 'Ejemplo de cómo empiezas con Marcy en cuatro pasos: la conoces, revisas el horario y los idiomas de tu negocio, conectas tus canales y queda lista para contestar. Al final, Marcy contesta en tus canales de mensajes, agenda las citas y te avisa de las llamadas perdidas y de cada contacto por correo.',
+    atras: 'Atrás', continuar: 'Continuar', empezar: 'Empezar', repetir: 'Repetir',
+    s1t: 'Conoce a Marcy', s1d: 'Tu asistente para Tu Negocio. Contesta, agenda y te avisa.',
+    s1rows: [
+      ['messages-square', 'Contesta sola', 'A cualquier hora'],
+      ['layout-grid', 'En tus canales', 'Donde ya te escriben'],
+      ['bell-ring', 'Te pasa lo importante', 'Tú decides qué'],
+    ],
+    s2t: 'Hola, Tu Negocio', s2d: 'Revisa lo que Marcy sabe de tu negocio.',
+    s2rows: [['Negocio', 'Tu Negocio'], ['Horario', 'Lun a sáb · 9:00 a. m. a 7:00 p. m.'], ['Idiomas', 'Español e inglés']],
+    s3t: 'Tus canales', s3d: 'Marcy se conecta a lo que ya usas.',
+    s4t: 'Lista para contestar', s4d: 'Marcy ya atiende a Tu Negocio.',
+    s4rows: [['Respuestas automáticas', 'Activadas · Contesta a cualquier hora'], ['Te avisa por correo', 'Activado · Te pasa cada contacto']],
+    enLinea: 'Marcy · En línea', tusCanales: 'Tus canales',
+    contesta: 'Marcy contesta', contestaD: 'Activado · En tus canales de mensajes',
+    contestaEn: 'Contesta en', agendaEn: 'Agenda en',
+    aviso: 'Te avisa al momento', avisoD: 'Llamadas perdidas y cada contacto por correo',
+    resumen4: 'Respuestas automáticas y avisos por correo, activados.', y: ' y ',
+    horario: 'Horario', idiomas: 'Idiomas',
+    listaT: 'Los 4 pasos',
+  },
+  en: {
+    ejemplo: 'Example',
+    ejemploPanel: 'Example setup, done with you',
+    negocio: 'Your Business',
+    sr: 'Example of how you start with Marcy in four steps: you meet her, check your business hours and languages, connect your channels, and she is ready to answer. At the end, Marcy answers on your messaging channels, books appointments, and lets you know about missed calls and every lead by email.',
+    atras: 'Back', continuar: 'Continue', empezar: 'Get started', repetir: 'Replay',
+    s1t: 'Meet Marcy', s1d: 'Your assistant for Your Business. Answers, books and lets you know.',
+    s1rows: [
+      ['messages-square', 'Answers on her own', 'At any hour'],
+      ['layout-grid', 'On your channels', 'Where people already message you'],
+      ['bell-ring', 'Flags what matters', 'You decide what'],
+    ],
+    s2t: 'Hi, Your Business', s2d: 'Check what Marcy knows about your business.',
+    s2rows: [['Business', 'Your Business'], ['Hours', 'Mon to Sat · 9:00 AM to 7:00 PM'], ['Languages', 'Spanish and English']],
+    s3t: 'Your channels', s3d: 'Marcy plugs into what you already use.',
+    s4t: 'Ready to answer', s4d: 'Marcy is now looking after Your Business.',
+    s4rows: [['Automatic replies', 'On · Answers at any hour'], ['Email alerts', 'On · Sends you every lead']],
+    enLinea: 'Marcy · Online', tusCanales: 'Your channels',
+    contesta: 'Marcy answers', contestaD: 'On · Across your messaging channels',
+    contestaEn: 'Answers on', agendaEn: 'Books in',
+    aviso: 'Lets you know right away', avisoD: 'Missed calls, and every lead by email',
+    resumen4: 'Automatic replies and email alerts are on.', y: ' and ',
+    horario: 'Hours', idiomas: 'Languages',
+    listaT: 'The 4 steps',
+  },
+}[lang];
+
+// Canales: nombre, línea gris, nombre dentro de frase (minúscula), papel en el panel final
+// (§5-14: solo CONTESTA en los de mensajes; el calendario es AGENDA; llamadas y correo son AVISO)
+// e icono de app. Las marcas van por LogoMarca (P06); el resto son iconos de app propios
+// (squircle 22,5 %, dibujo de producto, nunca un logo ajeno).
+type Rol = 'contesta' | 'agenda' | 'aviso';
+const CANALES: Record<CanalAlta, { es: [string, string, string]; en: [string, string, string]; rol: Rol; marca?: string }> = {
+  whatsapp: { es: ['WhatsApp', 'Contesta tus mensajes', 'WhatsApp'], en: ['WhatsApp', 'Answers your messages', 'WhatsApp'], rol: 'contesta', marca: 'whatsapp' },
+  web: { es: ['Chat de tu web', 'Contesta en tu página', 'chat de tu web'], en: ['Your website chat', 'Answers on your site', 'your website chat'], rol: 'contesta' },
+  calendario: { es: ['Calendario', 'Agenda las citas', 'calendario'], en: ['Calendar', 'Books appointments', 'calendar'], rol: 'agenda' },
+  correo: { es: ['Correo', 'Te pasa cada contacto', 'correo'], en: ['Email', 'Sends you every lead', 'email'], rol: 'aviso' },
+  llamadas: { es: ['Llamadas perdidas', 'Te avisa al momento', 'llamadas perdidas'], en: ['Missed calls', 'Lets you know right away', 'missed calls'], rol: 'aviso' },
+};
+const filas = canales.map((id) => ({ id, ...CANALES[id], txt: CANALES[id][lang] }));
+const deRol = (r: Rol) => filas.filter((f) => f.rol === r);
+// Alto de la lista: 142 px; baja lo justo para que la última fila quede entera (como el original).
+const bajar = Math.max(0, filas.length * 34 + 4 - 142);
+
+// Iconos de app propios (SVG sin ids: hay varias instancias por página).
+const dia = lang === 'en' ? 'MON' : 'LUN';
+const GLIFO: Record<string, string> = {
+  whatsapp: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 9.5c-6.1 0-11 4.5-11 10.1 0 2.2.8 4.3 2.1 6L10 31l5.7-1.9c1.3.6 2.8.9 4.3.9 6.1 0 11-4.5 11-10.1S26.1 9.5 20 9.5z" fill="#fff"/></svg>',
+  web: '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M15 11h12a6 6 0 0 1 6 6v4a6 6 0 0 1-6 6h-8.5L13 31.5V26.3A6 6 0 0 1 9 21v-4a6 6 0 0 1 6-6z" fill="#f0ede8"/><circle cx="15.5" cy="19" r="1.7" fill="#1b1d1c"/><circle cx="21" cy="19" r="1.7" fill="#1b1d1c"/><circle cx="26.5" cy="19" r="1.7" fill="#1b1d1c"/><circle cx="31.5" cy="10.5" r="4.6" fill="#4fc3a1" stroke="#1d2321" stroke-width="2.2"/></svg>',
+  calendario: `<svg viewBox="0 0 40 40" aria-hidden="true"><text x="20" y="13.2" text-anchor="middle" font-size="7.6" font-weight="700" letter-spacing=".4" fill="#e5484d">${dia}</text><text x="20" y="31.5" text-anchor="middle" font-size="18.5" font-weight="500" letter-spacing="-.6" fill="#1d1d1f">12</text></svg>`,
+  correo: '<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="8.5" y="12" width="23" height="16.5" rx="3" fill="#fff"/><path d="M9.6 13.6 20 21.2l10.4-7.6" fill="none" stroke="#2b78ea" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  llamadas: '<svg viewBox="0 0 24 24" aria-hidden="true"><path transform="translate(3.2 3.6) scale(.7)" d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" fill="#fff"/><circle cx="18.6" cy="5.4" r="3.1" fill="#ff453a" stroke="#34c759" stroke-width="1.1"/></svg>',
+};
+
+const listaId = `w2-alta-lista-${uid}`;
+const frase = filas.map((f) => f.txt[2]);
+const enumera = (xs: string[]) => (xs.length > 1 ? xs.slice(0, -1).join(', ') + T.y + xs[xs.length - 1] : xs[0] ?? '');
+const trasDosPuntos = (x: string) => { const y = x.replace(/\.$/, ''); return lang === 'es' ? y.charAt(0).toLowerCase() + y.slice(1) : y; };
+const may = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
+const pasos = [
+  [T.s1t, T.s1d],
+  // En español, tras dos puntos va minúscula; en inglés los días y los idiomas van con mayúscula.
+  [T.s2t, `${T.s2rows[1][0]}: ${trasDosPuntos(T.s2rows[1][1])}. ${T.s2rows[2][0]}: ${trasDosPuntos(T.s2rows[2][1])}.`],
+  [T.s3t, may(enumera(frase)) + '.'],
+  [T.s4t, T.resumen4],
+];
+const avatar = '/assets/bot/marcy-mini-128.webp';
+const avatarSet = '/assets/bot/marcy-mini-32.webp 32w, /assets/bot/marcy-mini-64.webp 64w, /assets/bot/marcy-mini-96.webp 96w, /assets/bot/marcy-mini-128.webp 128w, /assets/bot/marcy-mini.webp 256w';
+---
+<div class:list={['alta', cls]} tabindex="-1" data-w2-alta data-w2-step="5" lang={lang} style={`--alta-bajar:${bajar}px`}>
+  <p class="sr-only">{T.sr}</p>
+  <div class="alta-lienzo">
+    <div class="alta-escena" aria-hidden="true" data-nosnippet>
+      <span class="alta-rot">
+        <span class="alta-rot-a">{T.ejemplo}</span>
+        <span class="alta-rot-b">{T.ejemploPanel}</span>
+      </span>
+
+      <div class="alta-pos">
+        <!-- Ventana del asistente (4 pantallas) -->
+        <div class="alta-win">
+          <div class="alta-bar"><i></i><i></i><i></i></div>
+
+          <div class="alta-scr" data-s="1">
+            <span class="alta-app"><img src={avatar} srcset={avatarSet} sizes="48px" alt="" width="48" height="48" loading="lazy" decoding="async" /></span>
+            <span class="alta-t">{T.s1t}</span>
+            <span class="alta-d">{T.s1d}</span>
+            <span class="alta-feat">
+              {T.s1rows.map(([ic, a, b]) => (
+                <span class="alta-feat-row">
+                  <Icon name={`lucide:${ic}`} class="alta-feat-ic" />
+                  <span><span class="alta-rt">{a}</span><span class="alta-rd">{b}</span></span>
+                </span>
+              ))}
+            </span>
+          </div>
+
+          <div class="alta-scr" data-s="2">
+            <span class="alta-ava"><Icon name="lucide:store" /></span>
+            <span class="alta-t">{T.s2t}</span>
+            <span class="alta-d">{T.s2d}</span>
+            <span class="alta-tabla">
+              {T.s2rows.map(([k, v]) => (
+                <span class="alta-tabla-row"><span class="alta-k">{k}</span><span class="alta-v">{v}</span></span>
+              ))}
+            </span>
+          </div>
+
+          <div class="alta-scr" data-s="3">
+            <span class="alta-glifo"><Icon name="lucide:inbox" /></span>
+            <span class="alta-t">{T.s3t}</span>
+            <span class="alta-d">{T.s3d}</span>
+            <span class="alta-lst">
+              <span class="alta-lst-in">
+                {filas.map((f) => (
+                  <span class="alta-row" data-w2-alta-c3>
+                    <span class="alta-tile">
+                      {f.marca && LogoMarca
+                        ? <LogoMarca id={f.marca} size={24} tono="color" baldosa titulo="" />
+                        : <span class={`alta-ic alta-ic--${f.id}`} set:html={GLIFO[f.id]} />}
+                    </span>
+                    <span class="alta-row-tx"><span class="alta-rt">{f.txt[0]}</span><span class="alta-rd">{f.txt[1]}</span></span>
+                    <span class="alta-chk"><Icon name="lucide:check" /></span>
+                  </span>
+                ))}
+              </span>
+            </span>
+          </div>
+
+          <div class="alta-scr" data-s="4">
+            <svg class="alta-big" viewBox="0 0 40 40" width="40" height="40"><path d="M9 21.5l7.2 7L31.5 12" pathLength="1" /></svg>
+            <span class="alta-t">{T.s4t}</span>
+            <span class="alta-d">{T.s4d}</span>
+            <span class="alta-caja">
+              {T.s4rows.map(([a, b]) => (
+                <span class="alta-row alta-row--caja" data-w2-alta-c4>
+                  <span class="alta-row-tx"><span class="alta-rt">{a}</span><span class="alta-rd">{b}</span></span>
+                  <span class="alta-chk"><Icon name="lucide:check" /></span>
+                </span>
+              ))}
+            </span>
+          </div>
+
+          <div class="alta-foot">
+            <span class="alta-back">{T.atras}</span>
+            <span class="alta-dots"><i></i><i></i><i></i><i></i><b></b></span>
+            <span class="alta-btn alta-btn-a">{T.continuar}</span>
+            <span class="alta-btn alta-btn-b">{T.empezar}</span>
+          </div>
+        </div>
+
+        <!-- Panel web de ejemplo (estado final) -->
+        <div class="alta-panel">
+          <span class="alta-p-head">
+            <span class="alta-p-ava"><img src={avatar} srcset={avatarSet} sizes="38px" alt="" width="38" height="38" loading="lazy" decoding="async" /></span>
+            <span>
+              <span class="alta-p-name">{T.negocio}</span>
+              <span class="alta-p-on"><i class="alta-p-dot"></i>{T.enLinea}</span>
+            </span>
+          </span>
+          <span class="alta-p-sec alta-p-grupos">
+            {[['contesta', T.contestaEn], ['agenda', T.agendaEn]].map(([rol, lab]) => deRol(rol as Rol).length > 0 && (
+              <span class="alta-p-grupo">
+                <span class="alta-p-lab">{lab}</span>
+                <span class="alta-p-tiles">
+                  {deRol(rol as Rol).map((f) => (
+                    <span class="alta-tile alta-tile--p">
+                      {f.marca && LogoMarca
+                        ? <LogoMarca id={f.marca} size={34} tono="color" baldosa titulo="" />
+                        : <span class={`alta-ic alta-ic--${f.id}`} set:html={GLIFO[f.id]} />}
+                    </span>
+                  ))}
+                </span>
+              </span>
+            ))}
+          </span>
+          <span class="alta-p-sec alta-p-sw">
+            <span><span class="alta-rt">{T.contesta}</span><span class="alta-rd">{T.contestaD}</span></span>
+            <span class="alta-sw"><i class="alta-sw-knob"></i></span>
+          </span>
+          <span class="alta-p-sec alta-p-sw">
+            <span><span class="alta-rt">{T.aviso}</span><span class="alta-rd">{T.avisoD}</span></span>
+            <span class="alta-p-av">
+              {(['llamadas', 'correo'] as const).map((id) => (
+                <span class="alta-tile alta-tile--av"><span class={`alta-ic alta-ic--${id}`} set:html={GLIFO[id]} /></span>
+              ))}
+            </span>
+          </span>
+          <span class="alta-p-sec alta-p-dl">
+            <span class="alta-p-kv"><span class="alta-k">{T.horario}</span><span class="alta-v">{T.s2rows[1][1]}</span></span>
+            <span class="alta-p-kv"><span class="alta-k">{T.idiomas}</span><span class="alta-v">{T.s2rows[2][1]}</span></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <button class="alta-replay" type="button" data-w2-alta-replay>
+      <Icon name="lucide:rotate-ccw" />
+      <span>{T.repetir}</span>
+    </button>
+
+    <div class="alta-lista" id={listaId} hidden data-w2-alta-lista>
+      <p class="alta-lista-t">{T.listaT}</p>
+      <ol>
+        {pasos.map(([a, b]) => (<li><span class="alta-rt">{a}</span><span class="alta-rd">{b}</span></li>))}
+      </ol>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { initAltas } from './alta';
+  initAltas();
+</script>
+
+<style>
+  .alta {
+    --alta-k: 1;
+    --alta-acc: var(--accent-teal, #4fc3a1);
+    --alta-acc-ink: color-mix(in oklab, var(--accent-teal, #4fc3a1) 60%, #0e0e0d);
+    --alta-ok: #23a55a;
+    --alta-paper: var(--w-p-bg, #f0ede8);
+    --alta-ink: var(--w-p-ink, #0e0e0d);
+    --alta-ink-2: #625e58;
+    --alta-ink-3: #77726b;
+    --alta-line: var(--w-p-line, rgba(14,14,13,.08));
+    --alta-ease: var(--w-ease-text, cubic-bezier(.33,1,.68,1));
+    width: 100%;
+  }
+  .alta:focus { outline: none; }
+
+  /* ── Lienzo ─────────────────────────────────────────── */
+  .alta-lienzo {
+    position: relative;
+    width: 100%; max-width: 528px; min-width: 0; margin-inline: auto;
+    height: 404px; /* a 390: ventana escalada (--alta-k) + aire; desde 600 px, el lienzo medido 528×488 */
+    border-radius: 20px; overflow: hidden;
+    background:
+      radial-gradient(90% 60% at 50% 0%, rgba(79,195,161,.20), rgba(79,195,161,0) 70%),
+      linear-gradient(180deg, rgba(79,195,161,.24) 0%, rgba(79,195,161,.12) 55%, rgba(240,237,232,.13) 100%),
+      var(--w-s2, #181817);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    container: alta / inline-size;
+  }
+  @media (min-width: 600px) { .alta-lienzo { height: 488px; } }
+  .alta-escena { position: absolute; inset: 0; }
+
+  @container alta (max-width: 383px) { .alta-escena { --alta-k: .92; } }
+  @container alta (max-width: 349px) { .alta-escena { --alta-k: .84; } }
+  @container alta (max-width: 319px) { .alta-escena { --alta-k: .76; } }
+  @container alta (max-width: 289px) { .alta-escena { --alta-k: .7; } }
+  @container alta (max-width: 259px) { .alta-escena { --alta-k: .64; } }
+
+  /* Rótulo "Ejemplo" (uno por objeto): se alarga al recogerse la ventana. */
+  .alta-rot {
+    position: absolute; top: 12px; left: 14px; z-index: 3;
+    font-family: var(--font-mono); font-size: 11px; line-height: 14px; font-weight: 500;
+    letter-spacing: var(--w-tr-micro, .1em); text-transform: uppercase;
+    color: var(--w-ink-80, rgba(240,237,232,.8));
+  }
+  .alta-rot > span { display: block; transition: opacity 300ms var(--alta-ease), transform 300ms var(--alta-ease); }
+  .alta-rot-b { position: absolute; top: 0; left: 0; white-space: nowrap; opacity: 0; transform: translateY(4px); }
+  .alta[data-w2-step="5"] .alta-rot-a { opacity: 0; transform: translateY(-4px); }
+  .alta[data-w2-step="5"] .alta-rot-b { opacity: 1; transform: none; transition-delay: 150ms; }
+
+  .alta-pos {
+    position: absolute; left: 50%; top: 50%;
+    width: 356px; height: 372px; margin: -186px 0 0 -178px;
+    scale: var(--alta-k);
+  }
+
+  /* ── Ventana ────────────────────────────────────────── */
+  .alta-win {
+    position: absolute; inset: 0;
+    border-radius: 14px; overflow: hidden;
+    background: var(--alta-paper);
+    box-shadow: 0 0 0 .5px rgba(0,0,0,.14), 0 22px 50px -18px rgba(0,0,0,.55);
+    color: var(--alta-ink);
+    font-family: var(--font-body); -webkit-font-smoothing: antialiased;
+    transform-origin: 50% 1%;
+    transition: opacity 350ms var(--alta-ease), transform 350ms var(--alta-ease);
+  }
+  /* Se recoge: la ventana se encoge hacia la caja del panel (300 × ~331 px, arriba) y el panel
+     toma su lugar desde ese mismo tamaño. */
+  .alta[data-w2-step="5"] .alta-win {
+    opacity: 0; transform: scaleX(.843) scaleY(.89); pointer-events: none;
+    transition: transform 520ms cubic-bezier(.65,0,.35,1), opacity 260ms var(--alta-ease) 260ms;
+  }
+
+  .alta-bar { position: absolute; top: 13px; left: 14px; display: flex; gap: 7px; }
+  .alta-bar i { width: 11px; height: 11px; border-radius: 50%; background: #d3d0cb; box-shadow: inset 0 0 0 .5px rgba(0,0,0,.12); }
+  .alta-bar i:first-child { background: #ee6a5f; }
+
+  .alta-scr {
+    position: absolute; inset: 0 0 56px; padding: 30px 28px 0;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 280ms var(--alta-ease), transform 280ms var(--alta-ease);
+  }
+  .alta[data-w2-step="1"] .alta-scr[data-s="1"],
+  .alta[data-w2-step="2"] .alta-scr[data-s="2"],
+  .alta[data-w2-step="3"] .alta-scr[data-s="3"],
+  .alta[data-w2-step="4"] .alta-scr[data-s="4"] {
+    opacity: 1; transform: none;
+    transition-duration: 380ms; transition-delay: 220ms;
+  }
+
+  .alta-t { display: block; font-family: var(--font-display); font-weight: 600; font-size: 19px; line-height: 24px; letter-spacing: -.015em; color: var(--alta-ink); }
+  .alta-d { display: block; margin-top: 6px; font-size: 12.5px; line-height: 17px; color: var(--alta-ink-2); max-width: 280px; }
+  .alta-rt { display: block; font-size: 12.5px; line-height: 16px; font-weight: 600; color: var(--alta-ink); }
+  .alta-rd { display: block; font-size: 11px; line-height: 15px; color: var(--alta-ink-3); }
+
+  /* Pantalla 1 */
+  .alta-app {
+    width: 48px; height: 48px; margin-bottom: 12px; border-radius: 22.5%;
+    overflow: hidden; background: #1b1d1c;
+    box-shadow: 0 6px 14px -6px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.08);
+  }
+  .alta-app img, .alta-p-ava img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .alta-feat { display: grid; gap: 13px; margin-top: 20px; text-align: left; width: 236px; }
+  .alta-feat-row { display: grid; grid-template-columns: 20px 1fr; gap: 10px; align-items: start; }
+  .alta-feat-row :global(.alta-feat-ic) { width: 18px; height: 18px; margin-top: 1px; color: var(--alta-acc-ink); }
+
+  /* Pantalla 2 */
+  .alta-ava {
+    display: grid; place-items: center; width: 62px; height: 62px; margin-bottom: 12px; border-radius: 50%;
+    background: linear-gradient(180deg, #a9a49d, #7d7871); color: #fff;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+  }
+  .alta-ava :global(svg) { width: 26px; height: 26px; }
+  .alta-tabla {
+    display: grid; width: 300px; margin-top: 22px; padding: 2px 12px;
+    border-radius: 10px; background: rgba(14,14,13,.045); text-align: left;
+  }
+  .alta-tabla-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; font-size: 12px; line-height: 15px; }
+  .alta-tabla-row + .alta-tabla-row { border-top: 1px solid var(--alta-line); }
+  .alta-k { color: var(--alta-ink); font-weight: 500; white-space: nowrap; }
+  .alta-v { color: var(--alta-ink-2); text-align: right; }
+
+  /* Pantalla 3 */
+  .alta-glifo { display: grid; place-items: center; width: 36px; height: 36px; margin-bottom: 8px; color: var(--alta-acc-ink); }
+  .alta-glifo :global(svg) { width: 30px; height: 30px; stroke-width: 1.6; }
+  .alta-lst {
+    position: relative; display: block; width: 300px; height: 142px; margin-top: 12px;
+    border-radius: 10px; overflow: hidden; text-align: left;
+    background: #fbfaf8; box-shadow: inset 0 0 0 1px var(--alta-line);
+  }
+  .alta-lst::after {
+    content: ''; position: absolute; inset: auto 0 0; height: 26px; pointer-events: none;
+    background: linear-gradient(180deg, rgba(251,250,248,0), #fbfaf8);
+  }
+  .alta-lst-in { display: block; transition: transform 900ms var(--w-ease-loop, cubic-bezier(.645,.045,.355,1)); }
+  .alta.is-bajada .alta-lst-in { transform: translateY(calc(var(--alta-bajar) * -1)); }
+  .alta-row {
+    display: grid; grid-template-columns: 24px 1fr 16px; gap: 10px; align-items: center;
+    height: 34px; padding: 0 12px 0 10px;
+  }
+  .alta-lst .alta-row + .alta-row { border-top: 1px solid var(--alta-line); }
+  .alta-row .alta-rt { font-size: 12.5px; line-height: 15px; }
+  .alta-row .alta-rd { font-size: 10.5px; line-height: 13px; }
+  .alta-tile { display: grid; place-items: center; width: 24px; height: 24px; }
+  /* Iconos de app propios: squircle 22,5 %, relieve de icono (luz arriba, sombra corta). */
+  .alta-ic {
+    position: relative; display: block; width: 100%; height: 100%; border-radius: 22.5%; overflow: hidden;
+    box-shadow: inset 0 0 0 .5px rgba(0,0,0,.14), 0 1px 1.5px rgba(0,0,0,.16);
+  }
+  .alta-ic::after {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0) 46%);
+  }
+  .alta-ic :global(svg) { display: block; width: 100%; height: 100%; }
+  .alta-ic :global(text) { font-family: var(--font-body); }
+  .alta-ic--whatsapp { background: linear-gradient(180deg, #5be584, #1fb955); }
+  .alta-ic--web { background: linear-gradient(180deg, #2f3a36, #141716); }
+  .alta-ic--calendario { background: #fff; }
+  .alta-ic--calendario::after { background: linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,.035)); }
+  .alta-ic--correo { background: linear-gradient(180deg, #5eb0ff, #1b6fe4); }
+  .alta-ic--llamadas { background: linear-gradient(180deg, #6fe58a, #2dbd52); }
+  .alta-chk {
+    display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--alta-ok); color: #fff;
+    opacity: 0; transform: scale(.55);
+    transition: opacity 180ms ease-out, transform 260ms cubic-bezier(.34,1.56,.64,1);
+  }
+  .alta-chk :global(svg) { width: 11px; height: 11px; stroke-width: 3.2; }
+  .alta-row.is-on .alta-chk, .alta-chk--on { opacity: 1; transform: none; }
+  .alta-p-sw .alta-chk { margin-right: 9px; }
+
+  /* Pantalla 4 */
+  .alta-big { width: 40px; height: 40px; margin-bottom: 6px; }
+  .alta-big path {
+    fill: none; stroke: var(--alta-acc-ink); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 1; stroke-dashoffset: 1;
+    transition: stroke-dashoffset 450ms var(--alta-ease) 0ms;
+  }
+  .alta[data-w2-step="4"] .alta-big path { stroke-dashoffset: 0; transition-delay: 300ms; }
+  .alta-caja {
+    display: block; width: 300px; margin-top: 20px; border-radius: 10px; text-align: left;
+    background: #fbfaf8; box-shadow: inset 0 0 0 1px var(--alta-line);
+  }
+  .alta-row--caja { grid-template-columns: 1fr 16px; height: 48px; padding: 0 12px; }
+  .alta-row--caja + .alta-row--caja { border-top: 1px solid var(--alta-line); }
+
+  /* Pie: Atrás · puntos · Continuar/Empezar */
+  .alta-foot { position: absolute; inset: auto 0 0; height: 56px; }
+  .alta-back {
+    position: absolute; left: 18px; top: 20px; font-size: 12.5px; line-height: 16px; color: var(--alta-ink-3);
+    transition: opacity 250ms var(--alta-ease);
+  }
+  .alta[data-w2-step="1"] .alta-back { opacity: 0; }
+  /* 4 puntos de 5 px cada 10 px; la píldora activa (11 px) se desliza por transform. */
+  .alta-dots { position: absolute; left: 50%; top: 26px; width: 35px; height: 5px; margin-left: -17px; display: flex; gap: 5px; }
+  .alta-dots i { width: 5px; height: 5px; border-radius: 3px; background: #cdc8c1; }
+  .alta-dots b {
+    position: absolute; left: -3px; top: 0; width: 11px; height: 5px; border-radius: 3px; background: var(--alta-acc-ink);
+    transition: transform 300ms var(--w-ease-ui, cubic-bezier(.4,0,.2,1));
+  }
+  .alta[data-w2-step="2"] .alta-dots b { transform: translateX(10px); }
+  .alta[data-w2-step="3"] .alta-dots b { transform: translateX(20px); }
+  .alta[data-w2-step="4"] .alta-dots b, .alta[data-w2-step="5"] .alta-dots b { transform: translateX(30px); }
+
+  .alta-btn {
+    position: absolute; right: 16px; top: 14px; height: 28px; padding: 0 16px; border-radius: 14px;
+    display: inline-flex; align-items: center;
+    background: var(--alta-acc); color: var(--alta-ink);
+    font-family: var(--font-body); font-size: 12.5px; font-weight: 600; letter-spacing: -.005em;
+    box-shadow: inset 0 0 0 .5px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.12);
+    transition: opacity 250ms var(--alta-ease);
+  }
+  .alta-btn-b { opacity: 0; }
+  .alta[data-w2-step="4"] .alta-btn-a, .alta[data-w2-step="5"] .alta-btn-a { opacity: 0; }
+  .alta[data-w2-step="4"] .alta-btn-b, .alta[data-w2-step="5"] .alta-btn-b { opacity: 1; transition-delay: 200ms; }
+
+  /* ── Panel web de ejemplo ───────────────────────────── */
+  .alta-panel {
+    position: absolute; left: 28px; right: 28px; top: 4px;
+    display: grid; padding: 14px 16px 6px; border-radius: 14px;
+    background: rgba(246,245,241,.97); color: var(--alta-ink);
+    box-shadow: 0 0 0 .5px rgba(0,0,0,.14), 0 22px 50px -18px rgba(0,0,0,.55);
+    font-family: var(--font-body); -webkit-font-smoothing: antialiased;
+    opacity: 0; transform: scaleX(1.187) scaleY(1.124); transform-origin: 50% 0;
+    transition: opacity 200ms var(--alta-ease), transform 200ms var(--alta-ease);
+    pointer-events: none;
+  }
+  .alta[data-w2-step="5"] .alta-panel {
+    opacity: 1; transform: none;
+    transition: transform 520ms cubic-bezier(.65,0,.35,1), opacity 300ms var(--alta-ease) 180ms;
+  }
+  .alta-p-head { display: grid; grid-template-columns: 38px 1fr; gap: 10px; align-items: center; padding-bottom: 12px; }
+  .alta-p-ava { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; background: #1b1d1c; }
+  .alta-p-name { display: block; font-family: var(--font-display); font-size: 15px; line-height: 19px; font-weight: 600; letter-spacing: -.01em; }
+  .alta-p-on { display: flex; align-items: center; gap: 6px; font-size: 11.5px; line-height: 15px; color: var(--alta-ink-2); }
+  .alta-p-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--alta-ok); }
+  .alta-p-dot::after {
+    content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+    box-shadow: 0 0 0 0 rgba(35,165,90,.5);
+  }
+  .alta-p-sec { display: block; padding: 11px 0; border-top: 1px solid var(--alta-line); }
+  .alta-p-lab { display: block; font-size: 11.5px; line-height: 15px; color: var(--alta-ink-2); margin-bottom: 8px; }
+  .alta-p-grupos { display: flex; gap: 18px; }
+  .alta-p-grupo + .alta-p-grupo { padding-left: 18px; border-left: 1px solid var(--alta-line); }
+  .alta-p-tiles { display: flex; flex-wrap: wrap; gap: 8px; }
+  .alta-tile--p { width: 34px; height: 34px; }
+  .alta-p-av { display: flex; gap: 6px; }
+  .alta-tile--av { width: 24px; height: 24px; }
+  .alta-p-sw { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; }
+  .alta-p-sw .alta-rt { font-size: 13px; }
+  .alta-sw { position: relative; flex: none; width: 34px; height: 20px; border-radius: 10px; background: var(--alta-acc); box-shadow: inset 0 0 0 .5px rgba(0,0,0,.1); }
+  .alta-sw::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    box-shadow: 0 0 0 0 rgba(79,195,161,.55);
+  }
+  .alta-sw-knob {
+    position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; border-radius: 50%;
+    background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25);
+  }
+  .alta-p-dl { display: grid; gap: 6px; }
+  .alta-p-kv { display: flex; justify-content: space-between; gap: 10px; font-size: 11.5px; line-height: 15px; }
+
+  /* Micro-vida del estado final (solo a la vista y sin reducir movimiento) */
+  /* Anillos que se expanden por fuera (box-shadow): se ven sobre el papel, no se tapan con la pista. */
+  .alta.is-vivo[data-w2-step="5"] .alta-sw::before { animation: alta-ring-sw 2.4s cubic-bezier(.2,.7,.3,1) infinite; }
+  .alta.is-vivo[data-w2-step="5"] .alta-p-dot::after { animation: alta-ring-dot 2.4s cubic-bezier(.2,.7,.3,1) 1.2s infinite; }
+  @keyframes alta-ring-sw {
+    0% { box-shadow: 0 0 0 0 rgba(79,195,161,.6); }
+    75%, 100% { box-shadow: 0 0 0 9px rgba(79,195,161,0); }
+  }
+  @keyframes alta-ring-dot {
+    0% { box-shadow: 0 0 0 0 rgba(35,165,90,.55); }
+    75%, 100% { box-shadow: 0 0 0 7px rgba(35,165,90,0); }
+  }
+
+  /* ── Repetir ────────────────────────────────────────── */
+  .alta-replay {
+    position: absolute; right: 16px; bottom: 16px; z-index: 4;
+    display: none; align-items: center; gap: 6px;
+    height: 32px; min-width: 86px; padding: 0 13px 0 11px; border: 0; border-radius: 16px;
+    background: #f7f6f2; color: var(--alta-ink);
+    font-family: var(--font-body); font-size: 13px; font-weight: 500; line-height: 1;
+    box-shadow: 0 0 0 .5px rgba(0,0,0,.12), 0 4px 12px -4px rgba(0,0,0,.35);
+    cursor: pointer;
+    opacity: 0; transform: translateY(6px); visibility: hidden;
+    transition: opacity 300ms var(--alta-ease), transform 300ms var(--alta-ease), visibility 0s linear 300ms, background-color 150ms ease;
+  }
+  .alta-replay::after { content: ''; position: absolute; inset: -6px; } /* área de toque 44 */
+  .alta-replay :global(svg) { width: 14px; height: 14px; }
+  .alta-replay:focus-visible { outline: 2px solid var(--accent-gold, #d4a24c); outline-offset: 2px; }
+  .alta-replay:hover { background: color-mix(in oklab, #f7f6f2 94%, #000); }
+  .alta[data-w2-js] .alta-replay { display: inline-flex; }
+  .alta.is-replay .alta-replay { opacity: 1; transform: none; visibility: visible; transition-delay: 0s; }
+
+  /* Lista de los 4 pasos (reducir movimiento) */
+  .alta-lista {
+    position: absolute; left: 16px; right: 16px; top: 36px; z-index: 5;
+    padding: 14px 16px; border-radius: 14px; background: #f6f5f1; color: var(--alta-ink);
+    box-shadow: 0 0 0 .5px rgba(0,0,0,.14), 0 22px 50px -18px rgba(0,0,0,.55);
+    font-family: var(--font-body);
+  }
+  .alta-lista[hidden] { display: none; }
+  .alta.is-lista .alta-escena { visibility: hidden; }
+  .alta-lista { top: 16px; bottom: 64px; overflow: auto; }
+  .alta-lista-t { margin: 0 0 8px; font-family: var(--font-display); font-weight: 600; font-size: 15px; }
+  .alta-lista ol { margin: 0; padding-left: 20px; display: grid; gap: 9px; }
+  .alta-lista li { font-size: 12.5px; color: var(--alta-ink-2); }
+  .alta-lista .alta-rd { font-size: 12px; line-height: 16px; color: var(--alta-ink-2); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .alta *, .alta *::before, .alta *::after { transition: none !important; animation: none !important; }
+  }
+</style>

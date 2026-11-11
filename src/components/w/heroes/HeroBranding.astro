@@ -1,0 +1,116 @@
+---
+// Hero de la landing de branding (design/rediseno-workos.md §4.18, ola 2).
+// W-NEW-30 + W-NEW-12: cabecera PARTIDA con borde inferior de 1 px. Izquierda: chip
+// de ciudad, eyebrow oro 24 (heros partidos, §2.3) y H1 VERBATIM (§2.14). Derecha:
+// bajada 16 al 70 % y los dos botones. Debajo, el plano técnico de la marca de
+// EJEMPLO "Tu Marca" (no Julio's, E-32), objeto de la coreografía (§2.9: textos .1/.3/.4 s,
+// objeto a .5 s). Revisión 1 (I-1, E-01): el marco del plano pasa a --w-contrast-bg (sobre
+// --w-s1 no se distinguía de la noche) y lleva detrás franjas de luz oro a ventana completa,
+// las mismas del abanico del piloto. La sección recorta en horizontal (franjas de 100vw).
+// Revisión 1 (M-1): las filas van ordenadas por pieza del dibujo, para que la llamada N
+// señale la fila N (1 sello, 2 isotipo, 3 palabra, 4 paleta, 5 aplicación, 6 cajetín).
+// Ronda 1 G08 (I3/I4): el plano es PlanoTuMarca (carpeta de la página): signo nuevo, paleta de la marca
+// del personalizador y construcción animada al entrar. Pendiente [SISTEMA]: el PlanoMarca nuevo de P03.
+// HeroTexto no sirve aquí (solo centrado o a la izquierda en una columna): el marcado
+// repite sus clases y data-w-in para heredar la misma coreografía y escala.
+import LlamarMovil from '../LlamarMovil.astro';
+import Button from '../../ui/Button.astro';
+import ChipCiudad from '../ChipCiudad.astro';
+import Eyebrow from '../Eyebrow.astro';
+import PlanoTuMarca from '../sections/branding/PlanoTuMarca.astro';
+
+interface Cta { label: string; href: string; track?: string }
+interface Props {
+  h1Html: string;
+  chip: string;
+  eyebrow: string;
+  tail?: string;
+  lead: string;
+  primary: Cta;
+  link?: Cta;
+  lang?: 'es' | 'en';
+}
+const { h1Html, chip, eyebrow, tail, lead, primary, link, lang = 'es' } = Astro.props;
+---
+<section class="w-hero hb">
+  <div class="w-container">
+    <div class="hb__crumbs"><slot name="crumbs" /></div>
+    <div class="hb__head">
+      <div class="hb__l">
+        <div class="hb__top" data-w-in="1">
+          <ChipCiudad label={chip} />
+          <Eyebrow tone="gold" class="hb__eyebrow">{eyebrow}</Eyebrow>
+        </div>
+        <h1 class="w-h1 hb__h1" data-w-in="1" set:html={h1Html} />
+        {tail && <p class="w-h1__tail hb__h1" data-w-in="1">{tail}</p>}
+      </div>
+      <div class="hb__r">
+        <p class="hb__lead" data-w-in="2">{lead}</p>
+        <div class="hb__actions" data-w-in="3">
+          <LlamarMovil primaryHref={primary.href} />
+          <Button variant="primary" size="lg" href={primary.href} data-track={primary.track}>{primary.label}</Button>
+          {link && <Button variant="link" href={link.href} data-track={link.track}>{link.label}</Button>}
+        </div>
+      </div>
+    </div>
+    <div class="hb__plan">
+      <div class="hb__light" aria-hidden="true"></div>
+      <div data-w-in="obj">
+        <PlanoTuMarca lang={lang} />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hb { overflow-x: clip; }
+  .hb__crumbs { margin-bottom: 32px; }
+  .hb__crumbs :global(ol) { padding-inline-start: 0; margin: 0; }
+  .hb__head {
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px;
+    padding-bottom: 56px; border-bottom: 1px solid var(--w-line);
+  }
+  .hb__top { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; margin-bottom: var(--w-gap-eyebrow); }
+  /* Eyebrow 24 en heros partidos (§2.3); 18 en móvil por el token. */
+  .hb__top :global(.hb__eyebrow) { font-size: clamp(1.125rem, 0.9rem + 0.5vw, 1.5rem); margin: 0; }
+  .hb__h1 { margin: 0; max-width: 640px; }
+  .hb__lead {
+    margin: 0; max-width: 440px;
+    font-family: var(--font-body); font-size: 16px; line-height: 1.6; color: var(--w-ink-70);
+  }
+  .hb__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: var(--w-gap-lead); }
+  .hb__plan {
+    margin-top: 56px; position: relative; isolation: isolate;
+    /* I-1: el marco del plano se lee como superficie (capítulo de contraste del plan). */
+    --w-s1: var(--w-contrast-bg);
+  }
+  /* Franjas de luz oro a ventana completa detrás del plano (patrón del abanico del piloto):
+     asoman a los lados del marco y bajo su pie; fundido arriba y en los bordes. */
+  .hb__light {
+    position: absolute; z-index: -1;
+    left: 50%; width: 100vw; margin-left: -50vw;
+    top: 20%; bottom: -72px;
+    background: var(--w-stripes);
+    -webkit-mask-image:
+      linear-gradient(180deg, transparent 0%, #000 45%, #000 80%, transparent 100%),
+      linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(180deg, transparent 0%, #000 45%, #000 80%, transparent 100%),
+      linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+    mask-composite: intersect;
+    pointer-events: none;
+  }
+  @media (--lg) {
+    /* W-NEW-30: titular en 568 a la izquierda; texto y botones a la derecha (433),
+       los botones a la altura del pie del titular. */
+    .hb__head { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 64px; align-items: end; padding-bottom: 72px; }
+    .hb__r { padding-bottom: 4px; }
+    .hb__plan { margin-top: 64px; }
+  }
+  @media (--lt-md) {
+    .hb__crumbs { margin-bottom: 24px; }
+    .hb__head { padding-bottom: 40px; }
+    .hb__plan { margin-top: 40px; }
+  }
+</style>

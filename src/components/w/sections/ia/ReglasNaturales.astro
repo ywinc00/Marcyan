@@ -1,0 +1,120 @@
+---
+// "Tú le explicas, Marcy lo cumple" (W-ADV-07 · design/rediseno-workos.md §4.12-4).
+// Capítulo de contraste de la página (lo pone kinds/ia-chat.ts con contrast:'contrast').
+// Cabecera numerada (solo etiqueta) + H2 centrado a dos tonos + bajada; panel de 896:
+// a la izquierda, 4 frases en lenguaje natural del dueño de un negocio de EJEMPLO y un
+// campo "Ajustar una regla…" (decorativo); a la derecha, las reglas fijas y las revisiones
+// de cada mensaje, que aparecen fila a fila UNA vez al entrar la sección (~4 s; solo
+// opacidad y transform, colgadas del .is-revealed de reveal.ts). Estado final visible por
+// defecto: solo arrancan ocultas con html.w-anim (sin reduced-motion).
+// Estados por VALOR (§2.11): "Sí" en el acento, "Te lo pasa" en crema, "No" en gris
+// con borde discontinuo (todos ≥ 4.5:1).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Ejemplo from '../../Ejemplo.astro';
+import Icon from '../../../ui/Icon.astro';
+
+type Kind = 'ok' | 'mid' | 'off';
+interface Copy {
+  label: string; title: string; sub: string; ask: string; said: string[];
+  fixedTitle: string; fixedNote: string; fixed: [Kind, string, string][];
+  checksTitle: string; checksNote: string; checks: string[]; input: string; sr: string;
+}
+interface Props { copy: Copy; n: number; lang?: 'es' | 'en' }
+const { copy, n, lang = 'es' } = Astro.props;
+let i = 0;
+---
+<CabeceraNumerada n={n} label={copy.label} align="center" />
+<div class="rn">
+  <h2 class="w-h2 rn__h" set:html={copy.title} />
+  <p class="rn__sub">{copy.sub}</p>
+
+  <figure class="rn__panel">
+    <Ejemplo lang={lang} />
+    <figcaption class="sr-only">{copy.sr}</figcaption>
+    <div class="rn__left" aria-hidden="true">
+      <p class="rn__ask">{copy.ask}</p>
+      {copy.said.map((s) => <p class="rn__said">{s}</p>)}
+      <div class="rn__input"><span>{copy.input}</span><span class="rn__send"><Icon name="lucide:arrow-up" /></span></div>
+    </div>
+    <div class="rn__right" aria-hidden="true">
+      <div class="rn__head"><p class="rn__t">{copy.fixedTitle}</p><p class="rn__note">{copy.fixedNote}</p></div>
+      <ul class="rn__rules" role="list">
+        {copy.fixed.map(([k, chip, text]) => (
+          <li class="rn__row" style={`--i:${i++}`}><span class:list={['rn__chip', `rn__chip--${k}`]}>{chip}</span><span class="rn__rule">{text}</span></li>
+        ))}
+      </ul>
+      <div class="rn__sep"></div>
+      <div class="rn__head"><p class="rn__t">{copy.checksTitle}</p><p class="rn__note">{copy.checksNote}</p></div>
+      <ul class="rn__checks" role="list">
+        {copy.checks.map((c) => <li class="rn__row" style={`--i:${i++}`}>{c}</li>)}
+      </ul>
+    </div>
+  </figure>
+</div>
+
+<style>
+  .rn { margin-top: 24px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .rn__h { max-width: 25ch; margin: 0 auto; }
+  .rn__sub {
+    margin: 16px auto 0; max-width: 560px;
+    font: 400 var(--w-lead)/1.5 var(--font-body); color: var(--w-ink-80);
+  }
+  .rn__panel {
+    position: relative; margin: 56px 0 0; width: 100%; max-width: 896px; text-align: left;
+    display: grid; grid-template-columns: 1fr; gap: 8px;
+    background: var(--w-s1); border: 1px solid var(--w-line-strong); border-radius: 16px;
+    padding: 8px; box-shadow: var(--w-edge);
+  }
+  @media (--md) { .rn__panel { grid-template-columns: 1fr 1fr; } }
+  .rn__left { display: flex; flex-direction: column; padding: 24px 22px 18px; min-height: 0; }
+  .rn__ask { margin: 0 0 14px; font: 400 13px/1.4 var(--font-body); color: var(--w-ink-60); }
+  .rn__said { margin: 0 0 14px; font: 400 15px/1.6 var(--font-body); color: var(--w-ink); max-width: 36ch; }
+  .rn__input {
+    margin-top: auto; display: flex; align-items: center; justify-content: space-between;
+    min-height: 40px; padding: 0 6px 0 16px; border-radius: 999px;
+    background: rgba(var(--star-rgb), .05); border: 1px solid var(--w-line);
+    font: 400 13px/1 var(--font-body); color: var(--w-ink-60);
+  }
+  .rn__send {
+    display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(var(--star-rgb), .10); color: var(--w-ink-80);
+  }
+  .rn__send :global(svg) { width: 14px; height: 14px; }
+  .rn__right {
+    background: var(--w-s3); border: 1px solid var(--w-line); border-radius: 12px; padding: 22px 20px;
+  }
+  .rn__head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .rn__t { margin: 0; font: 500 16px/1.3 var(--font-display); color: var(--w-ink); }
+  .rn__note { margin: 0; font: 400 13px/1.3 var(--font-body); color: var(--w-ink-60); }
+  .rn__rules, .rn__checks { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 12px; }
+  .rn__rules li { display: grid; grid-template-columns: 108px 1fr; align-items: center; gap: 10px; }
+  .rn__chip {
+    justify-self: start; font: 500 13px/1 var(--font-mono); padding: 5px 9px; border-radius: 999px;
+    border: 1px solid transparent; white-space: nowrap;
+  }
+  .rn__chip--ok { color: var(--w-accent); border-color: rgba(var(--w-accent-rgb), .45); background: rgba(var(--w-accent-rgb), .10); }
+  .rn__chip--mid { color: var(--w-ink-80); border-color: rgba(var(--star-rgb), .30); }
+  .rn__chip--off { color: var(--w-ink-70); border-color: rgba(var(--star-rgb), .30); border-style: dashed; }
+  .rn__rule { font: 400 13px/1.4 var(--font-mono); color: var(--w-ink-80); }
+  .rn__checks li { font: 400 15px/1.55 var(--font-body); color: var(--w-ink-80); }
+  .rn__sep { height: 1px; background: var(--w-line-strong); margin: 22px 0; }
+
+  /* Fila a fila, una vez, al revelarse la sección (~4 s en total). */
+  :global(html.w-anim) .rn__row {
+    opacity: .01; transform: translateY(6px);
+    transition: opacity var(--w-dur-reveal) var(--w-ease-out), transform var(--w-dur-reveal) var(--w-ease-out);
+    transition-delay: calc(500ms + var(--i) * 560ms);
+  }
+  :global(html.w-anim [data-w-reveal].is-revealed) .rn__row,
+  :global(html.w-in-all) .rn__row { opacity: 1; transform: none; }
+
+  @media (--lt-md) {
+    /* Un solo eje en móvil (control global r2, menor 1): titular y bajada siguen centrados
+       como la etiqueta, igual que 02 "Cómo trabaja". */
+    .rn__h, .rn__sub { margin-inline: 0; }
+    .rn__sub { font-size: 1rem; }
+    .rn__panel { margin-top: 36px; }
+    .rn__left { padding: 36px 14px 14px; }
+    .rn__said { font-size: 14px; margin-bottom: 10px; }
+  }
+</style>

@@ -1,0 +1,183 @@
+---
+// P07 · Placa de pistas propia (design/rediseno-workos-v2.md §2 P07; original W-HOME-12,
+// C/02-chip-marca). SVG 860×480 dibujado aquí, NUNCA la imagen de WorkOS.
+// · Pistas: buses de líneas paralelas de 1,25 px en teal al 14 % con codos a 45°, que salen
+//   de los 4 lados del chip (centro 430,240; chip 220×220) y se abren en abanico.
+// · Pads y chips menores al 8 %. Todo funde hacia los bordes con una máscara radial.
+// · Luz: degradados que se trasladan (solo `transform`/`opacity`) enmascarados por las
+//   pistas. `.cp-hl` = luz de entrada (pista inferior); `.cp-luz--sup` / `.cp-luz--inf`
+//   = bucle de 6 s (lo anima ChipIA con sus clases; aquí solo se dibuja).
+// · capa="entrada" (solo variante portada): pinta ÚNICAMENTE la luz de entrada sobre el bus
+//   inferior y su brillo sobre el arco del horizonte, en un SVG aparte que ChipIA pone ENCIMA del
+//   horizonte (si no, el relleno del horizonte la tapa y el encendido pierde su primer tiempo).
+// Ids con sufijo por instancia (`uid`). Decorativa: aria-hidden.
+interface Props { uid: string; class?: string; capa?: 'placa' | 'entrada' }
+const { uid, class: cls, capa = 'placa' } = Astro.props;
+
+const CX = 430, CY = 240, L = 320, R = 540, T = 130, B = 350, W = 860, H = 480;
+
+// Aleatorio con semilla: la placa es SIEMPRE la misma (sin saltos entre compilaciones).
+let seed = 7;
+const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+
+const sup: string[] = []; // pistas por encima del centro (bucle superior)
+const inf: string[] = []; // pistas por debajo (bucle inferior + luz de entrada)
+const pads: [number, number, number, number][] = [];
+const ics: [number, number, number, number][] = [];
+
+// ── Bus inferior: 13 líneas que bajan y se abren en abanico a 45° ──
+for (let i = 0; i < 13; i++) {
+  const k = i - 6, a = Math.abs(k), s = Math.sign(k), x = CX + k * 9;
+  if (a <= 1) { inf.push(`M${x} ${B}V${H}`); continue; }
+  const yb = B + 12 + (6 - a) * 6;
+  const d = 26 + a * 11;
+  const x2 = x + s * d;
+  if (a === 4 || a === 6) {
+    const ye = yb + d + 34 + a * 4;
+    inf.push(`M${x} ${B}V${yb}L${x2} ${yb + d}V${ye}`);
+    pads.push([x2 - 3, ye, 6, 9]);
+  } else inf.push(`M${x} ${B}V${yb}L${x2} ${yb + d}V${H}`);
+}
+// ── Bus superior: 13 líneas que suben, dos grupos que se abren y un tramo central a un chip menor ──
+for (let i = 0; i < 13; i++) {
+  const k = i - 6, a = Math.abs(k), s = Math.sign(k), x = CX + k * 9;
+  if (a <= 2) { sup.push(`M${x} ${T}V${62}`); continue; }
+  const yb = T - 10 - (6 - a) * 6;
+  const d = 30 + a * 13;
+  const x2 = x + s * d;
+  const ye = a % 2 ? 0 : 26 + a * 3;
+  sup.push(`M${x} ${T}V${yb}L${x2} ${yb - d}V${ye}`);
+  if (ye) pads.push([x2 - 3, ye - 9, 6, 9]);
+}
+ics.push([CX - 34, 26, 68, 36]);
+// ── Buses laterales: 11 líneas por lado que salen y se doblan arriba/abajo ──
+for (const side of [-1, 1]) {
+  const x0 = side < 0 ? L : R;
+  for (let j = 0; j < 11; j++) {
+    const k = j - 5, a = Math.abs(k), y = CY + k * 9;
+    const run = 16 + (5 - a) * 6;
+    const xb = x0 + side * run;
+    if (a <= 1) {
+      const xe = side < 0 ? 0 : W;
+      (k <= 0 ? sup : inf).push(`M${x0} ${y}H${xe}`);
+      continue;
+    }
+    const sk = Math.sign(k);
+    const d = 22 + a * 12 + Math.round(rnd() * 6);
+    const xd = xb + side * d, yd = y + sk * d;
+    const long = rnd() > .35;
+    const xe = long ? (side < 0 ? 0 : W) : xd + side * (40 + Math.round(rnd() * 60));
+    (k < 0 ? sup : inf).push(`M${x0} ${y}H${xb}L${xd} ${yd}H${xe}`);
+    if (!long) pads.push([side < 0 ? xe - 9 : xe, yd - 3, 9, 6]);
+  }
+}
+// ── Pistas sueltas de fondo (densidad del original): grupos de 3-5 paralelas con un codo ──
+const grupos: [number, number, number, number, number][] = [
+  // x, y, dir(1 → derecha, -1 ← izquierda), sube(-1)/baja(1), n
+  [36, 64, 1, 1, 4], [160, 30, 1, 1, 3], [700, 44, -1, 1, 4], [824, 92, -1, 1, 3],
+  [40, 404, 1, -1, 4], [190, 452, 1, -1, 3], [672, 440, -1, -1, 4], [826, 380, -1, -1, 3],
+];
+for (const [x, y, dx, dy, n] of grupos) {
+  for (let i = 0; i < n; i++) {
+    const yy = y + i * 8 * dy, run = 34 + i * 4, d = 26 + Math.round(rnd() * 10);
+    const p = `M${x} ${yy}H${x + dx * run}L${x + dx * (run + d)} ${yy + dy * d}V${yy + dy * (d + 18)}`;
+    (yy < CY ? sup : inf).push(p);
+  }
+  pads.push([x - 4, y - 2 + (dy < 0 ? -(n - 1) * 8 : 0), 4, (n - 1) * 8 + 4]);
+}
+// Hileras de pads (como las del original arriba a la izquierda) y chips menores.
+for (let r = 0; r < 2; r++) for (let c = 0; c < 6; c++) pads.push([214 + c * 12, 70 + r * 12, 7, 5]);
+for (let r = 0; r < 2; r++) for (let c = 0; c < 5; c++) pads.push([590 + c * 12, 400 + r * 12, 7, 5]);
+ics.push([92, 150, 54, 32], [714, 146, 46, 28], [100, 300, 40, 26], [726, 318, 54, 32]);
+
+const dSup = sup.join('');
+const dInf = inf.join('');
+---
+{capa === 'entrada' ? (
+<svg class:list={['cp', 'cp--entrada', cls]} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+  <defs>
+    <path id={`cpe-i-${uid}`} d={dInf} />
+    <mask id={`cpe-mi-${uid}`} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+      <use href={`#cpe-i-${uid}`} fill="none" stroke="#fff" stroke-width="2.6" />
+    </mask>
+    <linearGradient id={`cpe-fv-${uid}`} gradientUnits="userSpaceOnUse" x1="0" y1="322" x2="0" y2={H}>
+      <stop offset="0" stop-color="#fff" />
+      <stop offset="1" stop-color="#fff" stop-opacity="0" />
+    </linearGradient>
+    <mask id={`cpe-f-${uid}`} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+      <rect x={CX - 150} y="322" width="300" height={H - 322} fill={`url(#cpe-fv-${uid})`} />
+    </mask>
+    <linearGradient id={`cpe-hg-${uid}`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4fc3a1" stop-opacity="0" />
+      <stop offset=".7" stop-color="#4fc3a1" stop-opacity="1" />
+      <stop offset="1" stop-color="#4fc3a1" stop-opacity="0" />
+    </linearGradient>
+    <radialGradient id={`cpe-ar-${uid}`} cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#d6f5ea" stop-opacity="1" />
+      <stop offset=".55" stop-color="#4fc3a1" stop-opacity=".6" />
+      <stop offset="1" stop-color="#4fc3a1" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <g mask={`url(#cpe-f-${uid})`}>
+    <g mask={`url(#cpe-mi-${uid})`}>
+      <rect class="cp-hl" x={CX - 135} y="220" width="270" height="260" fill={`url(#cpe-hg-${uid})`} />
+    </g>
+  </g>
+  <ellipse class="cp-hl-arco" cx={CX} cy="323" rx="270" ry="7" fill={`url(#cpe-ar-${uid})`} />
+  <g opacity=".35"><ellipse class="cp-hl-arco" cx={CX} cy="323" rx="210" ry="26" fill={`url(#cpe-ar-${uid})`} /></g>
+</svg>
+) : (
+<svg class:list={['cp', cls]} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">
+  <defs>
+    <path id={`cp-s-${uid}`} d={dSup} />
+    <path id={`cp-i-${uid}`} d={dInf} />
+    <radialGradient id={`cp-fg-${uid}`} gradientUnits="userSpaceOnUse" cx={CX} cy={CY} r="430" gradientTransform={`translate(${CX} ${CY}) scale(1 .62) translate(${-CX} ${-CY})`}>
+      <stop offset=".42" stop-color="#fff" />
+      <stop offset="1" stop-color="#000" />
+    </radialGradient>
+    <mask id={`cp-f-${uid}`} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+      <rect width={W} height={H} fill={`url(#cp-fg-${uid})`} />
+    </mask>
+    <mask id={`cp-ms-${uid}`} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+      <use href={`#cp-s-${uid}`} fill="none" stroke="#fff" stroke-width="1.8" />
+    </mask>
+    <mask id={`cp-mi-${uid}`} maskUnits="userSpaceOnUse" x="0" y="0" width={W} height={H}>
+      <use href={`#cp-i-${uid}`} fill="none" stroke="#fff" stroke-width="1.8" />
+    </mask>
+    <linearGradient id={`cp-lz-${uid}`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4fc3a1" stop-opacity="0" />
+      <stop offset=".5" stop-color="#4fc3a1" stop-opacity=".42" />
+      <stop offset="1" stop-color="#4fc3a1" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id={`cp-hg-${uid}`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4fc3a1" stop-opacity="0" />
+      <stop offset=".7" stop-color="#4fc3a1" stop-opacity=".9" />
+      <stop offset="1" stop-color="#4fc3a1" stop-opacity="0" />
+    </linearGradient>
+    <radialGradient id={`cp-gl-${uid}`} cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#f0ede8" stop-opacity=".05" />
+      <stop offset="1" stop-color="#f0ede8" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <g mask={`url(#cp-f-${uid})`}>
+    <ellipse cx={CX} cy={CY} rx="330" ry="210" fill={`url(#cp-gl-${uid})`} />
+    <g class="cp-pistas" fill="none" stroke="#4fc3a1" stroke-opacity=".14" stroke-width="1.25" stroke-linejoin="miter">
+      <use href={`#cp-s-${uid}`} />
+      <use href={`#cp-i-${uid}`} />
+    </g>
+    <g fill="#4fc3a1" fill-opacity=".08">
+      {pads.map(([x, y, w, h]) => <rect x={x} y={y} width={w} height={h} rx="1" />)}
+    </g>
+    <g fill="#4fc3a1" fill-opacity=".05" stroke="#4fc3a1" stroke-opacity=".1" stroke-width="1">
+      {ics.map(([x, y, w, h]) => <rect x={x + .5} y={y + .5} width={w} height={h} rx="2" />)}
+    </g>
+    <g mask={`url(#cp-ms-${uid})`}>
+      <rect class="cp-luz cp-luz--sup" x="0" y="0" width={W} height="220" fill={`url(#cp-lz-${uid})`} />
+    </g>
+    <g mask={`url(#cp-mi-${uid})`}>
+      <rect class="cp-luz cp-luz--inf" x="0" y="0" width={W} height="220" fill={`url(#cp-lz-${uid})`} />
+      <rect class="cp-hl" x={CX - 135} y="220" width="270" height="260" fill={`url(#cp-hg-${uid})`} />
+    </g>
+  </g>
+</svg>
+)}

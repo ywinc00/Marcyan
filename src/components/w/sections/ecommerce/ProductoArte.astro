@@ -1,0 +1,116 @@
+---
+// Productos ILUSTRADOS de "Tu Tienda" (marca de ejemplo `tienda`, design/rediseno-workos-v2.md §1.6 y P03).
+// Sustituyen al icono de línea dentro de un cuadrado beige de la v1 (FI §3-2: "productos sin foto").
+// Geometría simple y plana, dibujada por nosotros (E-38/E-49/E-53: nada de escenas): un objeto por
+// lámina, con su luz (franja clara), su sombra propia (elipse de contacto) y la paleta kraft/salvia de
+// la marca. Sin ids internos (ningún degradado ni máscara), así puede repetirse en la página sin
+// duplicar ids (§1.6). Decorativo: aria-hidden siempre; el nombre del producto va en texto al lado.
+//   vela     vaso de vidrio ámbar con cera, mecha y llama, etiqueta kraft
+//   cafe     bolsa kraft con pliegue, válvula y etiqueta en tinta
+//   caja     caja de regalo salvia con tapa más ancha, cinta y lazo grande en ámbar (contraste a 36 px)
+//   taza     taza de barro terracota, más ancha que alta, asa gruesa y vapor (no se confunde con un bote)
+//   viaje    vela de viaje en lata gris humo con tapa
+//   grano    bolsa tostada oscura con etiqueta crema y dos granos de café delante (distinta de `cafe`)
+// Revisión r1 (E-53, E-56 punto 3): caja, taza y café en grano se redibujaron para leerse a 1x.
+//
+// Peso (§1.8): cada producto se dibuja UNA vez por página como <symbol id="tt-pa-<id>"> (modo
+// 'sprite', lo monta el hero de la página) y cada uso es un <svg><use> (modo por defecto). Los ids
+// llevan el prefijo tt- y solo existen en las landings de tienda: sin duplicados (verify-extra).
+export type ProductoId = 'vela' | 'cafe' | 'caja' | 'taza' | 'viaje' | 'grano';
+const IDS: ProductoId[] = ['vela', 'cafe', 'caja', 'taza', 'viaje', 'grano'];
+interface Props { id?: ProductoId; size?: number; sombra?: boolean; class?: string; modo?: 'uso' | 'sprite' }
+const { id = 'vela', size = 40, sombra = true, class: cls, modo = 'uso' } = Astro.props;
+---
+{/* 2026-11-08 (dueño: «los productos dibujados hacen que el ejemplo parezca pobre»): cada producto es
+    ahora una FOTO real de Unsplash (licencia libre, ids en design/ejemplos-v8.md). El dibujo queda solo
+    en el modo 'sprite', que ya no se usa para pintar. */}
+{modo === 'uso' && (
+  <img class:list={['pa', cls]} src={`/fotos/ejemplos/prod-${id}-${size >= 60 ? 640 : 160}.webp`} srcset={`/fotos/ejemplos/prod-${id}-160.webp 160w, /fotos/ejemplos/prod-${id}-320.webp 320w, /fotos/ejemplos/prod-${id}-640.webp 640w`} sizes={size >= 60 ? '420px' : `${Math.max(Math.round(size * 2.4), 80)}px`} width={size} height={size} style={`--pa:${size}px`} alt="" aria-hidden="true" loading="lazy" decoding="async" />
+)}
+{modo === 'sprite' && (
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  {IDS.map((id) => (
+  <symbol id={`tt-pa-${id}`} overflow="visible">
+  {id === 'vela' && (
+    <g>
+      <path d="M17 18h30v34a5 5 0 0 1-5 5H22a5 5 0 0 1-5-5z" fill="#B47A3C" />
+      <path d="M17 18h30v6H17z" fill="#C98F4F" />
+      <ellipse cx="32" cy="22" rx="13" ry="2.6" fill="#F3E6CC" />
+      <path d="M17 32h30v13H17z" fill="#E6DBC8" />
+      <path d="M17 32h30v1.2H17zM17 43.8h30V45H17z" fill="#2A211B" opacity=".14" />
+      <path d="M26.5 37.4h11M28.5 40.2h7" stroke="#2A211B" stroke-width="1.3" stroke-linecap="round" opacity=".7" />
+      <path d="M21 20v34" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".28" />
+      <path d="M32 21.6v-4.2" stroke="#2A211B" stroke-width="1.1" stroke-linecap="round" />
+      <path d="M32 8.6c2.6 2.8 3.2 5.2 1.6 7.2-.8 1-2.4 1-3.2 0-1.6-2 -1-4.4 1.6-7.2z" fill="#E9A64B" />
+      <path d="M32 12.4c.9 1.1 1 2 .5 2.7-.3.3-.7.3-1 0-.5-.7-.4-1.6.5-2.7z" fill="#FBE3B0" />
+    </g>
+  )}
+  {id === 'cafe' && (
+    <g>
+      <path d="M19 15h26l3 40a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2z" fill="#C9A97E" />
+      <path d="M19 15h26l.6 7H18.4z" fill="#B08E62" />
+      <path d="M18.4 22h27.2" stroke="#2A211B" stroke-width="1" opacity=".18" />
+      <path d="M24 15l-1.5 42M40 15l1.5 42" stroke="#2A211B" stroke-width=".8" opacity=".1" />
+      <rect x="22.5" y="30" width="19" height="16" rx="1.5" fill="#2A211B" />
+      <path d="M26 35.5h12M27.5 39h9" stroke="#E6DBC8" stroke-width="1.3" stroke-linecap="round" />
+      <circle cx="32" cy="42.6" r=".9" fill="#A9B78F" />
+      <circle cx="38.5" cy="25.6" r="2" fill="#8F7350" />
+      <circle cx="38.5" cy="25.6" r=".8" fill="#2A211B" opacity=".5" />
+      <path d="M21.5 23v31" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".22" />
+    </g>
+  )}
+  {id === 'caja' && (
+    <g>
+      <path d="M14 31h36v22a3 3 0 0 1-3 3H17a3 3 0 0 1-3-3z" fill="#7F8E66" />
+      <path d="M11 24h42v8H11z" fill="#4E5A3D" />
+      <path d="M14 32h36v2.4H14z" fill="#2A211B" opacity=".22" />
+      <path d="M28.5 24h7v32h-7z" fill="#C2703D" />
+      <path d="M28.5 32h7v2.4h-7z" fill="#2A211B" opacity=".2" />
+      <path d="M32 24c-3-8.5-15-11-15.5-4.6-.4 4.6 9.6 5.4 15.5 4.6z" fill="#C2703D" />
+      <path d="M32 24c3-8.5 15-11 15.5-4.6.4 4.6-9.6 5.4-15.5 4.6z" fill="#C2703D" />
+      <path d="M32 24c-2.6-5-8.6-7.4-11.4-5.4M32 24c2.6-5 8.6-7.4 11.4-5.4" stroke="#8E4A22" stroke-width="1.3" fill="none" stroke-linecap="round" />
+      <rect x="29" y="20.6" width="6" height="5.4" rx="1.6" fill="#A85A2C" />
+      <path d="M17 36v17" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".2" />
+    </g>
+  )}
+  {id === 'taza' && (
+    <g>
+      <path d="M43 31h4a8 8 0 0 1 0 16h-4" stroke="#A65F3E" stroke-width="5" fill="none" />
+      <path d="M12 27h32v17a11 11 0 0 1-11 11h-10a11 11 0 0 1-11-11z" fill="#B9734F" />
+      <path d="M12 27h32v6c-3 2-6 .4-8.6 2-2.6 1.6-5.4 1-7.4-.4-2.4-1.6-5-1.2-7.4.2-2.2 1.2-6.6 1-8.6-1z" fill="#F3E6CC" />
+      <ellipse cx="28" cy="27" rx="16" ry="3" fill="#E6DBC8" />
+      <ellipse cx="28" cy="27.3" rx="13.4" ry="2" fill="#5A3E2B" />
+      <path d="M16.5 37v8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".3" />
+      <path d="M23 21c-2-2.4 2-4.4 0-7.4M31 21c-2-2.4 2-4.4 0-7.4" stroke="#8A7F72" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".7" />
+    </g>
+  )}
+  {id === 'viaje' && (
+    <g>
+      <path d="M14 33h36v15a6 6 0 0 1-6 6H20a6 6 0 0 1-6-6z" fill="#7C8A8D" />
+      <ellipse cx="32" cy="33" rx="18" ry="4" fill="#9DB0B4" />
+      <ellipse cx="32" cy="33" rx="15" ry="2.9" fill="#F3E6CC" />
+      <path d="M14 39.5h36v7H14z" fill="#E6DBC8" />
+      <path d="M24 43h16" stroke="#2A211B" stroke-width="1.3" stroke-linecap="round" opacity=".7" />
+      <path d="M32 32v-3.4" stroke="#2A211B" stroke-width="1.1" stroke-linecap="round" />
+      <path d="M32 21c2.2 2.4 2.7 4.4 1.4 6.1-.7.8-2.1.8-2.8 0-1.3-1.7-.8-3.7 1.4-6.1z" fill="#E9A64B" />
+      <path d="M18 36v14" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".3" />
+    </g>
+  )}
+  {id === 'grano' && (
+    <g>
+      <path d="M16 13h24l3 41a2 2 0 0 1-2 2H15a2 2 0 0 1-2-2z" fill="#5A3E2B" />
+      <path d="M16 13h24l.6 6.4H15.4z" fill="#3F2A1D" />
+      <rect x="18" y="25" width="20" height="13" rx="1.5" fill="#F3E6CC" />
+      <path d="M21.5 29.6h13M23 33.4h10" stroke="#2A211B" stroke-width="1.3" stroke-linecap="round" opacity=".75" />
+      <path d="M18 20.5v31" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".16" />
+      <g transform="rotate(-30 42 48)"><ellipse cx="42" cy="48" rx="6.6" ry="8.8" fill="#B07A48" stroke="#F5F0E7" stroke-width="1.4" /><path d="M42 40c-3 3.2-3 12.8 0 16" stroke="#4A2E1C" stroke-width="1.8" fill="none" stroke-linecap="round" /></g>
+      <g transform="rotate(18 50 40)"><ellipse cx="50" cy="40" rx="5" ry="6.6" fill="#9A6538" stroke="#F5F0E7" stroke-width="1.2" /><path d="M50 34.2c-2.2 2.4-2.2 9.2 0 11.6" stroke="#4A2E1C" stroke-width="1.5" fill="none" stroke-linecap="round" /></g>
+    </g>
+  )}
+  </symbol>))}
+</svg>
+)}
+
+<style>
+  .pa { display: block; flex: none; width: var(--pa); height: var(--pa); max-width: none; object-fit: cover; border-radius: max(3px, calc(var(--pa) * .1)); background: #e9e3d8; }
+</style>

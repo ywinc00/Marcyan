@@ -1,0 +1,107 @@
+---
+// Panel del megamenú de Servicios (design/rediseno-workos.md §2.12, G10;
+// recortes W-ADV-10 y W-HOME-02). Se renderiza en el HTML del servidor con
+// `hidden` (nunca en <template>); lo abre y cierra el script de SiteNav.
+// Vive DENTRO del <header>: posición absoluta fija (no animada), sin
+// backdrop-filter. Solo el contenido interior (.mega__in) hace el fundido.
+// Cerrojo 5: sale de v3, TODO su CSS aquí y solo lee variables.
+import IconoObjeto from '../IconoObjeto.astro';
+import MegaRecursos from './MegaRecursos.astro';
+import { serviciosPara, navW, type NavLang } from '../../../i18n/w/nav';
+
+interface Props { lang?: NavLang; currentPath?: string }
+const { lang = 'es', currentPath } = Astro.props;
+const items = serviciosPara(lang, currentPath);
+const ui = navW[lang] ?? navW.es;
+---
+<div id="nav-mega" class="mega" data-nav-mega hidden>
+  <div class="mega__in">
+    <ul class="mega__grid">
+      {items.map((s) => (
+        <li>
+          <a class="mega__cell" href={s.href}>
+            <IconoObjeto id={s.id} size={48} />
+            <span class="mega__txt">
+              <span class="mega__name">{s.name}</span>
+              <span class="mega__promise">{s.promise}</span>
+            </span>
+          </a>
+        </li>
+      ))}
+      <li>
+        <a class="mega__cell mega__all" href={ui.allServices.href}>
+          <span>{ui.allServices.label}</span><span class="mega__chev" aria-hidden="true">›</span>
+        </a>
+      </li>
+    </ul>
+    <span class="mega__rule" aria-hidden="true"></span>
+    <MegaRecursos lang={lang} />
+  </div>
+</div>
+
+<style>
+  .mega {
+    position: absolute; top: calc(100% + 8px); left: 50%;
+    transform: translateX(-50%);
+    width: min(900px, calc(100vw - 32px));
+    padding: 12px; border-radius: var(--w-r-cell, 8px);
+    background: var(--w-s-solid);
+    border: 1px solid var(--w-line);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 18px 40px rgba(0, 0, 0, .45);
+  }
+  .mega[hidden] { display: none; }
+  /* Puente invisible sobre el hueco de 8 px: el ratón pasa del botón al panel sin salir. */
+  .mega::before { content: ''; position: absolute; inset: -9px 0 auto 0; height: 9px; }
+
+  .mega__in {
+    display: grid; grid-template-columns: minmax(0, 2fr) 1px minmax(0, 288px);
+    column-gap: 0;
+    opacity: 0; transform: translateY(4px);
+    transition: opacity 120ms var(--w-ease-ui, ease), transform 120ms var(--w-ease-ui, ease);
+  }
+  .mega[data-open] .mega__in { opacity: 1; transform: none; }
+  /* Tableta (panel más estrecho que 900): los recursos ceden ancho a los productos. */
+  @media (--lt-lg) { .mega__in { grid-template-columns: minmax(0, 2.6fr) 1px minmax(0, 1fr); } }
+
+  .mega__grid {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, auto); grid-auto-flow: column;
+  }
+  .mega__cell {
+    display: flex; align-items: center; gap: 16px;
+    min-height: 84px; padding: 12px 16px; border-radius: var(--w-r-cell, 8px);
+    color: var(--w-ink);
+    transition: background var(--w-dur-micro, 150ms) var(--w-ease-ui, ease);
+  }
+  .mega__txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .mega__name {
+    font-family: var(--font-body); font-size: 14px; font-weight: 500; line-height: 1.43;
+    color: var(--w-ink);
+  }
+  .mega__promise {
+    font-family: var(--font-body); font-size: 14px; line-height: 1.43;
+    color: var(--w-ink-60);
+  }
+  .mega__all {
+    gap: 8px; font-family: var(--font-body); font-size: 14px; font-weight: 500;
+  }
+  .mega__chev {
+    font-size: 18px; line-height: 1; color: var(--accent-gold);
+    transition: transform var(--w-dur-hover, 200ms) var(--w-ease-ui, ease);
+  }
+  @media (--hover-fine) {
+    .mega__cell:hover { background: var(--w-s2); }
+    .mega__all:hover .mega__chev { transform: translateX(3px); }
+  }
+  .mega__cell:focus-visible { background: var(--w-s2); }
+  .mega__all:focus-visible .mega__chev { transform: translateX(3px); }
+
+  .mega__rule { background: var(--w-line); margin: 4px 0; }
+
+  @media (--motion-reduce) {
+    .mega__in { transform: none; transition: none; }
+    .mega__cell, .mega__chev { transition: none; }
+    .mega__all:hover .mega__chev, .mega__all:focus-visible .mega__chev { transform: none; }
+  }
+</style>

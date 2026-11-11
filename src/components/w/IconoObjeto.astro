@@ -1,0 +1,74 @@
+---
+// Icono-objeto de producto (design/rediseno-workos.md §2.8, G6).
+// Pinta <use href="/w/iconos.svg#wi-<id>">: el sprite es un archivo compartido en caché
+// (control v2 r3, I-02; antes iba en línea en cada página). `inline` dibuja el símbolo completo
+// dentro del propio SVG (ids de degradado con sufijo único: sin duplicados).
+// Cerrojo 5: sale de v3 (megamenú, tarjetas de portada y hubs), así que
+// TODO su CSS va aquí y solo lee variables (--w-*, --accent-*).
+import { ICONOS, type IconoId, type IconoTone } from './objects/registry';
+import { GLYPH_DEFS, glyphMarkup } from './objects/glyphs';
+import { SPRITE_HREF } from './objects/sprite';
+
+interface Props {
+  id: IconoId;
+  size?: 40 | 44 | 48 | 52 | 56 | 80;
+  tone?: IconoTone;
+  inline?: boolean;
+  class?: string;
+}
+const { id, size = 48, tone, inline = false, class: cls } = Astro.props;
+const def = ICONOS[id];
+if (!def) throw new Error(`IconoObjeto: id desconocido "${id}"`);
+const t = tone ?? def.tone;
+// Brillo estático solo en oro y solo a 80 px (§2.8; nunca en teal, E-03).
+const glow = t === 'gold' && size === 80;
+
+let inner = '';
+if (inline) {
+  const sfx = `-${id}-${Math.random().toString(36).slice(2, 8)}`;
+  inner = `<defs>${GLYPH_DEFS}</defs>${glyphMarkup(id)}`
+    .replace(/id="wi-(bg|hl|mk|fade)"/g, `id="wi-$1${sfx}"`)
+    .replace(/url\(#wi-(bg|hl|mk|fade)\)/g, `url(#wi-$1${sfx})`);
+}
+---
+<svg
+  class:list={['wi', t === 'teal' && 'wi--teal', glow && 'wi--glow', cls]}
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  aria-hidden="true"
+  focusable="false"
+>
+  {inline ? <Fragment set:html={inner} /> : <use href={`${SPRITE_HREF}#wi-${id}`} />}
+</svg>
+
+<style>
+  /* El contorno pasa del 45 % al 80 % en 200 ms: propiedad registrada para que
+     la transición funcione y herede dentro del árbol de <use>. */
+  @property --wi-edge-a {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 0.45;
+  }
+  .wi {
+    display: block; flex: none; overflow: visible;
+    --wi-rgb: var(--accent-gold-rgb); /* tono por clase (oro por defecto), no por style en línea: pesa menos */
+    --wi-edge-a: 0.45; --wi-edge-hover: 0.8;
+    --wi-sw: 2; --wi-tint: 0.1; --wi-bw: 1;
+    transition: --wi-edge-a var(--w-dur-hover, 200ms) var(--w-ease-ui, ease);
+  }
+  /* Oficio por tamaño (control 2, E-27): lo que a 80 px es relieve, a 40-48 px desaparece.
+     Pequeño = trazo ~2 px reales, contorno más presente y el acento como relleno de la base. */
+  .wi[width='40'], .wi[width='44'], .wi[width='48'] {
+    --wi-sw: 2.9; --wi-tint: 0.26; --wi-edge-a: 0.72; --wi-edge-hover: 1; --wi-bw: 1.4;
+  }
+  .wi[width='52'], .wi[width='56'] { --wi-sw: 2.5; --wi-tint: 0.2; --wi-edge-a: 0.6; --wi-edge-hover: 0.9; --wi-bw: 1.2; }
+  .wi--teal { --wi-rgb: var(--accent-teal-rgb); }
+  .wi--glow { filter: drop-shadow(0 0 10px rgba(200, 169, 110, 0.18)); }
+  /* Hover solo dentro de tarjetas enlazadas y con puntero fino. */
+  @media (--hover-fine) {
+    :global(a:hover) .wi { --wi-edge-a: var(--wi-edge-hover); }
+  }
+  :global(a:focus-visible) .wi { --wi-edge-a: var(--wi-edge-hover); }
+  @media (--motion-reduce) { .wi { transition: none; } }
+</style>

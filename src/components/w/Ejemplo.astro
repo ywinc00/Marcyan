@@ -1,0 +1,37 @@
+---
+// Etiqueta "Ejemplo" de los objetos con datos inventados (regla de prueba honesta).
+// Cerrojo 5: sale de v3, así que TODO su CSS va aquí (solo lee variables --w-*).
+// Por defecto se coloca arriba a la derecha del objeto (el objeto debe ser
+// position:relative) y por encima de cualquier bucle (E-18).
+interface Props {
+  label?: string;
+  lang?: 'es' | 'en';
+  /** dark = sobre objeto de sistema (noche) · light = sobre objeto de producto (claro) */
+  on?: 'dark' | 'light';
+  /** corner = esquina superior derecha del objeto · inline = en el flujo */
+  pos?: 'corner' | 'inline';
+  class?: string;
+}
+const { label, lang = 'es', on = 'dark', pos = 'corner', class: cls } = Astro.props;
+const text = label ?? (lang === 'en' ? 'Example' : 'Ejemplo');
+---
+<span class:list={['w-example', `w-example--${on}`, pos === 'corner' && 'w-example--corner', cls]}>{text}</span>
+
+<style>
+  .w-example {
+    display: inline-block;
+    font-family: var(--font-mono); font-weight: 500; font-size: 12px; line-height: 1.2;
+    text-transform: uppercase; letter-spacing: var(--w-tr-micro, 0.1em);
+    padding: 3px 8px; border-radius: var(--w-r-cell, 8px);
+    background: rgba(var(--star-rgb), 0.06);
+    border: 1px solid var(--w-line-ink);
+    color: var(--w-ink-80);
+    white-space: nowrap;
+  }
+  .w-example--light {
+    background: rgba(14, 14, 13, 0.06);
+    border-color: var(--w-p-line);
+    color: var(--w-p-ink-2);
+  }
+  .w-example--corner { position: absolute; top: 12px; right: 12px; z-index: 3; }
+</style>

@@ -1,0 +1,103 @@
+---
+// Ficha de mapa de EJEMPLO (objeto de PRODUCTO, claro · design/rediseno-workos.md §3.6).
+// Sin logotipo de Google ni de ningún tercero (§1.C): "ficha de mapa de ejemplo".
+// "Reseñas" como barras grises SIN estrellas ni número (§1.C, M-11). Estático.
+import Icon from '../../ui/Icon.astro';
+import Ejemplo from '../Ejemplo.astro';
+
+interface Props {
+  lang?: 'es' | 'en';
+  name?: string;
+  city?: string;
+  size?: 'hero' | 'card' | 'mini';
+  tone?: 'gold' | 'teal';
+  /** Categoría (por defecto la de la plomería de ejemplo). */
+  cat?: string;
+  class?: string;
+}
+const { lang = 'es', name, city = 'Houston', size = 'card', tone = 'gold', cat, class: cls } = Astro.props;
+const en = lang === 'en';
+const T = {
+  name: name ?? (en ? 'Your Plumbing' : 'Tu Plomería'),
+  cat: cat ?? (en ? `Plumber · ${city}` : `Plomero · ${city}`),
+  reviews: en ? 'Reviews' : 'Reseñas',
+  open: en ? 'Open' : 'Abierto',
+  closes: en ? 'closes 6 p.m.' : 'cierra 6 p. m.',
+  call: en ? 'Call' : 'Llamar',
+  dir: en ? 'Directions' : 'Cómo llegar',
+  web: en ? 'Website' : 'Sitio web',
+  sr: en ? 'Example map listing: name, category, reviews, hours and buttons to call, get directions or visit the website.'
+         : 'Ficha de mapa de ejemplo: nombre, categoría, reseñas, horario y botones para llamar, llegar o ir al sitio web.',
+};
+---
+<div class:list={['wo-map', `wo-map--${size}`, cls]} data-tone={tone}>
+  <p class="sr-only">{T.sr}</p>
+  <div aria-hidden="true">
+    <Ejemplo lang={lang} on="light" />
+    <div class="wo-map__map">
+      <svg viewBox="0 0 360 120" preserveAspectRatio="xMidYMid slice">
+        <rect width="360" height="120" fill="#e4e0d8" />
+        <path d="M-10 86 C60 70 120 96 200 78 S320 52 370 64" stroke="#fff" stroke-width="9" fill="none" />
+        <path d="M120 -10 L150 130" stroke="#fff" stroke-width="6" fill="none" />
+        <path d="M250 -10 C240 40 268 80 258 130" stroke="#fff" stroke-width="5" fill="none" />
+        <path d="M-10 30 L370 22" stroke="#f6f4f0" stroke-width="3" fill="none" />
+        <rect x="18" y="38" width="70" height="30" rx="4" fill="#d9e2d3" />
+        <rect x="282" y="86" width="60" height="26" rx="4" fill="#d9e2d3" />
+      </svg>
+      <span class="wo-map__pin"><Icon name="lucide:map-pin" /></span>
+    </div>
+    <div class="wo-map__body">
+      <p class="wo-map__name" translate="no">{T.name}</p>
+      <p class="wo-map__cat">{T.cat}</p>
+      <div class="wo-map__rev">
+        <span class="wo-map__revl">{T.reviews}</span>
+        <span class="wo-map__bars"><i style="--w:92%"></i><i style="--w:70%"></i><i style="--w:38%"></i></span>
+      </div>
+      <p class="wo-map__open"><b>{T.open}</b> · {T.closes}</p>
+      <div class="wo-map__acts">
+        <span class="wo-map__act wo-map__act--main"><Icon name="lucide:phone" />{T.call}</span>
+        <span class="wo-map__act"><Icon name="lucide:navigation" />{T.dir}</span>
+        <span class="wo-map__act"><Icon name="lucide:globe" />{T.web}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .wo-map {
+    --wo-acc: var(--accent-gold);
+    position: relative; width: min(100%, 340px);
+    background: var(--w-p-bg, #f0ede8); color: var(--w-p-ink, #0e0e0d);
+    border: 1px solid var(--w-p-line, rgba(14,14,13,.08));
+    border-radius: var(--w-r-obj, 12px); overflow: hidden;
+    font-family: var(--font-body); text-align: left;
+  }
+  .wo-map[data-tone='teal'] { --wo-acc: var(--accent-teal); }
+  .wo-map__map { position: relative; height: 112px; }
+  .wo-map__map svg { display: block; width: 100%; height: 100%; }
+  .wo-map__pin {
+    position: absolute; left: 50%; top: 50%; translate: -50% -70%;
+    display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50% 50% 50% 4px; rotate: -45deg;
+    background: var(--w-p-ink, #0e0e0d); color: var(--w-p-bg, #f0ede8);
+  }
+  .wo-map__pin :global(svg) { width: 16px; height: 16px; rotate: 45deg; }
+  .wo-map__body { padding: 16px 18px 18px; display: grid; gap: 8px; }
+  .wo-map__name { margin: 0; font: 600 18px/1.2 var(--font-display); letter-spacing: -0.02em; }
+  .wo-map__cat { margin: -4px 0 0; font-size: 13px; color: var(--w-p-ink-2, #4a4743); }
+  .wo-map__rev { display: flex; align-items: center; gap: 12px; }
+  .wo-map__revl { font-size: 13px; font-weight: 500; }
+  .wo-map__bars { flex: 1; display: grid; gap: 4px; }
+  .wo-map__bars i { display: block; height: 4px; width: var(--w); border-radius: 2px; background: #cdc8bf; }
+  .wo-map__open { margin: 0; font-size: 13px; color: var(--w-p-ink-2, #4a4743); }
+  .wo-map__open b { color: var(--w-p-ink, #0e0e0d); font-weight: 600; }
+  .wo-map__acts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+  .wo-map__act {
+    display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px;
+    border: 1px solid var(--w-p-line, rgba(14,14,13,.08)); border-radius: 8px; background: #fff;
+    font-size: 13px; font-weight: 500; white-space: nowrap;
+  }
+  .wo-map__act :global(svg) { width: 16px; height: 16px; }
+  .wo-map__act--main { background: var(--wo-acc); border-color: transparent; color: var(--w-p-ink, #0e0e0d); }
+  .wo-map--mini { width: min(100%, 290px); }
+  .wo-map--mini .wo-map__map { height: 84px; }
+</style>

@@ -1,0 +1,116 @@
+---
+// F05 · Placa de circuito (IA para pymes). FO/bocetos/f05-ia-pymes.html + W-CONV-23.
+// Pistas teal que NACEN del objeto del hero (el chip) y salen por sus cuatro lados,
+// con pulsos que viajan hacia fuera (6 s) y pads al final, sobre trama de puntos.
+// En PC las de la izquierda bajan por debajo del bloque de texto; en móvil salen por
+// arriba (ancladas a la burbuja de la pregunta, v5) y por abajo del objeto. Sin halo: solo trazo. Solo stroke-dashoffset.
+// Quieto: pistas y pads sin pulsos.
+interface Props { estilos?: boolean; eco?: boolean }
+const { estilos = true, eco = false } = Astro.props;
+
+type P = [number, number];
+const pista = (pts: P[]) => 'M' + pts.map(([x, y]) => `${x} ${y}`).join('L');
+// Caja del objeto alrededor del origen: PC 480×580, móvil 347×554.
+function trazas(hw: number, hh: number, movil: boolean) {
+  const out: { d: string; end: P }[] = [];
+  const add = (pts: P[]) => out.push({ d: pista(pts), end: pts[pts.length - 1] });
+  if (!movil) {
+    // Izquierda: salen por el lado bajo del objeto y pasan por DEBAJO del texto.
+    for (let i = 0; i < 7; i++) {
+      const y0 = hh - 150 + i * 20, x1 = -hw - 30 - i * 14, dy = 110 - i * 6;
+      add([[-hw, y0], [x1, y0], [x1 - dy, y0 + dy], [-hw - 420 - ((i * 83) % 360), y0 + dy]]);
+    }
+    // Derecha: hasta el borde.
+    for (let i = 0; i < 6; i++) {
+      const y0 = -hh + 60 + i * 92, x1 = hw + 40 + ((i * 31) % 70), dy = (i % 2 ? 1 : -1) * 36;
+      add([[hw, y0], [x1, y0], [x1 + Math.abs(dy), y0 + dy], [hw + 420, y0 + dy]]);
+    }
+  }
+  // Arriba y abajo.
+  const n = movil ? 5 : 6, paso = movil ? 64 : 80;
+  for (let i = 0; i < n; i++) {
+    const x0 = -((n - 1) * paso) / 2 + i * paso;
+    for (const s of [-1, 1]) {
+      // v5: en móvil las de arriba van en su propio lienzo, anclado al borde de la burbuja (abajo).
+      if (movil && s < 0) continue;
+      const y1 = s * (hh + 34 + ((i * 23) % 50)), dx = (i % 2 ? 1 : -1) * 30;
+      add([[x0, s * hh], [x0, y1], [x0 + dx, y1 + s * 30], [x0 + dx, s * (hh + (movil ? 260 : 420))]]);
+    }
+  }
+  return out;
+}
+const pc = trazas(240, 290, false);
+const mo = trazas(174, 277, true);
+// v5 (dueño, 2026-11-07: «las líneas de arriba están mal formadas y desconectadas»). En móvil las pistas
+// de arriba NACEN del borde superior de la burbuja de la pregunta (origen 0,0 = centro de ese borde, lo
+// mide el guion): suben 16 px, giran a 45° y suben 12 px más hasta su pad. Cuatro, dentro del ancho de la
+// burbuja y a la izquierda del rótulo «Ejemplo»; quedan ~36 px de aire con los botones (390 px).
+const moTop: { d: string; end: P }[] = [-108, -54, 0, 54].map((x0, i) => {
+  const dx = (i < 2 ? -1 : 1) * 14; // las de la izquierda giran hacia fuera a la izquierda, las otras a la derecha
+  const pts: P[] = [[x0, 0], [x0, -16], [x0 + dx, -30], [x0 + dx, -40]];
+  return { d: pista(pts), end: pts[pts.length - 1] };
+});
+// Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
+const CSS = `
+  .wf-pl { position: absolute; inset: 0; --fx: var(--wf-foco-x, calc(100% - var(--wf-l) - 240px)); --fy: var(--wf-foco-y, 429px); }
+  .wf--centro .wf-pl { --fx: var(--wf-foco-x, 50%); --fy: var(--wf-foco-y, 680px); }
+  .wf-pl__trama {
+    position: absolute; inset: 0;
+    background: radial-gradient(rgba(var(--wf-a), .12) 1px, transparent 1.3px) 0 0 / 16px 16px;
+    -webkit-mask-image: radial-gradient(46% 52% at var(--fx) var(--fy), #000, transparent 80%);
+            mask-image: radial-gradient(46% 52% at var(--fx) var(--fy), #000, transparent 80%);
+  }
+  .wf-pl__svg { position: absolute; left: var(--fx); top: var(--fy); overflow: visible; }
+  .wf-pl__svg--pc { width: 2200px; height: 1440px; margin: -720px 0 0 -1100px; }
+  .wf-pl__svg--mo { display: none; width: 1000px; height: 1240px; margin: -620px 0 0 -500px; }
+  .wf-pl__svg--mot { display: none; left: var(--pl-x, 50%); top: var(--pl-top, calc(var(--fy) - 237px)); width: 400px; height: 120px; margin: -100px 0 0 -200px; }
+  .wf-pl__t { fill: none; stroke: rgba(var(--wf-a), .26); stroke-width: 1.2; }
+  .wf-pl__p {
+    fill: none; stroke: rgb(var(--wf-a)); stroke-width: 1.6; stroke-linecap: round;
+    stroke-dasharray: 28 1200; stroke-dashoffset: 1228; animation: wf-pl-corre 6s linear infinite;
+  }
+  .wf-pl circle { fill: var(--bg-base, #080808); stroke: rgba(var(--wf-a), .5); stroke-width: 1.2; }
+  @keyframes wf-pl-corre { from { stroke-dashoffset: 1228; } to { stroke-dashoffset: 0; } }
+  @media (max-width: 767.98px) {
+    .wf-pl, .wf--centro .wf-pl { --fx: var(--wf-foco-x-movil, 50%); --fy: var(--wf-foco-y-movil, 755px); }
+    .wf-pl__svg--pc { display: none; }
+    .wf-pl__svg--mo, .wf-pl__svg--mot { display: block; }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-pl">
+  <div class="wf-pl__trama"></div>
+  {[{ set: pc, cls: 'wf-pl__svg wf-pl__svg--pc', vb: '-1100 -720 2200 1440' }, { set: mo, cls: 'wf-pl__svg wf-pl__svg--mo', vb: '-500 -620 1000 1240' }, { set: moTop, cls: 'wf-pl__svg wf-pl__svg--mot', vb: '-200 -100 400 120' }].map(({ set, cls, vb }) => (
+    <svg class={cls} viewBox={vb} focusable="false">
+      {set.map((t) => <path class="wf-pl__t" d={t.d} />)}
+      {!eco && set.filter((_, i) => i % 3 === 0).map((t, i) => <path class="wf-pl__p" d={t.d} style={`animation-delay:-${(i * 0.9).toFixed(1)}s`} />)}
+      {set.map((t) => <circle cx={t.end[0]} cy={t.end[1]} r="4" />)}
+    </svg>
+  ))}
+</div>
+<script>
+  import { zrect, zoom } from '../zoom';
+  // Ancla las pistas de arriba (móvil) al borde superior de la burbuja de la pregunta del hero.
+  function anclaPlaca() {
+    const capa = document.querySelector<HTMLElement>('.wf-pl');
+    const ask = document.querySelector<HTMLElement>('.wo-lock__ask');
+    if (!capa || !ask) return;
+    let raf = 0;
+    const calc = () => {
+      raf = 0;
+      const c = zrect(capa), r = zrect(ask);
+      if (!r.width) return;
+      capa.style.setProperty('--pl-x', `${(r.left - c.left + r.width / 2).toFixed(1)}px`);
+      capa.style.setProperty('--pl-top', `${(r.top - c.top).toFixed(1)}px`);
+    };
+    const pide = () => { if (!raf) raf = requestAnimationFrame(calc); };
+    new ResizeObserver(pide).observe(capa);
+    calc();
+    // la burbuja entra con transform (no la ve ResizeObserver): una medida más al terminar
+    window.addEventListener('load', pide, { once: true });
+    setTimeout(pide, 1400);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', anclaPlaca, { once: true });
+  else anclaPlaca();
+</script>

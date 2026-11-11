@@ -693,7 +693,7 @@ const houstonIa: ClusterPage = {
     title: 'Servicios relacionados',
     links: [
       { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Un sitio rápido es la base donde vive tu asistente de IA.', icon: 'lucide:layout-template' },
-      { label: '¿Cuánto cuesta un chatbot?', href: '/es/precios', desc: 'El precio de un asistente con IA y qué incluye.', icon: 'lucide:tag' },
+      { label: '¿Cuánto cuesta un chatbot?', href: '/es/blog/cuanto-cuesta-chatbot-whatsapp-guia', desc: 'Guía de precios en Estados Unidos: apps, desarrollo a medida y el cobro de Meta.', icon: 'lucide:tag' },
     ],
   },
   service: {
@@ -1069,7 +1069,7 @@ const miamiIa: ClusterPage = {
     title: 'Servicios relacionados',
     links: [
       { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'Un sitio rápido es la base donde vive tu asistente de IA.', icon: 'lucide:layout-template' },
-      { label: '¿Cuánto cuesta un chatbot?', href: '/es/precios', desc: 'El precio de un asistente con IA y qué incluye.', icon: 'lucide:tag' },
+      { label: '¿Cuánto cuesta un chatbot?', href: '/es/blog/cuanto-cuesta-chatbot-whatsapp-guia', desc: 'Guía de precios en Estados Unidos: apps, desarrollo a medida y el cobro de Meta.', icon: 'lucide:tag' },
       { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'El mismo servicio, en nuestra base de operaciones.', icon: 'lucide:messages-square' },
     ],
   },

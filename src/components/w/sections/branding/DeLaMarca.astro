@@ -1,0 +1,68 @@
+---
+// Branding · 02 "De la marca a todo lo demás" (G08 · design/rediseno-workos-v2.md §3; original
+// W-CORE-06 "Sign-in that feels like part of your app", ficha C/03-personalizador).
+// v2: la Escalera decorativa de la v1 se retira y se monta el Personalizador de P01 SOLO
+// (sin consola) con la marca de ejemplo "Tu Marca" (negocios.ts → 'marca'). Cuatro controles
+// reales en dos raíles, cada grupo un radiogroup con flechas (§1.7):
+//   izquierda · Color (la paleta de la marca + sus 3 alternativas) · Modo (día / noche)
+//   derecha   · Marcos (rectas · suaves · redondas) · Letra (moderna · clásica · técnica)
+// Cuatro opciones a la izquierda (Tu logo / Tus colores / Tu tipografía / Tu web): la maqueta
+// cambia por opción y las elecciones se conservan. Láminas de logo, paleta y tipografía en
+// VistaMarca.astro (sustituto local de las vistas de PlanoMarca de P03, pendiente [SISTEMA]);
+// "Tu web" es también VistaMarca (vista="web", ronda 1 B1: WebEjemplo se quedaba en esqueleto). Las tres
+// no activas viajan en <template> (§1.8).
+// Precios solo de pricing.ts: logo = ancla baja del branding, colores = branding completo,
+// web = ancla baja del diseño web; la tipografía va con los colores y no repite precio.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Personalizador, { type Opcion } from '../../demos/Personalizador.astro';
+import VistaMarca from './VistaMarca.astro';
+import { PRICE_ANCHORS } from '../../../../i18n/pricing';
+import type { BrandingCopy } from '../../../../i18n/w/branding';
+
+interface Props { copy: BrandingCopy['marca']; n: number; city: string; lang?: 'es' | 'en' }
+const { copy, n, lang = 'es' } = Astro.props;
+const desde = (v: number) => (lang === 'en' ? `From $${v.toLocaleString('en-US')}` : `Desde $${v.toLocaleString('en-US')}`);
+const opciones: Opcion[] = [
+  { id: 'logo', icon: 'lucide:pen-tool', titulo: copy.logo.title, texto: copy.logo.text, precio: desde(PRICE_ANCHORS.brandingLogo) },
+  { id: 'colores', icon: 'lucide:palette', titulo: copy.colores.title, texto: copy.colores.text, precio: desde(PRICE_ANCHORS.branding) },
+  { id: 'tipo', icon: 'lucide:type', titulo: copy.tipo.title, texto: copy.tipo.text },
+  { id: 'web', icon: 'lucide:monitor-smartphone', titulo: copy.web.title, texto: copy.web.text, precio: desde(PRICE_ANCHORS.webLanding) },
+];
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="bm">
+  <Personalizador
+    lang={lang}
+    marca="marca"
+    id="branding"
+    controles={{ izq: ['color', 'modo'], der: ['marcos', 'letra'] }}
+    opciones={opciones}
+    etiquetaOpciones={copy.opciones}
+  >
+    <VistaMarca slot="maqueta" vista="logo" lang={lang} />
+    <VistaMarca slot="opcion-colores" vista="paleta" lang={lang} />
+    <VistaMarca slot="opcion-tipo" vista="tipo" lang={lang} />
+    <VistaMarca slot="opcion-web" vista="web" lang={lang} />
+  </Personalizador>
+</div>
+
+<style>
+  .bm { margin-top: var(--w-chapter-gap, 64px); }
+  /* El resumen "Tu web: … · botones · idioma" del personalizador nombra grupos que esta versión
+     no monta (Botones e Idioma): aquí se oculta y queda el chip. Pendiente [SISTEMA]: que el
+     resumen se arme con los grupos presentes. */
+  .bm :global(.pz-sum__t) { display: none; }
+  @media (min-width: 1120px) {
+    /* W-CORE-06: lista de opciones a la izquierda (486) y escenario de 544 a la derecha. */
+    .bm :global(.pz) { display: grid; grid-template-columns: minmax(0, 486px) 544px; justify-content: space-between; align-items: center; column-gap: 48px; }
+    .bm :global(.pz-opts) { margin: 0 0 56px; }
+    /* Con 6 controles por raíl (no 9 como en la web), los grupos estirados dejaban los botones
+       sueltos: raíles a la medida de sus grupos, centrados en la altura de la bandeja. */
+    .bm :global(.pz-rail) { height: auto; top: 259px; transform: translateY(-50%); }
+    .bm :global(.pz-g) { flex: none; justify-content: flex-start; gap: 12px; }
+  }
+  @media (max-width: 1119.98px) {
+    .bm :global(.pz-opts) { margin-inline: auto; }
+  }
+  @media (--lt-md) { .bm { margin-top: 40px; } }
+</style>

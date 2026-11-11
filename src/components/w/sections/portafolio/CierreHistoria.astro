@@ -1,0 +1,45 @@
+---
+// Portafolio · cierre (W-PROOF-14, §4.5-7): bloque de ~456 px con rejilla de rombos tenue,
+// titular 52 centrado en el ÚNICO degradado de la página (§2.11) y una línea debajo; a
+// continuación, por slot, el cierre en dos tarjetas con el trío contractual (CierreDosTarjetas).
+// La rejilla se funde en el centro, donde va el texto (E-37): solo se ve en los bordes.
+interface Props { title: string; sub: string; id?: string }
+const { title, sub, id = 'historia' } = Astro.props;
+---
+<div class="pk">
+  <div class="pk__band">
+    <span class="pk__grid" aria-hidden="true"></span>
+    <h2 class="pk__title w-grad-text" id={id}>{title}</h2>
+    <p class="pk__sub">{sub}</p>
+  </div>
+  <div class="pk__cards"><slot /></div>
+</div>
+
+<style>
+  .pk__band {
+    position: relative; isolation: isolate;
+    min-height: clamp(280px, 18rem + 8vw, 456px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 48px 0;
+  }
+  .pk__grid {
+    position: absolute; z-index: -1; inset: 0 calc(-1 * var(--container-pad)); pointer-events: none;
+    background:
+      repeating-linear-gradient(45deg, rgba(var(--accent-gold-rgb), .07) 0 1px, transparent 1px 56px),
+      repeating-linear-gradient(-45deg, rgba(var(--accent-gold-rgb), .07) 0 1px, transparent 1px 56px);
+    -webkit-mask-image: radial-gradient(closest-side, transparent 42%, #000 72%, transparent 100%);
+            mask-image: radial-gradient(closest-side, transparent 42%, #000 72%, transparent 100%);
+  }
+  .pk__title {
+    margin: 0; max-width: 18ch;
+    font-family: var(--font-display); font-weight: 500;
+    font-size: var(--w-h2-chapter); line-height: var(--w-lh-h2c); letter-spacing: -0.045em;
+    text-wrap: balance; padding-bottom: .06em;
+  }
+  .pk__sub {
+    margin: 20px 0 0; max-width: 32.5rem;
+    font-family: var(--font-body); font-size: var(--w-lead); line-height: 1.5; color: var(--w-ink-80);
+  }
+  .pk__cards { margin-top: 24px; }
+  @media (--lt-md) { .pk__sub { font-size: 16px; } }
+</style>

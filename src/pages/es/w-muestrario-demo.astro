@@ -1,0 +1,96 @@
+---
+// Muestrario de P01 (DemoConstruye + Personalizador), noindex y fuera del sitemap (filtro /w-muestrario).
+// Dos instancias de la demo (ES y EN) para que verify-extra detecte ids repetidos, y el Personalizador
+// montado SOLO (como lo usará branding). Se borra antes de cualquier merge a main (design/rediseno-workos-v2.md §1.2).
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import WStyles from '../../components/w/WStyles.astro';
+import DemoConstruye from '../../components/w/demos/DemoConstruye.astro';
+import Personalizador from '../../components/w/demos/Personalizador.astro';
+import WebEjemplo from '../../components/w/objetos/WebEjemplo.astro';
+import { clusterNav } from '../../i18n/clusters';
+import { catalog, PRICE_ANCHORS } from '../../i18n/pricing';
+import { catalog as catalogEn } from '../../i18n/pricing.en';
+
+const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
+const web = catalog.find((p) => p.id === 'diseno-web')!.tiers;
+const webEn = catalogEn.find((p) => p.id === 'diseno-web')!.tiers;
+const anclas = [PRICE_ANCHORS.webLanding, PRICE_ANCHORS.webRedesign, PRICE_ANCHORS.web];
+const ids = ['landing', 'rediseno', 'medida'];
+
+const es = {
+  bloque1: {
+    n: 1, etiqueta: 'Cómo se construye tu web', titleHtml: 'De tu negocio a tu web publicada',
+    texto: 'Arrancamos con tus datos, como en {comando}, y tu web se arma sobre tu marca: páginas en español e inglés, lista para Google. La propuesta llega en 24 horas.',
+    ventajas: [
+      { icon: 'lucide:languages', titulo: 'Bilingüe de verdad', texto: 'Español e inglés escritos desde el diseño, no un botón de traducir.' },
+      { icon: 'lucide:search', titulo: 'Lista para Google y la IA', texto: 'Estructura y datos que Google y los asistentes de IA pueden leer.' },
+    ],
+  },
+  bloque2: {
+    n: 2, etiqueta: 'Hazla tuya', titleHtml: 'Elige por dónde empezar',
+    texto: 'Tres formas de tener tu web, con el precio de entrada a la vista. Empieza con una página y crece cuando lo necesites.',
+    opciones: web.map((t, i) => ({ id: ids[i], titulo: t.name, texto: t.blurb, precio: `Desde ${usd(anclas[i])}`, railes: i !== 2 })),
+  },
+  consola: {
+    comando: 'marcyan web --negocio "Tu Plomería" --idiomas es,en',
+    bloques: [
+      { paso: 'Leyendo tu marca', detalles: ['logo.svg · colores · tipografía'] },
+      { paso: 'Escribiendo tus páginas', detalles: ['/es  /en', 'inicio · servicios · contacto'] },
+      { paso: 'Preparando para Google', detalles: ['sitemap.xml · datos para buscadores'] },
+    ],
+    cierre: 'Tu web está lista', leyendaTrabajando: 'Preparando tu web', leyendaLista: 'Web lista para publicar',
+  },
+};
+const en = {
+  bloque1: {
+    n: 1, etiqueta: 'How your website gets built', titleHtml: 'From your business to your live website',
+    texto: 'We start from your details, as in {comando}, and your site is built on your brand: pages in Spanish and English, ready for Google. Your proposal arrives in 24 hours.',
+    ventajas: [
+      { icon: 'lucide:languages', titulo: 'Truly bilingual', texto: 'Spanish and English written in from the design, not a translate button.' },
+      { icon: 'lucide:search', titulo: 'Ready for Google and AI', texto: 'Structure and data that Google and AI assistants can read.' },
+    ],
+  },
+  bloque2: {
+    n: 2, etiqueta: 'Make it yours', titleHtml: 'Choose where to start',
+    texto: 'Three ways to get your website, with the starting price up front. Start with one page and grow when you need to.',
+    opciones: webEn.map((t, i) => ({ id: ids[i], titulo: t.name, texto: t.blurb, precio: `From ${usd(anclas[i])}`, railes: i !== 2 })),
+  },
+  consola: {
+    comando: 'marcyan web --business "Your Plumbing" --languages es,en',
+    bloques: [
+      { paso: 'Reading your brand', detalles: ['logo.svg · colors · type'] },
+      { paso: 'Writing your pages', detalles: ['/es  /en', 'home · services · contact'] },
+      { paso: 'Getting ready for Google', detalles: ['sitemap.xml · search data'] },
+    ],
+    cierre: 'Your website is ready', leyendaTrabajando: 'Getting your site ready', leyendaLista: 'Ready to publish',
+  },
+};
+---
+<Layout title="Muestrario · Demo de construcción" lang="es" path="/w-muestrario-demo" noindex hasEn={false} ds="v3">
+  <WStyles />
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es" currentPath={Astro.url.pathname} />
+  <main id="main" class="w-rails" data-w data-w-tone="gold">
+    <section class="w-cell mu-intro" style="padding-top: calc(var(--nav-h) + 72px); min-height: 100svh; box-sizing: border-box">
+      <div class="w-container"><p class="mu-k">Muestrario · P01 · Demo de construcción y personalizador (no indexable)</p></div>
+    </section>
+    <section class="w-cell">
+      <div class="w-container"><DemoConstruye lang="es" id="dc-es" {...es} /></div>
+    </section>
+    <section class="w-cell">
+      <div class="w-container"><DemoConstruye lang="en" id="dc-en" {...en} /></div>
+    </section>
+    <section class="w-cell">
+      <div class="w-container mu-solo">
+        <p class="mu-k">Personalizador montado solo (uso de branding)</p>
+        <Personalizador lang="es" id="solo">
+          <WebEjemplo slot="maqueta" marca="plomeria" frame="tarjeta" vista="completa" lang="es" />
+        </Personalizador>
+      </div>
+    </section>
+    <div style="height: 60vh" aria-hidden="true"></div>
+  </main>
+</Layout>
+<style>
+  .mu-k { font: 500 12px/1 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: rgba(240, 237, 232, .6); margin: 0 0 32px; }
+</style>

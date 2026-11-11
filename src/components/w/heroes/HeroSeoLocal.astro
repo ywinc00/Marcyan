@@ -1,0 +1,108 @@
+---
+// Hero de las landings de SEO local · v5 «La palabra con ventana» (dueño, 2026-11-07; design/seo-local-hero.md).
+// Principio de Liron Moran Interiors (Refero 067fe2b3: texto enorme cortado por una imagen) con los colores
+// del ocaso (fondo F32, principio de Joby e38f56d1). Izquierda: HeroTexto de siempre (chip, H1 verbatim,
+// cola, bajada, botones). Derecha: «CERCA / DE TI» a tamaño cartel, decorativo (aria-hidden), y en el hueco
+// entre las letras la ficha de mapa de EJEMPLO que ya usaba esta landing (FichaMapa, marca restaurante): lo
+// que ve tu cliente cuando te busca. La letra grande es la de la marca (Space Grotesk): la serif del boceto
+// sería una fuente nueva = decisión global del dueño (gramática intocable).
+// Nunca detrás de texto (E-37): la palabra vive en la columna derecha. Móvil: texto arriba y debajo la
+// palabra con su ventana, a escala.
+import HeroTexto from '../HeroTexto.astro';
+import { fichaDe } from '../objetos/barrios/negociosFicha';
+import FichaMapa from '../objetos/barrios/FichaMapa.astro';
+
+interface Cta { label: string; href: string; track?: string }
+interface Props {
+  h1Html: string;
+  chip: string;
+  tail?: string;
+  lead: string;
+  primary: Cta;
+  link?: Cta;
+  cityName: string;
+  sr: string;
+  lang?: 'es' | 'en';
+}
+const { h1Html, chip, tail, lead, primary, link, cityName, sr, lang = 'es' } = Astro.props;
+const W = lang === 'en' ? ['NEAR', 'YOU'] : ['CERCA', 'DE TI'];
+---
+<section class="w-hero hsl">
+  <div class="w-container hsl__grid">
+    <div class="hsl__text">
+      <HeroTexto
+        tone="gold"
+        chip={chip}
+        h1Html={h1Html}
+        tail={tail}
+        lead={lead}
+        primary={primary}
+        link={link}
+        align="left"
+      >
+        <slot name="crumbs" slot="crumbs" />
+      </HeroTexto>
+    </div>
+    <div class="hsl__obj">
+      <p class="sr-only">{sr}</p>
+      <div class="hsl__pal" aria-hidden="true">
+        <span class="hsl__w hsl__w--1" data-w-in="2">{W[0]}</span>
+        <span class="hsl__w hsl__w--2" data-w-in="2">{W[1].split(' ').map((t, i) => <><span class={`hsl__p hsl__p--${i + 1}`}>{t}</span>{' '}</>)}</span>
+      </div>
+      <div class="hsl__win" data-w-in="obj">
+        <FichaMapa marca="restaurante" negocio={/miami/i.test(cityName ?? '') ? fichaDe('barberia', lang) : undefined} lang={lang} city={cityName} size="hero" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hsl { overflow: clip; padding-bottom: 104px; position: relative; }
+  .hsl__grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; align-items: center; }
+  .hsl__obj { position: relative; min-height: 520px; }
+  /* La palabra: dos líneas a tamaño cartel, crema casi plena; la ventana la corta por el medio. */
+  .hsl__pal { position: absolute; inset: 0; pointer-events: none; }
+  .hsl__w {
+    position: absolute; left: 0; white-space: nowrap;
+    font-family: var(--font-display); font-weight: 400; letter-spacing: -.06em; line-height: .8;
+    color: rgba(240, 237, 232, .94);
+  }
+  .hsl__w--1 { top: 34px; font-size: 238px; }
+  .hsl__w--2 { top: 262px; left: -18px; font-size: 232px; }
+  /* La ventana: la ficha de mapa de la landing, flotando sobre la palabra con sombra de noche. */
+  .hsl__win {
+    position: absolute; z-index: 2; left: 236px; top: 8px; width: 336px;
+    border-radius: 20px; overflow: hidden; background: var(--w-p-bg, #f0ede8);
+    box-shadow: 0 50px 90px -30px rgba(0, 0, 0, .9), 0 0 0 1px rgba(255, 255, 255, .06);
+  }
+  /* Partido solo desde 1280: por debajo la palabra no cabe junto al texto y se apila (como en móvil). */
+  @media (min-width: 1280px) {
+    .hsl__grid { grid-template-columns: minmax(0, 560px) minmax(0, 1fr); gap: 48px; min-height: 560px; }
+    .hsl__text :global(.w-herotext--left) { max-width: 560px; }
+  }
+  @media (max-width: 1279.98px) {
+    .hsl { padding-bottom: 72px; }
+    .hsl__obj { min-height: 0; height: 470px; }
+    .hsl__obj { --hsl-f: clamp(104px, 30vw, 170px); }
+    .hsl__w--1 { top: 18px; font-size: var(--hsl-f); }
+    .hsl__w--2 { top: calc(18px + clamp(96px, 27vw, 156px)); left: -6px; font-size: clamp(100px, 29vw, 166px); }
+    /* la ventana tapa el centro de «CERCA» (la R): deja ver «CE» a la izquierda y «CA» a la derecha */
+    .hsl__win { left: calc(var(--hsl-f) * 1.08); top: 0; width: min(calc(var(--hsl-f) * 1.72), 300px); }
+  }
+  @media (min-width: 768px) and (max-width: 1279.98px) {
+    .hsl__obj { --hsl-f: 200px; height: 520px; }
+    .hsl__w--2 { top: 200px; font-size: 196px; }
+    .hsl__win { left: 196px; width: 300px; }
+  }
+  /* Teléfono (dueño, 2026-11-07): la altura la marca la ficha; «CERCA» arriba, «DE» a media altura
+     a la izquierda y «TI» abajo a la derecha, asomando bajo el borde de la ficha. */
+  @media (max-width: 767.98px) {
+    .hsl__obj { height: auto; padding-bottom: calc(var(--hsl-f) * .74); }
+    /* ficha hasta el borde derecho de la columna: más ancha en teléfonos estrechos */
+    .hsl__win { position: relative; width: min(calc(100% - var(--hsl-f) * 1.08), 300px); }
+    .hsl__w--2 { position: static; }
+    .hsl__p { position: absolute; }
+    .hsl__p--1 { left: -6px; top: calc(50% - .4em); }
+    .hsl__p--2 { right: 0; bottom: 0; }
+  }
+</style>

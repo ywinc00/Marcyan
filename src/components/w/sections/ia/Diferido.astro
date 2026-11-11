@@ -1,0 +1,67 @@
+---
+// Montaje diferido de una escena de ejemplo (design/rediseno-workos-v2.md §1.8: "maquetas
+// clonadas bajo demanda"). La escena (aria-hidden, sin texto que cuente para el SEO) no pesa en
+// el DOM ni en el trazado mientras la página carga (revisión G06 r1: TBT 536 ms y 2.317 nodos):
+// se monta cuando el hueco se acerca a la pantalla (900 px antes). El hueco reserva su alto con
+// --dif-h / --dif-h-lg para que nada salte. Al montar avisa con el evento `w2:diferido` en
+// document (detail = el hueco) y cada sección arranca su pieza. El resumen sr-only va FUERA
+// (lo da quien usa el hueco).
+//
+// Revisión G06 r2 (sin JS = hueco vacío de 440-500 px, contra §5 B4 · A-05 · F-02): la escena
+// vive en un <noscript>, no en un <template>. Sin JS el navegador la pinta tal cual, en su
+// estado final del HTML (primera carta del mazo, pantalla final del alta, arco de logos
+// quieto). Con JS el contenido de <noscript> es un único nodo de texto (cero nodos de
+// elemento, cero trazado) y se inserta como HTML al acercarse. Una sola copia en el HTML.
+interface Props { h: number; hLg?: number; class?: string }
+const { h, hLg = h, class: cls } = Astro.props;
+const html = await Astro.slots.render('default');
+---
+<div class:list={['dif', cls]} data-w2-dif style={`--dif-h:${h}px;--dif-h-lg:${hLg}px`}>
+  <noscript set:html={html} />
+</div>
+
+<script>
+  const montar = (host: HTMLElement) => {
+    if (host.dataset.w2Dif === 'listo') return;
+    const ns = host.querySelector('noscript');
+    if (!ns) return;
+    host.dataset.w2Dif = 'listo';
+    const t = document.createElement('template');
+    t.innerHTML = ns.textContent ?? '';
+    // Los <script> que Astro deja junto a la pieza (p. ej. el de AltaMarcy) no se ejecutan al
+    // venir de HTML: se recrean para que el navegador los cargue (módulos: una sola vez).
+    const viejos = [...t.content.querySelectorAll('script')];
+    viejos.forEach((v) => v.remove());
+    ns.replaceWith(t.content);
+    for (const v of viejos) {
+      const s = document.createElement('script');
+      for (const a of v.attributes) s.setAttribute(a.name, a.value);
+      s.textContent = v.textContent;
+      host.append(s);
+    }
+    document.dispatchEvent(new CustomEvent('w2:diferido', { detail: host }));
+  };
+  const huecos = [...document.querySelectorAll<HTMLElement>('[data-w2-dif]')];
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((es) => {
+      for (const e of es) if (e.isIntersecting) { io.unobserve(e.target); montar(e.target as HTMLElement); }
+    }, { rootMargin: '900px 0px' });
+    huecos.forEach((h) => io.observe(h));
+  } else huecos.forEach(montar);
+  // Saltos por ancla o impresión: todo montado.
+  addEventListener('beforeprint', () => huecos.forEach(montar));
+</script>
+
+<style>
+  .dif { min-height: var(--dif-h); display: flex; justify-content: center; align-items: center; width: 100%; }
+  .dif[data-w2-dif='listo'] { min-height: 0; }
+  /* Sin JS: <noscript> se pinta como un elemento normal; que no rompa el centrado del hueco. */
+  /* Solo SIN JS: con JS el contenido del <noscript> es UN nodo de texto (el HTML escapado) y,
+     con display: contents, se maquetaba como una línea de texto sin cortes de cientos de px. En
+     el teléfono eso ensanchaba la página entera a 681 px hasta que la escena se montaba (v3:
+     "el hero de IA conversacional se rompe en móvil"). */
+  .dif > :global(noscript) { display: none; }
+  @media (scripting: none) { .dif > :global(noscript) { display: contents; } }
+  @media (--lg) { .dif { min-height: var(--dif-h-lg); } }
+  @media (--lg) { .dif[data-w2-dif='listo'] { min-height: 0; } }
+</style>

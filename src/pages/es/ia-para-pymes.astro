@@ -1,6 +1,8 @@
 ---
-// Landing · /es/ia-para-pymes — IA para tu Negocio (wedge, lenguaje de dolor).
-import ClusterLanding from '../../components/ClusterLanding.astro';
+// Landing · /es/ia-para-pymes · IA para tu Negocio.
+// Plantilla v3 (rediseño WorkOS, tipo `ia-pymes`): WLanding + kinds/ia-pymes.ts (activación por página, ver registry.ts).
+import WLanding from '../../components/w/landing/WLanding.astro';
+import spec from '../../components/w/landing/kinds/ia-pymes';
 import { clusters } from '../../i18n/clusters';
 ---
-<ClusterLanding cluster={clusters['ia-para-pymes']} />
+<WLanding cluster={clusters['ia-para-pymes']} spec={spec} />

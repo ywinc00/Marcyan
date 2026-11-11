@@ -1,0 +1,139 @@
+---
+// Portafolio · hero (design/rediseno-workos.md §4.5; W-PROOF-05 + W-PROOF-01 + W-PROOF-06).
+// Cabecera de caso a la izquierda: migas, H1 hub VERBATIM (§2.14) + cola en el mismo tono,
+// trama de puntos tenue en una franja de 120 px a sangre detrás del titular (nunca detrás
+// de la bajada, E-37), entradilla 19/30. Debajo, la captura REAL de Texas Rush Remove en
+// marco de navegador de 736 px que sobresale 26 px a la izquierda (aquí sí: es prueba,
+// excepción explícita a E-32) y enlaza a #trr. A la derecha, la ficha lateral pegajosa
+// del proyecto que se ve (W-PROOF-06). Hub de venta: sin botones (E-05, A-04).
+// Al pie, la tira de nombres reales (W-CORE-03) y la celda "Tu negocio aquí" (W-NEW-08),
+// que en WorkOS cierra la rejilla de logos.
+// Coreografía §2.9: textos 1/2, captura "obj", ficha 3 (contiene enlaces: nunca
+// tocable sin verse). La captura es la primera pantalla: carga inmediata, no diferida.
+import FichaLateral from '../../FichaLateral.astro';
+import TiraLogos from '../../TiraLogos.astro';
+import CeldaTuNegocio from '../../CeldaTuNegocio.astro';
+
+interface Row { label: string; value: string; href?: string }
+interface Props {
+  h1Html: string;
+  tail?: string;
+  lead: string;
+  shot: { slug: string; name: string; label: string; alt: string; domain?: string };
+  side: { logoName: string; rows: Row[]; label: string };
+  wa: string;
+  lang?: 'es' | 'en';
+}
+const { h1Html, tail, lead, shot, side, wa, lang = 'es' } = Astro.props;
+---
+<section class="w-hero ph">
+  <div class="w-container">
+    <div class="ph__crumbs" data-w-in="1"><slot name="crumbs" /></div>
+  </div>
+
+  <div class="ph__band">
+    <div class="ph__dots" aria-hidden="true"></div>
+    <div class="w-container ph__head">
+      <h1 class="w-h1 w-h1--hub ph__h1" data-w-in="1" set:html={h1Html} />
+      {tail && <p class="w-h1__tail w-h1__tail--hub ph__tail" data-w-in="1">{tail}</p>}
+    </div>
+  </div>
+
+  <div class="w-container">
+    <div class="ph__grid">
+      <div class="ph__main">
+        <p class="ph__lead" data-w-in="2">{lead}</p>
+        <div class="ph__shotwrap" data-w-in="obj">
+          <a class="ph__shot" href={`#${shot.slug}`} aria-label={shot.label}>
+            <span class="ph__bar" aria-hidden="true">
+              <span class="ph__dotsbar"><i></i><i></i><i></i></span>
+            </span>
+            <span class="ph__screen">
+              <img
+                src={`/Galeria/${shot.slug}-pc-900.webp`}
+                srcset={`/Galeria/${shot.slug}-pc-480.webp 480w, /Galeria/${shot.slug}-pc-640.webp 640w, /Galeria/${shot.slug}-pc-900.webp 900w, /Galeria/${shot.slug}-pc-1280.webp 1280w, /Galeria/${shot.slug}-pc.webp 1920w`}
+                sizes="(min-width: 1024px) 736px, calc(100vw - 32px)"
+                width="900" height="506"
+                alt={shot.alt}
+                decoding="async" fetchpriority="high"
+              />
+            </span>
+          </a>
+        </div>
+      </div>
+      <div class="ph__side" data-w-in="3">
+        <FichaLateral logoName={side.logoName} rows={side.rows} label={side.label} />
+      </div>
+    </div>
+
+    <div class="ph__logos">
+      <TiraLogos lang={lang} />
+      <div class="ph__add"><CeldaTuNegocio href={wa} lang={lang} /></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ph { position: relative; z-index: 1; overflow-x: clip; padding-bottom: clamp(64px, 3rem + 2vw, 88px); }
+  .ph__crumbs { margin-bottom: 24px; }
+  .ph__crumbs :global(ol) { padding-inline-start: 0; margin: 0; }
+  .ph__crumbs :global(.crumbs a) { color: var(--w-accent); }
+
+  /* Titular a la izquierda, ~780 px como W-PROOF-05; la trama corre detrás a sangre,
+     centrada en el titular, y se funde antes de llegar a la columna de la ficha. */
+  .ph__band { position: relative; }
+  .ph__dots {
+    position: absolute; inset: 50% 0 auto 0; height: 120px; margin-top: -60px;
+    pointer-events: none;
+    background: radial-gradient(rgba(var(--accent-gold-rgb), .16) 1px, transparent 1.3px) 0 0 / 24px 24px;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 55%, transparent 80%);
+            mask-image: linear-gradient(90deg, transparent, #000 10%, #000 55%, transparent 80%);
+  }
+  .ph__head { position: relative; }
+  .ph__h1, .ph__tail { margin: 0; }
+  .ph__h1, .ph__tail { max-width: 780px; }
+  /* La cola va en el tono atenuado (§2.3, como la 1.ª frase del capítulo a dos tonos): el H1
+     verbatim no lleva punto y, al mismo tono, se leía seguido con la cola (control global r1). */
+  :global(:root[data-ds="v3"]) .ph__tail { color: var(--w-ink-45); }
+
+  .ph__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; margin-top: 40px; }
+  .ph__main { min-width: 0; }
+  .ph__lead {
+    margin: 0; max-width: 688px;
+    font-family: var(--font-body); font-size: 17px; line-height: 1.6; color: var(--w-ink-80);
+  }
+  .ph__shotwrap { margin-top: 40px; }
+  .ph__shot {
+    display: block; position: relative; overflow: hidden; text-decoration: none;
+    background: var(--w-s2); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-cell, 8px); box-shadow: var(--w-edge);
+    transition: border-color var(--w-dur-hover) var(--w-ease-ui);
+  }
+  @media (--hover-fine) { .ph__shot:hover { border-color: var(--w-line-strong); } }
+  .ph__bar { display: flex; align-items: center; gap: 12px; height: 32px; padding: 0 12px; border-bottom: 1px solid var(--w-line); }
+  .ph__dotsbar { display: inline-flex; gap: 6px; flex: none; }
+  .ph__dotsbar i { width: 8px; height: 8px; border-radius: 50%; background: var(--w-ink-30); }
+  .ph__screen { display: block; aspect-ratio: 900 / 506; background: var(--w-s1); }
+  .ph__screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+
+  .ph__side { min-width: 0; }
+  /* Caja del nombre compacta (sin logos en el repo): una cabecera de la tabla, no un hueco
+     de 145 px que se lee a relleno. También alarga el recorrido pegajoso de la ficha. */
+  .ph__side :global(.w-side) { gap: 12px; }
+  .ph__side :global(.w-side__logo) { min-height: 0; padding: 18px 24px; font-size: 22px; }
+
+  .ph__logos { text-align: center; }
+  .ph__add { margin-top: 28px; display: flex; justify-content: center; }
+
+  @media (--lg) {
+    .ph__grid {
+      grid-template-columns: minmax(0, 688px) minmax(0, 379px);
+      justify-content: space-between; gap: 48px; margin-top: 48px;
+    }
+    .ph__lead { font-size: 19px; line-height: 30px; }
+    /* La captura mide 736 y sobresale 26 px a la izquierda del texto (W-PROOF-05). */
+    .ph__shotwrap { margin-left: -26px; width: calc(100% + 48px); max-width: 736px; }
+    /* La columna se estira con la rejilla: la ficha pega dentro de ella mientras pasa la captura. */
+    .ph__side { align-self: stretch; }
+  }
+</style>

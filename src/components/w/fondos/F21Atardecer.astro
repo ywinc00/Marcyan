@@ -1,0 +1,49 @@
+---
+// F21 · Atardecer (bienes raíces, v3). Principio del atardecer de Passport (WorkOS): la luz cálida sube
+// desde el horizonte sobre la noche, con gradación larga y grano fino. Aquí la noche de la marca se
+// calienta detrás de la tarjeta de la casa (oro, cobre, malva) y vuelve a la noche en el pie del hero,
+// así que la sección siguiente nunca corta nada. Motivo único: el haz de líneas que sale por la izquierda
+// pasa por detrás de la tarjeta y sale por la derecha (v4), por debajo de la fila de botones, nunca detrás de texto.
+// El cielo es atmósfera (G-01 + G-02), no un segundo motivo. Quieto. Solo CSS y un SVG en línea.
+// Ajustes: --wf-sol-x/-y (centro de la luz).
+interface Props { estilos?: boolean }
+const { estilos = true } = Astro.props;
+// v5: el haz de líneas ya no vive en el fondo; lo pinta HeroSector anclado a la tarjeta (pasa por detrás).
+// Grano fino (G-02): ruido fractal en una tesela de 160 px, en línea.
+const GRANO = "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E\")";
+const CSS = `
+  /* La escena trae su propio pie de noche: el fundido general se acorta para no apagar el horizonte. */
+  .wf:has(> .wf-at) {
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 72px), transparent);
+            mask-image: linear-gradient(180deg, #000 calc(100% - 72px), transparent);
+  }
+  .wf-at { position: absolute; inset: 0; --sx: var(--wf-sol-x, 76%); --sy: var(--wf-sol-y, 84%); }
+  .wf-at__cielo {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(34% 30% at var(--sx) var(--sy), rgba(248, 190, 126, .50) 0%, rgba(226, 136, 86, .30) 34%, rgba(150, 76, 92, .14) 64%, transparent 100%),
+      radial-gradient(70% 52% at var(--sx) calc(var(--sy) + 6%), rgba(118, 62, 104, .30) 0%, rgba(58, 40, 84, .18) 52%, transparent 100%),
+      /* Banda del horizonte de lado a lado: el calor se abre por todo el ancho, más fuerte bajo la casa. */
+      linear-gradient(180deg, transparent 66%, rgba(196, 112, 84, .10) 80%, rgba(226, 146, 96, .16) 86%, rgba(120, 60, 70, .08) 91%, transparent 96%),
+      linear-gradient(180deg, #080808 0%, #0a0b13 24%, #0e1122 50%, #17162b 70%, #261b2b 83%, #120c10 93%, #080808 100%);
+  }
+  .wf-at__grano {
+    position: absolute; inset: 0; opacity: .07; mix-blend-mode: soft-light;
+    background-image: ${GRANO}; background-size: 160px 160px;
+  }
+  @media (max-width: 1023.98px) {
+    .wf-at { --sx: var(--wf-sol-x-movil, 50%); --sy: var(--wf-sol-y-movil, 64%); }
+    .wf-at__cielo {
+      background:
+        radial-gradient(80% 20% at var(--sx) var(--sy), rgba(248, 190, 126, .48) 0%, rgba(226, 136, 86, .28) 36%, rgba(150, 76, 92, .12) 68%, transparent 100%),
+        radial-gradient(120% 34% at var(--sx) calc(var(--sy) + 8%), rgba(118, 62, 104, .30) 0%, transparent 100%),
+        linear-gradient(180deg, #080808 0%, #0a0b13 22%, #0e1122 42%, #1a172b 58%, #2a1c2c 68%, #1d1520 84%, #0e0a0d 94%, #080808 100%);
+    }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-at">
+  <div class="wf-at__cielo"></div>
+  <div class="wf-at__grano"></div>
+</div>

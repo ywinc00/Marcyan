@@ -1,0 +1,48 @@
+---
+// IA conversacional · 02 "Cómo trabaja" (§4.12-3): W-ADV-05 (3 pasos, cada uno con su
+// tarjeta-evidencia: la misma conversación viaja del paso 1 al 3) + W-ADV-06 (chips de
+// veredicto con su motivo), construido con BandejaPasos + ChipsVeredicto. EJEMPLO.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import BandejaPasos from '../../BandejaPasos.astro';
+import ChipsVeredicto from '../../ChipsVeredicto.astro';
+import type { IaChatCopy } from '../../../../i18n/w/ia-chat';
+
+interface Props { copy: IaChatCopy['pasos']; n: number; lang?: 'es' | 'en' }
+const { copy, n } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} align="center" />
+<div class="ws-gap">
+  <BandejaPasos titleHtml={copy.title} lead={copy.lead} steps={copy.steps} tone="teal">
+    <div slot="ui-1" class="ev ev--quote" aria-hidden="true"><p>“{copy.ask}”</p></div>
+    <div slot="ui-2" class="ev ev--acts" aria-hidden="true">
+      {copy.actions.map(([k, v]) => <p><span class="ev__k">{k}</span><span class="ev__dot">·</span><span class="ev__v">{v}</span></p>)}
+    </div>
+    <div slot="ui-3" class="ev ev--chips">
+      <ChipsVeredicto items={copy.verdicts} on="light" tone="teal" />
+    </div>
+  </BandejaPasos>
+</div>
+<style>
+  .ws-gap { margin-top: 12px; }
+  /* Tarjetas-evidencia: objetos de PRODUCTO en claro (§2.4), 144 px como en W-ADV-05. */
+  .ev {
+    box-sizing: border-box; width: 100%; min-height: 144px; display: flex; flex-direction: column; justify-content: center;
+    background: var(--w-p-bg); color: var(--w-p-ink); border: 1px solid var(--w-p-line);
+    border-radius: var(--w-r-obj); padding: 14px 18px;
+  }
+  .ev--quote p { margin: 0; font: 500 17px/1.4 var(--font-display); letter-spacing: -0.01em; }
+  .ev--acts { padding-block: 6px; }
+  .ev--acts p {
+    display: flex; gap: 6px; margin: 0; padding: 10px 0; font: 400 13px/1.3 var(--font-mono);
+    border-bottom: 1px solid var(--w-line-ink);
+  }
+  .ev--acts p:last-child { border-bottom: 0; }
+  .ev__k { color: var(--w-p-ink); font-weight: 500; }
+  .ev__dot, .ev__v { color: var(--w-p-ink-2); }
+  .ev--chips { padding: 6px 14px; }
+  /* Móvil estrecho: en la tarjeta no caben chip y motivo en una línea en las tres filas;
+     las tres pasan igual a chip arriba y motivo debajo, alineados a la izquierda. */
+  @media (--lt-sm) {
+    .ev--chips :global(.wd-chips__row) { flex-direction: column; align-items: flex-start; gap: 4px; padding: 10px 0; }
+  }
+</style>

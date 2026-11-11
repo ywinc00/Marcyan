@@ -1,0 +1,37 @@
+---
+// Ciudades · 03 "Barrios y sectores" (§4.13-4): las landings de barrio y de sector que
+// existen hoy, con la descripción que ya llevan en su hub (sin copy nuevo por tarjeta).
+// Texto a la izquierda y la rejilla (760) a la derecha: la rejilla sola dejaba media
+// sección vacía a 1440.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import DondeEstaTuNegocio from '../../DondeEstaTuNegocio.astro';
+import type { IconoId } from '../../objects/registry';
+
+interface Props {
+  n: number;
+  label: string;
+  title: string;
+  lead: string;
+  items: { name: string; text: string; href: string; kind: 'barrio' | 'sector'; iconId?: IconoId }[];
+}
+const { n, label, title, lead, items } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} />
+<div class="ciu-2c">
+  <div class="ciu-2c__txt">
+    <h2 class="w-h2" set:html={title} />
+    <p class="ciu-2c__lead">{lead}</p>
+  </div>
+  <div class="ciu-2c__obj">
+    <DondeEstaTuNegocio items={items} />
+  </div>
+</div>
+<style>
+  /* H2 a 12 px de la cabecera, como §2.6 y el resto de capítulos; el objeto arranca arriba. */
+  .ciu-2c { display: grid; gap: 32px; margin-top: 12px; min-width: 0; }
+  .ciu-2c__txt, .ciu-2c__obj { min-width: 0; }
+  .ciu-2c__lead { margin: 12px 0 0; max-width: 430px; font-family: var(--font-body); font-size: 16px; line-height: 1.6; color: var(--fg-secondary); }
+  @media (--lg) {
+    .ciu-2c { grid-template-columns: minmax(0, 380px) minmax(0, 760px); column-gap: 60px; justify-content: space-between; align-items: start; }
+  }
+</style>

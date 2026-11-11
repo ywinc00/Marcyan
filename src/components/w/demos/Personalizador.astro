@@ -1,0 +1,390 @@
+---
+// Personalizador "Hazla tuya" (P01 · design/rediseno-workos-v2.md §2 P01; original W-CORE-06,
+// ficha C/03-personalizador). Maqueta central entre DOS raíles de 78 px con grupos de controles
+// reales: cada clic escribe una variable --ej-s-* o un atributo data-ej-* en el [data-ej-scope]
+// (contrato de WebEjemplo, P02a) y la maqueta cambia en 220 ms. 17 controles en la versión web:
+//   izquierda · Color (4: la paleta de la marca + sus 3 alternativas con nombre) · Marcos (3) · Modo (2)
+//   derecha   · Idioma (ES | EN, píldora que se desliza) · Letra (3) · Botones (3)
+// Cada grupo es role="radiogroup" con opciones role="radio" + aria-checked, tabulación itinerante y
+// flechas (nunca aria-pressed). Resumen "Tu web: …" en aria-live SOLO con cambios del visitante.
+//
+// Se monta SOLO (branding: props `controles`, `opciones`, slot `maqueta`) o dentro de DemoConstruye
+// (`embebido`: la lista de opciones vive en la columna de texto y el escenario recibe la consola,
+// el esqueleto y la leyenda por slots). El motor es demo-construye.ts (busca dentro de su nodo).
+// Opciones no activas: su maqueta va en <template> hasta que se eligen (§1.8).
+import Icon from '../../ui/Icon.astro';
+import { negocios, type NegocioId } from '../objetos/ejemplos/negocios';
+
+export type GrupoId = 'color' | 'marcos' | 'modo' | 'idioma' | 'letra' | 'botones';
+export interface ControlSet { izq: GrupoId[]; der: GrupoId[] }
+export interface Opcion { id: string; titulo: string; texto: string; precio?: string; icon?: string; railes?: boolean }
+interface Props {
+  lang: 'es' | 'en';
+  marca?: NegocioId;
+  controles?: ControlSet;
+  /** Lista de opciones propia (montaje solo). En DemoConstruye la pinta la columna de texto. */
+  opciones?: Opcion[];
+  /** Montado dentro de DemoConstruye (estado 1 consola / estado 2 personalizador). */
+  embebido?: boolean;
+  /** Etiqueta accesible de la lista de opciones (montaje solo). */
+  etiquetaOpciones?: string;
+  id?: string;
+  class?: string;
+}
+const {
+  lang, marca = 'plomeria', controles = { izq: ['color', 'marcos', 'modo'], der: ['idioma', 'letra', 'botones'] },
+  opciones, embebido = false, etiquetaOpciones, id, class: cls,
+} = Astro.props;
+const uid = `pz-${id ?? marca}-${lang}`;
+const L = lang === 'en';
+
+// ── Paletas: la de la marca + sus 3 alternativas, en día y en noche (negocios.ts, P02a) ──
+type Pal = { bg: string; ink: string; ink2: string; accent: string; onAccent: string };
+const neg = negocios[marca];
+// Cada alternativa trae su propia versión de noche (negocios.ts, P02a): "Pino" sigue siendo pino de noche.
+const baseNombre = marca === 'plomeria' ? { es: 'Cobre', en: 'Copper' } : { es: 'Original', en: 'Original' };
+const colores = [
+  { nombre: baseNombre, dia: neg.paleta as Pal, noche: neg.paletaNoche as Pal },
+  ...neg.alternativas.map((a) => ({ nombre: a.nombre, dia: a as Pal, noche: a.noche as Pal })),
+];
+const pal = (p: Pal) => ({ bg: p.bg, ink: p.ink, ink2: p.ink2, accent: p.accent, onAccent: p.onAccent });
+
+const T = {
+  grupos: {
+    color: L ? 'Color' : 'Color', marcos: L ? 'Corners' : 'Marcos', modo: L ? 'Mode' : 'Modo',
+    idioma: L ? 'Language' : 'Idioma', letra: L ? 'Type' : 'Letra', botones: L ? 'Buttons' : 'Botones',
+  } as Record<GrupoId, string>,
+  // Etiqueta fina que aparece sobre la parte cambiada (detalle Pedestal).
+  pieza: {
+    color: L ? 'Color' : 'Color', marcos: L ? 'Corners' : 'Marcos', modo: L ? 'Mode' : 'Modo',
+    idioma: L ? 'Language' : 'Idioma', letra: L ? 'Type' : 'Letra', botones: L ? 'Buttons' : 'Botones',
+  } as Record<GrupoId, string>,
+  chip: L ? 'Everything matches your brand' : 'Todo se ajusta a tu marca',
+  tuWeb: L ? 'Your site' : 'Tu web',
+};
+const marcos = [
+  { v: '2px', r: 0, n: L ? 'Square' : 'Rectas' },
+  { v: '10px', r: 5, n: L ? 'Soft' : 'Suaves' },
+  { v: '24px', r: 12, n: L ? 'Round' : 'Redondas' },
+];
+const modos = [
+  { v: 'claro', n: L ? 'Light' : 'Día', icon: 'lucide:sun' },
+  { v: 'oscuro', n: L ? 'Dark' : 'Noche', icon: 'lucide:moon' },
+];
+const idiomas = [{ v: 'es', n: 'ES', l: L ? 'Spanish' : 'Español' }, { v: 'en', n: 'EN', l: L ? 'English' : 'Inglés' }];
+const letras = [
+  { v: "'Space Grotesk Variable','Space Grotesk',system-ui,sans-serif", w: 300, n: L ? 'Modern' : 'Moderna', cls: 'pz-aa--sans' },
+  { v: "Georgia,'Noto Serif',serif", w: 400, n: L ? 'Classic' : 'Clásica', cls: 'pz-aa--serif' },
+  { v: "'JetBrains Mono Variable','JetBrains Mono',ui-monospace,monospace", w: 400, n: L ? 'Technical' : 'Técnica', cls: 'pz-aa--mono' },
+];
+const botones = [
+  { v: 'fill', n: L ? 'Solid' : 'Relleno' },
+  { v: 'outline', n: L ? 'Outline' : 'Contorno' },
+  { v: 'pill', n: L ? 'Pill' : 'Píldora' },
+];
+const aria = (g: GrupoId, n: string) => `${T.grupos[g]}: ${n.toLowerCase()}`;
+// Estado inicial (lo que pinta el HTML): paleta de la marca, suaves, día, idioma de la página,
+// moderna, relleno. El motor no escribe nada hasta el primer cambio (o lo guardado en la sesión).
+const cerca = marcos.reduce((m, x, i) => (Math.abs(parseInt(x.v) - neg.radio) < Math.abs(parseInt(marcos[m].v) - neg.radio) ? i : m), 0);
+const ini = { color: 0, marcos: cerca, modo: 0, idioma: lang === 'en' ? 1 : 0, letra: 0, botones: Math.max(0, botones.findIndex((x) => x.v === neg.boton)) };
+const resumen = `${T.tuWeb}: ${colores[ini.color].nombre[lang]} · ${marcos[ini.marcos].n} · ${botones[ini.botones].n} · ${idiomas[ini.idioma].n}`;
+
+const slotMaqueta = Astro.slots.has('maqueta') ? await Astro.slots.render('maqueta') : '';
+const tpl = opciones
+  ? await Promise.all(opciones.slice(1).map(async (o) => ({ id: o.id, html: Astro.slots.has(`opcion-${o.id}`) ? await Astro.slots.render(`opcion-${o.id}`) : '' })))
+  : [];
+const sinRailes = (opciones ?? []).filter((o) => o.railes === false).map((o) => o.id).join(' ');
+const datos = JSON.stringify({
+  colores: colores.map((c) => ({ n: c.nombre[lang], d: pal(c.dia), o: pal(c.noche) })),
+  marcos: marcos.map((m) => ({ v: m.v, n: m.n })),
+  modos: modos.map((m) => ({ v: m.v, n: m.n })),
+  idiomas: idiomas.map((m) => ({ v: m.v, n: m.n })),
+  letras: letras.map((m) => ({ v: m.v, w: m.w, n: m.n })),
+  botones: botones.map((m) => ({ v: m.v, n: m.n })),
+  pieza: T.pieza, tuWeb: T.tuWeb, ini, marca, sinRailes,
+});
+
+const lados: ('izq' | 'der')[] = ['izq', 'der'];
+const opcionesGrupo = (g: GrupoId): any[] =>
+  g === 'color' ? colores.map((c, i) => ({ i, n: c.nombre[lang], c })) :
+  g === 'marcos' ? marcos.map((m, i) => ({ i, n: m.n, m })) :
+  g === 'modo' ? modos.map((m, i) => ({ i, n: m.n, m })) :
+  g === 'idioma' ? idiomas.map((m, i) => ({ i, n: m.l, m })) :
+  g === 'letra' ? letras.map((m, i) => ({ i, n: m.n, m })) :
+  botones.map((m, i) => ({ i, n: m.n, m }));
+---
+<div
+  class:list={['pz', embebido && 'pz--emb', cls]}
+  data-pz
+  data-pz-datos={datos}
+  data-ej-scope
+  data-ej-lang={lang}
+  data-ej-mode="claro"
+  data-ej-btn={neg.boton}
+  data-pz-view={opciones?.[0]?.id ?? 'base'}
+  style={`--ej-s-radius:${marcos[ini.marcos].v}`}
+  lang={lang}
+>
+  {opciones && !embebido && (
+    <div class="pz-opts" role="radiogroup" aria-label={etiquetaOpciones ?? T.chip} data-dc-opts>
+      {opciones.map((o, i) => (
+        <button type="button" role="radio" class="pz-opt" aria-checked={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-dc-opt={o.id}>
+          <span class="pz-opt__t">{o.icon && <Icon name={o.icon} width={18} height={18} />}<b>{o.titulo}</b>{o.precio && <span class="pz-opt__p">{o.precio}</span>}</span>
+          <span class="pz-opt__x">{o.texto}</span>
+        </button>
+      ))}
+    </div>
+  )}
+
+  <div class="pz-stage" data-pz-stage>
+    {lados.map((lado) => (
+      <div class:list={['pz-rail', `pz-rail--${lado}`]} data-pz-rail={lado}>
+        <div class="pz-rail__in">
+          {controles[lado].map((g) => (
+            <div
+              class:list={['pz-g', `pz-g--${g}`, g === 'idioma' && 'pz-seg']}
+              role="radiogroup" aria-label={T.grupos[g]} data-pz-g={g} data-i={ini[g]}
+            >
+              {g === 'idioma' && <span class="pz-seg__pill" aria-hidden="true"></span>}
+              {opcionesGrupo(g).map(({ i, n, ...o }) => (
+                <button
+                  type="button" role="radio" class="pz-c" data-pz-i={i}
+                  aria-checked={i === ini[g] ? 'true' : 'false'} tabindex={i === ini[g] ? 0 : -1}
+                  aria-label={aria(g, n)}
+                >
+                  {g === 'color' && <span class="pz-sw" style={`--sw:${o.c.dia.accent}`}></span>}
+                  {g === 'marcos' && <span class="pz-corner" style={`--cr:${o.m.r}px`}></span>}
+                  {g === 'modo' && <Icon name={o.m.icon} width={16} height={16} />}
+                  {g === 'idioma' && <span class="pz-lang">{o.m.n}</span>}
+                  {g === 'letra' && <span class:list={['pz-aa', o.m.cls]}>Aa</span>}
+                  {g === 'botones' && <span class:list={['pz-btn', `pz-btn--${o.m.v}`]}></span>}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+
+    <slot name="consola" />
+    <div class="pz-tray" data-pz-tray>
+      <div class="pz-tray__card">
+        <div class="pz-view is-on" data-pz-v={opciones?.[0]?.id ?? 'base'}>
+          <Fragment set:html={slotMaqueta} />
+          <slot name="capa" />
+        </div>
+        {tpl.map((t) => (
+          <div class="pz-view" data-pz-v={t.id} hidden>
+            <template data-pz-tpl><Fragment set:html={t.html} /></template>
+          </div>
+        ))}
+        <span class="pz-shine" aria-hidden="true"></span>
+      </div>
+      <span class="pz-tag" aria-hidden="true" data-pz-tag><b></b></span>
+    </div>
+
+    <div class="pz-foot">
+      <slot name="leyenda" />
+      <div class="pz-sum">
+        <span class="pz-chip"><Icon name="lucide:palette" width={14} height={14} />{T.chip}</span>
+        <span class="pz-sum__t" aria-hidden="true" data-pz-sum>{resumen}</span>
+        <span class="pz-sr" aria-live="polite" data-pz-live></span>
+      </div>
+    </div>
+    <span class="pz-ghost" aria-hidden="true" data-pz-ghost>
+      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M4 2l15 11-6.5 1.2L16 21l-3 1.4-3.4-6.6L4 20z" fill="#f0ede8" stroke="#080808" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    </span>
+  </div>
+</div>
+
+<script>
+  import { initPersonalizadores } from './demo-construye';
+  initPersonalizadores();
+</script>
+
+<style>
+  /* ── Escenario: raíles de 78 a cada lado de la bandeja (384×492, tarjeta 360 = lienzo 400 a 0,9) ── */
+  .pz { --pz-ease: cubic-bezier(.22, 1, .36, 1); --pz-pitch: 44px; position: relative; color: var(--fg-primary, #f0ede8); }
+  .pz-stage { position: relative; width: 544px; height: 590px; margin-inline: auto; }
+  .pz-tray {
+    position: absolute; z-index: 4; top: 0; left: 80px; width: 384px; height: 518px; box-sizing: border-box;
+    padding: 12px; border-radius: 26px; background: var(--w-s2, #181817);
+    box-shadow: var(--w-edge, inset 0 1px 0 rgba(255,255,255,.08)), inset 0 0 9px rgba(0, 0, 0, .35), 0 30px 60px rgba(0, 0, 0, .35);
+    transition: transform 600ms var(--pz-ease);
+  }
+  .pz-tray__card { position: relative; z-index: 2; width: 360px; height: 494px; }
+  .pz-view { position: absolute; inset: 0; transition: opacity 220ms var(--w-ease-ui, ease); }
+  .pz-view:not(.is-on) { opacity: 0; pointer-events: none; }
+  .pz-rail {
+    position: absolute; top: 0; width: 78px; height: 518px; box-sizing: border-box;
+    padding: 13px; border-radius: 22px; background: var(--w-s1, #121211); border: 1px solid var(--w-line, rgba(200,169,110,.09));
+    box-shadow: inset 0 0 9px rgba(0, 0, 0, .35);
+    transition: opacity 600ms var(--pz-ease), transform 600ms var(--pz-ease);
+  }
+  .pz-rail--izq { left: -12px; }
+  .pz-rail--der { right: -12px; }
+  .pz-rail__in { display: flex; flex-direction: column; gap: 13px; height: 100%; }
+  .pz-g {
+    position: relative; display: flex; flex: auto; flex-direction: column; align-items: center; justify-content: space-between;
+    gap: 10px; padding: 8px; border-radius: 11px; background: var(--w-s2, #181817);
+    box-shadow: var(--w-edge, inset 0 1px 0 rgba(255,255,255,.08)), 0 10px 18px rgba(0, 0, 0, .25);
+    transform-origin: top; transition: transform 600ms var(--pz-ease), opacity 600ms var(--pz-ease);
+  }
+  /* ── Control 34×34: el estado vive en ::before (reposo 0/.9 · pulsado 1/1 · hover .6) ── */
+  .pz-c {
+    position: relative; display: grid; place-items: center; flex: none; width: 34px; height: 34px; padding: 0;
+    border: 0; border-radius: 5px; background: none; color: var(--fg-primary, #f0ede8); cursor: pointer;
+  }
+  .pz-c::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; opacity: 0; transform: scale(.9);
+    background: rgba(240, 237, 232, .10); box-shadow: inset 0 0 0 1px rgba(240, 237, 232, .06);
+    transition: opacity 160ms, transform 200ms var(--pz-ease);
+  }
+  .pz-c::after { content: ''; position: absolute; inset: -5px; } /* área de toque 44 */
+  .pz-c[aria-checked='true']::before { opacity: 1; transform: none; }
+  .pz-c > * { position: relative; opacity: .5; transition: opacity 160ms; }
+  .pz-c[aria-checked='true'] > * { opacity: 1; }
+  @media (hover: hover) and (pointer: fine) {
+    .pz-c:not([aria-checked='true']):hover::before { opacity: .6; transform: none; }
+    .pz-c:hover > * { opacity: .8; }
+  }
+  .pz-c:focus-visible { outline: 2px solid var(--accent-gold, #c8a96e); outline-offset: 2px; }
+  .pz-sw { width: 18px; height: 18px; border-radius: 999px; background: var(--sw); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22); }
+  .pz-g--color .pz-c > * { opacity: 1; }
+  .pz-corner { position: relative; width: 16px; height: 16px; }
+  .pz-corner::before {
+    content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; box-sizing: border-box;
+    border: 0 solid currentColor; border-width: 2px 0 0 2px; border-top-left-radius: var(--cr);
+  }
+  .pz-aa { font-size: 15px; line-height: 1; }
+  .pz-aa--sans { font-family: var(--font-display); font-weight: 300; }
+  .pz-aa--serif { font-family: Georgia, 'Noto Serif', serif; }
+  .pz-aa--mono { font-family: var(--font-mono); font-size: 14px; }
+  .pz-btn { display: block; width: 24px; height: 12px; box-sizing: border-box; border-radius: 3px; background: currentColor; }
+  .pz-btn--outline { background: none; border: 1.5px solid currentColor; }
+  .pz-btn--pill { border-radius: 999px; }
+  .pz-lang { font: 600 11px/1 var(--font-mono); letter-spacing: .04em; }
+  /* Idioma: control segmentado, la píldora se desliza 260 ms. */
+  .pz-seg { flex: none; justify-content: flex-start; }
+  .pz-seg__pill {
+    position: absolute; top: 8px; left: 50%; width: 34px; height: 34px; margin-left: -17px; border-radius: 5px;
+    background: rgba(240, 237, 232, .12); box-shadow: inset 0 0 0 1px rgba(240, 237, 232, .08);
+    transition: transform 260ms var(--pz-ease);
+  }
+  .pz-seg[data-i='1'] .pz-seg__pill { transform: translateY(var(--pz-pitch)); }
+  .pz-seg .pz-c::before { display: none; }
+
+  /* ── Pie: chip + resumen (y la leyenda de la consola, que pone DemoConstruye) ── */
+  .pz-foot { position: absolute; top: 534px; left: 0; right: 0; display: grid; justify-items: center; }
+  .pz-foot > :global(*) { grid-area: 1 / 1; }
+  .pz-sum { display: grid; justify-items: center; gap: 10px; transition: opacity 400ms var(--pz-ease), transform 400ms var(--pz-ease); }
+  .pz-chip {
+    display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 15px;
+    font: 500 14px/1.2 var(--font-body); color: var(--fg-primary, #f0ede8); background: var(--w-s2, #181817);
+    box-shadow: var(--w-edge, inset 0 1px 0 rgba(255,255,255,.08)), 0 10px 20px rgba(0, 0, 0, .35);
+  }
+  .pz-chip :global(svg) { color: var(--accent-gold, #c8a96e); }
+  .pz-sum__t { font: 400 12px/1.4 var(--font-mono); color: rgba(240, 237, 232, .6); letter-spacing: .02em; }
+  .pz-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* Brillo que cruza la maqueta al cambiar de idioma (por transform, 900 ms). */
+  .pz-shine { position: absolute; z-index: 5; top: 0; left: 0; right: 0; aspect-ratio: 400 / 520; overflow: hidden; border-radius: clamp(2px, var(--ej-s-radius, 12px), 24px); pointer-events: none; }
+  .pz-shine::before {
+    content: ''; position: absolute; inset: 0 -60%; opacity: 0;
+    background: linear-gradient(100deg, transparent 40%, rgba(255, 255, 255, .28) 50%, transparent 60%);
+    transform: translateX(-60%);
+  }
+  .pz-shine.is-on::before { animation: pz-shine 900ms var(--pz-ease) both; }
+  @keyframes pz-shine { 0% { opacity: 1; transform: translateX(-60%); } 100% { opacity: 1; transform: translateX(60%); } }
+
+  /* Etiqueta fina sobre la parte cambiada (1,2 s), como una selección de editor: marco de 1 px oro
+     ajustado a la pieza (con su mismo radio) y rótulo mono 11 pegado ENCIMA del marco, en el hueco
+     que la separa del texto de arriba (no tapa texto de la web). */
+  .pz-tag {
+    position: absolute; z-index: 6; top: 0; left: 0; box-sizing: border-box; pointer-events: none; opacity: 0;
+    border: 1px solid var(--accent-gold, #c8a96e); transition: opacity 200ms;
+  }
+  .pz-tag.is-on { opacity: 1; }
+  .pz-tag b {
+    position: absolute; left: -1px; bottom: 100%; white-space: nowrap; padding: 1px 5px 0; border-radius: 3px 3px 3px 0;
+    font: 600 11px/13px var(--font-mono); letter-spacing: .02em; color: #111110; background: var(--accent-gold, #c8a96e);
+  }
+  /* Titular: rótulo ENCIMA y a la derecha, en el hueco que deja el antetítulo corto (no tapa el titular). */
+  .pz-tag.is-in b { left: auto; right: -1px; border-radius: 3px 3px 0 3px; }
+
+  .pz-ghost { position: absolute; z-index: 9; top: 0; left: 0; opacity: 0; pointer-events: none; transition: opacity 300ms, transform 700ms var(--pz-ease); }
+  .pz-ghost.is-on { opacity: 1; }
+  .pz-ghost.is-press svg { transform: scale(.86); transition: transform 120ms; }
+
+  /* ── Lista de opciones (montaje solo) ── */
+  .pz-opts { display: grid; gap: 4px; max-width: 486px; margin-bottom: 40px; }
+  .pz-opt {
+    display: grid; gap: 8px; width: 100%; padding: 14px 16px; text-align: left; cursor: pointer;
+    border: 0; border-radius: 12px; background: transparent; color: inherit; font: inherit;
+    transition: background-color 200ms var(--w-ease-ui, ease), box-shadow 200ms var(--w-ease-ui, ease);
+  }
+  .pz-opt[aria-checked='true'] { background: var(--w-s3, #1f1f1d); box-shadow: var(--w-edge), 0 0 0 1px var(--w-line, rgba(200,169,110,.09)), 0 3px 8px rgba(0, 0, 0, .25); }
+  .pz-opt__t { display: flex; align-items: center; gap: 10px; font: 500 16px/24px var(--font-display); }
+  .pz-opt__t b { font-weight: 500; }
+  .pz-opt__p { margin-left: auto; font: 500 13px/1 var(--font-mono); color: var(--accent-gold, #c8a96e); }
+  .pz-opt__x { font: 400 15px/1.5 var(--font-body); color: var(--w-ink-70, rgba(240,237,232,.7)); }
+  .pz-opt:focus-visible { outline: 2px solid var(--accent-gold, #c8a96e); outline-offset: 2px; }
+
+  /* Marcos: rectas 2 · suaves 10 · redondas 24 (plan §2 P01). Pesa más que el radio fijo de WebEjemplo
+     (0,4,0) para que se vea también con los botones en píldora: el marco de la tarjeta sigue al radio
+     (tope 22 para quedar concéntrico con la bandeja de 26), el botón de menú lo lleva × .5 y el chip
+     "Abierto" × .25. Los botones en píldora siguen en píldora (manda Botones). */
+  .pz[data-ej-scope] :global(.ej.ej--tarjeta .ej__marco) { border-radius: clamp(2px, var(--ej-radius), 24px); transition: border-radius 220ms var(--pz-ease); }
+  .pz[data-ej-scope] :global(.ej.ej--vertical .ej__nav .ej__menu) {
+    display: grid; place-items: center; width: 32px; height: 32px; box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--ej-ink) 22%, transparent); border-radius: calc(var(--ej-radius) * .5);
+    transition: border-radius 220ms var(--pz-ease), border-color 220ms var(--pz-ease);
+  }
+  .pz[data-ej-scope] :global(.ej.ej--vertical .ej__nav .ej__abierto) {
+    padding: 4px 9px 4px 8px; background: color-mix(in srgb, var(--ej-ink) 6%, var(--ej-bg)); border-radius: calc(var(--ej-radius) * .25);
+    transition: border-radius 220ms var(--pz-ease), background-color 220ms var(--pz-ease);
+  }
+
+  /* Vista sin raíles (p. ej. "A medida": abanico de páginas, como opcion-2 del original). */
+  .pz.is-norails .pz-rail { opacity: 0; transform: translateY(16px); pointer-events: none; visibility: hidden; transition: opacity 300ms, transform 300ms, visibility 0s 300ms; }
+
+  /* Táctil: área de 44 con hueco ≥ 10 px entre vecinos. */
+  @media (pointer: coarse) {
+    .pz { --pz-pitch: 54px; }
+    .pz-g { gap: 20px; }
+    .pz-rail, .pz-stage { height: auto; }
+  }
+
+  /* ── Apilado (< 1120): raíles como TIRAS horizontales de 52 px encima y debajo de la maqueta ── */
+  @media (max-width: 1119.98px) {
+    .pz-stage { width: 100%; height: auto; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .pz-rail, .pz-tray, .pz-foot { position: relative; inset: auto; }
+    .pz-rail { order: 0; width: 100%; max-width: 400px; height: 52px; padding: 6px; border-radius: 16px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent); mask-image: linear-gradient(90deg, transparent, #000 14px, #000 calc(100% - 14px), transparent); }
+    .pz-rail--der { order: 2; }
+    /* La bandeja puede comerse parte del margen (borde a 10 px de la pantalla) para que la tarjeta
+       llegue a 358 px a 390: lienzo 400 a ≥ 0,89 y ningún texto < 11 px. */
+    .pz-tray { order: 1; flex: none; width: min(384px, calc(100vw - 20px)); height: auto; padding: 6px; border-radius: 20px; transform: none !important; }
+    .pz-tray__card { width: 100%; height: auto; aspect-ratio: 400 / 548; }
+    .pz-foot { order: 3; top: auto; }
+    .pz-rail__in { flex-direction: row; height: 100%; width: max-content; margin-inline: auto; gap: 8px; }
+    .pz-g { flex-direction: row; flex: none; padding: 0 4px; gap: 10px; align-items: center; }
+    .pz-seg__pill { top: 50%; left: 4px; margin: -17px 0 0; }
+    .pz-seg[data-i='1'] .pz-seg__pill { transform: translateX(var(--pz-pitch)); }
+    .pz.is-norails .pz-rail { display: none; }
+  }
+  @media (max-width: 1119.98px) and (pointer: coarse) { .pz-g { gap: 20px; } .pz-rail { height: 52px; } }
+  /* Teléfono (control v2 r1, M6): las tiras medían 478 y 424 px para 345 de hueco y escondían
+     "Redondas" y "Día/Noche" sin pista de desliz. Bajo 520 px cada tira PARTE sus grupos en líneas
+     (sin desliz ni máscara): todo control queda a la vista. */
+  @media (max-width: 519.98px) {
+    .pz-rail { height: auto; overflow: visible; -webkit-mask-image: none; mask-image: none; }
+    .pz-rail__in { width: 100%; flex-wrap: wrap; justify-content: center; row-gap: 6px; column-gap: 4px; }
+  }
+  @media (max-width: 519.98px) and (pointer: coarse) { .pz-rail { height: auto; } .pz-g { gap: 12px; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pz *, .pz *::before { transition-duration: 0s !important; animation: none !important; }
+    .pz-ghost { display: none; }
+  }
+</style>

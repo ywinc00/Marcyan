@@ -1,0 +1,73 @@
+---
+// SEO local · 03 "Barrio por barrio" (§4.16-4), capítulo de contraste: CabeceraNumerada +
+// MatrizFilas (W-ADV-52) zona × servicio con las zonas reales de la ciudad (las del mapa
+// del hub y las que ya nombra la página). Casilla llena = landing que EXISTE hoy (enlazada);
+// punteada = todavía sin página (sin enlace). Fila fija, la del área entera: la única
+// animación en bucle de la página es el radar de la sección 01 (§2.10, "una firma").
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import MatrizFilas from '../../MatrizFilas.astro';
+import type { SeoCopy } from '../../../../i18n/w/seo-local';
+
+interface Props { copy: SeoCopy['barrios']; n: number; lang?: 'es' | 'en' }
+const { copy, n, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="sl-gap">
+  <div class="sl-mx" data-sl-mx>
+  <MatrizFilas rows={copy.rows} columns={copy.columns} fixedRow={0} label={copy.tableLabel} lang={lang} />
+  <span class="sl-mx__hint" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6" /></svg></span>
+  </div>
+  <p class="sl-note">{copy.note}</p>
+</div>
+<script>
+  // Móvil: la matriz se desliza en horizontal (rev2 G05: cortaba "Diseño we" sin pista).
+  // Fundido + flecha en el borde derecho mientras quede tabla a la derecha; al llegar al
+  // final se apagan. La primera vez que entra a la vista, la tabla "asoma" 40 px y vuelve
+  // (una sola vez; nunca con reducir movimiento).
+  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('[data-sl-mx]').forEach((el) => {
+    const sc = el.querySelector<HTMLElement>('.wd-mx__scroll');
+    if (!sc) return;
+    const sync = () => el.classList.toggle('is-end', sc.scrollLeft + sc.clientWidth >= sc.scrollWidth - 4);
+    sc.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+    sync();
+    if (mq.matches) return;
+    const io = new IntersectionObserver((es) => {
+      if (!es.some((e) => e.isIntersecting && e.intersectionRatio >= 0.6)) return;
+      io.disconnect();
+      if (sc.scrollWidth <= sc.clientWidth + 4 || sc.scrollLeft > 0) return;
+      sc.scrollTo({ left: 40, behavior: 'smooth' });
+      setTimeout(() => { if (sc.scrollLeft <= 44) sc.scrollTo({ left: 0, behavior: 'smooth' }); }, 700);
+    }, { threshold: [0.6] });
+    io.observe(el);
+  });
+</script>
+<style>
+  .sl-gap { margin-top: var(--w-chapter-gap); }
+  .sl-note { margin: 20px auto 0; max-width: 46rem; text-align: center; font-size: var(--w-small); line-height: 1.6; color: var(--fg-secondary); }
+  .sl-mx { position: relative; }
+  .sl-mx__hint { display: none; }
+  @media (--lt-md) {
+    .sl-gap { margin-top: 48px; }
+    /* Móvil: columnas con sitio para que los servicios partan por palabra (nunca
+       "conve…"), y un fundido con flecha en el borde derecho que avisa de que la caja
+       se desplaza (rev2: el fundido solo, de 48 px, no se notaba). */
+    .sl-mx :global(.wd-mx__t) { min-width: calc(196px + var(--wd-cols) * 100px); }
+    .sl-mx :global(.wd-mx__ch) { font-size: 13px; }
+    .sl-mx::after {
+      content: ''; position: absolute; z-index: 2; top: 1px; right: 1px; bottom: 1px; width: 72px;
+      border-radius: 0 var(--w-r-obj) var(--w-r-obj) 0;
+      background: linear-gradient(90deg, transparent, var(--w-s1) 70%);
+      pointer-events: none; transition: opacity 200ms var(--w-ease-ui);
+    }
+    .sl-mx__hint {
+      position: absolute; z-index: 3; right: 10px; top: 50%; translate: 0 -50%;
+      display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+      background: var(--w-s2, #181817); border: 1px solid var(--w-line-strong);
+      color: var(--accent-gold); box-shadow: 0 6px 14px -6px rgba(0,0,0,.6);
+      pointer-events: none; transition: opacity 200ms var(--w-ease-ui);
+    }
+    .sl-mx.is-end::after, .sl-mx.is-end .sl-mx__hint { opacity: 0; }
+  }
+</style>

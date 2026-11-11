@@ -1,0 +1,21 @@
+---
+// Barrio · 01 "Servicios en tu barrio" (§4.20-2): cabecera numerada (solo etiqueta) +
+// TarjetasHermanas con los servicios de la ciudad madre (hrefs = los del megamenú de
+// esa página, R5) y tres recursos (hub de la ciudad, diagnóstico, precios).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import TarjetasHermanas from '../../TarjetasHermanas.astro';
+
+interface Props {
+  n: number;
+  label: string;
+  hermanas: Record<string, unknown>;
+}
+const { n, label, hermanas } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} />
+<div class="wb-gap">
+  <TarjetasHermanas {...(hermanas as any)} />
+</div>
+<style>
+  .wb-gap { margin-top: 28px; }
+</style>

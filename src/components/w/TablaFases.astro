@@ -1,0 +1,60 @@
+---
+// Tabla de fases (W-NEW-25, design/rediseno-workos.md §3.4).
+// Filas con divisoria de 1 px: fase en mono 13 (x=0), bloque 16 desde x≈323,
+// "qué recibes" desde x≈748 (sobre 1200). Alimentada por content.process (los
+// datos no se tocan). Sin plazos que no estén prometidos en los datos.
+// Móvil: cada fila apilada (fase, bloque, qué recibes).
+interface Row { phase: string; block: string; gets?: string }
+interface Props {
+  rows: Row[];
+  /** Rótulo mono opcional encima de la tabla. */
+  label?: string;
+  /** Rótulos de columna para lectores de pantalla (fase · paso · qué recibes). */
+  headers?: [string, string, string];
+  id?: string;
+  class?: string;
+}
+const { rows, label, headers = ['Fase', 'Paso', 'Qué recibes'], id, class: cls } = Astro.props;
+---
+<div class:list={['phases', cls]} id={id}>
+  {label && <p class="phases__label">{label}</p>}
+  <table class="phases__t">
+    <thead class="sr-only">
+      <tr>{headers.map((h) => <th scope="col">{h}</th>)}</tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <th scope="row" class="phases__phase">{r.phase}</th>
+          <td class="phases__block">{r.block}</td>
+          <td class="phases__gets">{r.gets}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .phases { max-width: var(--w-rail-max); margin-inline: auto; }
+  .phases__label {
+    margin: 0 0 32px; font-family: var(--font-mono); font-weight: 500; font-size: 12px; line-height: 1.2;
+    text-transform: uppercase; letter-spacing: var(--w-tr-micro); color: var(--w-ink-60);
+  }
+  .phases__t { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .phases__t tr { display: grid; grid-template-columns: 1fr; gap: 6px; padding-block: 20px; border-top: 1px solid var(--w-line); }
+  .phases__t tbody tr:last-child { border-bottom: 1px solid var(--w-line); }
+  .phases__t th, .phases__t td { padding: 0; text-align: start; font-weight: 400; vertical-align: top; min-width: 0; }
+  .phases__phase {
+    font-family: var(--font-mono); font-size: 13px; line-height: 1.5; color: var(--w-accent, var(--accent-gold));
+    letter-spacing: 0.02em;
+  }
+  .phases__block { font-family: var(--font-body); font-size: 16px; line-height: 1.5; color: var(--w-ink); }
+  .phases__gets { font-family: var(--font-body); font-size: 15px; line-height: 1.55; color: var(--fg-secondary); }
+  .phases__gets:empty { display: none; }
+  @media (--md) {
+    /* 323 / 748 sobre 1200 ≈ 27 % / 62 %. */
+    .phases__t tr { grid-template-columns: 27% 35.4% minmax(0, 1fr); gap: 0; padding-block: 24px; }
+    .phases__block { padding-right: 32px; }
+    .phases__gets:empty { display: block; }
+  }
+</style>

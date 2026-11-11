@@ -1,0 +1,161 @@
+---
+// Listado de guías con filtro por tema (W-CONT-05 + W-CONT-06, design/rediseno-workos.md §4.7).
+// · Filtro: píldoras radio 999, alto 43, 14 px; la activa con borde de 2 px oro (sombra
+//   interior, sin mover nada). En móvil la fila se desplaza en horizontal (W-CONT-05).
+//   Sin la lupa de WorkOS: con media docena de guías no hace falta un buscador.
+// · Filas: portada 50 % | texto 50 % centrado en vertical, ~72 px entre filas.
+// · Contrato (enriquecimiento progresivo, como el índice de antes): la lista lleva TODAS
+//   las guías. Las que ya salen arriba (destacada y pareja) llevan `hidden` de serie, así
+//   que sin JS cada guía se ve exactamente una vez en la página. Con JS, "Todas" deja la
+//   lista como viene y un tema enseña TODAS las guías de ese tema (también las de arriba),
+//   oculta el resto y actualiza aria-pressed.
+import Portada from './Portada.astro';
+import type { PostCard } from '../../../../i18n/w/blog';
+
+interface Props {
+  posts: PostCard[];
+  /** hrefs de las guías que ya salen en la destacada y la pareja. */
+  topHrefs: string[];
+  categories: { label: string; id: string }[];
+  filterAria: string;
+  all: string;
+  none: string;
+}
+const { posts, topHrefs, categories, filterAria, all, none } = Astro.props;
+---
+<div class="bl" data-blog>
+  {categories.length > 1 && (
+    <nav class="bl__filter" aria-label={filterAria}>
+      <ul class="bl__chips" role="list">
+        <li>
+          <button type="button" class="bl__chip is-active" data-filter="all" aria-pressed="true">{all}</button>
+        </li>
+        {categories.map((cat) => (
+          <li>
+            <button type="button" class="bl__chip" data-filter={cat.id} aria-pressed="false">{cat.label}</button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )}
+
+  <p class="bl__none" data-blog-none hidden>{none}</p>
+
+  <ul id="articulos" class="bl__list" role="list">
+    {posts.map((p) => {
+      const top = topHrefs.includes(p.href);
+      return (
+        <li class="bl__row" data-post data-cats={p.cats.join(' ')} data-top={top ? '' : undefined} hidden={top}>
+          <a class="bl__card" href={p.href}>
+            <Portada tags={p.tags} slug={p.href.split('/').pop()} class="bl__art" />
+            <div class="bl__body">
+              {p.tags[0] && <span class="bl__tag">{p.tags[0]}</span>}
+              <h3 class="bl__title">{p.title}</h3>
+              <p class="bl__excerpt">{p.description}</p>
+              <div class="bl__foot">
+                <span>{p.reading}</span>
+                <time datetime={p.dateISO}>{p.dateLabel}</time>
+              </div>
+            </div>
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+</div>
+
+<style>
+  .bl { min-width: 0; }
+  .bl__filter { margin: 40px 0 56px; min-width: 0; }
+  .bl__chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+  .bl__chip {
+    display: inline-flex; align-items: center; height: 44px; padding: 0 16px; white-space: nowrap;
+    border: 1px solid var(--w-line-strong); border-radius: 999px; background: transparent; cursor: pointer;
+    font: 500 14px/1 var(--font-body); color: var(--w-ink-80);
+    transition: border-color var(--w-dur-micro) var(--w-ease-ui), color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  @media (--hover-fine) { .bl__chip:hover { color: var(--w-ink); border-color: rgba(var(--accent-gold-rgb), .45); } }
+  /* Activa: borde de 2 px oro (1 px de borde + 1 px de sombra interior, sin animarla). */
+  .bl__chip.is-active { color: var(--accent-gold); border-color: var(--accent-gold); box-shadow: inset 0 0 0 1px var(--accent-gold); }
+  .bl__chip:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 3px; }
+
+  .bl__none { margin: 0 0 32px; font: 400 16px/1.5 var(--font-body); color: var(--w-ink-70); }
+  .bl__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 64px; }
+  .bl__row[hidden] { display: none; }
+  .bl__card { display: grid; grid-template-columns: 1fr; gap: 24px; color: var(--w-ink); text-decoration: none; min-width: 0; }
+  .bl__card :global(.bl__art) {
+    aspect-ratio: 576 / 369; border-radius: var(--w-r-cell); border: 1px solid var(--w-line);
+    transition: border-color var(--w-dur-hover) var(--w-ease-ui);
+  }
+  .bl__body { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 10px; min-width: 0; }
+  .bl__tag {
+    display: inline-flex; padding: 3px 9px; border-radius: var(--w-r-cell);
+    font: 500 13px/20px var(--font-body); color: var(--accent-gold); background: rgba(var(--accent-gold-rgb), .12);
+  }
+  .bl__title {
+    margin: 4px 0 0; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: var(--w-h3); line-height: 1.25; letter-spacing: -0.025em; color: var(--w-ink); text-wrap: balance;
+    transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .bl__excerpt { margin: 0; font: 400 16px/1.5 var(--font-body); color: var(--w-ink-70); }
+  .bl__foot {
+    padding-top: 6px; width: 100%; display: flex; justify-content: space-between; gap: 16px;
+    font: 400 14px/20px var(--font-body); color: var(--w-ink-60);
+  }
+  @media (--hover-fine) {
+    .bl__card:hover :global(.bl__art) { border-color: rgba(var(--accent-gold-rgb), .32); }
+    .bl__card:hover .bl__title { color: var(--accent-gold); }
+  }
+  .bl__card:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 6px; border-radius: var(--w-r-cell); }
+
+  @media (--md) {
+    .bl__card { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; align-items: center; }
+    .bl__list { gap: 72px; }
+  }
+  /* Móvil: la fila de temas se desplaza en horizontal (W-CONT-05) y se funde en el borde
+     derecho para que se note que sigue (E-30). */
+  @media (--lt-md) {
+    .bl__filter {
+      margin: 32px calc(-1 * var(--container-pad)) 40px; overflow-x: auto; scrollbar-width: none;
+      -webkit-mask-image: linear-gradient(to right, #000 85%, transparent);
+              mask-image: linear-gradient(to right, #000 85%, transparent);
+    }
+    .bl__filter::-webkit-scrollbar { display: none; }
+    .bl__chips { flex-wrap: nowrap; padding: 2px var(--container-pad); width: max-content; }
+  }
+  @media (--motion-reduce) {
+    .bl__chip, .bl__title, .bl__card :global(.bl__art) { transition: none; }
+  }
+</style>
+
+<script>
+  // Filtro por tema, enriquecimiento progresivo (contrato del índice). Sin JS: la lista
+  // tal cual viene (cada guía una vez en la página). Con JS: "Todas" restaura ese estado;
+  // un tema enseña todas sus guías y oculta el resto; aria-pressed sigue a la activa.
+  const root = document.querySelector<HTMLElement>('[data-blog]');
+  if (root) {
+    const chips = Array.from(root.querySelectorAll<HTMLButtonElement>('.bl__chip'));
+    const rows = Array.from(root.querySelectorAll<HTMLElement>('[data-post]'));
+    const none = root.querySelector<HTMLElement>('[data-blog-none]');
+    const apply = (filter: string) => {
+      let shown = 0;
+      for (const row of rows) {
+        const cats = (row.dataset.cats || '').split(' ');
+        const match = filter === 'all' ? !row.hasAttribute('data-top') : cats.includes(filter);
+        row.hidden = !match;
+        if (match) shown++;
+      }
+      if (none) none.hidden = shown !== 0;
+    };
+    for (const chip of chips) {
+      chip.addEventListener('click', () => {
+        for (const c of chips) {
+          const on = c === chip;
+          c.classList.toggle('is-active', on);
+          c.setAttribute('aria-pressed', on ? 'true' : 'false');
+        }
+        apply(chip.dataset.filter || 'all');
+      });
+    }
+  }
+</script>

@@ -1,0 +1,321 @@
+---
+// Demo por pasos (W-CORE-05 + F-05 · design/rediseno-workos.md §3.5).
+// Dos modos:
+//  · Con título (`titleHtml`): H2 32/40 + párrafo + filas de pasos a la izquierda.
+//    Con `headSize="section"` (sistema tras el piloto, W-CORE-05) el H2 es el de sección (40)
+//    y va bajo una CabeceraNumerada SOLO de etiqueta: título, bajada y pasos juntos a la
+//    izquierda y el escenario a la derecha, un solo titular. En móvil: título y bajada,
+//    luego la demo (arranca entera a la vista) y debajo los pasos.
+//  · Bajo cabecera (sin `titleHtml`, control 2): va debajo de una CabeceraNumerada que
+//    ya lleva el H2 y la bajada; aquí solo las filas de pasos, sin titular propio (un
+//    titular por sección, esquema de encabezados limpio).
+// Izquierda (440): los pasos como filas legibles 16/26 con número mono. El paso que
+// corre se marca (caja --w-s3, número en acento, brillo de 0,9 s); los hechos llevan
+// su marca; los pendientes van atenuados.
+// Derecha (680): pantalla radio 20 en marco --w-s2 y fondo claro (slot `screen`,
+// normalmente <WebEjemplo frame="tarjeta">) y, asomando por DETRÁS a su izquierda (como
+// el terminal de W-CORE-05), el registro de la máquina (`log`, mono 13 oro): lo que DEJA
+// cada paso (archivos, conexiones), nunca la lista repetida. La pantalla nunca queda
+// tapada (control 2 ronda 2: el registro encima cortaba la web de ejemplo) y el texto del
+// registro acaba antes del borde de la pantalla. Sin `log` no hay registro.
+// Armado (antes de arrancar): el registro ya lleva sus líneas, atenuadas, nunca una caja
+// vacía (WorkOS en t0000).
+// Sin pegajoso (control 2: el panel apenas se quedaba fijo ~270 px y la reserva dejaba
+// una losa negra de ~490 px, E-01): disparo único por entrada en vista (~3 s), cuando la
+// escenario está ENTERO a la vista, con aire bajo él (o al 75 % si no cabe en la ventana;
+// control 2 piloto r3: arrancaba con la pantalla a medio entrar).
+// Estado final por defecto (sin JS o con reducir movimiento): web terminada y pasos
+// marcados. Móvil: en modo bajo cabecera la demo va ANTES de la lista, para que se vea
+// entera cuando arranca. En móvil hay UNA sola lista legible (las filas): el registro
+// asoma por DETRÁS del borde inferior de la pantalla, como en escritorio, y enseña solo la
+// línea del paso que corre (al terminar, la última), nunca los 5 pasos repetidos.
+interface Props {
+  titleHtml?: string;
+  text?: string;
+  /** Tamaño del titular propio: "small" (32, por defecto) o "section" (H2 40 de sección). */
+  headSize?: 'small' | 'section';
+  steps: string[];
+  /** Registro de la máquina, una línea por paso (lo que deja cada paso). */
+  log?: string[];
+  /** Leyenda final, p. ej. "Web publicada" (el check lo pinta el componente). */
+  done: string;
+  /** Leyenda mientras corre, p. ej. "Publicando tu web". */
+  working?: string;
+  tone?: 'gold' | 'teal';
+  lang?: 'es' | 'en';
+  id?: string;
+  class?: string;
+}
+const { titleHtml, text, headSize = 'small', steps, log, done, tone = 'gold', lang = 'es', id, class: cls } = Astro.props;
+const sec = !!titleHtml && headSize === 'section';
+const en = lang === 'en';
+const bare = !titleHtml;
+const working = Astro.props.working ?? (en ? 'Building your website' : 'Construyendo tu web');
+const pad = (n: number) => String(n).padStart(2, '0');
+const sr = (en ? 'Example: ' : 'Ejemplo: ') + (log?.length ? log.join(', ') : steps.join(', ')) + '. ' + done + '.';
+---
+<div class:list={['wd-demo', bare && 'wd-demo--bare', sec && 'wd-demo--sec', cls]} id={id} data-w-tone={tone} data-wd-demo>
+  <div class="wd-demo__copy">
+    {titleHtml && <h2 class:list={[sec ? 'w-h2' : 'wd-demo__h']} set:html={titleHtml} />}
+    {text && <p class="wd-demo__p">{text}</p>}
+    <ol class="wd-demo__rows">
+      {steps.map((s, i) => (
+        <li class="wd-demo__row is-done" data-wd-row>
+          <span class="wd-demo__n" aria-hidden="true">{pad(i + 1)}</span>
+          <span class="wd-demo__rt">{s}</span>
+          <span class="wd-demo__tick" aria-hidden="true">✓</span>
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <div class="wd-demo__side">
+    <p class="sr-only">{sr}</p>
+    <div class:list={['wd-demo__stage', !log?.length && 'wd-demo__stage--solo']} aria-hidden="true">
+      <div class="wd-demo__screen">
+        <div class="wd-demo__screen-in" data-wd-screen><slot name="screen" /></div>
+      </div>
+      {log && log.length > 0 && (
+        <div class="wd-demo__log">
+          <ol class="wd-demo__steps">
+            {log.map((s) => (
+              <li class="wd-demo__step is-done is-shown" data-wd-step>
+                <span class="wd-demo__mark"></span><span class="wd-demo__lbl">{s}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+    </div>
+    <p class="wd-demo__cap" aria-hidden="true">
+      <span class="wd-demo__spin"></span>
+      <span class="wd-demo__ok">✓</span>
+      <span class="wd-demo__cap-w">{working}</span>
+      <span class="wd-demo__cap-d">{done}</span>
+    </p>
+  </div>
+</div>
+
+<style>
+  .wd-demo {
+    --wd-acc: var(--w-accent, var(--accent-gold));
+    --wd-acc-rgb: var(--w-accent-rgb, var(--accent-gold-rgb));
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px;
+    max-width: var(--w-rail-max); margin-inline: auto;
+  }
+  /* ── Texto ── */
+  .wd-demo__h {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: var(--w-h2-small); line-height: 1.25; letter-spacing: -0.03em; color: var(--w-ink);
+    text-wrap: balance;
+  }
+  .wd-demo__p {
+    margin: 16px 0 0; max-width: 32.5rem;
+    font-family: var(--font-body); font-size: 16px; line-height: 26px; color: var(--fg-secondary);
+  }
+  .wd-demo--sec :global(.w-h2) { margin: 0; max-width: 580px; }
+  .wd-demo--sec .wd-demo__p { max-width: 430px; line-height: 1.6; }
+  .wd-demo__rows { list-style: none; margin: 32px 0 0; padding: 0; max-width: 32.5rem; }
+  .wd-demo--bare .wd-demo__rows { margin-top: 0; }
+  .wd-demo__row {
+    position: relative; overflow: hidden;
+    display: grid; grid-template-columns: 40px minmax(0, 1fr) 20px; align-items: baseline;
+    padding: 16px 12px; border-top: 1px solid var(--w-line);
+    font-family: var(--font-body); font-size: 16px; line-height: 26px; color: var(--w-ink);
+    transition: color var(--w-dur-ui) var(--w-ease-ui);
+  }
+  .wd-demo__row:last-child { border-bottom: 1px solid var(--w-line); }
+  /* Caja del paso que corre: capa propia que se funde (solo opacidad). */
+  .wd-demo__row::before {
+    content: ''; position: absolute; inset: 4px 0; z-index: -1; border-radius: var(--w-r-obj);
+    background: var(--w-s3); box-shadow: inset 0 0 0 1px var(--w-line-strong);
+    opacity: 0; transition: opacity var(--w-dur-ui) var(--w-ease-ui);
+  }
+  .wd-demo__rows { position: relative; isolation: isolate; }
+  .wd-demo__row.is-active::before { opacity: 1; }
+  .wd-demo__n { font-family: var(--font-mono); font-weight: 500; font-size: 12px; color: var(--wd-acc); letter-spacing: .04em; }
+  .wd-demo__tick {
+    font-family: var(--font-body); font-weight: 600; font-size: 14px; color: var(--wd-acc); text-align: right;
+    opacity: 0; transition: opacity var(--w-dur-ui) var(--w-ease-ui);
+  }
+  .wd-demo__row.is-done .wd-demo__tick { opacity: 1; }
+  /* Brillo de 0,9 s en el paso que corre (lista y registro), con transform. */
+  .wd-demo__row::after, .wd-demo__step::after {
+    content: ''; position: absolute; inset: 0 auto 0 0; width: 45%;
+    background: linear-gradient(90deg, transparent, rgba(var(--star-rgb), .14), transparent);
+    transform: translateX(-120%); opacity: 0; pointer-events: none;
+  }
+  .wd-demo__row.is-active::after, .wd-demo__step.is-active::after { opacity: 1; animation: wd-demo-shine 900ms var(--w-ease-ui) infinite; }
+  @keyframes wd-demo-shine { to { transform: translateX(260%); } }
+  /* Armado (antes de entrar en vista): pendientes atenuados (legibles, AA a 16 px). */
+  .wd-demo.is-armed .wd-demo__row:not(.is-done):not(.is-active) { color: var(--w-ink-60); }
+  .wd-demo.is-armed .wd-demo__row:not(.is-done):not(.is-active) .wd-demo__n { color: var(--w-ink-60); }
+
+  /* ── Demo ── */
+  .wd-demo__side { min-width: 0; }
+  .wd-demo__stage { position: relative; }
+  .wd-demo__screen {
+    position: relative; z-index: 1;
+    padding: 12px; border-radius: 20px;
+    background: var(--w-s2); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .wd-demo__screen-in {
+    border-radius: var(--w-r-obj); overflow: hidden; min-height: 360px;
+    padding: 24px 20px 28px; background: var(--w-p-bg); color: var(--w-p-ink);
+  }
+  .wd-demo__screen-in > :global(*) { height: 100%; }
+  /* Móvil: tarjeta que asoma por DETRÁS del borde inferior de la pantalla (los 22 px de
+     arriba quedan bajo la pantalla y son solo relleno) con UNA línea a la vista. */
+  .wd-demo__log {
+    position: relative; z-index: 0;
+    margin: -22px 16px 0; padding: 34px 16px 12px; border-radius: var(--w-r-obj);
+    background: var(--w-s-solid); border: 1px solid var(--w-line-strong); box-shadow: var(--w-edge), 0 18px 40px rgba(0, 0, 0, .45);
+  }
+  .wd-demo__steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+  @media (--lt-lg) {
+    /* Las líneas apiladas en la misma celda: solo se ve la del paso que corre; sin demo en
+       marcha (final, sin JS, reducido), la última; armada y sin arrancar, la primera. */
+    .wd-demo__step { grid-area: 1 / 1; visibility: hidden; }
+    .wd-demo__step.is-active,
+    .wd-demo:not(.is-working) .wd-demo__step:last-child,
+    .wd-demo.is-working .wd-demo__steps:not(:has(.is-active)) .wd-demo__step:first-child { visibility: visible; }
+  }
+  .wd-demo__step {
+    position: relative; overflow: hidden;
+    display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 10px; align-items: center;
+    font-family: var(--font-mono); font-weight: 500; font-size: 13px; line-height: 1.35; color: var(--wd-acc);
+  }
+  .wd-demo__mark {
+    position: relative; width: 12px; height: 12px; border-radius: 3px;
+    border: 1px solid rgba(var(--wd-acc-rgb), .7); transform: rotate(45deg) scale(.8);
+  }
+  .wd-demo__mark::after {
+    content: ''; position: absolute; inset: 2px; border-radius: 1px; background: var(--wd-acc);
+    opacity: 0; transition: opacity var(--w-dur-hover) var(--w-ease-ui);
+  }
+  .wd-demo__step.is-done .wd-demo__mark::after { opacity: 1; }
+  .wd-demo__lbl { min-width: 0; overflow-wrap: anywhere; }
+  .wd-demo.is-armed .wd-demo__step { opacity: .38; }
+  .wd-demo__step { transition: opacity 320ms var(--w-ease-ui); }
+  .wd-demo.is-armed .wd-demo__step.is-shown { opacity: 1; }
+
+  /* Leyenda: spinner → check. */
+  .wd-demo__cap {
+    margin: 18px 0 0; display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: var(--font-body); font-size: 14px; line-height: 20px; color: var(--w-ink-70);
+  }
+  .wd-demo__spin {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid rgba(var(--star-rgb), .18); border-top-color: var(--wd-acc);
+    animation: wd-demo-spin 800ms linear infinite;
+  }
+  @keyframes wd-demo-spin { to { transform: rotate(360deg); } }
+  .wd-demo__ok { color: var(--wd-acc); font-weight: 600; }
+  .wd-demo__spin, .wd-demo__cap-w { display: none; }
+  .wd-demo.is-working .wd-demo__spin, .wd-demo.is-working .wd-demo__cap-w { display: inline-block; }
+  .wd-demo.is-working .wd-demo__ok, .wd-demo.is-working .wd-demo__cap-d { display: none; }
+
+  /* Móvil, bajo cabecera: la demo primero (arranca entera a la vista) y filas compactas. */
+  @media (--lt-lg) {
+    .wd-demo--bare .wd-demo__side { order: -1; }
+    /* Con título de sección: título y bajada, la demo y luego los pasos. */
+    .wd-demo--sec { gap: 0; }
+    .wd-demo--sec .wd-demo__copy { display: contents; }
+    .wd-demo--sec .wd-demo__side { order: 1; margin-top: 32px; }
+    .wd-demo--sec .wd-demo__rows { order: 2; margin-top: 32px; }
+    .wd-demo__row { padding-block: 12px; }
+  }
+  @media (--lt-md) {
+    .wd-demo__screen-in { min-height: 300px; padding: 18px 16px 22px; }
+  }
+  @media (--lg) {
+    .wd-demo { grid-template-columns: minmax(0, 440px) minmax(0, 680px); justify-content: space-between; align-items: center; gap: 64px; }
+    /* Bajo cabecera la lista arranca pegada a la bajada (sin hueco muerto bajo el H2). */
+    .wd-demo--bare, .wd-demo--sec { align-items: start; }
+    /* Como en W-CORE-05: el registro asoma por DETRÁS de la pantalla, a su izquierda. Su
+       lado derecho (40 px) queda bajo la pantalla y es solo relleno: el texto acaba antes. */
+    .wd-demo__stage { --wd-shift: 40%; }
+    .wd-demo__screen { margin-left: var(--wd-shift); }
+    .wd-demo__stage--solo .wd-demo__screen { margin-left: 0; }
+    .wd-demo__screen-in { min-height: 400px; }
+    .wd-demo__cap { margin-left: 40%; }
+    .wd-demo__stage--solo + .wd-demo__cap { margin-left: 0; }
+    .wd-demo__log {
+      position: absolute; z-index: 0; left: 0; top: 50%; translate: 0 -50%; margin: 0;
+      width: calc(var(--wd-shift) + 40px); padding: 14px 52px 14px 16px;
+    }
+    /* Mono 12 en escritorio: cada línea del registro cabe entera en lo que asoma. */
+    .wd-demo__step { font-size: 12px; }
+  }
+  @media (--motion-reduce) {
+    .wd-demo__step, .wd-demo__mark::after, .wd-demo__row, .wd-demo__row::before, .wd-demo__tick { transition: none; }
+    .wd-demo__step.is-active::after, .wd-demo__row.is-active::after, .wd-demo__spin { animation: none; }
+  }
+</style>
+
+<script>
+  // Tiempos medidos en la tira de W-CORE-05 (~3 s en total, una vez).
+  const STEP_MS = 560, SHINE_MS = 900;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  document.querySelectorAll<HTMLElement>('[data-wd-demo]').forEach((el) => {
+    const rows = Array.from(el.querySelectorAll<HTMLElement>('[data-wd-row]'));
+    const steps = Array.from(el.querySelectorAll<HTMLElement>('[data-wd-step]'));
+    const stage = el.querySelector<HTMLElement>('.wd-demo__stage') || el;
+    const webs = () => Array.from(el.querySelectorAll<HTMLElement>('[data-wd-screen] [data-wo-state]'));
+    if (reduced.matches || !('IntersectionObserver' in window) || !rows.length) return;
+    const timers: number[] = [];
+    const all = () => [...rows, ...steps];
+    const settle = () => {
+      timers.forEach((t) => clearTimeout(t));
+      el.classList.remove('is-armed', 'is-working');
+      all().forEach((s) => { s.classList.remove('is-active'); s.classList.add('is-done', 'is-shown'); });
+      webs().forEach((w) => w.setAttribute('data-wo-state', 'lista'));
+    };
+    reduced.addEventListener?.('change', (e) => { if (e.matches) settle(); });
+    const arm = () => {
+      el.classList.add('is-armed', 'is-working');
+      all().forEach((s) => s.classList.remove('is-done', 'is-active', 'is-shown'));
+      webs().forEach((w) => w.setAttribute('data-wo-state', 'esqueleto'));
+    };
+    // Paso i: la fila de la lista y la línea del registro avanzan juntas.
+    const at = (i: number) => {
+      [rows, steps].forEach((list) => {
+        list[i - 1]?.classList.replace('is-active', 'is-done');
+        list[i]?.classList.add('is-shown', 'is-active');
+      });
+    };
+    const play = () => {
+      rows.forEach((_, i) => timers.push(window.setTimeout(() => at(i), i * STEP_MS)));
+      const last = (rows.length - 1) * STEP_MS;
+      // La web se llena a mitad del recorrido y queda terminada con el último paso.
+      timers.push(window.setTimeout(() => webs().forEach((w) => w.setAttribute('data-wo-state', 'lista')), Math.round(last * 0.6)));
+      timers.push(window.setTimeout(() => {
+        [rows, steps].forEach((list) => list[list.length - 1]?.classList.replace('is-active', 'is-done'));
+        el.classList.remove('is-working');
+      }, last + SHINE_MS));
+    };
+    // Arranca cuando la demo está entera a la vista (o lo más entera que quepa).
+    // La raíz recorta un 8 % abajo: el escenario tiene que estar entero y con aire bajo él;
+    // si es más alto que lo que queda, basta con el 75 % (control 2 piloto r3).
+    const ROOT_BOTTOM = 0.08;
+    const need = () => {
+      const h = Math.max(1, stage.getBoundingClientRect().height);
+      const room = window.innerHeight * (1 - ROOT_BOTTOM);
+      return h <= room ? 0.98 : Math.max(0.75, (room / h) * 0.98);
+    };
+    let armed = false;
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!armed) {
+          armed = true;
+          // Si ya está a la vista al cargar, no se esconde nada: queda terminada.
+          if (e.isIntersecting && e.intersectionRatio > 0.05) { io.disconnect(); return; }
+          arm();
+          continue;
+        }
+        if (e.isIntersecting && e.intersectionRatio >= need() - 0.005) { io.disconnect(); play(); }
+      }
+    }, { rootMargin: `0px 0px -${ROOT_BOTTOM * 100}% 0px`, threshold: [0, 0.05, 0.2, 0.35, 0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 0.98, 1] });
+    io.observe(stage);
+  });
+</script>

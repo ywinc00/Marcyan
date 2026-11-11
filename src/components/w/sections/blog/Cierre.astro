@@ -1,0 +1,132 @@
+---
+// Cierre del índice del blog (W-CONT-50, design/rediseno-workos.md §4.7): dos tarjetas
+// iguales de 576 con 48 px entre ellas (icono de línea 24, título en el acento, texto 14-15
+// y la acción). NO se monta CierreDosTarjetas además (sería doble cierre): aquí el TRÍO
+// contractual vive en la tarjeta "Propuesta gratis" con sus clases y eventos exactos,
+// una sola vez: a.ctaband__act--form[proposal_requested] → #contacto ·
+// a.ctaband__act--wa[whatsapp_clicked] · a.ctaband__act--call[call_clicked].
+// Dominante por dispositivo SIN `order` (DOM fijo: formulario · WhatsApp · llamar):
+// escritorio = formulario con la piel del botón principal; móvil = Llamar.
+// La otra tarjeta lleva al diagnóstico (tool_cta_clicked). tel/wa por props.
+import Icon from '../../../ui/Icon.astro';
+import { t, type Lang } from '../../../../i18n/ui';
+import type { BlogW } from '../../../../i18n/w/blog';
+
+interface Props {
+  copy: BlogW['close'];
+  tel: string;
+  wa: string;
+  lang?: Lang;
+}
+const { copy, tel, wa, lang = 'es' } = Astro.props;
+const ui = t(lang);
+---
+<div class="bc" role="group" aria-label={copy.aria}>
+  <article class="bc__card">
+    <div class="bc__head">
+      <span class="bc__icon" aria-hidden="true"><Icon name="lucide:file-pen-line" /></span>
+      <div class="bc__txt">
+        <h2 class="bc__title">{copy.proposal.title}</h2>
+        <p class="bc__text">{copy.proposal.text}</p>
+      </div>
+    </div>
+    <div class="bc__acts">
+      <a class="bc__act ctaband__act ctaband__act--form" href="#contacto" data-track="proposal_requested">
+        <span>{copy.proposal.form}</span><span class="bc__chev" aria-hidden="true">›</span>
+      </a>
+      <a class="bc__act ctaband__act ctaband__act--wa" href={wa} data-track="whatsapp_clicked">
+        <span>WhatsApp</span><span class="bc__chev" aria-hidden="true">›</span>
+      </a>
+      <a class="bc__act ctaband__act ctaband__act--call" href={tel} data-track="call_clicked">
+        <span>{ui.cta.call}</span><span class="bc__chev" aria-hidden="true">›</span>
+      </a>
+    </div>
+  </article>
+
+  <article class="bc__card">
+    <div class="bc__head">
+      <span class="bc__icon" aria-hidden="true"><Icon name="lucide:scan-search" /></span>
+      <div class="bc__txt">
+        <h2 class="bc__title">{copy.checkup.title}</h2>
+        <p class="bc__text">{copy.checkup.text}</p>
+      </div>
+    </div>
+    <div class="bc__acts">
+      <a class="bc__act" href={copy.checkup.href} data-track="tool_cta_clicked">
+        <span>{copy.checkup.cta}</span><span class="bc__chev" aria-hidden="true">›</span>
+      </a>
+    </div>
+  </article>
+</div>
+
+<style>
+  .bc { display: grid; grid-template-columns: 1fr; gap: 16px; min-width: 0; }
+  @media (--md) { .bc { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px; } }
+
+  .bc__card {
+    display: flex; flex-direction: column; justify-content: space-between; gap: 20px; min-width: 0;
+    padding: 24px; border: 1px solid var(--w-line); border-radius: var(--w-r-cell);
+    background: var(--w-s1); box-shadow: var(--w-edge);
+    transition: border-color var(--w-dur-hover) var(--w-ease-ui);
+  }
+  @media (--md) { .bc__card { padding: 28px 32px; } }
+  @media (--hover-fine) { .bc__card:hover { border-color: var(--w-line-strong); } }
+
+  .bc__head { display: flex; align-items: flex-start; gap: 16px; min-width: 0; }
+  .bc__icon { flex: none; width: 24px; height: 24px; margin-top: 1px; color: var(--w-accent); }
+  .bc__icon :global(svg) { width: 24px; height: 24px; }
+  .bc__txt { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .bc__title { margin: 0; font: 500 16px/1.35 var(--font-body); color: var(--w-accent); }
+  .bc__text { margin: 0; font: 400 15px/1.5 var(--font-body); color: var(--w-ink-70); max-width: 34ch; }
+
+  .bc__acts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 22px; padding-left: 40px; min-width: 0; }
+  .bc__act {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: var(--tap-min); padding: 8px 0; white-space: nowrap; text-decoration: none;
+    font: 500 16px/1 var(--font-body); color: var(--w-ink); border-radius: var(--radius-md);
+    transition: color var(--w-dur-micro) var(--w-ease-ui), background var(--duration-fast) var(--ease-out-expo), transform var(--duration-fast);
+  }
+  .bc__chev { font-size: 18px; line-height: 1; color: var(--w-accent); transition: transform var(--w-dur-hover) var(--w-ease-ui); }
+  @media (--hover-fine) {
+    .bc__act:hover { color: var(--w-accent); }
+    .bc__act:hover .bc__chev { transform: translateX(3px); }
+  }
+  .bc__act:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 3px; }
+
+  /* Móvil: Llamar domina (piel del botón principal) a todo el ancho. */
+  .bc__acts .ctaband__act--call {
+    flex: 1 0 100%; margin-top: 6px; padding: 14px 28px; font-weight: 600; letter-spacing: .01em;
+    background: var(--accent-gold); color: var(--fg-inverse);
+  }
+  .bc__acts .ctaband__act--call .bc__chev { display: none; }
+  .bc__acts .ctaband__act--call:active { transform: scale(.97); }
+  @media (--lt-md) { .bc__acts { padding-left: 0; } }
+
+  /* Escritorio: el formulario domina; Llamar vuelve a enlace. */
+  @media (--md) {
+    .bc__acts .ctaband__act--call {
+      flex: 0 0 auto; margin-top: 0; padding: 8px 0; font-weight: 500; letter-spacing: 0;
+      background: none; color: var(--w-ink);
+    }
+    .bc__acts .ctaband__act--call .bc__chev { display: inline; }
+    .bc__acts .ctaband__act--call:active { transform: none; }
+    .bc__acts .ctaband__act--form {
+      padding: 10px 22px; font-weight: 600; font-size: 15px; letter-spacing: .01em;
+      background: var(--accent-gold); color: var(--fg-inverse);
+    }
+    .bc__acts .ctaband__act--form .bc__chev { display: none; }
+    .bc__acts .ctaband__act--form:active { transform: scale(.97); }
+  }
+  @media (--md) and (--hover-fine) {
+    .bc__acts .ctaband__act--call:hover { color: var(--w-accent); background: none; }
+    .bc__acts .ctaband__act--form:hover { color: var(--fg-inverse); background: color-mix(in srgb, var(--accent-gold), white 10%); }
+  }
+  @media (--lt-md) and (--hover-fine) {
+    .bc__acts .ctaband__act--call:hover { color: var(--fg-inverse); background: color-mix(in srgb, var(--accent-gold), white 10%); }
+  }
+  @media (--motion-reduce) {
+    .bc__card, .bc__act, .bc__chev { transition: none; }
+    .bc__act:hover .bc__chev { transform: none; }
+    .bc__acts .ctaband__act--call:active, .bc__acts .ctaband__act--form:active { transform: none; }
+  }
+</style>

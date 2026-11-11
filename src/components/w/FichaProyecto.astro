@@ -1,0 +1,183 @@
+---
+// Ficha de proyecto (W-EVT-15 como bloque, sin capa modal; §3.3).
+// Fondo --w-s1 con halo del accent del proyecto arriba a la derecha al 10 %
+// (solo oro: el teal nunca lleva halo, E-03; el punto de la meta va en el acento de la página).
+// Izquierda 512: título 48/1.2 500 (compacta 32), meta "Sitio + SEO · Houston" 16
+// al 70 %, UN solo texto 16/26 y DESPUÉS (el motivo antes que la acción, control 2
+// ronda 2) botón secundario + enlace (la acción dominante de la página es otra).
+// Texto único (control 2: did y result decían casi lo mismo): el `result` que trae
+// la página (proof.items) si lo hay; si no, el `did` del portafolio. Derecha: captura
+// REAL en marco de navegador radio 8 + teléfono solapado, width/height y lazy.
+// MJA rotulado "Florida (Orlando)". Móvil: captura arriba, texto abajo.
+// Sin apertura animada (con o sin reduced-motion).
+import Button from '../ui/Button.astro';
+import { portfolioProjects as PES } from '../../i18n/portfolio';
+import { portfolioProjects as PEN } from '../../i18n/portfolio.en';
+
+interface ProjectLike {
+  name: string; cat: string; slug?: string; accent?: string; badge?: string;
+  did?: string; result?: string; serviceLabel?: string; serviceHref?: string;
+}
+interface Props {
+  /** De `portfolioProjects` o de `proof.items` (se completa por nombre con el portafolio). */
+  project: ProjectLike;
+  variant?: 'grande' | 'compacta';
+  /** Ancla de la ficha (por defecto, el slug del proyecto). */
+  id?: string;
+  lang?: 'es' | 'en';
+  /** Nivel del título dentro de la página. */
+  as?: 'h2' | 'h3';
+  /** Botón principal (por defecto "Ver el proyecto" → ancla del portafolio). */
+  primary?: { label: string; href: string; track?: string };
+  /** Enlace con chevron (por defecto, el servicio del proyecto de portfolio.ts). */
+  link?: { label: string; href: string; track?: string } | false;
+  class?: string;
+}
+const { project, variant = 'grande', id, lang = 'es', as: H = 'h3', primary, link, class: cls } = Astro.props;
+
+const list = lang === 'en' ? PEN : PES;
+const full = list.find((p) => p.name === project.name);
+const p = { ...full, ...project } as ProjectLike & { slug?: string; mh?: number };
+const slug = p.slug;
+const accent = p.accent === 'teal' ? 'teal' : 'gold';
+const MOVIL_520_H: Record<string, number> = { trr: 958, mja: 899, jls: 944, rn: 1068 };
+const DOMINIOS: Record<string, string> = { trr: 'texasrushremove.com', mja: 'movejunkaway.com' };
+
+const cityRaw = (p.cat ?? '').split('·').map((s) => s.trim())[1] ?? '';
+const city = slug === 'mja' ? 'Florida (Orlando)' : cityRaw.replace(/,\s*[A-Z]{2}$/, '');
+const meta = [p.badge, city].filter(Boolean).join(' · ');
+const portHref = lang === 'en' ? '/en/portfolio' : '/es/portafolio';
+const prim = primary ?? { label: lang === 'en' ? 'See the project' : 'Ver el proyecto', href: `${portHref}#${slug ?? ''}` };
+const lnk = link === false ? null : (link ?? (p.serviceLabel && p.serviceHref ? { label: p.serviceLabel, href: p.serviceHref } : null));
+// Un solo texto por pieza: el de la página manda; si no trae, el del portafolio.
+const body = project.result ?? p.did ?? p.result;
+const alt = lang === 'en' ? { pc: 'desktop view', movil: 'mobile view' } : { pc: 'vista de escritorio', movil: 'vista móvil' };
+---
+<article
+  class:list={['w-fp', `w-fp--${variant}`, `w-fp--${accent}`, cls]}
+  id={id ?? slug}
+  data-accent={accent}
+>
+  {slug && (
+    <div class="w-fp__media">
+      <div class="w-fp__browser">
+        <div class="w-fp__bar" aria-hidden="true">
+          <span class="w-fp__dots"><i></i><i></i><i></i></span>
+          <span class="w-fp__url" translate="no">{DOMINIOS[slug] ?? ''}</span>
+        </div>
+        <div class="w-fp__screen">
+          <img
+            src={`/Galeria/${slug}-pc-900.webp`}
+            srcset={`/Galeria/${slug}-pc-480.webp 480w, /Galeria/${slug}-pc-640.webp 640w, /Galeria/${slug}-pc-900.webp 900w, /Galeria/${slug}-pc-1280.webp 1280w, /Galeria/${slug}-pc.webp 1920w`}
+            sizes={variant === 'grande' ? '(min-width: 1024px) 560px, calc(100vw - 32px)' : '(min-width: 1024px) 480px, calc(100vw - 32px)'}
+            width="900" height="506"
+            alt={`${p.name}, ${alt.pc}`}
+            loading="lazy" decoding="async"
+          />
+        </div>
+      </div>
+      <div class="w-fp__phone">
+        <div class="w-fp__phone-screen">
+          <img
+            src={`/Galeria/${slug}-movil-520.webp`}
+            srcset={`/Galeria/${slug}-movil-160.webp 160w, /Galeria/${slug}-movil-260.webp 260w, /Galeria/${slug}-movil-390.webp 390w, /Galeria/${slug}-movil-520.webp 520w, /Galeria/${slug}-movil-780.webp 780w, /Galeria/${slug}-movil.webp 1320w`}
+            sizes="(min-width: 1024px) 132px, 24vw"
+            width="520" height={MOVIL_520_H[slug] ?? 960}
+            alt={`${p.name}, ${alt.movil}`}
+            loading="lazy" decoding="async"
+          />
+        </div>
+      </div>
+    </div>
+  )}
+
+  <div class="w-fp__body">
+    <H class="w-fp__title" translate="no">{p.name}</H>
+    {meta && <p class="w-fp__meta"><span class="w-fp__dot" aria-hidden="true"></span>{meta}</p>}
+    {body && <p class="w-fp__p">{body}</p>}
+    <div class="w-fp__actions">
+      <Button variant="secondary" size="lg" href={prim.href} data-track={prim.track}>{prim.label}</Button>
+      {lnk && <Button variant="link" href={lnk.href} data-track={lnk.track}>{lnk.label}</Button>}
+    </div>
+  </div>
+</article>
+
+<style>
+  .w-fp {
+    position: relative; overflow: hidden;
+    display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px;
+    padding: 20px 20px 32px;
+    background: var(--w-s1); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-tray, 22px); box-shadow: var(--w-edge);
+  }
+  /* Halo del accent arriba a la derecha al 10 % (solo oro, E-03). */
+  .w-fp--gold {
+    background:
+      radial-gradient(70% 60% at 100% 0%, rgba(var(--accent-gold-rgb), 0.10) 0%, transparent 70%),
+      var(--w-s1);
+  }
+
+  /* ── Texto ── */
+  .w-fp__body { min-width: 0; }
+  .w-fp__title {
+    margin: 0;
+    font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(2rem, 1.4rem + 1.8vw, 3rem); line-height: 1.2; letter-spacing: -0.02em;
+    color: var(--w-ink); text-wrap: balance;
+  }
+  .w-fp--compacta .w-fp__title { font-size: clamp(1.625rem, 1.3rem + 0.8vw, 2rem); }
+  .w-fp__meta {
+    display: flex; align-items: center; gap: 10px; margin: 12px 0 0;
+    font-family: var(--font-body); font-size: 16px; line-height: 1.5; color: var(--w-ink-70);
+  }
+  /* El punto va en el acento de la PÁGINA (E-14: un acento por bloque; en Miami, oro, el
+     punto teal de MJA chocaba con los filetes oro de las tarjetas). */
+  .w-fp__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--w-accent, var(--accent-gold)); flex: none; }
+  .w-fp__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: 32px; }
+  .w-fp__p {
+    margin: 24px 0 0; max-width: 512px;
+    font-family: var(--font-body); font-size: 16px; line-height: 26px; color: var(--w-ink-70);
+  }
+  .w-fp__p + .w-fp__p { margin-top: 14px; }
+
+  /* ── Captura ── */
+  .w-fp__media { position: relative; min-width: 0; padding-bottom: 28px; }
+  .w-fp__browser {
+    position: relative; z-index: 1; overflow: hidden;
+    background: var(--w-s2); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-cell, 8px); box-shadow: var(--w-edge);
+  }
+  .w-fp__bar { display: flex; align-items: center; gap: 12px; height: 30px; padding: 0 12px; border-bottom: 1px solid var(--w-line); }
+  .w-fp__dots { display: inline-flex; gap: 6px; flex: none; }
+  .w-fp__dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--w-ink-30); }
+  .w-fp__url {
+    flex: 1; min-width: 0; max-width: 260px; margin-inline: auto; height: 18px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 999px; background: rgba(var(--star-rgb), 0.05);
+    font-family: var(--font-mono); font-size: 11px; line-height: 1; color: var(--w-ink-60);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .w-fp__screen { aspect-ratio: 900 / 506; background: var(--w-s1); }
+  .w-fp__screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .w-fp__phone {
+    position: absolute; z-index: 2; right: 5%; bottom: 0;
+    width: 22%; min-width: 68px; max-width: 132px; padding: 4px;
+    background: var(--w-s3); border: 1px solid var(--w-line-strong);
+    border-radius: var(--w-r-obj, 12px); box-shadow: var(--w-edge);
+  }
+  .w-fp__phone-screen { aspect-ratio: 10 / 17; overflow: hidden; border-radius: 8px; background: var(--w-s1); }
+  /* Ancho completo de la captura, recortada solo por abajo (nunca por los lados). */
+  .w-fp__phone-screen img { display: block; width: 100%; height: auto; }
+
+  @media (--lg) {
+    .w-fp {
+      grid-template-columns: minmax(0, 512px) minmax(0, 1fr);
+      gap: 64px; align-items: center; padding: 64px 48px 64px 64px;
+    }
+    .w-fp--compacta { grid-template-columns: minmax(0, 440px) minmax(0, 1fr); gap: 48px; padding: 48px 40px 48px 48px; }
+    /* Escritorio: texto a la izquierda, captura a la derecha (en el DOM la captura va
+       primero para que en móvil quede arriba sin reordenar con `order`). */
+    .w-fp__body { grid-column: 1; grid-row: 1; }
+    .w-fp__media { grid-column: 2; grid-row: 1; }
+  }
+</style>

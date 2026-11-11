@@ -1,0 +1,46 @@
+---
+// Teléfono de ejemplo que enseña una web de /webs a tamaño de móvil real (lienzo 390 × 844
+// escalado al ancho, como WebEjemplo frame="movil"). La web dentro se adapta sola (consulta de
+// contenedor: a 390 px cada web pinta su versión de teléfono). Barra de estado con la hora REAL.
+interface Props { lang?: 'es' | 'en'; sr?: string; fondo?: string; tinta?: string; class?: string }
+const { lang = 'es', sr, fondo = '#fff', tinta = '#111', class: cls } = Astro.props;
+---
+<div class:list={['tw', cls]} lang={lang} style={`--tw-bg:${fondo};--tw-ink:${tinta}`}>
+  {sr && <p class="sr-only">{sr}</p>}
+  <div class="tw__marco" aria-hidden="true" data-nosnippet>
+    <div class="tw__vp">
+      <div class="tw__lz">
+        <div class="tw__bar"><span data-reloj="hm">9:41</span><span class="tw__ic"><i></i><i></i><i></i><b></b></span></div>
+        <span class="tw__isla"></span>
+        <div class="tw__web"><slot /></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { iniciaRelojes } from '../../reloj';
+  iniciaRelojes();
+</script>
+
+<style>
+  .tw { width: 100%; }
+  .tw__marco {
+    padding: 8px; border-radius: 30px; background: #111110;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .10), 0 0 0 1px rgba(var(--accent-gold-rgb, 196, 163, 90), .12), 0 30px 60px -30px rgba(0, 0, 0, .8);
+  }
+  .tw__vp { position: relative; overflow: hidden; border-radius: 23px; aspect-ratio: 390 / 844; container-type: inline-size; background: var(--tw-bg, #fff); }
+  .tw__lz {
+    position: absolute; left: 0; top: 0; width: 390px; height: 844px; transform-origin: 0 0;
+    transform: scale(.6);
+    transform: scale(min(1, tan(atan2(100cqw, 390px))));
+  }
+  .tw__bar { position: absolute; z-index: 3; left: 0; right: 0; top: 0; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 6px 30px 0 34px; font: 600 15px/1 system-ui, -apple-system, 'Segoe UI', sans-serif; color: var(--tw-ink, #111); }
+  .tw__ic { display: inline-flex; align-items: flex-end; gap: 2px; }
+  .tw__ic i { width: 3px; background: currentColor; border-radius: 1px; }
+  .tw__ic i:nth-child(1) { height: 5px; } .tw__ic i:nth-child(2) { height: 8px; } .tw__ic i:nth-child(3) { height: 11px; }
+  .tw__ic b { width: 22px; height: 11px; margin-left: 6px; border-radius: 3px; box-shadow: inset 0 0 0 1.5px currentColor; position: relative; }
+  .tw__ic b::after { content: ''; position: absolute; inset: 2.5px 6px 2.5px 2.5px; border-radius: 1px; background: currentColor; }
+  .tw__isla { position: absolute; z-index: 4; top: 11px; left: 50%; width: 110px; height: 32px; margin-left: -55px; border-radius: 16px; background: #0b0b0b; }
+  .tw__web { position: absolute; left: 0; right: 0; top: 48px; bottom: 0; overflow: hidden; }
+</style>

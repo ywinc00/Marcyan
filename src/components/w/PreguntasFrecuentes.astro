@@ -1,0 +1,141 @@
+---
+// Preguntas frecuentes v3 (design/rediseno-workos.md §3.2; W-CONV-11, I-03).
+// Bloque de 776 px centrado, titular 32/500 alineado al bloque; tarjetas sueltas
+// (padding 32, separadas 32) con "+" en cuadro de 32 que pasa a "−".
+// · <details> nativos TODOS cerrados al cargar (E-23): ningún `open`.
+// · Sin transición de altura: solo la opacidad del contenido en 120 ms (§6.6).
+// · Emite FAQPage con faqPage() de src/lib/schema.ts con el MISMO texto visible.
+// · `verified` por pregunta = sello W-CONV-52 (fecha real de la fuente).
+// Cerrojo 5: sale de v3 (hubs), así que TODO su CSS va aquí y solo lee --w-*.
+import Icon from '../ui/Icon.astro';
+import { protegerNombres } from '../../lib/nombres-clientes';
+import { faqPage } from '../../lib/schema';
+
+interface Item { q: string; a: string; verified?: string }
+interface Props {
+  tag?: string;
+  titleHtml: string;
+  items: Item[];
+  /** Obligatorio, sin valor por defecto (normalmente "faq"). */
+  id: string;
+  /** id del titular si no vale el derivado `${id}-title` (hubs: hx-faq-t, el de antes). */
+  titleId?: string;
+  jsonld?: boolean;
+  lang?: 'es' | 'en';
+  class?: string;
+}
+const { tag, titleHtml, items, id, titleId: titleIdProp, jsonld = true, lang = 'es', class: cls } = Astro.props;
+const titleId = titleIdProp ?? `${id}-title`;
+const ld = faqPage(items.map(({ q, a }) => ({ q, a })));
+const verifiedLabel = lang === 'en' ? 'Verified' : 'Verificado el';
+---
+<section class:list={['w-faq', cls]} id={id} aria-labelledby={titleId}>
+  <div class="w-faq__block">
+    <header class="w-faq__head">
+      {tag && <p class="w-faq__tag">{tag}</p>}
+      <h2 class="w-faq__title" id={titleId} set:html={titleHtml} />
+    </header>
+
+    <div class="w-faq__list">
+      {items.map((it) => (
+        <details class="w-faq__item">
+          <summary class="w-faq__q">
+            <span class="w-faq__sign" aria-hidden="true">
+              <span class="w-faq__bar"></span>
+              <span class="w-faq__bar w-faq__bar--v"></span>
+            </span>
+            <span class="w-faq__qtext" set:html={protegerNombres(it.q)} />
+          </summary>
+          <div class="w-faq__a">
+            <p set:html={protegerNombres(it.a)} />
+            {it.verified && (
+              <p class="w-faq__seal">
+                <Icon name="lucide:circle-check" />
+                <span>{verifiedLabel} {it.verified}</span>
+              </p>
+            )}
+          </div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+{jsonld && <script type="application/ld+json" is:inline set:html={JSON.stringify(ld)} />}
+
+<style>
+  .w-faq { min-width: 0; }
+  .w-faq__block { width: 100%; max-width: 776px; margin-inline: auto; min-width: 0; }
+  .w-faq__head { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+  .w-faq__tag {
+    margin: 0; font-family: var(--font-mono); font-weight: 500; font-size: 12px; line-height: 1.2;
+    text-transform: uppercase; letter-spacing: var(--w-tr-micro); color: var(--w-ink-60);
+  }
+  .w-faq__title {
+    margin: 0; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: var(--w-h2-small); line-height: 1.2; letter-spacing: -0.03em; color: var(--w-ink);
+    text-wrap: balance;
+  }
+  .w-faq__title :global(em) { font-style: normal; color: var(--w-accent); }
+
+  .w-faq__list { display: flex; flex-direction: column; gap: 16px; }
+  @media (--md) { .w-faq__list { gap: 32px; } }
+
+  .w-faq__item {
+    min-width: 0; background: var(--w-s2); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-obj); box-shadow: var(--w-edge);
+    transition: border-color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .w-faq__item[open] { border-color: var(--w-line-strong); }
+
+  .w-faq__q {
+    display: flex; align-items: center; gap: 20px; min-height: var(--tap-min);
+    padding: 24px 20px; cursor: pointer; list-style: none; border-radius: var(--w-r-obj);
+    font-family: var(--font-display); font-weight: 500; font-size: 18px; line-height: 1.3;
+    letter-spacing: -0.01em; color: var(--w-ink);
+    transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  @media (--md) { .w-faq__q { padding: 32px; font-size: 20px; } }
+  .w-faq__q::-webkit-details-marker { display: none; }
+  .w-faq__q::marker { content: ''; }
+  .w-faq__q:focus-visible { outline: 2px solid var(--w-accent); outline-offset: 2px; }
+  @media (--hover-fine) {
+    .w-faq__item:hover { border-color: var(--w-line-strong); }
+    .w-faq__q:hover { color: var(--w-accent); }
+  }
+  .w-faq__qtext { min-width: 0; }
+
+  /* "+" en cuadro de 32 (radio 8: token más cercano a 7), acento al 8 %; la
+     barra vertical se oculta al abrir y queda "−". Sin animación de giro. */
+  .w-faq__sign {
+    position: relative; flex: none; width: 32px; height: 32px; border-radius: var(--w-r-cell);
+    background: rgba(var(--w-accent-rgb), 0.12);
+  }
+  .w-faq__bar {
+    position: absolute; left: 50%; top: 50%; width: 14px; height: 2px; margin: -1px 0 0 -7px;
+    border-radius: 1px; background: var(--w-accent);
+  }
+  .w-faq__bar--v { transform: rotate(90deg); }
+  .w-faq__item[open] .w-faq__bar--v { opacity: 0; }
+
+  .w-faq__a { padding: 0 20px 24px 72px; }
+  @media (--md) { .w-faq__a { padding: 0 32px 32px 84px; } }
+  @media (--lt-sm) { .w-faq__a { padding-left: 20px; } }
+  .w-faq__a p {
+    margin: 0; font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+    color: var(--fg-secondary); max-width: 64ch;
+  }
+  .w-faq__item[open] .w-faq__a { animation: w-faq-in 120ms var(--w-ease-ui) both; }
+  @keyframes w-faq-in { from { opacity: 0; } to { opacity: 1; } }
+
+  .w-faq__a .w-faq__seal {
+    display: flex; align-items: center; gap: 6px; margin-top: 12px;
+    font-family: var(--font-mono); font-size: 12px; line-height: 1.3; color: var(--w-ink-60);
+  }
+  .w-faq__seal :global(svg) { width: 14px; height: 14px; flex: none; color: var(--w-ink-60); }
+
+  @media (--motion-reduce) {
+    .w-faq__item, .w-faq__q { transition: none; }
+    .w-faq__item[open] .w-faq__a { animation: none; }
+  }
+</style>

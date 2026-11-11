@@ -63,7 +63,8 @@ export function initClouds() {
     if (kind === 'edges') {
       if (innerWidth < 1024) return;                                                        // en el teléfono no hay márgenes
       const wrap = b.el.parentElement.querySelector('.hx-wrap'), r = wrap.getBoundingClientRect(), br = b.el.getBoundingClientRect();
-      const left = r.left - br.left + 20, right = r.right - br.left - 20, rnd = seeded(41);
+      const z = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;    // pantallas grandes: a píxeles CSS
+      const left = (r.left - br.left) / z + 20, right = (r.right - br.left) / z - 20, rnd = seeded(41);
       const rows = Math.max(3, Math.round(H / 560));
       for (let i = 0; i < rows; i++) {
         const y = (i + 0.75) * (H / rows) + (rnd() - 0.5) * 120, side = i % 2 === 0;

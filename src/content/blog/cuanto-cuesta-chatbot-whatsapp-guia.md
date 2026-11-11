@@ -1,13 +1,13 @@
 ---
-title: "¿Cuánto cuesta un chatbot de WhatsApp para tu negocio? Guía 2026"
-description: "Guía honesta de precios de un chatbot de WhatsApp en 2026: apps por suscripción, desarrollo a medida, el cobro de Meta por mensaje y el modelo de pago único de Marcyan."
+title: "Precio de un chatbot de WhatsApp en EE. UU. (2026)"
+description: "Cuánto cuesta un chatbot de WhatsApp para un negocio en Estados Unidos en 2026, en dólares: apps, desarrollo a medida y el cobro de Meta por mensaje."
 datePublished: 2026-06-18
 tags: ["Precios", "Inteligencia artificial"]
 heroKicker: "Guía de precios"
 heroBadge: "Chatbot · 2026"
 answer:
-  q: "¿Cuánto cuesta un chatbot de WhatsApp para un negocio en 2026?"
-  a: "Depende del modelo de cobro. Las apps por suscripción arrancan cerca de $15 a $40 al mes y suben al activar la IA; un desarrollo a medida cuesta miles de dólares. En Marcyan, el chatbot empieza desde $900 en un pago único. Aparte, Meta puede cobrar por los mensajes enviados."
+  q: "¿Cuánto cuesta un chatbot de WhatsApp para un negocio en Estados Unidos en 2026?"
+  a: "Depende del modelo de cobro. En dólares, las apps por suscripción arrancan cerca de $15 a $40 al mes y suben al activar la IA; un desarrollo a medida cuesta miles de dólares. En Marcyan, el chatbot empieza desde $900 en un pago único. Aparte, Meta cobra por los mensajes enviados con la tarifa de Estados Unidos."
   source: "Crescendo AI y Meta, 2026"
 faq:
   - q: "¿Cuánto cuesta un chatbot de WhatsApp al mes?"
@@ -27,6 +27,10 @@ related:
     href: "/es/houston/ia-conversacional"
     desc: "Te instalamos y entrenamos el chatbot para tu negocio en Houston."
     icon: "marcyan-ai"
+  - label: "IA conversacional en Miami"
+    href: "/es/miami/ia-conversacional"
+    desc: "Te instalamos y entrenamos el chatbot para tu negocio en Miami."
+    icon: "marcyan-ai"
   - label: "Inteligencia artificial para pymes"
     href: "/es/ia-para-pymes"
     desc: "Cómo la IA ayuda a un negocio pequeño, en lenguaje claro."
@@ -37,7 +41,7 @@ related:
     icon: "lucide:tag"
 ---
 
-Te dicen que un chatbot de WhatsApp es "barato" o que es "carísimo", y las dos cosas pueden ser ciertas según a quién le preguntes. **El problema no es el precio: es que casi nadie te explica el modelo de cobro completo.** Una app de $19 al mes puede terminar costando mucho más al activar la IA, y un cobro de Meta que casi nadie menciona se suma por separado. Aquí van los rangos reales de 2026, con su fuente, para que compares peras con peras.
+Te dicen que un chatbot de WhatsApp es "barato" o que es "carísimo", y las dos cosas pueden ser ciertas según a quién le preguntes. **El problema no es el precio: es que casi nadie te explica el modelo de cobro completo.** Una app de $19 al mes puede terminar costando mucho más al activar la IA, y un cobro de Meta que casi nadie menciona se suma por separado. Aquí van los rangos reales de 2026 para negocios en Estados Unidos, en dólares y con su fuente, para que compares peras con peras. Si tienes un negocio hispano en Houston o en Miami, es justo la cuenta que te conviene hacer antes de contratar.
 
 ## ¿Cuáles son las tres formas de pagar por un chatbot?
 
@@ -57,7 +61,7 @@ Los planes de entrada arrancan en un rango aproximado de **$15 a $40 al mes** ([
 
 ## ¿Es verdad que Meta cobra por usar WhatsApp? (el costo que casi nadie menciona)
 
-Sí, y es clave entenderlo: la **API oficial de WhatsApp es un producto de Meta** (Meta Business Platform), y Meta cobra por su uso. Desde julio de 2025, el modelo cambió a un **cobro por mensaje de plantilla** que el negocio inicia, con un precio que varía según el tipo de mensaje y el país de destino. Hay buenas noticias en la letra chica: los mensajes dentro de la ventana de atención al cliente son gratuitos y existen descuentos por volumen. Puedes ver el detalle vigente en la [página oficial de precios de Meta](https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing).
+Sí, y es clave entenderlo: la **API oficial de WhatsApp es un producto de Meta** (Meta Business Platform), y Meta cobra por su uso. Desde julio de 2025, el modelo cambió a un **cobro por mensaje de plantilla** que el negocio inicia, con un precio que varía según el tipo de mensaje y el país de destino. En esta guía la referencia es Estados Unidos: si tus clientes están en otro país, la tarifa de Meta cambia. Hay buenas noticias en la letra chica: los mensajes dentro de la ventana de atención al cliente son gratuitos y existen descuentos por volumen. Puedes ver el detalle vigente en la [página oficial de precios de Meta](https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing).
 
 Lo decimos claro porque es honesto: **ese cobro es de Meta, no de la agencia.** Cualquiera que te prometa un chatbot de WhatsApp "sin pagar absolutamente nada más" está omitiendo este punto. Las tarifas de Meta cambian, por eso no nos comprometemos aquí a una cifra que caduca; consulta siempre la fuente oficial.
 
@@ -65,7 +69,7 @@ Lo decimos claro porque es honesto: **ese cobro es de Meta, no de la agencia.** 
 
 Nosotros publicamos el precio de forma abierta: el **chatbot empieza desde $900 en un pago único**, como **servicio gestionado**. Eso significa que no es solo el software: incluye la instalación, el entrenamiento del bot con la información real de tu negocio (tus servicios, tus precios, tus preguntas frecuentes) y el mantenimiento para que siga funcionando.
 
-La diferencia con una app por suscripción es el modelo: pagas una vez en lugar de una mensualidad indefinida. Puedes ver el precio del chatbot y el resto de nuestros servicios en [precios](/es/precios). Si quieres que te lo dejemos andando en tu negocio, mira [IA conversacional en Houston](/es/houston/ia-conversacional). Y si apenas estás explorando qué puede hacer la IA por un negocio pequeño, empieza por [inteligencia artificial para pymes](/es/ia-para-pymes).
+La diferencia con una app por suscripción es el modelo: pagas una vez en lugar de una mensualidad indefinida. Puedes ver el precio del chatbot y el resto de nuestros servicios en [precios](/es/precios). Si quieres que te lo dejemos andando en tu negocio, mira [IA conversacional en Houston](/es/houston/ia-conversacional) o [IA conversacional en Miami](/es/miami/ia-conversacional). Y si apenas estás explorando qué puede hacer la IA por un negocio pequeño, empieza por [inteligencia artificial para pymes](/es/ia-para-pymes).
 
 ## ¿Qué NO te podemos prometer?
 
@@ -77,4 +81,4 @@ Seamos directos, porque esto separa una promesa honesta de una vendida:
 
 Lo que sí sabemos es que la velocidad de respuesta vende. El **53% de las visitas desde el celular se abandonan si algo tarda más de 3 segundos** ([Marketing Dive, citando a Google](https://www.marketingdive.com/news/google-53-of-mobile-users-abandon-sites-that-take-over-3-seconds-to-load/426070/)), y el **45% de los consumidores ya pide recomendaciones locales a la IA** ([BrightLocal, 2026](https://www.brightlocal.com/research/local-consumer-review-survey/)). Un mensaje que se queda sin contestar es un cliente que se va con el de al lado.
 
-¿Quieres un número exacto para tu negocio? Cuéntanos qué necesitas y te enviamos una **propuesta personalizada en menos de 24 horas, sin costo ni compromiso**.
+¿Quieres un número exacto para tu negocio en Houston, en Miami o en cualquier ciudad de Estados Unidos? Cuéntanos qué necesitas y te enviamos una **propuesta personalizada en menos de 24 horas, sin costo ni compromiso**.

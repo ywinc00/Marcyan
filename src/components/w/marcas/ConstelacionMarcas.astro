@@ -1,0 +1,294 @@
+---
+// ─────────────────────────────────────────────────────────────
+// ConstelacionMarcas · patrón L4 de WorkOS (Atlas "Connected to all your tools", W-ADV-21;
+// C/04-logos-marcas/frames/_atlas__0.jpg y workos/cat/productos-avanzados/atlas/T-tools-*.jpg).
+// design/rediseno-workos-v2.md P06.
+//
+// Composición del original (mirada en T-tools-f0..f5): el robot es el HÉROE (≈ 40 % del ancho) y
+// los logos forman una CORONA apretada y densa justo encima de su cabeza: anillos juntos en un arco
+// de ~160°, casillas pequeñas, polvo de logos lejanos y pálidos, y una línea fina de horizonte a la
+// altura del centro. Aquí: Marcy de busto (marcy-hero recortada arriba y fundida por abajo) de
+// 210/560 = 37,5 % del ancho; 2-3 anillos con 38 de paso; casillas #F7F6F2 de 30/27/24 con logo A
+// COLOR de 16/15/14 px (las multicolor en negro) y filo inset 1 px rgba(41,54,61,.07).
+//
+// Móvil (contenedor < 460 px): NO se encoge todo con el ancho (E-18). Tiene su propia maqueta en un
+// lienzo de 360: casillas de 30/28 px con logo de 15/14 px (suelo de §1.4), Marcy de 140 y anillos
+// recolocados. Las dos maquetas se calculan aquí y el CSS elige por consulta de contenedor.
+//
+// Coreografía (medida en la tira T-tools): cada ~0,9 s se enciende una casilla al azar: escala
+// 1→1,22 en 1,25 s cubic-bezier(.22,1,.36,1) y vuelta, anillo de halo, y una línea teal de 1 px se
+// dibuja hasta la cabeza (stroke-dashoffset, 500 ms); al apagarse se FUNDE entera (no se recoge).
+// Se solapan 2-3 a la vez.
+// Bucle (pantalla viva, §1.5) SOLO mientras está a la vista y con la pestaña visible (loop.ts:
+// IntersectionObserver rootMargin 100px, visibilitychange, botón de pausa 44×44 porque dura más de
+// 5 s). NO se para con el puntero encima (rev2 P06: medido 3 s quieta = parecía congelada): el bucle
+// se registra sobre el escenario `.cm-st`, que es decorativo (aria-hidden, nada enfocable) y lleva
+// pointer-events: none, así loop.ts nunca recibe pointerenter; la pausa queda en el botón y en el
+// estado global. Obedece además el estado GLOBAL de pausa: evento
+// `w2:pausa` en document ({ detail: { pausado } }) y sessionStorage 'w2:pausa' = '1'; su propio
+// botón lo publica (contrato propuesto hasta que loop.ts lo integre, ver informe P06).
+// Reducir movimiento: quieta con una casilla encendida y su línea (estado con sentido).
+//
+// Solo herramientas que la página ya nombra (§1.4). Solo ids de trazo (las palabras no caben en
+// una casilla redonda). Las primeras marcas de `ids` van al anillo de dentro, junto a la cabeza.
+// ─────────────────────────────────────────────────────────────
+import LogoMarca from './LogoMarca.astro';
+import { MARCAS, esTrazo, type MarcaId } from './datos';
+
+interface Props {
+  ids: MarcaId[];
+  lang?: 'es' | 'en';
+  /** Frase sr-only que resume la pieza (la pieza visual es aria-hidden). */
+  resumen?: string;
+  class?: string;
+}
+const { ids: idsIn, lang = 'es', resumen, class: extra = '' } = Astro.props;
+const ids = idsIn.filter(esTrazo);
+const nombres = ids.map((id) => MARCAS[id].titulo);
+const sr = resumen ?? (lang === 'en' ? `Connects with ${nombres.join(', ')}.` : `Se conecta con ${nombres.join(', ')}.`);
+const n = ids.length;
+
+// Una maqueta = lienzo lógico + centro del abanico + busto + anillos (radio, casilla, logo) + polvo.
+type Anillo = { r: number; s: number; logo: number };
+type Maqueta = { W: number; H: number; CX: number; CY: number; MW: number; arco: number; anillos: Anillo[]; polvo: number[] };
+// Coronilla de Marcy en marcy-hero (364 de ancho): a 0,15 del ancho desde el borde superior.
+const CORONILLA = 0.15;
+const pc: Maqueta = n <= 8
+  ? { W: 560, H: 0, CX: 280, CY: 0, MW: 210, arco: 150, anillos: [{ r: 112, s: 30, logo: 16 }, { r: 150, s: 27, logo: 15 }], polvo: [131, 169, 190, 210] }
+  : { W: 560, H: 0, CX: 280, CY: 0, MW: 210, arco: 160, anillos: [{ r: 112, s: 30, logo: 16 }, { r: 150, s: 27, logo: 15 }, { r: 188, s: 24, logo: 14 }], polvo: [131, 169, 207, 228, 248] };
+const movil: Maqueta = n <= 8
+  ? { W: 360, H: 0, CX: 180, CY: 0, MW: 140, arco: 150, anillos: [{ r: 88, s: 30, logo: 15 }, { r: 126, s: 28, logo: 14 }], polvo: [107, 145, 164] }
+  : { W: 360, H: 0, CX: 180, CY: 0, MW: 140, arco: 164, anillos: [{ r: 82, s: 30, logo: 15 }, { r: 120, s: 28, logo: 14 }, { r: 158, s: 28, logo: 14 }], polvo: [101, 139, 174] };
+
+// Arco de la corona según cuántas hay: con pocas se cierra (corona apretada), con muchas llega al máximo.
+const arcoDe = (m: Maqueta) => Math.min(m.arco, Math.max(110, n * 11 + 40));
+// Con el arco cerrado, la corona baja hacia la cabeza (radios menores) y el lienzo se ajusta: el centro
+// queda a la altura justa para el anillo de fuera y el alto termina donde se funde el busto.
+for (const m of [pc, movil]) {
+  const baja = Math.max(0, (m.arco + 10 - arcoDe(m)) * (m.W > 400 ? 0.4 : 0.35));
+  m.anillos = m.anillos.map((a) => ({ ...a, r: Math.round(a.r - baja) }));
+  m.polvo = m.polvo.map((r) => Math.round(r - baja));
+  const fuera = m.anillos[m.anillos.length - 1];
+  m.CY = Math.round(fuera.r + fuera.s / 2 + (m.W > 400 ? 28 : 22));
+  m.H = Math.round(m.CY + 4 - CORONILLA * m.MW + m.MW);
+}
+
+// Reparto por anillo proporcional al radio (los de fuera llevan más), mínimo 1. Luego se corrige para
+// que dos anillos vecinos no tengan el mismo número ni sean los dos impares: así sus casillas caen a
+// medio paso y la corona se lee trenzada, no en radios.
+const reparto = (m: Maqueta) => {
+  const sumR = m.anillos.reduce((a, b) => a + b.r, 0);
+  const k = m.anillos.map((a) => Math.max(1, Math.round((n * a.r) / sumR)));
+  let d = n - k.reduce((a, b) => a + b, 0);
+  for (let i = k.length - 1; d !== 0; i = (i - 1 + k.length) % k.length) {
+    if (d > 0) { k[i]++; d--; } else if (k[i] > 1) { k[i]--; d++; }
+  }
+  const valido = (c: number[]) => c.every((v, i) => v >= 1 && (i === 0 || (v >= c[i - 1] && v !== c[i - 1] && !(v % 2 && c[i - 1] % 2))));
+  if (valido(k)) return k;
+  for (let i = 0; i < k.length - 1; i++) {
+    for (const [de, a] of [[i, i + 1], [i + 1, i]]) {
+      const c = [...k]; c[de]--; c[a]++;
+      if (valido(c)) return c;
+    }
+  }
+  return k;
+};
+type Pos = { x: number; y: number; s: number; logo: number };
+const colocar = (m: Maqueta): Pos[] => {
+  const k = reparto(m);
+  const arco = arcoDe(m);
+  const out: Pos[] = [];
+  m.anillos.forEach((a, ai) => {
+    for (let j = 0; j < k[ai]; j++) {
+      const ang = ((90 + arco / 2 - arco * ((j + 0.5) / k[ai])) * Math.PI) / 180;
+      out.push({ x: m.CX + a.r * Math.cos(ang), y: m.CY - a.r * Math.sin(ang), s: a.s, logo: a.logo });
+    }
+  });
+  return out;
+};
+const P = colocar(pc), M = colocar(movil);
+const items = ids.map((id, i) => ({ id, p: P[i], m: M[i] }));
+
+// Polvo: puntos de 2-3 px entre y fuera de los anillos. Da la densidad del original (sus logos
+// lejanos, pequeños y pálidos) sin inventar herramientas: son puntos, no logos. Pseudoaleatorio fijo.
+let semilla = 7;
+const rnd = () => (semilla = (semilla * 9301 + 49297) % 233280) / 233280;
+const polvoDe = (m: Maqueta) => {
+  const out: { x: number; y: number; o: number; t: number }[] = [];
+  const arco = arcoDe(m) + 24;
+  m.polvo.forEach((r, ri) => {
+    const k = Math.round((r * arco * Math.PI) / 180 / (m.W > 400 ? 14 : 16));
+    for (let j = 0; j < k; j++) {
+      const ang = ((90 + arco / 2 - arco * ((j + 0.5) / k)) * Math.PI) / 180;
+      const rr = r + (rnd() - 0.5) * 4;
+      if (m.CY - rr * Math.sin(ang) < 6) continue; // nunca por encima del lienzo
+      out.push({ x: m.CX + rr * Math.cos(ang), y: m.CY - rr * Math.sin(ang), o: +Math.max(0.06, 0.1 + rnd() * 0.16 - ri * 0.015).toFixed(3), t: rnd() > 0.72 ? 3 : 2 });
+    }
+  });
+  return out;
+};
+const polvoP = polvoDe(pc), polvoM = polvoDe(movil);
+const pct = (v: number, base: number) => `${((v / base) * 100).toFixed(3)}%`;
+// Casilla: escala con el contenedor dentro de su maqueta, nunca por debajo de 24 px; el logo es fijo
+// en px (14-16), así nunca baja del mínimo de §1.4.
+const cqS = (m: Maqueta, s: number) => `max(24px, min(${s}px, ${((s / m.W) * 100).toFixed(3)}cqw))`;
+const cabezaY = (m: Maqueta) => m.CY + 4;
+const bustoTop = (m: Maqueta) => cabezaY(m) - CORONILLA * m.MW;
+const ultimo = (m: Maqueta) => m.anillos[m.anillos.length - 1].r;
+const estiloSt = [
+  `--ar:${pc.W}/${pc.H}`, `--arm:${movil.W}/${movil.H}`,
+  `--hzl:${pct(pc.CX - ultimo(pc) - 34, pc.W)}`, `--hzy:${pct(pc.CY, pc.H)}`,
+  `--hzlm:${pct(movil.CX - ultimo(movil) - 16, movil.W)}`, `--hzym:${pct(movil.CY, movil.H)}`,
+  `--bx:${pct(pc.CX, pc.W)}`, `--by:${pct(bustoTop(pc), pc.H)}`, `--bw:${pct(pc.MW, pc.W)}`,
+  `--bxm:${pct(movil.CX, movil.W)}`, `--bym:${pct(bustoTop(movil), movil.H)}`, `--bwm:${pct(movil.MW, movil.W)}`,
+].join(';');
+---
+<div class={`cm ${extra}`.trim()} data-w2-constelacion data-w2-lang={lang}>
+  <p class="cm-sr">{sr}</p>
+  <div class="cm-st" aria-hidden="true" data-nosnippet style={estiloSt}>
+    <span class="cm-hz"></span>
+    {polvoP.map((d) => <span class="cm-d cm-d--p" style={`left:${pct(d.x, pc.W)};top:${pct(d.y, pc.H)};opacity:${d.o};--t:${d.t}px`}></span>)}
+    {polvoM.map((d) => <span class="cm-d cm-d--m" style={`left:${pct(d.x, movil.W)};top:${pct(d.y, movil.H)};opacity:${d.o};--t:${d.t}px`}></span>)}
+    <div class="cm-centro">
+      <slot>
+        <img src="/assets/bot/marcy-hero.webp" srcset="/assets/bot/marcy-hero-182.webp 182w, /assets/bot/marcy-hero-270.webp 270w, /assets/bot/marcy-hero.webp 364w" sizes="(max-width: 767.98px) 50vw, 364px" width="364" height="512" alt="" loading="lazy" decoding="async" />
+      </slot>
+    </div>
+    <svg class="cm-lines cm-lines--p" viewBox={`0 0 ${pc.W} ${pc.H}`} preserveAspectRatio="none" focusable="false">
+      {items.map((it, i) => <line data-i={i} x1={it.p.x.toFixed(1)} y1={it.p.y.toFixed(1)} x2={pc.CX} y2={cabezaY(pc)} pathLength="1" />)}
+    </svg>
+    <svg class="cm-lines cm-lines--m" viewBox={`0 0 ${movil.W} ${movil.H}`} preserveAspectRatio="none" focusable="false">
+      {items.map((it, i) => <line data-i={i} x1={it.m.x.toFixed(1)} y1={it.m.y.toFixed(1)} x2={movil.CX} y2={cabezaY(movil)} pathLength="1" />)}
+    </svg>
+    <ul class="cm-l" role="list">
+      {items.map((it, i) => (
+        <li class="cm-i" data-i={i} style={`--x:${pct(it.p.x, pc.W)};--y:${pct(it.p.y, pc.H)};--s:${cqS(pc, it.p.s)};--lg:${it.p.logo}px;--xm:${pct(it.m.x, movil.W)};--ym:${pct(it.m.y, movil.H)};--sm:${it.m.s}px;--lgm:${it.m.logo}px`}>
+          <span class="cm-c"><LogoMarca id={it.id} size={16} tono="color" titulo="" /></span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
+<style>
+  .cm { position: relative; width: 100%; max-width: 560px; margin-inline: auto; container-type: inline-size; --marca-tinta: #111; }
+  .cm-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .cm-st { position: relative; width: 100%; aspect-ratio: var(--ar); pointer-events: none; }
+
+  /* Horizonte fino a la altura del centro del abanico (el original lo lleva bajo la corona). */
+  .cm-hz {
+    position: absolute; left: var(--hzl); right: var(--hzl); top: var(--hzy); height: 1px; margin-top: -.5px;
+    background: linear-gradient(90deg, transparent, rgba(240, 237, 232, .16) 16%, rgba(240, 237, 232, .16) 84%, transparent);
+  }
+
+  .cm-d { position: absolute; width: var(--t); height: var(--t); transform: translate(-50%, -50%); border-radius: 50%; background: #F0EDE8; }
+  .cm-d--m { display: none; }
+  /* El botón de pausa de loop.ts va a la esquina superior derecha, que la corona deja vacía. */
+  .cm > :global(.w-loop-pause) { top: 0 !important; right: 0 !important; bottom: auto !important; }
+
+  /* Marcy de busto: la figura entera recortada a un cuadrado por arriba y fundida por abajo. */
+  .cm-centro {
+    position: absolute; left: var(--bx); top: var(--by); width: var(--bw); aspect-ratio: 1;
+    transform: translateX(-50%); overflow: hidden; pointer-events: none;
+    -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent 98%);
+    mask-image: linear-gradient(180deg, #000 62%, transparent 98%);
+  }
+  .cm-centro :global(img) { display: block; width: 100%; height: auto; }
+
+  .cm-lines { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .cm-lines--m { display: none; }
+  /* Apagada: la línea se funde ENTERA; el trazo solo se rebobina cuando ya es invisible. */
+  .cm-lines line {
+    stroke: var(--accent-teal, #4fc3a1); stroke-width: 1; vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0;
+    transition: opacity 450ms linear, stroke-dashoffset 0s linear 460ms;
+  }
+  .cm-lines line.is-on { stroke-dashoffset: 0; opacity: .85; transition: stroke-dashoffset 500ms cubic-bezier(.22, 1, .36, 1), opacity 120ms linear; }
+
+  .cm-l { margin: 0; padding: 0; list-style: none; }
+  .cm-i { position: absolute; left: var(--x); top: var(--y); width: var(--s); height: var(--s); transform: translate(-50%, -50%); }
+  .cm-c {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    width: 100%; height: 100%; border-radius: 50%;
+    background: #F7F6F2;
+    box-shadow: inset 0 0 0 1px rgba(41, 54, 61, .07), 0 1px 2px rgba(0, 0, 0, .35);
+    transition: transform 1250ms cubic-bezier(.22, 1, .36, 1);
+  }
+  .cm-c :global(svg) { width: var(--lg); height: var(--lg); }
+  /* Halo: anillo fino que aparece alrededor de la casilla encendida. */
+  .cm-c::before {
+    content: ''; position: absolute; inset: -24%; border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(79, 195, 161, .55), 0 0 0 4px rgba(79, 195, 161, .07);
+    opacity: 0; transform: scale(.85);
+    transition: opacity 600ms linear, transform 1250ms cubic-bezier(.22, 1, .36, 1);
+  }
+  .cm-i.is-on { z-index: 2; }
+  .cm-i.is-on .cm-c { transform: scale(1.22); }
+  .cm-i.is-on .cm-c::before { opacity: 1; transform: scale(1); }
+
+  /* Móvil: otra maqueta (casillas de 28-30 px y logo de 14-15 px fijos; no escala con el ancho). */
+  @container (max-width: 459px) {
+    .cm-st { aspect-ratio: var(--arm); }
+    .cm-hz { left: var(--hzlm); right: var(--hzlm); top: var(--hzym); }
+    .cm-d--p, .cm-lines--p { display: none; }
+    .cm-d--m, .cm-lines--m { display: block; }
+    .cm-centro { left: var(--bxm); top: var(--bym); width: var(--bwm); }
+    .cm-i { left: var(--xm); top: var(--ym); width: var(--sm); height: var(--sm); }
+    .cm-c :global(svg) { width: var(--lgm); height: var(--lgm); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cm-c, .cm-c::before, .cm-lines line, .cm-lines line.is-on { transition: none; }
+  }
+</style>
+
+<script>
+  import { registerLoop } from '../loop';
+  // Tiempos medidos en la tira T-tools de Atlas: una casilla cada ~0,9 s, encendida 1,25 s.
+  const TICK = 900, ON = 1250;
+  const KEY = 'w2:pausa', EVT = 'w2:pausa';
+  const leerPausa = () => { try { return sessionStorage.getItem(KEY) === '1'; } catch { return false; } };
+  const guardarPausa = (p: boolean) => { try { p ? sessionStorage.setItem(KEY, '1') : sessionStorage.removeItem(KEY); } catch { /* sin almacenamiento */ } };
+
+  for (const el of document.querySelectorAll<HTMLElement>('[data-w2-constelacion]')) {
+    if (el.dataset.w2Listo) continue;
+    el.dataset.w2Listo = '1';
+    const items = Array.from(el.querySelectorAll<HTMLElement>('.cm-i'));
+    // Dos líneas por casilla (maqueta de escritorio y de móvil): se encienden juntas.
+    const lines = items.map((_, i) => Array.from(el.querySelectorAll<SVGLineElement>(`.cm-lines line[data-i="${i}"]`)));
+    if (!items.length) continue;
+    const lang = el.dataset.w2Lang === 'en' ? 'en' : 'es';
+    let tick = 0;
+    const offs = new Set<number>();
+    const recientes: number[] = [];
+    const set = (i: number, on: boolean) => { items[i]?.classList.toggle('is-on', on); lines[i]?.forEach((l) => l.classList.toggle('is-on', on)); };
+    const encender = () => {
+      const libres = items.map((_, i) => i).filter((i) => !recientes.includes(i));
+      const i = libres[Math.floor(Math.random() * libres.length)] ?? 0;
+      recientes.push(i);
+      if (recientes.length > Math.min(3, items.length - 1)) recientes.shift();
+      set(i, true);
+      const t = window.setTimeout(() => { set(i, false); offs.delete(t); }, ON);
+      offs.add(t);
+    };
+    const st = el.querySelector<HTMLElement>('.cm-st') ?? el;
+    const ctrl = registerLoop(st, {
+      start: () => { el.classList.remove('is-still'); items.forEach((_, i) => set(i, false)); encender(); tick = window.setInterval(encender, TICK); },
+      // Al parar, lo encendido termina su vuelta (sin saltos).
+      stop: () => { window.clearInterval(tick); },
+      still: () => { window.clearInterval(tick); offs.forEach((t) => window.clearTimeout(t)); offs.clear(); items.forEach((_, i) => set(i, i === 0)); el.classList.add('is-still'); },
+    }, { pauseButton: true, lang, buttonHost: el });
+
+    // Estado global de pausa (§1.5): lo lee al arrancar, lo sigue y su botón lo publica.
+    if (leerPausa()) ctrl.setUserPaused(true);
+    document.addEventListener(EVT, (e) => {
+      const p = !!(e as CustomEvent<{ pausado?: boolean }>).detail?.pausado;
+      ctrl.setUserPaused(p);
+    });
+    el.querySelector<HTMLButtonElement>('.w-loop-pause')?.addEventListener('click', (e) => {
+      const p = (e.currentTarget as HTMLElement).getAttribute('aria-pressed') === 'true';
+      guardarPausa(p);
+      document.dispatchEvent(new CustomEvent(EVT, { detail: { pausado: p } }));
+    });
+  }
+</script>

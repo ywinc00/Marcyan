@@ -1,0 +1,111 @@
+---
+// Dos tarjetas de modelo de pago (W-CONV-02, design/rediseno-workos.md §3.4).
+// 2 tarjetas 376×521, hueco 24, radio 16 → token 12, padding 40; la 2.ª en la
+// superficie de contraste. Franjas oro al ~8 % (~340×120) arriba a la derecha
+// con máscara; icono-objeto 44; título 28/500; texto; acción; divisoria a todo
+// el ancho; ventajas con check 16. Precios: solo los que lleguen por props.
+import IconoObjeto from './IconoObjeto.astro';
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import type { IconoId } from './objects/registry';
+
+interface Card {
+  title: string;
+  text: string;
+  icon: IconoId;
+  items: string[];
+  cta: { label: string; href: string; track?: string; variant?: 'primary' | 'link' };
+  /** Frase previa a la lista, p. ej. "Incluye:" (opcional). */
+  itemsLead?: string;
+}
+interface Props {
+  cards: [Card, Card];
+  tone?: 'gold' | 'teal';
+  class?: string;
+}
+const { cards, tone = 'gold', class: cls } = Astro.props;
+---
+<div class:list={['tm', cls]} data-w-tone={tone}>
+  {cards.map((c, i) => (
+    <article class:list={['tm__card', i === 1 && 'tm__card--contrast', c.items.length >= 5 && 'tm__card--tall']}>
+      <span class="tm__stripes" aria-hidden="true"></span>
+      <div class="tm__top">
+        <IconoObjeto id={c.icon} size={44} />
+        <h2 class="tm__title">{c.title}</h2>
+        <p class="tm__text">{c.text}</p>
+        <div class="tm__cta">
+          <Button
+            variant={c.cta.variant ?? 'link'}
+            size="lg"
+            href={c.cta.href}
+            data-track={c.cta.track}
+          >{c.cta.label}</Button>
+        </div>
+      </div>
+      <div class="tm__bottom">
+        {c.itemsLead && <p class="tm__lead">{c.itemsLead}</p>}
+        <ul class="tm__list">
+          {c.items.map((it) => (
+            <li><Icon name="lucide:check" class="tm__check" />{it}</li>
+          ))}
+        </ul>
+      </div>
+    </article>
+  ))}
+</div>
+
+<style>
+  .tm {
+    display: grid; grid-template-columns: 1fr; gap: 24px;
+    max-width: calc(376px * 2 + 24px); margin-inline: auto;
+  }
+  @media (--md) { .tm { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  .tm__card {
+    position: relative; overflow: hidden; isolation: isolate;
+    display: flex; flex-direction: column;
+    background: var(--w-s1); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-obj); box-shadow: var(--w-edge);
+  }
+  /* 521 px de alto solo con las 5 ventajas del recorte; con menos, manda el contenido. */
+  .tm__card--tall { min-block-size: 521px; }
+  /* La 2.ª en superficie de contraste de verdad (control 1: con --w-s1 contra #1c1c1c no se
+     distinguían): superficie elevada con luz oro que sube desde abajo y filo más claro. */
+  .tm__card--contrast {
+    background: radial-gradient(120% 70% at 50% 100%, rgba(var(--accent-gold-rgb), .16), transparent 70%), linear-gradient(180deg, #262522, var(--w-contrast-bg) 60%);
+    border-color: var(--w-line-strong); box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+  }
+
+  /* Franjas de luz arriba a la derecha (~340×120), fundidas hacia abajo-izquierda. */
+  .tm__stripes {
+    position: absolute; top: 0; right: 0; inline-size: min(340px, 90%); block-size: 120px;
+    background: var(--w-stripes); opacity: .45; z-index: -1; pointer-events: none;
+    -webkit-mask-image: radial-gradient(120% 140% at 100% 0%, #000 20%, transparent 72%);
+    mask-image: radial-gradient(120% 140% at 100% 0%, #000 20%, transparent 72%);
+  }
+  .tm__card--contrast .tm__stripes { opacity: 1; }
+
+  .tm__top { padding: 40px 40px 32px; }
+  .tm__title {
+    margin: 24px 0 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 28px; line-height: 1.15; letter-spacing: -0.02em; color: var(--w-ink);
+  }
+  .tm__text { margin: 12px 0 0; font-family: var(--font-body); font-size: 16px; line-height: 1.55; color: var(--w-ink-80); }
+  .tm__cta { margin-top: 20px; }
+
+  .tm__bottom { flex: 1; padding: 32px 40px 40px; border-top: 1px solid var(--w-line); }
+  .tm__card--contrast .tm__bottom { border-top-color: var(--w-line-strong); }
+  .tm__lead { margin: 0 0 16px; font-family: var(--font-body); font-size: 15px; line-height: 1.5; color: var(--w-ink); }
+  .tm__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+  .tm__list li {
+    display: flex; gap: 12px; align-items: flex-start;
+    font-family: var(--font-body); font-size: 15px; line-height: 1.45; color: var(--w-ink-80);
+  }
+  .tm__list :global(.tm__check) { flex: none; width: 16px; height: 16px; margin-top: 2px; color: var(--w-accent, var(--accent-gold)); }
+
+  @media (--lt-md) {
+    .tm__card--tall { min-block-size: 0; }
+    .tm__top { padding: 32px 24px 24px; }
+    .tm__bottom { padding: 24px; }
+  }
+</style>

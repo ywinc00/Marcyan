@@ -1,0 +1,109 @@
+---
+// F01 · Retícula de maqueta (diseño web). FO/bocetos/f01-diseno-web.html.
+// 12 columnas que coinciden con el contenedor (.w-container), regla con medidas
+// bajo la barra, línea base, y un marco de selección con tiradores que SALTA entre
+// 3 módulos cada 3 s: por defecto abraza las 3 tarjetas del abanico de HeroWeb
+// (medido en el hero real: central en col 5-8, laterales en 3-6 y 7-10, 50 px más
+// bajas), como la selección de una capa en un editor. Nunca sobre el texto: arranca
+// en --wf-obj. Columnas y desnivel ajustables (--wf-sel-1/2/3, --wf-sel-dy).
+// Solo opacity/transform.
+// Quieto (reducir movimiento / eco): el primer módulo seleccionado.
+interface Props { estilos?: boolean; eco?: boolean; lang?: 'es' | 'en' }
+const { estilos = true, eco = false, lang = 'es' } = Astro.props;
+const marcas = Array.from({ length: 16 }, (_, i) => i * 120);
+const mod = lang === 'en' ? 'module' : 'módulo';
+// Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
+const CSS = `
+  .wf-r { position: absolute; inset: 0; --g: 24px; }
+  .wf-r__cols, .wf-r__sel {
+    position: absolute; left: var(--wf-l); right: var(--wf-l);
+    display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--g);
+  }
+  .wf-r__cols {
+    top: 0; bottom: 0;
+    -webkit-mask-image: linear-gradient(180deg, #000, transparent 88%);
+            mask-image: linear-gradient(180deg, #000, transparent 88%);
+  }
+  .wf-r__cols i { background: rgba(var(--wf-a), .045); border-inline: 1px solid rgba(var(--wf-a), .11); }
+  .wf-r__base {
+    position: absolute; inset: calc(var(--nav-h) + 22px) 0 0;
+    background: repeating-linear-gradient(180deg, rgba(var(--wf-a), .05) 0 1px, transparent 1px 8px);
+    -webkit-mask-image: linear-gradient(180deg, #000, transparent 62%);
+            mask-image: linear-gradient(180deg, #000, transparent 62%);
+  }
+  .wf-r__regla {
+    position: absolute; top: var(--nav-h); left: 0; right: 0; height: 22px;
+    border-bottom: 1px solid rgba(var(--wf-a), .14);
+  }
+  .wf-r__marcas {
+    position: absolute; inset: 0 0 0 var(--wf-l);
+    background:
+      repeating-linear-gradient(90deg, rgba(var(--wf-a), .24) 0 1px, transparent 1px 12px) left bottom / 100% 6px no-repeat,
+      repeating-linear-gradient(90deg, rgba(var(--wf-a), .34) 0 1px, transparent 1px 120px) left bottom / 100% 12px no-repeat;
+  }
+  .wf-r__marcas span {
+    position: absolute; top: 1px; padding-left: 3px;
+    font: 500 9px/1 var(--font-mono, 'JetBrains Mono', monospace); letter-spacing: .04em;
+    color: rgba(var(--wf-s), .36);
+  }
+
+  /* Marco de selección: 3 módulos de la retícula, alrededor del objeto. */
+  .wf-r__sel { top: calc(var(--wf-obj, 543px) - 8px); height: 420px; }
+  .wf-r__f {
+    grid-row: 1; margin: 0 -8px; opacity: 0;
+    border: 1px dashed rgba(var(--wf-a), .5); border-radius: 2px;
+    animation: wf-r-salta 9s linear infinite;
+  }
+  .wf-r__f--1 { grid-column: var(--wf-sel-1, 5 / 9); opacity: 1; }
+  .wf-r__f--2 { grid-column: var(--wf-sel-2, 3 / 7); margin-top: var(--wf-sel-dy, 50px); animation-delay: -6s; }
+  .wf-r__f--3 { grid-column: var(--wf-sel-3, 7 / 11); margin-top: var(--wf-sel-dy, 50px); animation-delay: -3s; }
+  .wf-r__f::before, .wf-r__f::after {
+    content: ''; position: absolute; width: 7px; height: 7px;
+    background: var(--bg-base, #080808); border: 1px solid rgb(var(--wf-a));
+  }
+  .wf-r__f { position: relative; }
+  .wf-r__f::before { left: -4px; top: -4px; }
+  .wf-r__f::after { right: -4px; bottom: -4px; }
+  .wf-r__f b {
+    position: absolute; top: -21px; left: -1px; white-space: nowrap;
+    font: 500 10px/1 var(--font-mono, 'JetBrains Mono', monospace); letter-spacing: .04em;
+    color: rgba(var(--wf-a), .9); background: var(--bg-base, #080808); padding: 3px 6px; border-radius: 4px;
+  }
+  .wf-r__f--3 b { left: auto; right: -1px; }
+  @keyframes wf-r-salta {
+    0% { opacity: 0; transform: scale(.985); }
+    2.5%, 31% { opacity: 1; transform: scale(1); }
+    33.3%, 100% { opacity: 0; transform: scale(1); }
+  }
+
+  @media (max-width: 767.98px) {
+    .wf-r { --g: 12px; }
+    .wf-r__cols, .wf-r__sel { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .wf-r__cols i:nth-child(n + 5) { display: none; }
+    /* Móvil: el abanico enseña una tarjeta; el marco la abraza y respira (las laterales
+       asoman en los bordes de la pantalla, donde un marco quedaría cortado). */
+    .wf-r__f--1 {
+      grid-column: 1 / 5; margin: 0 var(--wf-sel-mi-movil, 31px);
+      animation: wf-r-respira 3s ease-in-out infinite alternate;
+    }
+    .wf-r__f--2, .wf-r__f--3 { display: none; }
+    .wf-r__sel { top: calc(var(--wf-obj-movil, 545px) - 8px); height: 300px; }
+    @keyframes wf-r-respira { from { opacity: .45; } to { opacity: 1; } }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-r">
+  <div class="wf-r__cols">{Array.from({ length: 12 }, () => <i></i>)}</div>
+  <div class="wf-r__base"></div>
+  {!eco && (
+    <div class="wf-r__regla"><div class="wf-r__marcas">{marcas.map((x) => <span style={`left:${x}px`}>{x}</span>)}</div></div>
+  )}
+  {!eco && (
+    <div class="wf-r__sel">
+      <div class="wf-r__f wf-r__f--1"><b>{mod} · 4 col</b></div>
+      <div class="wf-r__f wf-r__f--2"><b>{mod} · 4 col</b></div>
+      <div class="wf-r__f wf-r__f--3"><b>{mod} · 4 col</b></div>
+    </div>
+  )}
+</div>

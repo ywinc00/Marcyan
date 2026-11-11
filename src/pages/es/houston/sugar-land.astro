@@ -1,7 +1,8 @@
 ---
-// Landing · /es/houston/sugar-land — Ola 3 (barrio Houston).
-// Toda la estructura vive en ClusterLanding; aquí solo se elige el contenido.
-import ClusterLanding from '../../../components/ClusterLanding.astro';
+// Landing · /es/houston/sugar-land.
+// Plantilla v3 (rediseño WorkOS, tipo `barrio`): WLanding + kinds/barrio.ts (activación por página, ver registry.ts).
+import WLanding from '../../../components/w/landing/WLanding.astro';
+import spec from '../../../components/w/landing/kinds/barrio';
 import { clusters } from '../../../i18n/clusters';
 ---
-<ClusterLanding cluster={clusters['houston/sugar-land']} />
+<WLanding cluster={clusters['houston/sugar-land']} spec={spec} />

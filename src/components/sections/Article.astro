@@ -1,40 +1,24 @@
 ---
-// Cuerpo del artículo: estiliza el HTML que produce <Content/> (Markdown).
-// El H1 vive en el hero; aquí los H2 (preguntas, palanca AEO) hacia abajo.
-// Rediseño: columna de lectura editorial con RIEL-MARGEN (filete oro sutil a la
-// izquierda + nodo de constelación en cada H2) que ancla la medida sin ser muro gris.
-// La página lo coloca en su grilla de lectura (junto a la ToC sticky); este componente
-// solo aporta la columna. Estilos a contenido dinámico = :global() acotado bajo .article__body.
+// Cuerpo del artículo v3 (design/rediseno-workos.md §4.8; W-CONT-23 + W-CONV-37).
+// Estiliza el HTML que produce <Content/> (el Markdown NO se reescribe). Escala de
+// lectura de revista técnica: párrafo 19/1.65 en 680 (17 en móvil) con tinta al 90 %,
+// H2 26/33.8 500, H3 22/28.6 500. Enlaces en oro subrayados SOLO dentro del texto
+// (E-22). Las tablas que ya trae el Markdown se pintan como la comparativa W-CONV-37:
+// tarjeta opaca de radio 12, cabecera 18/500, primera columna en tinta 500, divisores
+// de 1 px, sin rayado de filas. Estilos a contenido dinámico = :global() bajo .article__body.
+// E-24: los nombres de clientes del Markdown se pintan bajo translate="no" (solo el HTML visible).
+import { protegerNombresHtml } from '../../lib/nombres-clientes';
+const body = protegerNombresHtml(await Astro.slots.render('default'));
 ---
 <div class="article">
-  <div class="article__body"><slot /></div>
+  <div class="article__body" set:html={body} />
 </div>
 
 <style>
   .article { min-width: 0; }
-  /* Columna de lectura: medida cómoda, riel-margen oro a la izquierda. */
-  .article__body {
-    position: relative;
-    max-width: min(72ch, 100%);
-    padding-inline-start: var(--space-5);
-  }
-  /* Riel continuo (hairline oro muy tenue) — ancla la columna de lectura. */
-  .article__body::before {
-    content: "";
-    position: absolute;
-    inset-block: 4px;
-    inset-inline-start: 0;
-    width: 1px;
-    background: linear-gradient(180deg, var(--accent-gold-line), transparent 92%);
-    pointer-events: none;
-  }
-  @media (--lt-sm) {
-    /* En pantallas muy estrechas el riel se retira para ganar ancho de lectura. */
-    .article__body { padding-inline-start: 0; }
-    .article__body::before { display: none; }
-  }
+  .article__body { position: relative; max-width: 680px; }
 
-  /* Ritmo vertical entre bloques */
+  /* Ritmo vertical */
   .article__body :global(p),
   .article__body :global(ul),
   .article__body :global(ol),
@@ -42,126 +26,113 @@
   .article__body :global(pre),
   .article__body :global(figure),
   .article__body :global(table),
-  .article__body :global(hr) { margin-top: var(--space-5); }
-  .article__body :global(h2) { margin-top: var(--space-8); }
-  .article__body :global(h3) { margin-top: var(--space-6); }
-  .article__body :global(h4) { margin-top: var(--space-5); }
+  .article__body :global(hr) { margin: 24px 0 0; }
+  .article__body :global(h2) { margin: 64px 0 0; }
+  .article__body :global(h3) { margin: 40px 0 0; }
+  .article__body :global(h4) { margin: 32px 0 0; }
+  .article__body :global(h2 + p),
+  .article__body :global(h3 + p),
+  .article__body :global(h4 + p) { margin-top: 16px; }
   .article__body > :global(:first-child) { margin-top: 0; }
 
-  /* Encabezados (font display, escala fluida) */
+  /* Encabezados (W-CONT-23: 26/33.8 y 22/28.6, peso 500) */
   .article__body :global(h2),
   .article__body :global(h3),
   .article__body :global(h4) {
-    font-family: var(--font-display); color: var(--fg-primary);
-    line-height: var(--leading-snug); letter-spacing: var(--tracking-normal);
-    text-wrap: balance; scroll-margin-top: calc(var(--nav-h) + var(--space-5));
+    font-family: var(--font-display); font-weight: 500; color: var(--w-ink);
+    text-wrap: balance; scroll-margin-top: calc(var(--nav-h) + 24px);
   }
-  .article__body :global(h2) { font-size: var(--fluid-h3); font-weight: 600; }
-  .article__body :global(h3) { font-size: var(--fluid-h4); font-weight: 600; }
-  .article__body :global(h4) { font-size: var(--text-lg); font-weight: 600; }
+  .article__body :global(h2) { font-size: 1.625rem; line-height: 1.3; letter-spacing: -0.025em; }
+  .article__body :global(h3) { font-size: 1.375rem; line-height: 1.3; letter-spacing: -0.02em; }
+  .article__body :global(h4) { font-size: 1.1875rem; line-height: 1.35; letter-spacing: -0.01em; }
 
-  /* Marcador de constelación en cada H2: nodo oro sobre el riel-margen (eco ArticleHero). */
-  .article__body :global(h2) { position: relative; }
-  .article__body :global(h2)::before {
-    content: "";
-    position: absolute;
-    inset-inline-start: calc(var(--space-5) * -1);
-    inset-block-start: 0.62em;
-    width: 5px; height: 5px;
-    border-radius: var(--radius-pill);
-    background: var(--accent-gold);
-    transform: translate(-2px, -50%);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-gold), transparent 82%);
-  }
-  @media (--lt-sm) {
-    .article__body :global(h2)::before { display: none; }
-  }
-
-  /* Párrafos y texto (legible == fg-secondary, regla del DS) */
+  /* Lectura: 19/1.65, tinta al 90 % */
   .article__body :global(p),
   .article__body :global(li) {
-    color: var(--fg-secondary); font-size: var(--text-md); line-height: var(--leading-loose);
+    font-family: var(--font-body); font-size: 1.1875rem; line-height: 1.65;
+    color: rgba(var(--star-rgb), .9); text-wrap: pretty;
   }
-  .article__body :global(strong) { color: var(--fg-primary); font-weight: 600; }
+  .article__body :global(strong) { color: var(--w-ink); font-weight: 600; }
   .article__body :global(em) { font-style: italic; }
 
-  /* Lead editorial: el primer párrafo tras el riel respira un poco más. */
-  .article__body > :global(p:first-of-type) {
-    font-size: var(--fluid-lead); color: var(--fg-primary);
-  }
-
-  /* Enlaces internos/externos */
   .article__body :global(a) {
     color: var(--accent-gold); text-decoration: underline;
-    text-decoration-color: var(--accent-gold-line); text-underline-offset: 3px;
-    transition: text-decoration-color var(--duration-fast), color var(--duration-fast);
+    text-decoration-color: rgba(var(--accent-gold-rgb), .4); text-decoration-thickness: 1px; text-underline-offset: 4px;
+    transition: text-decoration-color var(--w-dur-micro) var(--w-ease-ui);
   }
-  .article__body :global(a:hover) { text-decoration-color: var(--accent-gold); }
+  @media (--hover-fine) { .article__body :global(a:hover) { text-decoration-color: var(--accent-gold); } }
   .article__body :global(a:focus-visible) {
-    outline: 2px solid var(--accent-gold); outline-offset: 2px; border-radius: var(--radius-sm);
+    outline: 2px solid var(--accent-gold); outline-offset: 2px; border-radius: 2px;
   }
 
   /* Listas */
   .article__body :global(ul),
-  .article__body :global(ol) { padding-left: var(--space-6); }
+  .article__body :global(ol) { padding-left: 1.4em; }
   .article__body :global(ul) { list-style: disc; }
   .article__body :global(ol) { list-style: decimal; }
-  .article__body :global(li + li) { margin-top: var(--space-2); }
+  .article__body :global(li + li) { margin-top: 10px; }
   .article__body :global(li::marker) { color: var(--accent-gold); }
   .article__body :global(li > ul),
-  .article__body :global(li > ol) { margin-top: var(--space-2); }
+  .article__body :global(li > ol) { margin-top: 10px; }
 
-  /* Cita */
+  /* Cita: bandeja opaca con filo oro a la izquierda */
   .article__body :global(blockquote) {
-    position: relative;
-    border-left: 3px solid var(--accent-gold); background: var(--bg-card);
-    border-radius: 0 var(--radius-md) var(--radius-md) 0;
-    padding: var(--space-4) var(--space-5); color: var(--fg-primary);
+    background: var(--w-s1); border: 1px solid var(--w-line);
+    border-left: 2px solid var(--accent-gold);
+    border-radius: 0 var(--w-r-obj) var(--w-r-obj) 0;
+    padding: 18px 24px; box-shadow: var(--w-edge);
   }
-  .article__body :global(blockquote p) { color: var(--fg-primary); }
+  .article__body :global(blockquote p) { color: var(--w-ink); font-size: 1.0625rem; line-height: 1.6; }
   .article__body :global(blockquote :first-child) { margin-top: 0; }
 
   /* Código */
   .article__body :global(code) {
-    font-family: var(--font-mono); font-size: 0.9em; color: var(--accent-teal);
-    background: var(--bg-card); border: 1px solid var(--border);
-    padding: 2px 6px; border-radius: var(--radius-sm);
+    font-family: var(--font-mono); font-size: 0.85em; color: var(--w-ink);
+    background: var(--w-s2); border: 1px solid var(--w-line);
+    padding: 2px 6px; border-radius: 6px;
   }
   .article__body :global(pre) {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: var(--space-5);
-    overflow-x: auto;
+    background: var(--w-s2); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-obj); padding: 20px; overflow-x: auto;
   }
-  .article__body :global(pre code) { background: none; border: none; padding: 0; color: var(--fg-primary); }
+  .article__body :global(pre code) { background: none; border: 0; padding: 0; }
 
-  /* Imágenes / figuras */
-  .article__body :global(img) { border-radius: var(--radius-lg); border: 1px solid var(--border); }
-  .article__body :global(figcaption) {
-    margin-top: var(--space-2); font-size: var(--text-sm); color: var(--fg-secondary); text-align: center;
-  }
+  .article__body :global(img) { border-radius: var(--w-r-cell); border: 1px solid var(--w-line); }
+  .article__body :global(figcaption) { margin-top: 8px; font-size: 0.875rem; color: var(--w-ink-60); text-align: center; }
 
-  /* Separador: filete con nodo central (eco de la constelación) */
-  .article__body :global(hr) {
-    position: relative; border: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border) 18%, var(--border) 82%, transparent);
-  }
+  .article__body :global(hr) { border: 0; height: 1px; background: var(--w-line); margin-block: 48px; }
 
-  /* Tablas (scroll propio → no rompe el ancho de página) */
+  /* Tablas del Markdown = comparativa W-CONV-37 (tarjeta opaca, radio 12, divisores 1 px). */
   .article__body :global(table) {
-    display: block; max-width: 100%; overflow-x: auto;
-    border-collapse: collapse; font-size: var(--text-sm);
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    background: var(--w-s2); border: 1px solid var(--w-line); border-radius: var(--w-r-obj);
+    box-shadow: var(--w-edge); overflow: hidden;
+    font-family: var(--font-body); font-size: 0.9375rem; line-height: 1.5;
+    margin-top: 32px;
   }
   .article__body :global(th),
   .article__body :global(td) {
-    border: 1px solid var(--border); padding: var(--space-3) var(--space-4);
-    text-align: left; vertical-align: top; color: var(--fg-secondary);
+    padding: 14px 20px; text-align: left; vertical-align: top;
+    border-bottom: 1px solid var(--w-line);
   }
   .article__body :global(th) {
-    font-family: var(--font-mono); font-size: var(--text-xs);
-    letter-spacing: var(--tracking-wide); text-transform: uppercase;
-    color: var(--fg-primary); background: var(--bg-card); white-space: nowrap;
+    font-family: var(--font-display); font-weight: 500; font-size: 1.0625rem; letter-spacing: -0.01em;
+    color: var(--w-ink); padding-top: 20px; padding-bottom: 16px;
+    border-bottom-color: var(--w-line-strong);
   }
-  .article__body :global(tbody tr:nth-child(even)) { background: var(--bg-2); }
+  .article__body :global(td) { color: var(--w-ink-80); }
+  .article__body :global(td:first-child) { color: var(--w-ink); font-weight: 500; }
+  .article__body :global(tbody tr:last-child td) { border-bottom: 0; }
+  @media (--lt-md) {
+    .article__body :global(p),
+    .article__body :global(li) { font-size: 1.0625rem; }
+    .article__body :global(h2) { font-size: 1.5rem; margin-top: 52px; }
+    .article__body :global(h3) { font-size: 1.25rem; }
+    .article__body :global(table) { font-size: 0.875rem; }
+    .article__body :global(th),
+    .article__body :global(td) { padding: 12px 14px; }
+    .article__body :global(th) { font-size: 0.9375rem; }
+  }
 
   @media (--motion-reduce) {
     .article__body :global(a) { transition: none; }

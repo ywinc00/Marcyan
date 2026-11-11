@@ -1,0 +1,66 @@
+---
+// Portada de una guía (v3, design/rediseno-workos.md §4.7 + vuelta 3 del dueño): una imagen
+// PROPIA por artículo, serie coherente (principio del blog de WorkOS, nunca sus imágenes): un
+// objeto-metáfora en volumen isométrico, paleta acotada de la casa (noche cálida, crema, oro;
+// teal solo en las guías de IA), luz dirigida y grano. Generadas con
+// un generador propio en Python/PIL en public/assets/blog/portadas/<slug>-{640,960,1280}.webp.
+// Sin texto encima (E-37). Decorativa (alt vacío: el título va al lado).
+// Si una guía aún no tiene portada (p. ej. las futuras en inglés), cae a la ilustración de
+// línea del tema (BlogIllustration) sobre la placa de noche, sin franjas.
+import BlogIllustration from '../../../BlogIllustration.astro';
+import { PORTADAS } from './portadas';
+
+
+interface Props {
+  tags: string[];
+  /** slug de la guía (último tramo del href). */
+  slug?: string;
+  size?: 'feature' | 'card' | 'thumb';
+  /** Tamaño real en pantalla si no es el de serie (p. ej. la miniatura de "Sigue leyendo"). */
+  sizes?: string;
+  /** true solo si la portada cae en la primera pantalla (la destacada). */
+  eager?: boolean;
+  class?: string;
+}
+const { tags, slug, size = 'card', eager = false, sizes: sizesProp, class: cls } = Astro.props;
+const conImagen = !!slug && PORTADAS.has(slug);
+const src = (w: number) => `/assets/blog/portadas/${slug}-${w}.webp`;
+const sizes = sizesProp ?? (size === 'feature'
+  ? '(min-width: 1024px) 656px, 100vw'
+  : size === 'thumb'
+    ? '140px'
+    : '(min-width: 1024px) 576px, (min-width: 768px) 50vw, 100vw');
+---
+<div class:list={['bp', `bp--${size}`, conImagen && 'bp--img', cls]} aria-hidden="true">
+  {conImagen ? (
+    <img
+      class="bp__img"
+      src={src(960)}
+      srcset={`${src(320)} 320w, ${src(640)} 640w, ${src(960)} 960w, ${src(1280)} 1280w`}
+      sizes={sizes}
+      width="1280" height="800" alt=""
+      loading={eager ? 'eager' : 'lazy'} decoding="async"
+    />
+  ) : (
+    <BlogIllustration tags={tags} class="bp__illo" />
+  )}
+</div>
+
+<style>
+  .bp {
+    position: relative; isolation: isolate; overflow: hidden; min-width: 0;
+    display: grid; place-items: center;
+    background:
+      radial-gradient(85% 75% at 50% 112%, rgba(var(--accent-gold-rgb), .42) 0%, rgba(var(--accent-gold-rgb), .14) 42%, transparent 74%),
+      radial-gradient(55% 55% at 50% 42%, rgba(var(--accent-gold-rgb), .07), transparent 70%),
+      linear-gradient(180deg, #151513 0%, var(--w-s1) 100%);
+  }
+  .bp--img { background: #0f0c09; }
+  .bp__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bp :global(.bp__illo) { width: 78%; max-width: 520px; }
+  .bp--feature :global(.bp__illo) { width: 84%; max-width: 600px; }
+  /* Trazo de la casa algo más firme a este tamaño (el SVG usa trazo que no escala). */
+  .bp :global(.bp__illo .illo-line) { stroke-width: 2; stroke-opacity: .9; }
+  .bp :global(.bp__illo .illo-thin) { stroke-width: 1.5; }
+  .bp--card :global(.bp__illo .illo-line) { stroke-width: 1.75; }
+</style>

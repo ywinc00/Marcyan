@@ -1,0 +1,415 @@
+---
+// SEO para IA · 01 "Cada asistente, su respuesta" (design/rediseno-workos-v2.md §3 G07).
+// Originales: W-HOME-11 (a la izquierda rasgos; a la derecha bandeja con PESTAÑAS arriba y,
+// debajo, una segunda caja de contorno con la respuesta "HTTP 200") + W-CORE-10 (la respuesta
+// del asistente que te cita: cabecera con la plataforma, burbuja del usuario con pico abajo a la
+// derecha, pasos con punto que late → check con fundido cruzado del texto y mensaje final en caja
+// gris con el negocio en negrita; tiempos 255/1170/2000/2330 ms).
+// Situación calzada: "la misma pregunta, cada asistente contesta a su manera y lee sus fuentes".
+// Logos reales (P06, §1.4): en las pestañas a color (interfaz dibujada); Google y Gemini, que son
+// multicolor, en la tinta del contexto; ChatGPT como palabra (§5-2). En los rasgos, monocromo crema.
+//
+// Interacción (§1.5 interactivo, §1.7): tablist/tab/tabpanel con flechas, Inicio y Fin. Al elegir,
+// la respuesta se reproduce (pasos → mensaje → fuentes). Al entrar en vista se reproduce la 1.ª;
+// al reentrar tras ≥ 8 s fuera, se repite la activa. Si nadie toca en 6 s, un cursor fantasma
+// cambia de pestaña (máximo 3 veces por visita, cada 4 s contados desde que termina la respuesta)
+// y se retira para siempre al primer pointerdown, focusin o keydown (v4: el hover ya no) dentro. El
+// fantasma no mueve el foco ni escribe en ninguna región viva. Con reducir movimiento: sin
+// fantasma, todo en su estado final, las pestañas siguen funcionando.
+// Sin JS: la 1.ª pestaña visible y completa; las demás ocultas (hidden).
+// Contrato §1.6: cada respuesta es ilustración aria-hidden + data-nosnippet con resumen sr-only.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import LogoMarca from '../../marcas/LogoMarca.astro';
+import type { MarcaId } from '../../marcas/datos';
+import type { PestanaAsistente } from '../../../../i18n/w/seo-ia';
+
+interface Props {
+  n: number;
+  label: string;
+  titleHtml: string;
+  lead: string;
+  intro: string;
+  traits: { marca: MarcaId; nombre: string; text: string }[];
+  question: string;
+  tablistLabel: string;
+  ejemplo: string;
+  srcTitle: string;
+  srcOk: string;
+  tabs: PestanaAsistente[];
+}
+const { n, label, titleHtml, lead, intro, traits, question, tablistLabel, ejemplo, srcTitle, srcOk, tabs } = Astro.props;
+const uid = 'ca' + Math.random().toString(36).slice(2, 7);
+---
+<CabeceraNumerada n={n} label={label} titleHtml={titleHtml} lead={lead} />
+
+<div class="ca" data-ca>
+  <div class="ca__side">
+    <p class="ca__intro">{intro}</p>
+    <ul class="ca__traits" role="list">
+      {traits.map((t) => (
+        <li class="ca__trait">
+          <span class="ca__brand">
+            <LogoMarca id={t.marca} size={t.nombre ? 18 : 17} tono="mono" titulo={t.nombre ? '' : undefined} />
+            {t.nombre && <b translate="no">{t.nombre}</b>}
+          </span>
+          <span class="ca__tx">{t.text}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="ca__obj">
+    <div class="ca__card">
+      <div class="ca__tabs" role="tablist" aria-label={tablistLabel}>
+        {tabs.map((t, i) => (
+          <button
+            class="ca__tab"
+            type="button"
+            role="tab"
+            id={`${uid}-tab-${t.id}`}
+            aria-controls={`${uid}-panel-${t.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+            data-ca-tab
+          >
+            <LogoMarca id={t.marca} size={t.nombre ? 16 : 15} tono="color" titulo={t.nombre ? '' : undefined} />
+            {t.nombre && <span translate="no">{t.nombre}</span>}
+          </button>
+        ))}
+      </div>
+
+      <div class="ca__stage">
+        {tabs.map((t, i) => (
+          <div
+            class="ca__panel"
+            role="tabpanel"
+            id={`${uid}-panel-${t.id}`}
+            aria-labelledby={`${uid}-tab-${t.id}`}
+            tabindex="0"
+            hidden={i !== 0}
+            data-ca-panel
+          >
+            <p class="sr-only">{t.sr}</p>
+            <div class="ca__chat" aria-hidden="true" data-nosnippet>
+              <p class="ca__who">
+                <LogoMarca id={t.marca} size={16} tono="color" titulo="" />
+                {t.nombre && <b translate="no">{t.nombre}</b>}
+                <span>{t.responde}</span>
+                <span class="ca__ej">{ejemplo}</span>
+              </p>
+              <p class="ca__user">{question}</p>
+              {t.pasos.map((p, j) => (
+                <p class="ca__step" style={`--d:${j === 0 ? 255 : 1170}ms;--h:${j === 0 ? 1170 : 2000}ms`}>
+                  <span class="ca__chk"><i></i></span>
+                  <span class="ca__sw"><span>{p.txt[0]}</span><span>{p.txt[1]}</span></span>
+                </p>
+              ))}
+              <p class="ca__msg">
+                {t.answer.pre}<b translate="no">{t.answer.biz}</b>{t.answer.post}
+                {t.answer.refs && (
+                  <><sup class="ca__ref">1</sup>{t.answer.refs[0]}<sup class="ca__ref">2</sup>{t.answer.refs[1]}</>
+                )}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <span class="ca__ghost" aria-hidden="true" data-ca-ghost>
+        <svg width="18" height="22" viewBox="0 0 18 22"><path d="M1.5 1.5v16.2l4.3-4.1 2.9 6.6 2.7-1.2-2.9-6.5 6-.4z" fill="#f7f6f2" stroke="#0e0e0d" stroke-width="1.3" stroke-linejoin="round" /></svg>
+      </span>
+    </div>
+
+    <!-- Caja de contorno "HTTP 200" del original: aquí, las fuentes que leyó la pestaña activa. -->
+    <div class="ca__src" aria-hidden="true" data-nosnippet>
+      <p class="ca__src-t">{srcTitle}</p>
+      {tabs.map((t, i) => (
+        <ol class="ca__src-list" hidden={i !== 0} data-ca-src>
+          {t.sources.map((s, j) => (
+            <li class="ca__src-row" style={`--d:${2000 + j * 160}ms`}>
+              <span class="ca__src-n">{j + 1}</span>
+              <span class="ca__src-u">{s.u}</span>
+              <span class="ca__src-ok"><span class="ca__src-tick">✓</span>{srcOk}</span>
+              <span class="ca__src-lee"><span class="ca__src-br">└</span>{s.lee}</span>
+            </li>
+          ))}
+        </ol>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  import { zrect, zoom } from '../../zoom';
+  // Cada bloque busca dentro de su propio nodo (Cerrojo 2). Sin estado global.
+  document.querySelectorAll<HTMLElement>('[data-ca]').forEach((root) => {
+    if (root.dataset.caMontado) return;
+    root.dataset.caMontado = '1';
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-ca-tab]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-ca-panel]')];
+    const srcs = [...root.querySelectorAll<HTMLElement>('[data-ca-src]')];
+    const card = root.querySelector<HTMLElement>('.ca__card')!;
+    const ghost = root.querySelector<HTMLElement>('[data-ca-ghost]')!;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let active = 0;
+
+    const play = (i: number) => {
+      if (reduce) return;
+      [panels[i], srcs[i]].forEach((el) => {
+        if (!el) return;
+        el.classList.remove('is-run');
+        void el.offsetWidth;
+        el.classList.add('is-run');
+      });
+    };
+    const select = (i: number, { focus = false } = {}) => {
+      active = i;
+      tabs.forEach((t, j) => {
+        const on = j === i;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        panels[j].hidden = !on;
+        if (srcs[j]) srcs[j].hidden = !on;
+      });
+      play(i);
+      if (focus) tabs[i].focus();
+    };
+
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(i));
+      t.addEventListener('keydown', (e) => {
+        const k = e.key;
+        let to = -1;
+        if (k === 'ArrowRight') to = (i + 1) % tabs.length;
+        else if (k === 'ArrowLeft') to = (i - 1 + tabs.length) % tabs.length;
+        else if (k === 'Home') to = 0;
+        else if (k === 'End') to = tabs.length - 1;
+        if (to < 0) return;
+        e.preventDefault();
+        select(to, { focus: true });
+        tabs[to].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      });
+    });
+
+    if (reduce || !('IntersectionObserver' in window)) return;
+    root.classList.add('is-armed');
+
+    // ── Cursor fantasma (máx. 3 por visita; se retira al primer gesto del visitante) ──
+    let retirado = false;
+    let usos = 0;
+    let visible = false;
+    let timer = 0;
+    const retirar = () => {
+      retirado = true;
+      clearTimeout(timer);
+      ghost.classList.remove('is-on');
+    };
+    ['pointerdown', 'focusin', 'keydown'].forEach((ev) =>
+      root.addEventListener(ev, retirar, { once: true, passive: true }));
+    const pausado = () => { try { return sessionStorage.getItem('w2:pausa') === '1'; } catch { return false; } };
+    const programar = (ms: number) => {
+      clearTimeout(timer);
+      if (retirado || usos >= 3) return;
+      timer = window.setTimeout(paso, ms);
+    };
+    const paso = () => {
+      if (retirado || usos >= 3) return;
+      if (!visible || document.hidden || pausado()) { programar(1500); return; }
+      const to = (active + 1) % tabs.length;
+      const c = zrect(card);
+      const r = zrect(tabs[to]);
+      const x = r.left - c.left + Math.min(r.width / 2, 28);
+      const y = r.top - c.top + r.height / 2;
+      // Si la pestaña queda fuera de la tira visible (móvil), la tira se desplaza primero.
+      const strip = tabs[to].parentElement!;
+      if (r.right > c.right - 8 || r.left < c.left + 8) strip.scrollTo({ left: tabs[to].offsetLeft - 24, behavior: 'smooth' });
+      ghost.style.setProperty('--gx', `${x}px`);
+      ghost.style.setProperty('--gy', `${y}px`);
+      ghost.classList.add('is-on');
+      window.setTimeout(() => {
+        if (retirado) return;
+        ghost.classList.add('is-tap');
+        select(to);
+        usos++;
+        window.setTimeout(() => ghost.classList.remove('is-tap'), 220);
+        window.setTimeout(() => { if (usos >= 3) ghost.classList.remove('is-on'); }, 900);
+        programar(2330 + 4000);
+      }, 720);
+    };
+
+    let visto = false;
+    let salida = 0;
+    new IntersectionObserver((es) => {
+      const e = es[es.length - 1];
+      if (e.isIntersecting && e.intersectionRatio >= 0.35) {
+        visible = true;
+        if (!visto) { visto = true; play(active); programar(2330 + 6000); }
+        else if (salida && performance.now() - salida >= 8000) play(active);
+        salida = 0;
+      } else if (!e.isIntersecting) {
+        visible = false;
+        if (visto && !salida) salida = performance.now();
+      }
+    }, { threshold: [0, 0.35] }).observe(card);
+  });
+</script>
+
+<style>
+  .ca { margin-top: 64px; display: grid; gap: 48px; }
+  @media (--lg) {
+    .ca { grid-template-columns: minmax(0, 461fr) minmax(0, 659fr); column-gap: 80px; align-items: start; }
+  }
+
+  /* ── Columna de texto (W-HOME-11, 461): frase y rasgos en rejilla de 2 ── */
+  .ca__intro { margin: 0; max-width: 30rem; font-family: var(--font-body); font-size: 19px; line-height: 1.55; color: var(--w-ink-80); }
+  .ca__traits { list-style: none; margin: 40px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 28px; }
+  .ca__trait { display: flex; flex-direction: column; gap: 10px; padding-top: 16px; border-top: 1px solid var(--w-line); }
+  .ca__brand { display: inline-flex; align-items: center; gap: 9px; min-height: 22px; }
+  .ca__brand b { font: 500 15px/1 var(--font-display); letter-spacing: -0.01em; color: var(--w-ink); }
+  .ca__tx { font-family: var(--font-body); font-size: 15px; line-height: 1.45; color: var(--w-ink-80); }
+
+  /* ── Bandeja de pestañas (objeto de sistema, opaco; W-HOME-11) ── */
+  .ca__obj { min-width: 0; display: grid; gap: 20px; }
+  .ca__card {
+    position: relative; min-width: 0; background: var(--w-s2); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-tray); box-shadow: var(--w-edge), 0 40px 80px -40px rgba(0, 0, 0, .6);
+    overflow: hidden;
+    --marca-tinta: var(--w-ink);
+  }
+  .ca__tabs {
+    display: flex; gap: 2px; padding: 0 10px; border-bottom: 1px solid var(--w-line);
+    overflow-x: auto; scrollbar-width: none; scroll-behavior: smooth;
+  }
+  .ca__tabs::-webkit-scrollbar { display: none; }
+  .ca__tab :global(.lm--word) { transform: translateY(1px); }
+  .ca__tab {
+    position: relative; flex: none; display: inline-flex; align-items: center; gap: 8px;
+    min-height: 54px; padding: 0 14px;
+    background: none; border: 0; cursor: pointer;
+    font: 500 14px/1 var(--font-body); color: var(--w-ink-60);
+    transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .ca__tab::after {
+    content: ''; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px;
+    background: var(--w-accent); transform: scaleX(.4); opacity: 0;
+    transition: opacity var(--w-dur-micro) var(--w-ease-ui), transform 260ms var(--w-ease-ui);
+  }
+  .ca__tab[aria-selected='true'] { color: var(--w-ink); }
+  .ca__tab[aria-selected='true']::after { opacity: 1; transform: none; }
+  @media (--hover-fine) { .ca__tab:hover { color: var(--w-ink); } }
+  .ca__tab:focus-visible { outline: 2px solid var(--w-accent); outline-offset: -6px; border-radius: 8px; }
+
+  .ca__stage { padding: 28px; min-height: 340px; display: grid; }
+  .ca__panel { display: grid; align-content: start; }
+  .ca__panel[hidden] { display: none; }
+  .ca__panel:focus-visible { outline: 2px solid var(--w-accent); outline-offset: 4px; border-radius: 14px; }
+
+  /* ── Respuesta del asistente (objeto de producto en claro, W-CORE-10) ── */
+  .ca__chat {
+    --acc: var(--w-accent, #4fc3a1);
+    position: relative; display: flex; flex-direction: column; gap: 12px;
+    padding: 20px 22px 22px; border-radius: var(--w-r-obj, 12px);
+    background: #fff; color: #1c1d21; border: 1px solid rgba(14, 14, 13, .07);
+    --marca-tinta: #1c1d21;
+  }
+  .ca__chat p { margin: 0; }
+  .ca__who { display: flex; align-items: center; gap: 7px; min-height: 22px; font: 400 13px/1.2 var(--font-body); color: #60646C; }
+  .ca__who b { font: 600 14px/1 var(--font-display); color: #1c1d21; letter-spacing: -0.01em; }
+  .ca__ej {
+    margin-left: auto; font: 500 10.5px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase;
+    color: #77736B; padding: 4px 7px; border-radius: 6px; background: #F2F1ED;
+  }
+  .ca__user {
+    align-self: flex-end; max-width: 86%; margin-bottom: 4px !important;
+    padding: 9px 13px; border-radius: 6px 6px 2px 6px;
+    background: #fff; border: .67px solid #DADBDF; box-shadow: 0 1px 2px rgba(14, 14, 13, .04);
+    font: 400 14px/1.4 var(--font-body); color: #1c1d21;
+  }
+  .ca__step { display: flex; align-items: center; gap: 10px; font: 400 13.5px/1.3 var(--font-body); color: #60646C; }
+  .ca__chk {
+    position: relative; flex: none; width: 16px; height: 16px; border-radius: 50%;
+    background: color-mix(in srgb, var(--acc) 22%, #fff);
+  }
+  .ca__chk i {
+    position: absolute; left: 5.5px; top: 3px; width: 4px; height: 8px;
+    border: solid color-mix(in srgb, var(--acc) 70%, #0e0e0d); border-width: 0 1.6px 1.6px 0; transform: rotate(45deg);
+  }
+  .ca__sw { display: grid; }
+  .ca__sw > span { grid-area: 1 / 1; }
+  .ca__sw > span:first-child { opacity: 0; }
+  .ca__msg {
+    margin-top: 6px !important; padding: 13px 15px; border-radius: 8px; background: #F2F2F0;
+    font: 400 15px/1.55 var(--font-body); color: #1c1d21;
+  }
+  .ca__msg b { font-weight: 700; }
+  .ca__ref {
+    display: inline-grid; place-items: center; min-width: 16px; height: 16px; margin: 0 2px 0 3px; padding: 0 4px;
+    border-radius: 8px; background: #E4E6E8; font: 500 10px/1 var(--font-mono); color: #3d4148; vertical-align: 2px;
+  }
+
+  /* ── Caja de contorno de fuentes (el "HTTP 200" del original) ── */
+  .ca__src {
+    padding: 18px 24px 20px; border-radius: var(--w-r-tray); border: 1px solid var(--w-line-strong);
+    background: var(--w-s0);
+  }
+  .ca__src-t { margin: 0 0 12px; text-align: center; font: 500 12px/1.2 var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--w-ink-60); }
+  .ca__src-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .ca__src-list[hidden] { display: none; }
+  .ca__src-row {
+    display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; column-gap: 12px; row-gap: 4px;
+    font: 400 13.5px/1.35 var(--font-mono);
+  }
+  .ca__src-row + .ca__src-row { padding-top: 12px; border-top: 1px dashed var(--w-line); }
+  .ca__src-ok { font-size: 12px; color: var(--w-ink-60); white-space: nowrap; }
+  .ca__src-tick { margin-right: 6px; color: var(--w-accent); }
+  .ca__src-lee { grid-column: 2 / -1; font-size: 12.5px; color: var(--w-ink-60); overflow-wrap: anywhere; }
+  .ca__src-br { margin-right: 8px; color: var(--w-ink-30); }
+  .ca__src-n {
+    display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(var(--w-accent-rgb), .14); color: var(--w-accent); font-size: 11px;
+  }
+  .ca__src-u { color: var(--w-ink); overflow-wrap: anywhere; }
+
+  /* ── Cursor fantasma ── */
+  .ca__ghost {
+    position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; opacity: 0;
+    transform: translate(calc(var(--gx, 60%) + 40px), calc(var(--gy, 0px) + 120px));
+    transition: transform 700ms cubic-bezier(.22, 1, .36, 1), opacity 300ms ease;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .35));
+  }
+  .ca__ghost.is-on { opacity: 1; transform: translate(var(--gx), var(--gy)); }
+  .ca__ghost svg { display: block; transition: transform 160ms ease; transform-origin: 2px 2px; }
+  .ca__ghost.is-tap svg { transform: scale(.86); }
+
+  /* ── Coreografía (solo con JS y sin reducir movimiento: .is-armed) ──
+     Paso 1 entra a 255 ms y queda hecho a 1170; paso 2 entra a 1170 y queda hecho a 2000;
+     mensaje a 2330 (fundido 250 ms); fuentes desde 2000 cada 160 ms. Mientras está pendiente,
+     el punto late (0 → .5 → 0, 2 s, W-CORE-10). */
+  .is-armed .ca__panel.is-run .ca__step { animation: ca-in 225ms var(--d) both cubic-bezier(.22, 1, .36, 1); }
+  .is-armed .ca__panel.is-run .ca__chk { animation: ca-pend calc(var(--h) - var(--d)) var(--d) both ease-in-out; }
+  .is-armed .ca__panel.is-run .ca__chk i { animation: ca-chk 260ms var(--h) both cubic-bezier(.22, 1, .36, 1); }
+  .is-armed .ca__panel.is-run .ca__sw > span:first-child { animation: ca-x-out 200ms var(--h) both; opacity: 1; }
+  .is-armed .ca__panel.is-run .ca__sw > span:last-child { animation: ca-x-in 200ms var(--h) both; }
+  .is-armed .ca__panel.is-run .ca__msg { animation: ca-in 250ms 2330ms both cubic-bezier(.22, 1, .36, 1); }
+  .is-armed .ca__panel.is-run .ca__user { animation: ca-in 240ms 40ms both cubic-bezier(.22, 1, .36, 1); }
+  .is-armed .ca__src-list.is-run .ca__src-row { animation: ca-in 240ms var(--d) both cubic-bezier(.22, 1, .36, 1); }
+  @keyframes ca-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @keyframes ca-pend { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+  @keyframes ca-chk { from { opacity: 0; transform: rotate(45deg) scale(.4); } to { opacity: 1; transform: rotate(45deg); } }
+  @keyframes ca-x-out { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes ca-x-in { from { opacity: 0; } to { opacity: 1; } }
+
+  @media (--lt-md) {
+    .ca { margin-top: 40px; gap: 36px; }
+    .ca__intro { font-size: 17px; }
+    .ca__traits { margin-top: 28px; gap: 22px 18px; }
+    .ca__tab { padding: 0 12px; min-height: 52px; }
+    .ca__tabs { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+    .ca__stage { padding: 14px; min-height: 0; }
+    .ca__chat { padding: 16px 16px 18px; }
+    .ca__user { max-width: 94%; }
+    .ca__src { padding: 16px 16px 18px; }
+    .ca__src-row { font-size: 12.5px; column-gap: 10px; }
+    .ca__src-lee { font-size: 12px; }
+  }
+  @media (max-width: 380px) { .ca__traits { grid-template-columns: minmax(0, 1fr); } }
+</style>

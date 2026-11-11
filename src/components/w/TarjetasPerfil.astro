@@ -1,0 +1,166 @@
+---
+// Tarjetas por perfil (design/rediseno-workos.md §3.2; W-NEW-09): titular centrado,
+// 2 tarjetas de 450×185 (hueco 16) + 1 ancha de 920×104; radio 8 (token más
+// cercano a 6), padding 28; título 18/500, texto 14, enlace "… ›" SIN subrayado
+// (E-22): el chevron se desplaza 3 px.
+// · `art` (opcional) = SVG en cadena (p. ej. silueta de una ciudad): va a todo el
+//   ancho de la tarjeta, anclado abajo, detrás del texto solo en la franja inferior
+//   sin texto (revisión "¿se entiende?" a 1x antes de integrar, E-53).
+// · v2 (G00, ronda 1): la tarjeta que lleva a un hub de ciudad (href …/houston o …/miami, o
+//   `city` explícito) pinta el DIBUJO DE LA CIUDAD del plan, /assets/cities/{houston,miami}.svg
+//   (el mismo de "Sedes": Houston = torres; Miami = hotel Art Déco con palmeras),
+//   que se reconoce a 1x (E-53). La silueta del pie del hub se descartó: a tamaño de tarjeta Miami
+//   era una franja de cajas negras. Desviación anotada: el plan pedía "a todo el ancho", pero el
+//   dibujo es una imagen de 322×235 / 276×249 px; a 450 px de ancho saldría borroso y más alto
+//   que la tarjeta, así que va a su tamaño natural (190 px de alto), apoyado abajo a la derecha.
+//   <img> diferida con alt vacío (decorativa); `lighten` funde su lavado oscuro con la tarjeta.
+// · v2 (G00): cuando la sección va alineada a la izquierda (servicios, `.ws-left`), la rejilla
+//   ocupa todo el ancho del contenido: ya no queda un hueco a la derecha (FI servicios 05).
+import Icon from '../ui/Icon.astro';
+
+interface Card { title: string; text: string; href: string; cta: string; art?: string; track?: string; city?: 'houston' | 'miami' }
+interface Wide { icon: string; title: string; text: string; href: string; cta: string; track?: string }
+interface Props {
+  titleHtml: string;
+  cards: [Card, Card];
+  wide?: Wide;
+  id?: string;
+  class?: string;
+}
+const { titleHtml, cards, wide, id, class: cls } = Astro.props;
+const titleId = `${id ?? 'perfiles'}-title`;
+// Ciudad de la tarjeta: explícita o la del hub al que enlaza (/es/houston, /en/miami…).
+// Tamaño natural de cada dibujo (el de su PNG interno).
+const CITY_IMG = { houston: { w: 276, h: 249 }, miami: { w: 322, h: 235 } } as const;
+const cityOf = (c: Card) => c.city ?? (c.art ? undefined : (/\/(houston|miami)\/?$/.exec(c.href)?.[1] as Card['city']));
+// Slots `obj-0`, `obj-1`… (opcionales): un objeto de producto al pie de la tarjeta N, en lugar del arte.
+const objs = await Promise.all(cards.map((_, i) => (Astro.slots.has(`obj-${i}`) ? Astro.slots.render(`obj-${i}`) : Promise.resolve(''))));
+---
+<section class:list={['w-prof', cls]} id={id} aria-labelledby={titleId}>
+  <h2 class="w-prof__title" id={titleId} set:html={titleHtml} />
+  <div class="w-prof__grid">
+    {cards.map((c, i) => { const city = cityOf(c); return (
+      <a class:list={['w-prof__card', c.art && 'w-prof__card--art', city && 'w-prof__card--city']} href={c.href} data-track={c.track}>
+        <span class="w-prof__body">
+          <span class="w-prof__ctitle">{c.title}</span>
+          <span class="w-prof__ctext">{c.text}</span>
+        </span>
+        <span class="w-prof__link">{c.cta}<span class="w-prof__chev" aria-hidden="true">›</span></span>
+        {objs[i] ? <span class="w-prof__obj" aria-hidden="true" set:html={objs[i]} /> : c.art && <span class="w-prof__art" aria-hidden="true" set:html={c.art} />}
+        {city && <span class:list={['w-prof__city', `w-prof__city--${city}`]} aria-hidden="true"><img src={`/assets/cities/${city}.svg`} alt="" width={CITY_IMG[city].w} height={CITY_IMG[city].h} loading="lazy" decoding="async" /></span>}
+      </a>
+    ); })}
+    {wide && (
+      <a class="w-prof__card w-prof__card--wide" href={wide.href} data-track={wide.track}>
+        <span class="w-prof__wico" aria-hidden="true"><Icon name={wide.icon} /></span>
+        <span class="w-prof__body">
+          <span class="w-prof__ctitle">{wide.title}</span>
+          <span class="w-prof__ctext">{wide.text}</span>
+        </span>
+        <span class="w-prof__link">{wide.cta}<span class="w-prof__chev" aria-hidden="true">›</span></span>
+      </a>
+    )}
+  </div>
+</section>
+
+<style>
+  .w-prof { min-width: 0; }
+  .w-prof__title {
+    margin: 0 0 40px; text-align: center; font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: var(--w-h2); line-height: 1.1; letter-spacing: var(--w-tr-h2); color: var(--w-ink); text-wrap: balance;
+  }
+  @media (--md) { .w-prof__title { margin-bottom: 56px; } }
+  .w-prof__title :global(.w-tone) { color: var(--w-ink-45); }
+  .w-prof__title :global(em) { font-style: normal; color: var(--w-accent); }
+
+  .w-prof__grid {
+    display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 920px; margin-inline: auto; min-width: 0;
+  }
+  @media (--md) { .w-prof__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  .w-prof__card {
+    position: relative; isolation: isolate; overflow: hidden; min-width: 0;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
+    padding: 24px; border-radius: var(--w-r-cell); text-decoration: none;
+    background: var(--w-s2); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+    transition: border-color var(--w-dur-hover) var(--w-ease-ui);
+  }
+  @media (--md) { .w-prof__card { padding: 28px; min-height: 185px; } }
+  @media (--hover-fine) { .w-prof__card:hover { border-color: var(--w-line-strong); } }
+  .w-prof__card:focus-visible { outline: 2px solid var(--w-accent); outline-offset: 2px; }
+
+  .w-prof__body { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .w-prof__ctitle {
+    font-family: var(--font-display); font-weight: 500; font-size: 18px; line-height: 1.3;
+    letter-spacing: -0.01em; color: var(--w-ink);
+  }
+  .w-prof__ctext { font-family: var(--font-body); font-size: 14px; line-height: 1.5; color: var(--w-ink-70); max-width: 44ch; }
+
+  .w-prof__link {
+    display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
+    font-family: var(--font-body); font-weight: 500; font-size: 14px; line-height: 1; color: var(--w-ink-80);
+    transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .w-prof__chev {
+    font-size: 17px; line-height: 1; color: var(--w-accent);
+    transition: transform 180ms var(--w-ease-ui);
+  }
+  @media (--hover-fine) {
+    .w-prof__card:hover .w-prof__link { color: var(--w-accent); }
+    .w-prof__card:hover .w-prof__chev { transform: translateX(3px); }
+  }
+  .w-prof__card:focus-visible .w-prof__chev { transform: translateX(3px); }
+
+  /* Ancha: icono · texto · enlace a la derecha (920×104). */
+  .w-prof__card--wide { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 16px; }
+  @media (--md) {
+    .w-prof__card--wide { grid-column: 1 / -1; flex-wrap: nowrap; min-height: 104px; padding-block: 24px; }
+    .w-prof__card--wide .w-prof__body { flex: 1; gap: 4px; }
+    .w-prof__card--wide .w-prof__link { align-self: center; }
+  }
+  .w-prof__wico {
+    display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: var(--w-r-cell);
+    background: rgba(var(--w-accent-rgb), 0.12); color: var(--w-accent);
+  }
+  .w-prof__wico :global(svg) { width: 18px; height: 18px; stroke-width: 1.75; }
+
+  /* Arte de silueta: a todo el ancho, anclado abajo; el texto va arriba. */
+  /* El arte mide 450×104: el hueco de abajo crece con el ancho de la tarjeta (el % de un padding
+     es del ancho), para que en servicios, ya a todo el ancho, no suba sobre el enlace. */
+  .w-prof__card--art { padding-bottom: max(104px, calc(23.2% + 8px)); }
+  .w-prof__art {
+    position: absolute; inset: auto 0 0 0; z-index: -1; pointer-events: none; color: rgba(var(--w-accent-rgb), 0.35);
+  }
+  .w-prof__art :global(svg) { display: block; width: 100%; height: auto; }
+  /* Objeto de producto (slot obj-N): en el flujo, al pie, sin tapar el enlace. */
+  .w-prof__obj { display: block; min-width: 0; margin-top: 4px; }
+
+  /* Sin hueco a la derecha cuando la sección va a la izquierda (servicios). */
+  :global(.ws-left) .w-prof__grid { max-width: none; }
+
+  /* Dibujo de la ciudad (v2, G00 ronda 1): debajo del enlace, apoyado en el borde de abajo y a la
+     derecha, a su tamaño natural. Una luz oro baja por detrás, como el pie del hub. */
+  .w-prof__card--city { gap: 16px; justify-content: flex-start; }
+  .w-prof__city {
+    position: relative; display: flex; justify-content: flex-end; align-items: flex-end;
+    margin: auto -24px -24px; pointer-events: none;
+  }
+  @media (--md) { .w-prof__city { margin: auto -28px -28px; } }
+  .w-prof__city::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: radial-gradient(ellipse 60% 90% at 72% 100%, rgba(212, 158, 90, .1), transparent 70%);
+  }
+  /* Un punto más de brillo para que el trazo oro se lea a 1x sobre la tarjeta. Miami: el PNG trae
+     en su borde izquierdo un resto de letra cortada; se recorta ese 3 %. */
+  .w-prof__city img {
+    display: block; height: 160px; width: auto; max-width: 100%; mix-blend-mode: lighten;
+    filter: brightness(1.45);
+  }
+  .w-prof__city--miami img { clip-path: inset(0 0 0 3%); }
+  @media (--md) { .w-prof__city img { height: 190px; } }
+
+  @media (--motion-reduce) {
+    .w-prof__card, .w-prof__link, .w-prof__chev { transition: none; }
+    .w-prof__card:hover .w-prof__chev, .w-prof__card:focus-visible .w-prof__chev { transform: none; }
+  }
+</style>

@@ -5,9 +5,8 @@
 // tokens/reset globales y arma <head> SEO/i18n (hreflang es/en/x-default).
 // Todas las páginas del sitio nuevo deben extender de aquí.
 // ─────────────────────────────────────────────────────────────
-import '@fontsource-variable/space-grotesk/index.css';
-import '@fontsource-variable/dm-sans/index.css';
-import '@fontsource-variable/jetbrains-mono/index.css';
+// Las 3 fuentes, solo con los subconjuntos que usa el sitio (styles/fonts.css: mismos woff2 de Fontsource).
+import '../styles/fonts.css';
 import '../styles/global.css';
 import { nap } from '../i18n/content';
 import { mirrorPath } from '../i18n/routes';
@@ -26,6 +25,9 @@ interface Props {
   /** Si la página tiene espejo en el otro idioma. false → no emitir hreflang en
    *  (las landings de cluster son solo-ES hasta la Ola 3; apuntar a /en/ daría 404). */
   hasEn?: boolean;
+  /** Sistema de diseño del rediseño WorkOS (design/rediseno-workos.md §2.13, Cerrojo 1).
+   *  'v3' escribe <html data-ds="v3"> y el script de la coreografía. Portada y hubs NO lo pasan. */
+  ds?: 'v3';
 }
 
 const SITE = 'https://marcyanstudio.com';
@@ -38,6 +40,7 @@ const {
   noindex = false,
   ogImage = '/assets/og/og-default.png',
   hasEn,
+  ds,
 } = Astro.props;
 
 // hreflang/canonical derivados de la RUTA REAL (Astro.url.pathname) + el mapa
@@ -108,6 +111,9 @@ const jsonLd = {
       knowsLanguage: ['es', 'en'],
       address: { '@type': 'PostalAddress', addressLocality: 'Houston', addressRegion: 'TX', addressCountry: 'US' },
       areaServed: { '@type': 'City', name: 'Houston' },
+      // Ficha de Google de Houston (enlace dado por el dueño, 2026-11-07; cid de la ficha).
+      hasMap: 'https://maps.google.com/?cid=12570640077238981353',
+      sameAs: ['https://maps.google.com/?cid=12570640077238981353'],
     },
     {
       '@type': 'ProfessionalService',
@@ -123,6 +129,9 @@ const jsonLd = {
       // coherente con el copy "sin dirección pública". Houston sí lleva address
       // por ser la base de operaciones.
       areaServed: { '@type': 'City', name: 'Miami' },
+      // Ficha de Google de Miami (encontrada en Maps con el teléfono 786, 2026-11-07; cid de la ficha).
+      hasMap: 'https://maps.google.com/?cid=16706895790770498199',
+      sameAs: ['https://maps.google.com/?cid=16706895790770498199'],
     },
   ],
 };
@@ -130,13 +139,21 @@ const jsonLd = {
 // Google Analytics 4. El snippet init va como string (set:html en el <head>)
 // para que las llaves del snippet no las procese el JSX de Astro.
 const GA_ID = 'G-4GJPX4PTRV';
-const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`;
+// Coreografía v3 (§2.9): html.w-anim si no hay reduced-motion; salvaguarda html.w-in-all a
+// los 2,5 s si reveal.ts no arrancó (red, bloqueador o error previo del bundle). Va inline en el
+// <head> para que el estado inicial exista antes del primer fotograma.
+const wAnimInit = `(function(){var d=document.documentElement;try{if(matchMedia('(prefers-reduced-motion: no-preference)').matches)d.classList.add('w-anim')}catch(e){}setTimeout(function(){if(!d.classList.contains('w-ready'))d.classList.add('w-in-all')},2500)})();`;
+// gtag.js (177 KB) se pide tras la carga, en un momento libre del navegador: el hilo principal
+// queda para pintar la portada (tareas largas de 150-180 ms en móvil). La cola dataLayer guarda
+// la visita y los eventos hasta que llega, así que no se pierde nada salvo rebotes de < 1 s.
+const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');(function(){function l(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=${GA_ID}';document.head.appendChild(s)}function i(){'requestIdleCallback' in window?requestIdleCallback(l,{timeout:2500}):setTimeout(l,1200)}document.readyState==='complete'?i():addEventListener('load',i,{once:true})})();`;
 ---
 <!doctype html>
-<html lang={lang}>
+<html lang={lang} data-ds={ds}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    {ds === 'v3' && <script is:inline set:html={wAnimInit} />}
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canon} />
@@ -168,7 +185,7 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
-    {/* Google Analytics 4 (gtag.js) — async, is:inline para que Astro NO lo
+    {/* Google Analytics 4 (gtag.js) — diferido tras la carga, is:inline para que Astro NO lo
         bundlee. Va al final del <head>: al ser async no bloquea el render y
         deja que fuentes/CSS críticos se descubran primero (cuida el PSI).
         NO se emite en páginas noindex (panel/kit/formulario): sin ruido de
@@ -176,7 +193,6 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
         del snippet no las interprete el JSX de Astro. */}
     {!noindex && (
       <>
-        <script async is:inline src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
         <script is:inline set:html={gaInit} />
       </>
     )}
@@ -191,7 +207,7 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
         <template> inerte; el DOM visible lo decide el cliente. Aparece también
         en la home: excepción sancionada, con QA de home y OK del dueño. */}
     {otherPath && <LangNotice lang={lang} href={otherPath} />}
-    <ChatWidget lang={lang} />
+    <ChatWidget lang={lang} city={/(^|\/)miami(\/|$)/.test(path) ? 'miami' : 'houston'} />
 
     <script>
       // Tracking first-party delegado: cualquier elemento con [data-track] dispara
@@ -199,6 +215,8 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
       // Instrumenta CtaBand (whatsapp/call), el teaser y las CTAs de herramientas
       // sin que cada página tenga que importar track.
       import { track } from '../lib/track.js';
+      import '../components/w/offscreen';
+      import '../components/w/zoom-img';
       document.addEventListener('click', (e) => {
         const el = e.target && e.target.closest && e.target.closest('[data-track]');
         if (el && el.dataset.track) track(el.dataset.track);

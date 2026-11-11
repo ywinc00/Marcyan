@@ -1,0 +1,62 @@
+---
+// F02 · Escaparate (tienda en línea). FO/bocetos/f02-tienda.html.
+// Tres haces de luz de vitrina que cuelgan de su lámpara bajo la barra y respiran
+// (7 s, desfasados), dos baldas y un amanecer oro desde abajo. Con el texto a la
+// izquierda, un haz cae sobre el objeto (el producto) y otro junto al texto.
+// Solo opacity. Quieto: los tres haces encendidos.
+interface Props { estilos?: boolean; eco?: boolean; texto?: 'centro' | 'izquierda' }
+const { estilos = true, eco = false } = Astro.props;
+// Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
+const CSS = `
+  .wf-e { position: absolute; inset: 0; --x1: 22%; --x2: 50%; --x3: 78%; --hw: 240px; }
+  .wf--izq .wf-e { --x1: 30%; --x2: 58%; --x3: 84%; }
+  .wf-e__alba {
+    position: absolute; inset: 0;
+    background: radial-gradient(90% 46% at 50% 82%, rgba(var(--wf-a), .2), rgba(var(--wf-a), .06) 45%, transparent 72%);
+  }
+  .wf-e__haz {
+    position: absolute; top: var(--nav-h); bottom: 0; width: var(--hw); margin-left: calc(var(--hw) / -2);
+    animation: wf-e-respira 7s ease-in-out infinite;
+  }
+  .wf-e__haz::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(var(--wf-s), .1), rgba(var(--wf-a), .045) 52%, transparent 80%);
+    clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%);
+  }
+  .wf-e__haz b {
+    position: absolute; top: 0; left: 50%; width: 28px; height: 4px; margin-left: -14px;
+    border-radius: 0 0 3px 3px; background: rgba(var(--wf-s), .55);
+  }
+  .wf-e__haz--1 { left: var(--x1); }
+  .wf-e__haz--2 { left: var(--x2); animation-delay: -2.3s; }
+  .wf-e__haz--3 { left: var(--x3); animation-delay: -4.6s; }
+  .wf-e__balda {
+    position: absolute; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(var(--wf-a), .26) 18%, rgba(var(--wf-a), .26) 82%, transparent);
+  }
+  .wf-e__balda--1 { top: var(--wf-balda-1, 61%); }
+  .wf-e__balda--2 { top: var(--wf-balda-2, 73%); }
+  /* PC: el hero es partido y el texto llega hasta los botones; las baldas van DEBAJO,
+     ya en el fundido (por eso más vivas), como la repisa de todo el escaparate. */
+  @media (min-width: 1024px) {
+    .wf-e__balda { background: linear-gradient(90deg, transparent, rgba(var(--wf-a), .5) 18%, rgba(var(--wf-a), .5) 82%, transparent); }
+    .wf-e__balda--1 { top: var(--wf-balda-1, calc(100% - 100px)); }
+    .wf-e__balda--2 { top: var(--wf-balda-2, calc(100% - 58px)); }
+  }
+  @keyframes wf-e-respira { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+
+  @media (max-width: 767.98px) {
+    .wf-e, .wf--izq .wf-e { --x1: 24%; --x2: 76%; --hw: 150px; }
+    .wf-e__haz--3 { display: none; }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-e">
+  <div class="wf-e__alba"></div>
+  <div class="wf-e__haz wf-e__haz--1"><b></b></div>
+  <div class="wf-e__haz wf-e__haz--2"><b></b></div>
+  <div class="wf-e__haz wf-e__haz--3"><b></b></div>
+  {!eco && <span class="wf-e__balda wf-e__balda--1"></span>}
+  {!eco && <span class="wf-e__balda wf-e__balda--2"></span>}
+</div>

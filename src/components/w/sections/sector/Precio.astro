@@ -1,0 +1,67 @@
+---
+// Sector · precio (§4.19-6, #precios): PrecioPuntos (W-CORE-14) con la cifra = ancla baja
+// de PRICE_ANCHORS ("Desde $400", la landing; degradado único de la página) y el slice
+// "A medida desde $1,500" abajo a la derecha (R6; el JSON-LD sigue con el slice). Debajo,
+// lo que incluye el sitio del sector (pricing.features, libre) en lista con check, la nota
+// de precio (libre, formada con PRICE_ANCHORS para que no contradiga a la cifra grande) y
+// el enlace a la propuesta, que conserva el evento pricing_cta_clicked (contrato).
+import PrecioPuntos from '../../PrecioPuntos.astro';
+import Button from '../../../ui/Button.astro';
+import Icon from '../../../ui/Icon.astro';
+import { catalog as catalogEs } from '../../../../i18n/pricing';
+import { catalog as catalogEn } from '../../../../i18n/pricing.en';
+import type { SectorCopy } from '../../../../i18n/w/sector';
+
+interface Props { copy: SectorCopy['precio']; features: string[]; lang?: 'es' | 'en' }
+const { copy, features, lang = 'es' } = Astro.props;
+const web = (lang === 'en' ? catalogEn : catalogEs).find((p) => p.id === 'diseno-web')!;
+const [t0, , t2] = web.tiers;
+---
+<PrecioPuntos
+  eyebrow={copy.eyebrow}
+  titleHtml={copy.title}
+  anchor="webLanding"
+  from={copy.from}
+  bottomLeft={{ big: t0.name, text: t0.blurb }}
+  bottomRight={{ label: t2.name, value: copy.slice }}
+/>
+<div class="ss-inc ss-w">
+  <p class="ss-inc__label">{copy.includes}</p>
+  <ul class="ss-inc__list">
+    {features.map((f) => (
+      <li><Icon name="lucide:check" class="ss-inc__ic" />{f}</li>
+    ))}
+  </ul>
+</div>
+<div class="ss-foot ss-w">
+  <p class="ss-note">{copy.note}</p>
+  <Button variant="link" href="#contacto" data-track="pricing_cta_clicked">{copy.cta}</Button>
+</div>
+<style>
+  /* Mismo ancho que la tarjeta de precio para que los bordes casen. */
+  .ss-w { max-width: var(--w-rail-max); margin-inline: auto; }
+  .ss-inc { margin-top: 48px; }
+  .ss-inc__label {
+    margin: 0 0 16px; font-family: var(--font-mono); font-weight: 500; font-size: 12px;
+    letter-spacing: var(--w-tr-micro); text-transform: uppercase; color: var(--w-ink-60);
+  }
+  .ss-inc__list {
+    list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr);
+    border-top: 1px solid var(--w-line);
+  }
+  .ss-inc__list li {
+    display: flex; align-items: center; gap: 12px; padding: 14px 0;
+    border-bottom: 1px solid var(--w-line);
+    font-family: var(--font-body); font-size: 16px; line-height: 1.4; color: var(--w-ink);
+  }
+  .ss-inc__list :global(.ss-inc__ic) { width: 18px; height: 18px; flex: none; color: var(--w-accent); }
+  .ss-foot {
+    margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: 8px 32px;
+  }
+  .ss-note { margin: 0; max-width: 46rem; font-size: var(--w-small); line-height: 1.6; color: var(--fg-secondary); }
+  @media (--md) {
+    .ss-inc__list { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 32px; }
+  }
+  @media (--lt-md) { .ss-inc { margin-top: 40px; } }
+</style>

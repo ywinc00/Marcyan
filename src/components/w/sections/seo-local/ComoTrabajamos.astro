@@ -1,0 +1,16 @@
+---
+// SEO local · 04 "Cómo trabajamos" (§4.16-5): CabeceraNumerada + TresPasosNumerados
+// (W-ADV-57). La celda que lo envuelve lleva id="proceso" (destino del enlace del hero).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import TresPasosNumerados from '../../TresPasosNumerados.astro';
+import type { SeoCopy } from '../../../../i18n/w/seo-local';
+
+interface Props { copy: SeoCopy['pasos']; n: number }
+const { copy, n } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="sl-gap"><TresPasosNumerados items={copy.items} /></div>
+<style>
+  .sl-gap { margin-top: var(--w-chapter-gap); }
+  @media (--lt-md) { .sl-gap { margin-top: 48px; } }
+</style>

@@ -1,0 +1,63 @@
+---
+// Precios · 03 "Después de publicar" (§4.4-5; W-CONV-08 "Support SLAs").
+// 3 columnas separadas por líneas verticales de 1 px: nombre del nivel (verbatim de
+// pricing.ts) 16/500, líneas 15 centradas y, al pie, "Desde $X al mes" derivado de
+// PRICE_ANCHORS (la página lo calcula; aquí no hay cifras).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+
+interface Col { title: string; lines: string[]; price: string; href: string; cta: string }
+interface Props { n: number; label: string; titleHtml: string; lead: string; cols: Col[] }
+const { n, label, titleHtml, lead, cols } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} titleHtml={titleHtml} lead={lead} />
+<ul class="pd">
+  {cols.map((c) => (
+    <li class="pd__col">
+      <h3 class="pd__h">{c.title}</h3>
+      <ul class="pd__lines">
+        {c.lines.map((l) => <li>{l}</li>)}
+      </ul>
+      <p class="pd__price">{c.price}</p>
+      <a class="pd__a" href={c.href}>{c.cta}<span class="pd__chev" aria-hidden="true">›</span></a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .pd {
+    list-style: none; margin: 56px 0 0; padding: 0;
+    display: grid; grid-template-columns: minmax(0, 1fr);
+  }
+  .pd__col {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    padding: 32px 16px; min-width: 0;
+  }
+  .pd__col + .pd__col { border-top: 1px solid var(--w-line); }
+  @media (--md) {
+    .pd { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .pd__col { padding: 8px 24px; }
+    .pd__col + .pd__col { border-top: 0; border-left: 1px solid var(--w-line); }
+  }
+  .pd__h {
+    margin: 0 0 16px; font-family: var(--font-display); font-weight: 500;
+    font-size: 17px; line-height: 1.3; color: var(--w-ink);
+  }
+  .pd__lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .pd__lines li { font-family: var(--font-body); font-size: 15px; line-height: 1.5; color: var(--w-ink-70); }
+  .pd__price {
+    margin: 20px 0 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 16px; line-height: 1.3; color: var(--accent-gold);
+  }
+  .pd__a {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 4px;
+    font: 500 15px/1 var(--font-body); color: var(--w-ink); text-decoration: none;
+    transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .pd__chev { font-size: 18px; line-height: 1; color: var(--accent-gold); transition: transform var(--w-dur-hover) var(--w-ease-ui); }
+  @media (--hover-fine) {
+    .pd__a:hover { color: var(--accent-gold); }
+    .pd__a:hover .pd__chev { transform: translateX(3px); }
+  }
+  .pd__a:focus-visible .pd__chev { transform: translateX(3px); }
+  @media (--motion-reduce) { .pd__chev { transition: none; } .pd__a:hover .pd__chev, .pd__a:focus-visible .pd__chev { transform: none; } }
+</style>

@@ -1,0 +1,29 @@
+---
+// Tienda en línea · capítulo de contraste (§4.15-5; v2 G04): CapituloDosFrases + RegistroVivo VIVO
+// "El día de tu tienda" (W-ADV-44: el registro avanza). En la v1 era estático y la prueba de vida daba
+// 0 % (FI §3-12, E-56 regla 7): ahora sube una fila cada 1,5 s mientras está a la vista, con la fila
+// central al 100 % y el resto ≥ 55 %, pausa fuera de vista y botón de pausa (loop.ts). El modo
+// `vivo-lento` de P03 (3 s) sustituirá a `loop` cuando P03 se integre ([SISTEMA]).
+import CapituloDosFrases from '../../CapituloDosFrases.astro';
+import RegistroVivo from '../../RegistroVivo.astro';
+import type { ShopCopy } from '../../../../i18n/w/ecommerce';
+
+interface Props { copy: ShopCopy['dia']; lang?: 'es' | 'en' }
+const { copy, lang = 'es' } = Astro.props;
+---
+<CapituloDosFrases tone1={copy.tone1} tone2={copy.tone2} sub={copy.sub} />
+<div class="ws-gap">
+  <RegistroVivo titleHtml={copy.title} text={copy.text} rows={copy.rows} variant="loop" lang={lang} class="ws-dia" />
+</div>
+<style>
+  .ws-gap { margin-top: var(--w-chapter-gap); }
+  /* La etiqueta "Ejemplo" (esquina superior) cae sobre la primera fila del bucle: en PC el
+     fundido de arriba deja libres sus primeros 52 px (revisión r1, menor 2). */
+  @media (--md) {
+    .ws-gap :global(.ws-dia.wd-log--loop .wd-log__win) {
+      -webkit-mask-image: linear-gradient(180deg, transparent 0, transparent 52px, #000 150px, #000 calc(100% - 100px), transparent 100%);
+      mask-image: linear-gradient(180deg, transparent 0, transparent 52px, #000 150px, #000 calc(100% - 100px), transparent 100%);
+    }
+  }
+  @media (--lt-md) { .ws-gap { margin-top: 48px; } }
+</style>

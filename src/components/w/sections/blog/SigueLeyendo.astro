@@ -1,0 +1,138 @@
+---
+// "Sigue leyendo" (design/rediseno-workos.md §4.8; W-CONT-26). Al acabar la guía:
+// filas de 680 con miniatura 140×88 (v4: la MISMA portada de la guía que en el índice del blog),
+// título 18/500 y la descripción del artículo, separadas por líneas de 1 px; debajo,
+// los enlaces del frontmatter (`related`, a las landings y precios) con sus href
+// EXACTOS (R5). La página elige los artículos (mismos temas primero).
+import Portada from './Portada.astro';
+import Icon from '../../../ui/Icon.astro';
+
+interface Post { title: string; href: string; desc?: string; tags: string[] }
+interface Link { label: string; href: string; desc?: string; icon?: string }
+interface Props {
+  posts: Post[];
+  links?: Link[];
+  title?: string;
+  relatedTitle?: string;
+}
+const { posts, links = [], title = 'Sigue leyendo', relatedTitle = 'Recursos relacionados' } = Astro.props;
+---
+<div class="more">
+  {posts.length > 0 && (
+    <div class="more__block">
+      <h2 class="more__title">{title}</h2>
+      <ul class="more__list">
+        {posts.map((p) => (
+          <li>
+            <a class="more__row" href={p.href}>
+              <span class="more__thumb" aria-hidden="true">
+                <Portada tags={p.tags} slug={p.href.split('/').filter(Boolean).pop()} size="thumb" class="more__art" />
+              </span>
+              <span class="more__txt">
+                <span class="more__ptitle">{p.title}</span>
+                {p.desc && <span class="more__desc">{p.desc}</span>}
+              </span>
+              <span class="more__chev" aria-hidden="true">›</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  {links.length > 0 && (
+    <div class="more__block">
+      <h2 class="more__title more__title--small">{relatedTitle}</h2>
+      <ul class="more__links">
+        {links.map((l) => (
+          <li>
+            <a class="more__link" href={l.href}>
+              <span class="more__lic" aria-hidden="true"><Icon name={l.icon ?? 'lucide:arrow-right'} /></span>
+              <span class="more__ltxt">
+                <span class="more__lname">{l.label}</span>
+                {l.desc && <span class="more__ldesc">{l.desc}</span>}
+              </span>
+              <span class="more__chev" aria-hidden="true">›</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
+
+<style>
+  .more { display: flex; flex-direction: column; gap: 56px; min-width: 0; }
+  .more__title {
+    margin: 0 0 8px;
+    font-family: var(--font-display); font-weight: 500; font-size: var(--w-h2-small); line-height: 1.2; letter-spacing: -0.03em;
+    color: var(--w-ink);
+  }
+  .more__title--small { font-size: var(--w-h4); letter-spacing: -0.01em; margin-bottom: 12px; }
+
+  .more__list { list-style: none; margin: 0; padding: 0; }
+  .more__list li + li { border-top: 1px solid var(--w-line); }
+  .more__row {
+    display: grid; grid-template-columns: 140px minmax(0, 1fr) auto; align-items: center; gap: 24px;
+    padding-block: 28px; text-decoration: none;
+  }
+  .more__thumb {
+    inline-size: 140px; block-size: 88px; border-radius: 6px; overflow: hidden;
+    background: var(--w-dawn), var(--w-s1); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+    display: grid; place-items: stretch;
+  }
+  .more__thumb :global(.more__art) { width: 100%; height: 100%; }
+  .more__thumb :global(.more__art .bp__illo) { width: 80%; }
+  .more__txt { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .more__ptitle {
+    font-family: var(--font-display); font-weight: 500; font-size: 1.125rem; line-height: 1.3; letter-spacing: -0.015em;
+    color: var(--w-ink); text-wrap: pretty; transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .more__desc {
+    font-family: var(--font-body); font-size: 0.9375rem; line-height: 1.5; color: var(--w-ink-60);
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  }
+  .more__chev {
+    font-family: var(--font-body); font-size: 20px; line-height: 1; color: var(--accent-gold);
+    transition: transform var(--w-dur-hover) var(--w-ease-ui);
+  }
+  @media (--hover-fine) {
+    .more__row:hover .more__ptitle, .more__link:hover .more__lname { color: var(--accent-gold); }
+    .more__row:hover .more__chev, .more__link:hover .more__chev { transform: translateX(3px); }
+  }
+  .more__row:focus-visible, .more__link:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 4px; border-radius: 6px; }
+
+  .more__links {
+    list-style: none; margin: 0; padding: 0;
+    border: 1px solid var(--w-line); border-radius: var(--w-r-obj); overflow: hidden;
+    display: grid; gap: 1px; background: var(--w-line);
+  }
+  .more__link {
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px;
+    padding: 16px 20px; background: var(--w-s1); text-decoration: none; min-height: 44px;
+  }
+  .more__lic {
+    inline-size: 36px; block-size: 36px; border-radius: 9px; display: grid; place-items: center;
+    background: rgba(var(--accent-gold-rgb), .08); border: 1px solid rgba(var(--accent-gold-rgb), .22); color: var(--accent-gold);
+  }
+  .more__lic :global(svg) { width: 18px; height: 18px; }
+  .more__ltxt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .more__lname {
+    font-family: var(--font-body); font-weight: 500; font-size: 1rem; line-height: 1.35; color: var(--w-ink);
+    transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .more__ldesc { font-family: var(--font-body); font-size: 0.875rem; line-height: 1.45; color: var(--w-ink-60); }
+
+  @media (--lt-sm) {
+    .more__row { grid-template-columns: 96px minmax(0, 1fr); gap: 16px; padding-block: 20px; }
+    .more__thumb { inline-size: 96px; block-size: 64px; }
+    .more__thumb :global(.more__illo) { width: 80px; }
+    .more__row .more__chev { display: none; }
+    .more__ptitle { font-size: 1rem; }
+    .more__desc { font-size: 0.875rem; }
+  }
+  @media (--motion-reduce) {
+    .more__ptitle, .more__lname, .more__chev { transition: none; }
+    .more__row:hover .more__chev, .more__link:hover .more__chev { transform: none; }
+  }
+</style>

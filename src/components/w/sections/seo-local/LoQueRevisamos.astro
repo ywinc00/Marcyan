@@ -1,0 +1,84 @@
+---
+// SEO local · 01 "Lo que revisamos" (§4.16-2): CabeceraNumerada + Bento2x2 (W-CORE-08/09 + B-03).
+// Celda 1 = el Radar (W-CORE-09 en su sitio de WorkOS: una celda de bento), firma de la
+// página, sin nada encima (el texto de la celda va arriba y el radar debajo, nunca detrás:
+// E-37). Las otras tres celdas, las señales que revisamos, cada una con su objeto:
+// datos iguales (NAP) · ficha (categorías, zonas, horario, fotos, reseñas) · web.
+// Móvil: las cuatro celdas con objeto (r1 G05: ficha y web se quedaban en texto).
+// v2 r1 G05: la celda web lleva el teléfono ENTERO de la marca restaurante (vista hero, con su
+// bisel y su isla), arriba con aire y sangrando por el borde inferior de la celda, como los
+// objetos de W-CORE-08. La mini (solo cabecera, ~200 px) quedaba cortada en el aire. El
+// rótulo "Ejemplo" va en la esquina de la bandeja: el del pie del marco quedaría fuera.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Bento2x2 from '../../Bento2x2.astro';
+import Radar from '../../objetos/Radar.astro';
+import WebEjemplo from '../../objetos/WebEjemplo.astro';
+import TelefonoWeb from '../../heroes/webs/TelefonoWeb.astro';
+import WebBarberia from '../../heroes/webs/WebBarberia.astro';
+import Ejemplo from '../../Ejemplo.astro';
+import Comprobacion from './Comprobacion.astro';
+import type { SeoCopy } from '../../../../i18n/w/seo-local';
+
+interface Props { copy: SeoCopy['revisamos']; n: number; city: string; lang?: 'es' | 'en' }
+const { copy, n, city, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="sl-gap">
+  <Bento2x2 cells={copy.cells} class="sl-rev">
+    <div slot="ui-1" class="sl-rev__radar"><Radar lang={lang} size="card" /></div>
+    <Comprobacion slot="ui-2" title={copy.datos.title} rows={copy.datos.rows} lang={lang} />
+    <Comprobacion slot="ui-3" title={copy.ficha.title} rows={copy.ficha.rows} lang={lang} />
+    <div slot="ui-4" class="sl-rev__web"><Ejemplo lang={lang} on="dark" class="sl-rev__ex" />{/miami/i.test(city) ? <TelefonoWeb lang={lang} fondo="#fbfaf7" tinta="#111318" class="sl-rev__phone"><WebBarberia lang={lang} /></TelefonoWeb> : <WebEjemplo frame="movil" marca="restaurante" vista="hero" ejemplo={false} city={city} lang={lang} class="sl-rev__phone" />}</div>
+  </Bento2x2>
+</div>
+<style>
+  .sl-gap { margin-top: var(--w-chapter-gap); }
+  /* Superficie: la sección entera sobre --w-s1 (como el bento del piloto), para romper la
+     losa negra entre el hero y la pila (E-01). Las celdas toman el color de la sección y
+     las bandejas suben un escalón (nunca un agujero de noche). */
+  :global(.w-cell:has(.sl-rev)) {
+    background: var(--w-s1);
+    --w-cell-bg: var(--w-s1);
+    --w-tray-bg: rgba(var(--star-rgb), .045);
+  }
+  /* Firma (E-54): la celda del radar es la que tiene luz. Amanecer oro bajo el radar,
+     anillos y haz con más contraste, y los avisos dentro del semicírculo, 2 o 3 a la vez. */
+  :global(.sl-rev.wd-bento .wd-bento__cell:first-child) {
+    background:
+      radial-gradient(70% 55% at 55% 100%, rgba(var(--accent-gold-rgb), .16), transparent 70%),
+      var(--w-s1);
+  }
+  .sl-rev__radar :global(.wo-radar__ring) {
+    border-color: rgba(var(--accent-gold-rgb), .38);
+    background: radial-gradient(closest-side, transparent 90%, rgba(var(--accent-gold-rgb), .10));
+  }
+  .sl-rev__radar :global(.wo-radar__beam) {
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(var(--accent-gold-rgb), .05) 4deg, rgba(var(--accent-gold-rgb), .20) 33deg, rgba(var(--accent-gold-rgb), .55) 36deg, transparent 36.5deg);
+  }
+  /* v2 (G05): los avisos se colocan solos, en polares entre anillos y con su foso (Radar.astro). */
+  /* El radar llega hasta el borde inferior de su celda, como en W-CORE-09 (sin bandeja). */
+  .sl-rev__radar { width: 100%; }
+  :global(.sl-rev .wd-bento__cell:first-child) { padding-bottom: 0; }
+  :global(.sl-rev .wd-bento__cell:first-child .wd-bento__ui) { flex: 1; align-items: end; margin-inline: -48px; }
+  /* La web en el móvil se corta en la línea de la celda (el teléfono "sale" por abajo, como
+     los objetos de W-CORE-08): la fila no crece hasta el alto del teléfono entero. */
+  .sl-rev__web { width: calc(100% + 29px); margin-inline: -14.5px; height: 340px; overflow: hidden; display: flex; justify-content: center; align-items: flex-start; padding-top: 30px; }
+  .sl-rev__web :global(.sl-rev__phone) { flex: none; width: min(340px, 100% - 12px); }
+  /* La web ocupa la bandeja hasta su borde interior (el teléfono a 300 px cabe en móvil sin
+     encogerse) y "Ejemplo" va en la esquina de la BANDEJA, nunca sobre el bisel. */
+  :global(.sl-rev .wd-bento__cell:last-child .wd-bento__tray) { position: relative; }
+  .sl-rev__web :global(.sl-rev__ex) { top: 14px; right: 14px; }
+  @media (--lt-md) {
+    .sl-rev__web { height: 330px; padding-top: 44px; }
+    .sl-rev__web :global(.sl-rev__phone) { width: min(300px, 100% - 2px); }
+    .sl-rev__web :global(.sl-rev__ex) { top: 12px; right: 12px; }
+  }
+  /* En PC y en móvil el teléfono sale por el borde inferior de la celda (bandeja abierta abajo). */
+  :global(.sl-rev .wd-bento__cell:last-child) { padding-bottom: 0; }
+  :global(.sl-rev .wd-bento__cell:last-child .wd-bento__ui) { flex: 1; align-items: end; }
+  :global(.sl-rev .wd-bento__cell:last-child .wd-bento__tray) { padding-bottom: 0; border-bottom: 0; border-radius: var(--w-r-tray) var(--w-r-tray) 0 0; }
+  @media (--lt-md) {
+    .sl-gap { margin-top: 48px; }
+    :global(.sl-rev .wd-bento__cell:first-child .wd-bento__ui) { margin-inline: -20px; }
+  }
+</style>

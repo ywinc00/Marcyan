@@ -1,0 +1,846 @@
+---
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// WEB DE EJEMPLO · CONTRATO (design/rediseno-workos-v2.md §1.6, §1.8 y §2 · P02a)
+// La usan P01 (demo y personalizador), P03 (objetos), P04 (escáner, estado `alambre`),
+// P08 (portátil) y P11 (proceso). Marco Marcyan, interior de marca ajena (negocios.ts).
+//
+// PROPS
+//   marca   NegocioId (plomeria · salon · restaurante · tienda · inmobiliaria · marca)
+//   frame   navegador (barra 28 px + dominio "· Ejemplo") · movil (radio 28, isla 64×18)
+//           · tarjeta (sin barra; demo de P01) · desnudo
+//   lienzo  escritorio 1280×800 · vertical 400×520 · movil 390×844. Por defecto según frame:
+//           navegador→escritorio, tarjeta/desnudo→vertical, movil→movil. El lienzo se dibuja a su
+//           tamaño fuente y se escala al ancho con transform: scale(min(1, 100cqw / ancho))
+//           (cociente de longitudes con tan(atan2()), sin JS; sin trigonometría CSS, <ej-web> escribe
+//           --ej-k con un ResizeObserver). Cada lienzo tiene su PROPIA
+//           composición (el vertical es "la web en columna", no la de escritorio encogida).
+//           LEGIBILIDAD (texto renderizado ≥ 11 px donde se lee, ≥ 9 px decorativo):
+//             escritorio · texto fuente ≥ 18 px → legible (≥ 11) desde 782 px de ancho. El marco
+//               navegador (y cualquier lienzo de escritorio) se usa SOLO en huecos ≥ 782 px (ronda 1:
+//               el antiguo mínimo de 640 dejaba el texto en 9,6 px). Por debajo, tarjeta o móvil.
+//             vertical   · texto fuente ≥ 13 px → legible desde 339 px (en 360, escala 0,9).
+//             movil      · texto fuente ≥ 15,5 px → legible con el marco a ≥ 300 px (por defecto).
+//   vista   hero (primera pantalla) · completa (hero + segunda franja) · mini (≤ 240 px:
+//           composición PROPIA recortada, logo + titular + 1 acción, a tamaño natural, sin lienzo)
+//   pagina  inicio · servicios · contacto (plomeria y marca; el resto cae a inicio)
+//   estado  lista · esqueleto (la misma estructura en bloques crema al 8 % sobre noche, la revela
+//           la consola de P01) · alambre (la web en línea con cotas; escáner P04, MiniPasos P03)
+//           · antes (la misma marca con una web anticuada pero digna; "Rediseño" de P01)
+//           esqueleto ⇄ lista ⇄ alambre se cambian EN VIVO con el atributo data-ej-estado de la raíz
+//           (mismo DOM; las cotas solo existen si se pinta en alambre). `antes` es otro DOM: para
+//           alternar Antes/Después se montan dos instancias (o una en <template>).
+//   lang    idioma de la PÁGINA (el logotipo y el rótulo salen de aquí y no cambian)
+//   ejemplo rótulo "Ejemplo" (por defecto true): en la barra del navegador o al pie del marco
+//   city    ciudad de los textos (por defecto Houston) · modo/boton: valores de partida opcionales
+//   Alias de compatibilidad (los usos de la v1 compilan Y se ven bien): kind→marca, state→estado,
+//   example→ejemplo, frame "pantalla"→navegador, size hero|card|mini→vista hero|completa|mini
+//   (salvo size="mini" en tarjeta → vista hero: las laterales del abanico v1 miden 208×300 y la
+//   composición mini dejaba media tarjeta vacía), site→idioma inicial de la web, pages (se ignora).
+//   Con `kind` y vista mini la raíz lleva además la clase v1 `wo-web--<frame>` (las reglas de ancho de los
+//   usos v1, p. ej. 236 px, valen para la mini, que va a tamaño natural; en un lienzo escalado no se
+//   honran: a 236 px el lienzo móvil deja el texto en 8,7 px y el contrato pide ≥ 300). La
+//   clase `ht-old` (maqueta "antes" de HazlaTuya v1) equivale a estado="antes". PUENTE PROVISIONAL:
+//   desaparece cuando P01/P02b sustituyan esos usos.
+//
+// SPRITE (§1.8): logotipo, signo, ilustración y glifos se pintan como <use> contra <symbol> que se
+//   emiten UNA vez por página (la primera instancia que los necesita los deja en un <svg> oculto,
+//   hermano de la raíz y fuera de las plantillas de idioma). Si esa instancia vive dentro de un
+//   <template> del consumidor, <ej-web> copia el symbol que falte desde ahí al conectarse.
+//
+// PERSONALIZAR DESDE FUERA (prioridad del scope, crítica A2)
+//   Un ancestro [data-ej-scope] escribe --ej-s-bg, --ej-s-ink, --ej-s-ink-2, --ej-s-accent,
+//   --ej-s-on-accent, --ej-s-radius, --ej-s-font-display (y --ej-s-display-weight). La raíz declara
+//   --ej-bg: var(--ej-s-bg, <marca>) y así cada una: el scope GANA siempre a la marca.
+//   Atributos en el scope (o en la raíz .ej): data-ej-btn fill|outline|pill, data-ej-mode
+//   claro|oscuro (paleta o paletaNoche de la marca), data-ej-lang es|en. Selectores:
+//   [data-ej-scope][data-ej-btn=…] .ej .ej__btn pesa más que .ej[data-ej-btn=…] .ej__btn, que pesa
+//   más que el botón propio de la marca (data-ej-btn-def): manda el scope.
+//   Si el scope escribe --ej-s-* y además pide modo oscuro, manda la variable: para "Pino de noche"
+//   el personalizador escribe alternativas[i].noche (negocios.ts).
+//   Las pruebas leen la variable EFECTIVA en un nodo interior (.ej__btn, .ej__tit), nunca en el scope.
+//
+// IDIOMA (§1.8): se pinta el de `site ?? lang`; el otro va en <template data-ej-l> y se inyecta al
+//   primer cambio de data-ej-lang (en el scope o en la raíz). El elemento <ej-web> lo resuelve y
+//   escribe data-ej-l-activo; emite el evento `ej:idioma` (burbujea) con { lang }.
+//
+// CONTRATO COMÚN (§1.6): dentro no hay h1-h6 (solo p/span/div); raíz aria-hidden + data-nosnippet
+//   + resumen sr-only hermano; el panel del otro idioma lleva `lang`; ningún tel:, wa.me ni
+//   data-track ("Llamar" es un span); SVG sin ids (cero choques con varias instancias).
+// ═════════════════════════════════════════════════════════════════════════════════════════
+import LogoEjemplo from './ejemplos/LogoEjemplo.astro';
+import Ilustracion from './ejemplos/Ilustracion.astro';
+import { negocios, conCiudad, telEnCiudad, type NegocioId, type Boton } from './ejemplos/negocios';
+
+type Frame = 'navegador' | 'movil' | 'tarjeta' | 'desnudo';
+type Lienzo = 'escritorio' | 'vertical' | 'movil';
+type Vista = 'hero' | 'completa' | 'mini';
+type Estado = 'esqueleto' | 'alambre' | 'antes' | 'lista';
+type L = 'es' | 'en';
+
+interface Props {
+  marca?: NegocioId;
+  frame?: Frame | 'pantalla';
+  lienzo?: Lienzo;
+  vista?: Vista;
+  pagina?: 'inicio' | 'servicios' | 'contacto';
+  estado?: Estado;
+  lang?: L;
+  ejemplo?: boolean;
+  city?: string;
+  modo?: 'claro' | 'oscuro';
+  boton?: Boton;
+  class?: string;
+  /** @deprecated alias de `marca` */ kind?: NegocioId;
+  /** @deprecated alias de `estado` */ state?: 'esqueleto' | 'lista';
+  /** @deprecated alias de `ejemplo` */ example?: boolean;
+  /** @deprecated hero→hero · card→completa · mini→mini */ size?: 'hero' | 'card' | 'mini';
+  /** @deprecated idioma inicial de la web si no es el de la página */ site?: L;
+  /** @deprecated se ignora (menú de páginas de la v1) */ pages?: string[];
+}
+
+const p = Astro.props;
+const marca: NegocioId = p.marca ?? p.kind ?? 'plomeria';
+const frame: Frame = p.frame === 'pantalla' ? 'navegador' : (p.frame ?? 'tarjeta');
+const lienzo: Lienzo = p.lienzo ?? (frame === 'navegador' ? 'escritorio' : frame === 'movil' ? 'movil' : 'vertical');
+const vista: Vista = p.vista ?? (p.size === 'mini' ? (frame === 'tarjeta' ? 'hero' : 'mini') : p.size === 'hero' ? 'hero' : 'completa');
+const clases = (p.class ?? '').split(/\s+/);
+const legado = p.kind !== undefined;
+const lang: L = p.lang ?? 'es';
+const city = p.city ?? 'Houston';
+const ejemplo = p.ejemplo ?? p.example ?? true;
+const n = negocios[marca];
+const tel = telEnCiudad(n.telefono, city);
+let estado: Estado = p.estado ?? p.state ?? (clases.includes('ht-old') ? 'antes' : 'lista');
+if (estado === 'antes' && !n.textos[lang].antes) estado = 'lista'; // solo plomería tiene "antes" en P02a
+let pagina = p.pagina ?? 'inicio';
+if (pagina === 'servicios' && !n.textos[lang].servicios) pagina = 'inicio';
+if (pagina === 'contacto' && !n.textos[lang].contacto) pagina = 'inicio';
+const webLang: L = p.site ?? lang;
+const otra: L = webLang === 'es' ? 'en' : 'es';
+
+const DIM: Record<Lienzo, [number, number]> = { escritorio: [1280, 800], vertical: [400, 520], movil: [390, 844] };
+const [W, H] = DIM[lienzo];
+const mini = vista === 'mini';
+// Tamaños que dependen del lienzo (alto de la mayúscula del logotipo y glifos, en px fuente).
+const LOGO: Record<Lienzo, number> = { escritorio: 17, vertical: 11, movil: 13 };
+const GLIFO: Record<Lienzo, number> = { escritorio: 22, vertical: 17, movil: 20 };
+// Ilustración ENTERA (ronda 1: nada de codos cortados a medias). 0 = esa composición no la lleva:
+// la tarjeta vertical completa necesita el alto para la franja de garantías.
+const ARTE: Record<Lienzo, Record<'hero' | 'completa', number>> = {
+  escritorio: { hero: 470, completa: 360 }, vertical: { hero: 160, completa: 0 }, movil: { hero: 340, completa: 150 },
+};
+const logoCap = mini ? 9.5 : LOGO[lienzo];
+const glifo = mini ? 14 : GLIFO[lienzo];
+const arte = mini || !n.ilustracion ? 0 : ARTE[lienzo][vista as 'hero' | 'completa'];
+// En hero vertical y móvil el dibujo se recorta a su caja real (viewBox 480: tubo de y 80 a 471, brida
+// derecha en x 472) para colocarlo entero bajo la acción sin el aire vacío de la caja.
+const arteRecorte = arte && vista === 'hero' && lienzo !== 'escritorio'
+  ? `--ej-arte-t:${-(80 / 480 * arte).toFixed(1)}px;--ej-arte-b:${-(9 / 480 * arte).toFixed(1)}px;--ej-arte-r:${-(8 / 480 * arte).toFixed(1)}px`
+  : undefined;
+const iconosGar = ['presupuesto', 'urgencia', 'idiomas'] as const;
+const conGar = !!n.textos[lang].garantias && !mini && (lienzo === 'escritorio' || vista === 'completa');
+
+// Sprite por página: symbols que necesita esta instancia y que ninguna anterior ha emitido.
+const sprite = (() => {
+  const loc = Astro.locals as Record<string, unknown>;
+  return (loc.__ejSprite ??= new Set<string>()) as Set<string>;
+})();
+const necesita: string[] = [];
+if (estado !== 'antes') {
+  necesita.push(`logo:${marca}:${lang}`, 'g:menu');
+  if (marca === 'plomeria') necesita.push('signo');
+  if (n.textos.es.accionTel) necesita.push('g:tel');
+  if (conGar && pagina === 'inicio') necesita.push(...iconosGar.map((g) => `g:${g}`));
+  if (pagina === 'servicios') necesita.push('g:flecha');
+  if (arte && pagina === 'inicio') necesita.push('g:codo-gota');
+}
+const nuevos = necesita.filter((x) => !sprite.has(x));
+nuevos.forEach((x) => sprite.add(x));
+
+const resumen = (() => {
+  const nom = n.nombre[lang];
+  if (lang === 'en') return estado === 'antes' ? `Example: an outdated website for ${nom}, a made-up business.`
+    : estado === 'lista' ? `Example: website for ${nom}, a made-up business.` : `Example: the layout of a website for ${nom}, a made-up business.`;
+  return estado === 'antes' ? `Ejemplo: web anticuada de ${nom}, un negocio inventado.`
+    : estado === 'lista' ? `Ejemplo: web de ${nom}, un negocio inventado.` : `Ejemplo: estructura de la web de ${nom}, un negocio inventado.`;
+})();
+const rotulo = lang === 'en' ? 'Example' : 'Ejemplo';
+const pal = (pre: string, x: typeof n.paleta) =>
+  `--ej-${pre}-bg:${x.bg};--ej-${pre}-ink:${x.ink};--ej-${pre}-ink-2:${x.ink2};--ej-${pre}-accent:${x.accent};--ej-${pre}-on-accent:${x.onAccent};`;
+const estilo = pal('m', n.paleta) + pal('n', n.paletaNoche) + `--ej-m-radius:${n.radio}px;`;
+
+// Cotas del alambre (solo se pintan si la instancia nace en alambre). Van en los MÁRGENES del lienzo,
+// cada una con su línea de cota y sus topes (h = horizontal, v = vertical con el rótulo girado), nunca
+// encima de las cajas (el ancho, arriba en escritorio y al pie en vertical y móvil para no cruzar la
+// cota de la nav). [texto, tipo, x, y, largo] en px del lienzo fuente.
+type Cota = [string, 'h' | 'v', number, number, number];
+const titEsc = vista === 'completa' ? 84 : 96;
+const COTAS: Record<Lienzo, Cota[]> = {
+  escritorio: [['1280', 'h', 0, 10, 1280], ['nav 92', 'v', 1248, 0, 92], ['7 col', 'h', 64, 106, 662], ['5 col', 'h', 750, 106, 466],
+    [`Aa ${titEsc}`, 'v', 32, vista === 'completa' ? 192 : 208, titEsc]],
+  vertical: [['400', 'h', 0, 513, 400], ['nav 64', 'v', 385, 4, 64], ['1 col', 'h', 24, 96, 352], ['Aa 44', 'v', 11, 138, 44]],
+  movil: [['390', 'h', 0, 834, 390], ['nav 60', 'v', 379, 52, 60], ['1 col', 'h', 22, 150, 346], ['Aa 50', 'v', 10, 202, 50]],
+};
+---
+{nuevos.length > 0 && (
+  <svg class="ej-sprite" data-ej-sprite aria-hidden="true" focusable="false" width="0" height="0">
+    {nuevos.map((x) => {
+      const [k, a, b] = x.split(':');
+      if (k === 'logo') return <LogoEjemplo marca={a as NegocioId} lang={b as L} modo="simbolo" solo="palabra" />;
+      if (k === 'signo') return <LogoEjemplo marca="plomeria" modo="simbolo" solo="signo" />;
+      return <Ilustracion id={a as any} modo="simbolo" />;
+    })}
+  </svg>
+)}
+<span class="ej-sr" data-nosnippet>{resumen}</span>
+<ej-web
+  class:list={['ej', `ej--${frame}`, `ej--${lienzo}`, `ej--${vista}`, p.class, legado && mini && `wo-web--${p.frame ?? 'tarjeta'}`]}
+  aria-hidden="true"
+  data-nosnippet
+  data-ej-marca={marca}
+  data-ej-frame={frame}
+  data-ej-lienzo={lienzo}
+  data-ej-vista={vista}
+  data-ej-pagina={pagina}
+  data-ej-estado={estado}
+  data-wo-state={estado === 'esqueleto' || estado === 'lista' ? estado : undefined}
+  data-ej-lang={webLang}
+  data-ej-l-activo={webLang}
+  data-ej-btn-def={n.boton}
+  data-ej-btn={p.boton}
+  data-ej-mode={p.modo}
+  style={estilo + `--ej-w:${W}px;--ej-h:${H}px;`}
+>
+  <div class="ej__marco">
+    {frame === 'navegador' && (
+      <div class="ej__barra">
+        <i></i><i></i><i></i>
+        <span class="ej__url"><span translate="no">{n.dominio}</span>{ejemplo && <span class="ej__url-ej"> · {rotulo}</span>}</span>
+      </div>
+    )}
+    {frame === 'movil' && <span class="ej__isla"></span>}
+    <div class="ej__vp">
+      <div class="ej__lz">
+        {[webLang, otra].map((L) => {
+          const T = n.textos[L];
+          const c = (t?: string) => conCiudad(t, city);
+          const panel = (
+            <>
+              {estado === 'antes' && T.antes ? (
+                /* ── ANTES (crítica escrita, ronda 1): web de hace diez años, digna (alineada, legible,
+                   de una pieza) pero sin jerarquía. 1) La llamada va enterrada en la cabecera, en texto,
+                   sin botón. 2) La "foto" es un banner genérico de banco que no enseña nada del oficio
+                   (un plano difuso, sin figuras dibujadas). 3) "Bienvenidos a…" ocupa el sitio del
+                   titular y no dice qué hacen ni dónde. 4) Párrafo de relleno justificado, con ríos.
+                   5) Menú de cinco pestañas subrayadas, un solo idioma y nada pensado para el móvil. */
+                <div class="ej__l ej__pg ea" data-ej-l-pane={L} lang={L !== lang ? L : undefined}>
+                  <div class="ea__top">
+                    <span class="ea__logo" translate="no">{n.nombre[lang]}</span>
+                    <span class="ea__tel">{T.antes.llamada} <b>{tel}</b></span>
+                  </div>
+                  <div class="ea__nav">{T.antes.nav.map((x, i) => <span class:list={[i === 0 && 'is-on']}>{x}</span>)}</div>
+                  <div class="ea__foto"></div>
+                  <div class="ea__cuerpo">
+                    <p class="ea__bien">{T.antes.bienvenida}</p>
+                    <p class="ea__txt">{c(T.antes.texto)}</p>
+                  </div>
+                  <div class="ea__pie">{T.antes.pie}</div>
+                </div>
+              ) : (
+                <div class="ej__l ej__pg" data-pg={pagina} data-ej-l-pane={L} lang={L !== lang ? L : undefined}>
+                  <div class="ej__nav">
+                    <span class="ej__logo ej-k"><LogoEjemplo marca={marca} size={logoCap} lang={lang} modo="uso" /></span>
+                    {T.nav && <span class="ej__links">{T.nav.map((x) => <span class="ej-k">{x}</span>)}</span>}
+                    <span class="ej__navder">
+                      {T.abierto && <span class="ej__abierto ej-k">{T.abierto}</span>}
+                      {T.accionTel && <span class="ej__btn2 ej-k">{T.accion}</span>}
+                      <span class="ej__menu ej-k"><Ilustracion id="menu" size={glifo + 4} modo="uso" /></span>
+                    </span>
+                  </div>
+
+                  {pagina === 'inicio' && (
+                    <div class="ej__hero">
+                      <div class="ej__copy">
+                        {T.antetitulo && <span class="ej__ante ej-k">{c(T.antetitulo)}</span>}
+                        <p class="ej__tit"><span class="ej-k">{T.titular}</span></p>
+                        {T.bajada && <p class="ej__baj"><span class="ej-k">{T.bajada}</span></p>}
+                        <span class="ej__acc ej__btn ej-k">
+                          {T.accionTel && <Ilustracion id="tel" size={glifo} modo="uso" />}
+                          {T.accion}
+                          {T.accionTel && <span class="ej__num">{tel}</span>}
+                        </span>
+                      </div>
+                      {arte > 0 && (
+                        <div class="ej__arte ej-k" style={arteRecorte}><Ilustracion id="codo-gota" size={arte} modo="uso" /></div>
+                      )}
+                    </div>
+                  )}
+
+                  {pagina === 'inicio' && T.garantias && conGar && (
+                    <div class="ej__gar">
+                      {T.garantias.map((g, i) => (
+                        <span class="ej__g"><span class="ej-k"><Ilustracion id={iconosGar[i]} size={glifo} modo="uso" />{g}</span></span>
+                      ))}
+                    </div>
+                  )}
+
+                  {pagina === 'inicio' && vista === 'completa' && lienzo === 'escritorio' && T.servicios && (
+                    <div class="ej__seg">
+                      <span class="ej__ante ej-k">{T.servicios.rotulo}</span>
+                      <div class="ej__seg-filas">
+                        {T.servicios.filas.map((f) => (
+                          <span class="ej__seg-f"><span class="ej__seg-t ej-k">{f.t}</span><span class="ej__seg-d ej-k">{f.d}</span></span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {pagina === 'servicios' && T.servicios && (
+                    <div class="ej__sv">
+                      <span class="ej__ante ej-k">{T.servicios.rotulo}</span>
+                      <p class="ej__tit"><span class="ej-k">{T.servicios.titulo}</span></p>
+                      <p class="ej__baj"><span class="ej-k">{c(T.servicios.intro)}</span></p>
+                      <div class="ej__sv-filas">
+                        {T.servicios.filas.map((f) => (
+                          <span class="ej__sv-f">
+                            <span class="ej__sv-t ej-k">{f.t}</span>
+                            <span class="ej__sv-d ej-k">{f.d}</span>
+                            <span class="ej__sv-a ej-k"><span>{T.servicios!.accionFila}</span><Ilustracion id="flecha" size={glifo - 2} modo="uso" /></span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {pagina === 'contacto' && T.contacto && (
+                    <div class="ej__ct">
+                      <div class="ej__ct-a">
+                        <p class="ej__tit"><span class="ej-k">{T.contacto.titulo}</span></p>
+                        <p class="ej__baj"><span class="ej-k">{T.contacto.intro}</span></p>
+                        <span class="ej__acc ej__btn ej-k">
+                          {T.accionTel && <Ilustracion id="tel" size={glifo} modo="uso" />}
+                          {T.accion}
+                          {T.accionTel && <span class="ej__num">{tel}</span>}
+                        </span>
+                        <span class="ej__hor">
+                          {T.contacto.horario.map((h) => <span class="ej__hor-f ej-k"><span>{h.d}</span><span class="ej__hor-h">{h.h}</span></span>)}
+                        </span>
+                        <span class="ej__zona ej-k">{c(T.contacto.zona)}</span>
+                      </div>
+                      <div class="ej__form ej-k">
+                        {T.contacto.campos.map((f, i) => <span class:list={['ej__campo', i === 2 && 'ej__campo--alto']}>{f}</span>)}
+                        <span class="ej__btn ej__btn--form"><span>{T.contacto.enviar}</span></span>
+                      </div>
+                    </div>
+                  )}
+
+                  {estado === 'alambre' && (
+                    <div class="ej__cotas">
+                      {COTAS[lienzo].map(([t, tipo, x, y, l]) => (
+                        <span class={`ej__cota ej__cota--${tipo}`} style={`--x:${x}px;--y:${y}px;--l:${l}px`}><span>{t}</span></span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          );
+          return L === webLang ? panel : <template data-ej-l={L}>{panel}</template>;
+        })}
+      </div>
+    </div>
+  </div>
+  {ejemplo && frame !== 'navegador' && <span class="ej__rot"><span translate="no">{n.dominio}</span> · {rotulo}</span>}
+</ej-web>
+
+<script>
+  // <ej-web>: resuelve el idioma efectivo (scope > raíz), inyecta el panel del otro idioma desde su
+  // <template> la primera vez y puentea el atributo de la v1 (data-wo-state, DemoPorPasos) a
+  // data-ej-estado. Solo actúa dentro de su propio nodo; no arranca nada hasta que hay un cambio.
+  const TRIG = typeof CSS !== 'undefined' && CSS.supports('width', 'calc(1px * tan(atan2(1px, 1px)))');
+  class EjWeb extends HTMLElement {
+    private obs?: MutationObserver;
+    private io?: IntersectionObserver;
+    private ro?: ResizeObserver;
+    private scope: Element | null = null;
+    connectedCallback() {
+      this.simbolos();
+      // Punto "Abierto": solo late mientras la web está a la vista (data-ej-vivo).
+      if (this.querySelector('.ej__abierto') && 'IntersectionObserver' in window) {
+        this.io = new IntersectionObserver(([e]) => this.toggleAttribute('data-ej-vivo', e.isIntersecting));
+        this.io.observe(this);
+      }
+      // Sin trigonometría CSS: la escala del lienzo la escribe JS (--ej-k).
+      const vp = this.querySelector<HTMLElement>('.ej__vp');
+      if (!TRIG && vp && !this.classList.contains('ej--mini') && 'ResizeObserver' in window) {
+        const w = parseFloat(getComputedStyle(this).getPropertyValue('--ej-w')) || 1280;
+        this.ro = new ResizeObserver(([e]) => this.style.setProperty('--ej-k', String(Math.min(1, e.contentRect.width / w))));
+        this.ro.observe(vp);
+      }
+      this.scope = this.parentElement?.closest('[data-ej-scope]') ?? null;
+      this.obs = new MutationObserver((recs) => {
+        for (const r of recs) {
+          if (r.target === this && r.attributeName === 'data-wo-state') {
+            const v = this.getAttribute('data-wo-state');
+            if (v) this.setAttribute('data-ej-estado', v);
+          }
+        }
+        this.idioma();
+      });
+      this.obs.observe(this, { attributes: true, attributeFilter: ['data-ej-lang', 'data-wo-state'] });
+      if (this.scope) this.obs.observe(this.scope, { attributes: true, attributeFilter: ['data-ej-lang'] });
+      this.idioma();
+    }
+    disconnectedCallback() { this.obs?.disconnect(); this.io?.disconnect(); this.ro?.disconnect(); }
+    // Sprite: si el symbol que usa esta instancia no está en el documento (la instancia que lo emitió
+    // vive en un <template> del consumidor), se copia desde esa plantilla a un sprite propio.
+    private simbolos() {
+      const faltan = [...new Set([...this.querySelectorAll('use')].map((u) => (u.getAttribute('href') || '').slice(1)))]
+        .filter((id) => id && !document.getElementById(id));
+      if (!faltan.length) return;
+      const ns = 'http://www.w3.org/2000/svg';
+      const sp = document.createElementNS(ns, 'svg');
+      sp.setAttribute('class', 'ej-sprite'); sp.setAttribute('aria-hidden', 'true'); sp.setAttribute('width', '0'); sp.setAttribute('height', '0');
+      for (const t of document.querySelectorAll('template')) {
+        for (const id of faltan) { const s = t.content.getElementById(id); if (s && !sp.querySelector(`#${id}`)) sp.appendChild(s.cloneNode(true)); }
+      }
+      if (sp.childNodes.length) { sp.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden'; document.body.appendChild(sp); }
+    }
+    private idioma() {
+      const l = this.scope?.getAttribute('data-ej-lang') || this.getAttribute('data-ej-lang') || 'es';
+      if (this.getAttribute('data-ej-l-activo') === l) return;
+      if (!this.querySelector(`.ej__l[data-ej-l-pane="${l}"]`)) {
+        const t = this.querySelector<HTMLTemplateElement>(`template[data-ej-l="${l}"]`);
+        if (!t) return;
+        t.replaceWith(t.content.cloneNode(true));
+      }
+      this.setAttribute('data-ej-l-activo', l);
+      this.dispatchEvent(new CustomEvent('ej:idioma', { bubbles: true, detail: { lang: l } }));
+    }
+  }
+  if (!customElements.get('ej-web')) customElements.define('ej-web', EjWeb);
+</script>
+
+<style>
+  /* ═══ Raíz: variables con prioridad del scope ═══ */
+  .ej-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+  .ej-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .ej {
+    --ej-bg: var(--ej-s-bg, var(--ej-m-bg));
+    --ej-ink: var(--ej-s-ink, var(--ej-m-ink));
+    --ej-ink-2: var(--ej-s-ink-2, var(--ej-m-ink-2));
+    --ej-accent: var(--ej-s-accent, var(--ej-m-accent));
+    --ej-on-accent: var(--ej-s-on-accent, var(--ej-m-on-accent));
+    --ej-radius: var(--ej-s-radius, var(--ej-m-radius));
+    --ej-font-display: var(--ej-s-font-display, var(--font-display));
+    --ej-display-weight: var(--ej-s-display-weight, 500);
+    --ej-rule: color-mix(in srgb, var(--ej-ink) 16%, transparent);
+    --ej-crema: 240, 237, 232;
+    --ej-t: 220ms cubic-bezier(.22, 1, .36, 1);
+    position: relative; display: block;
+    font-family: var(--font-body); text-align: left;
+  }
+  /* Modo noche: raíz < scope (el scope pesa más). Si el scope escribe --ej-s-*, mandan esas. */
+  .ej[data-ej-mode='oscuro'],
+  :global([data-ej-scope][data-ej-mode='oscuro']) .ej {
+    --ej-bg: var(--ej-s-bg, var(--ej-n-bg)); --ej-ink: var(--ej-s-ink, var(--ej-n-ink)); --ej-ink-2: var(--ej-s-ink-2, var(--ej-n-ink-2));
+    --ej-accent: var(--ej-s-accent, var(--ej-n-accent)); --ej-on-accent: var(--ej-s-on-accent, var(--ej-n-on-accent));
+  }
+  :global([data-ej-scope][data-ej-mode='claro']) .ej {
+    --ej-bg: var(--ej-s-bg, var(--ej-m-bg)); --ej-ink: var(--ej-s-ink, var(--ej-m-ink)); --ej-ink-2: var(--ej-s-ink-2, var(--ej-m-ink-2));
+    --ej-accent: var(--ej-s-accent, var(--ej-m-accent)); --ej-on-accent: var(--ej-s-on-accent, var(--ej-m-on-accent));
+  }
+  /* Idioma: lo resuelve <ej-web> en data-ej-l-activo. */
+  .ej[data-ej-l-activo='es'] .ej__l:not([data-ej-l-pane='es']),
+  .ej[data-ej-l-activo='en'] .ej__l:not([data-ej-l-pane='en']) { display: none; }
+
+  /* ═══ Marcos ═══ */
+  /* (0,1,1): gana a la regla base .ej (ancho 100 %) y pierde ante las de ancho del consumidor con 2 clases (236 px en móvil) */
+  :where(.ej) { width: 100%; } /* (0,1,0) */
+  ej-web:where(.ej--movil) { width: 300px; max-width: 100%; }
+  .ej__marco { position: relative; }
+  .ej--navegador .ej__marco {
+    border-radius: 12px; overflow: hidden; background: #1a1a19;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.10), 0 24px 48px -24px rgba(0,0,0,.6);
+  }
+  .ej__barra { display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; }
+  .ej__barra > i { width: 8px; height: 8px; border-radius: 50%; background: #626468; flex: none; }
+  .ej__url {
+    margin: 0 auto; transform: translateX(-21px); max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font: 500 11px/18px var(--font-mono); letter-spacing: .02em; color: rgba(var(--ej-crema), .72);
+    padding: 0 10px; border-radius: 6px; background: rgba(255,255,255,.06);
+  }
+  .ej__url-ej { color: rgba(var(--ej-crema), .6); }
+  .ej--tarjeta .ej__marco { border-radius: 12px; overflow: hidden; }
+  .ej--movil .ej__marco {
+    padding: 8px; border-radius: 28px; background: #111110;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.10), 0 0 0 1px rgba(var(--accent-gold-rgb, 196,163,90), .12);
+  }
+  .ej--movil .ej__vp { border-radius: 21px; }
+  .ej__isla { position: absolute; z-index: 2; top: 18px; left: 50%; width: 64px; height: 18px; margin-left: -32px; border-radius: 9px; background: #111110; }
+  .ej__rot {
+    display: block; margin-top: 10px; font: 500 11px/1.3 var(--font-mono); letter-spacing: .06em;
+    color: rgba(var(--ej-crema), .6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ej--movil .ej__rot { text-align: center; }
+
+  /* ═══ Lienzo: tamaño fuente fijo, escalado al ancho sin JS ═══ */
+  .ej__vp { position: relative; overflow: hidden; container-type: inline-size; background: var(--ej-bg); transition: background-color var(--ej-t); }
+  .ej--escritorio .ej__vp { aspect-ratio: 1280 / 800; }
+  .ej--vertical .ej__vp { aspect-ratio: 400 / 520; }
+  .ej--movil .ej__vp { aspect-ratio: 390 / 844; }
+  .ej__lz {
+    position: absolute; left: 0; top: 0; width: var(--ej-w); height: var(--ej-h);
+    transform-origin: 0 0;
+    transform: scale(var(--ej-k, 1)); /* respaldo sin trigonometría CSS (lo escribe <ej-web>) */
+    transform: scale(min(1, tan(atan2(100cqw, var(--ej-w)))));
+  }
+  /* mini: composición propia a tamaño natural, sin lienzo */
+  .ej--mini .ej__vp { aspect-ratio: auto; container-type: normal; }
+  .ej--mini .ej__lz { position: static; width: auto; height: auto; transform: none; }
+  .ej--movil.ej--mini .ej__marco { padding-bottom: 0; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+  .ej--movil.ej--mini .ej__vp { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+
+  /* ═══ Página (común) ═══ */
+  .ej__pg {
+    position: relative; height: 100%; box-sizing: border-box; display: flex; flex-direction: column;
+    color: var(--ej-ink); background: var(--ej-bg);
+    transition: background-color var(--ej-t), color var(--ej-t);
+  }
+  .ej__pg p { margin: 0; }
+  .ej__nav { display: grid; grid-template-columns: auto 1fr auto; align-items: center; flex: none; }
+  .ej__logo { display: inline-flex; line-height: 0; }
+  .ej__links { display: flex; justify-content: center; font-weight: 500; }
+  .ej__navder { display: flex; align-items: center; justify-content: flex-end; }
+  .ej__abierto { display: inline-flex; align-items: center; color: var(--ej-ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .ej__abierto::before { content: ''; width: .5em; height: .5em; border-radius: 50%; background: #3F8F5A; margin-right: .55em; flex: none; }
+  .ej[data-ej-vivo][data-ej-estado='lista'] .ej__abierto::before { animation: ej-late 2s ease-in-out infinite; }
+  .ej:not([data-ej-estado='lista']) .ej__abierto::before { visibility: hidden; }
+  .ej__menu { display: none; line-height: 0; }
+  .ej__hero { position: relative; }
+  .ej__copy { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; }
+  .ej__ante { display: inline-block; font-family: var(--font-mono); font-weight: 500; text-transform: uppercase; letter-spacing: .12em; color: var(--ej-ink-2); }
+  .ej__tit { font-family: var(--ej-font-display); font-weight: var(--ej-display-weight); text-wrap: balance; color: var(--ej-ink); }
+  .ej__baj { color: var(--ej-ink-2); }
+  .ej__num { font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; }
+  .ej__num::before { content: ''; width: 1px; height: 1.05em; background: currentColor; opacity: .38; margin: 0 .75em 0 .2em; }
+  .ej__arte { line-height: 0; }
+  .ej__arte > :global(svg) { margin-top: var(--ej-arte-t, 0); margin-bottom: var(--ej-arte-b, 0); }
+  .ej__gar { display: grid; border-top: 1px solid var(--ej-rule); flex: none; }
+  .ej__g > span { display: inline-flex; align-items: center; font-weight: 500; }
+  .ej__g :global(svg) { color: var(--ej-accent); }
+
+  /* ═══ Botones: base < marca (data-ej-btn-def) < raíz (data-ej-btn) < scope ═══ */
+  .ej__btn, .ej__btn2 {
+    display: inline-flex; align-items: center; white-space: nowrap; font-weight: 500;
+    border: 1.5px solid transparent; border-radius: calc(var(--ej-radius) * .5);
+    transition: background-color var(--ej-t), color var(--ej-t), border-color var(--ej-t), border-radius var(--ej-t);
+  }
+  .ej__btn { background: var(--ej-accent); color: var(--ej-on-accent); border-color: var(--ej-accent); }
+  .ej__btn2 { color: var(--ej-ink); border-color: color-mix(in srgb, var(--ej-ink) 70%, transparent); }
+  .ej__btn2:hover { background: var(--ej-ink); color: var(--ej-bg); }
+  .ej[data-ej-btn-def='outline'] .ej__btn { background: transparent; color: var(--ej-ink); border-color: var(--ej-ink); }
+  .ej[data-ej-btn-def='pill'] .ej__btn, .ej[data-ej-btn-def='pill'] .ej__btn2 { border-radius: 999px; }
+  .ej[data-ej-btn='fill'] .ej__btn { background: var(--ej-accent); color: var(--ej-on-accent); border-color: var(--ej-accent); border-radius: calc(var(--ej-radius) * .5); }
+  .ej[data-ej-btn='fill'] .ej__btn2 { border-radius: calc(var(--ej-radius) * .5); }
+  .ej[data-ej-btn='outline'] .ej__btn { background: transparent; color: var(--ej-ink); border-color: var(--ej-ink); border-radius: calc(var(--ej-radius) * .5); }
+  .ej[data-ej-btn='outline'] .ej__btn2 { border-radius: calc(var(--ej-radius) * .5); }
+  .ej[data-ej-btn='pill'] .ej__btn { background: var(--ej-accent); color: var(--ej-on-accent); border-color: var(--ej-accent); border-radius: 999px; }
+  .ej[data-ej-btn='pill'] .ej__btn2 { border-radius: 999px; }
+  :global([data-ej-scope][data-ej-btn='fill']) .ej .ej__btn { background: var(--ej-accent); color: var(--ej-on-accent); border-color: var(--ej-accent); border-radius: calc(var(--ej-radius) * .5); }
+  :global([data-ej-scope][data-ej-btn='fill']) .ej .ej__btn2 { border-radius: calc(var(--ej-radius) * .5); }
+  :global([data-ej-scope][data-ej-btn='outline']) .ej .ej__btn { background: transparent; color: var(--ej-ink); border-color: var(--ej-ink); border-radius: calc(var(--ej-radius) * .5); }
+  :global([data-ej-scope][data-ej-btn='outline']) .ej .ej__btn2 { border-radius: calc(var(--ej-radius) * .5); }
+  :global([data-ej-scope][data-ej-btn='pill']) .ej .ej__btn { background: var(--ej-accent); color: var(--ej-on-accent); border-color: var(--ej-accent); border-radius: 999px; }
+  :global([data-ej-scope][data-ej-btn='pill']) .ej .ej__btn2 { border-radius: 999px; }
+
+  /* ═══ ESCRITORIO 1280×800 ═══ */
+  .ej--escritorio .ej__pg { padding: 0 64px; }
+  .ej--escritorio .ej__nav { height: 92px; gap: 32px; }
+  .ej--escritorio .ej__links { gap: 40px; font-size: 18px; }
+  .ej--escritorio .ej__navder { gap: 28px; }
+  .ej--escritorio .ej__abierto { font-size: 18px; }
+  .ej--escritorio .ej__btn2 { height: 46px; padding: 0 22px; font-size: 18px; }
+  .ej--escritorio .ej__hero { flex: 1; display: grid; grid-template-columns: repeat(12, 1fr); column-gap: 24px; padding-top: 72px; }
+  .ej--escritorio .ej__copy { grid-column: 1 / span 7; }
+  .ej--escritorio .ej__arte { grid-column: 8 / span 5; justify-self: end; margin-top: -40px; }
+  .ej--escritorio .ej__ante { font-size: 18px; letter-spacing: .1em; }
+  .ej--escritorio .ej__tit { margin-top: 22px; font-size: 96px; line-height: .96; letter-spacing: -.045em; max-width: 7.2em; }
+  .ej--escritorio .ej__baj { margin-top: 28px; font-size: 21px; line-height: 1.45; }
+  .ej--escritorio .ej__acc { margin-top: 40px; }
+  .ej--escritorio .ej__btn { height: 62px; padding: 0 30px 0 24px; gap: 12px; font-size: 19px; }
+  .ej--escritorio .ej__gar { grid-template-columns: repeat(3, 1fr); }
+  .ej--escritorio .ej__g { padding: 26px 0 30px; }
+  .ej--escritorio .ej__g + .ej__g { padding-left: 28px; border-left: 1px solid var(--ej-rule); }
+  .ej--escritorio .ej__g > span { gap: 12px; font-size: 18px; }
+  .ej--escritorio.ej--completa .ej__hero { flex: none; padding-top: 56px; padding-bottom: 40px; }
+  .ej--escritorio.ej--completa .ej__tit { font-size: 84px; }
+  .ej--escritorio.ej--completa .ej__arte { margin-top: -24px; }
+  .ej__seg { padding-top: 30px; }
+  .ej__seg-filas { display: grid; grid-template-columns: repeat(3, 1fr); column-gap: 24px; margin-top: 18px; }
+  .ej__seg-f { display: flex; flex-direction: column; gap: 8px; }
+  .ej__seg-t { font: 500 28px/1.1 var(--ej-font-display); letter-spacing: -.02em; align-self: flex-start; }
+  .ej__seg-d { font-size: 18px; color: var(--ej-ink-2); align-self: flex-start; }
+  /* servicios */
+  .ej__sv { display: flex; flex-direction: column; align-items: flex-start; }
+  .ej__sv-filas { align-self: stretch; display: flex; flex-direction: column; }
+  .ej__sv-f { display: grid; align-items: center; border-top: 1px solid var(--ej-rule); }
+  .ej__sv-f:last-child { border-bottom: 1px solid var(--ej-rule); }
+  .ej__sv-t { font-family: var(--ej-font-display); font-weight: 500; letter-spacing: -.02em; justify-self: start; }
+  .ej__sv-d { color: var(--ej-ink-2); justify-self: start; }
+  .ej__sv-a { display: inline-flex; align-items: center; gap: .5em; color: var(--ej-accent); font-weight: 500; justify-self: end; }
+  .ej--escritorio .ej__sv { padding-top: 64px; }
+  .ej--escritorio .ej__sv .ej__tit { margin-top: 18px; font-size: 96px; line-height: .96; letter-spacing: -.045em; }
+  .ej--escritorio .ej__sv .ej__baj { margin-top: 20px; font-size: 21px; }
+  .ej--escritorio .ej__sv-filas { margin-top: 44px; }
+  .ej--escritorio .ej__sv-f { grid-template-columns: 4fr 5fr 3fr; height: 92px; }
+  .ej--escritorio .ej__sv-t { font-size: 32px; }
+  .ej--escritorio .ej__sv-d { font-size: 19px; }
+  .ej--escritorio .ej__sv-a { font-size: 18px; }
+  /* contacto */
+  .ej__ct-a { display: flex; flex-direction: column; align-items: flex-start; }
+  .ej__hor { display: flex; flex-direction: column; align-self: stretch; }
+  .ej__hor-f { display: flex; justify-content: space-between; gap: 1em; border-top: 1px solid var(--ej-rule); font-variant-numeric: tabular-nums; }
+  .ej__hor-h { color: var(--ej-ink-2); }
+  .ej__zona { color: var(--ej-ink-2); }
+  .ej__form {
+    display: flex; flex-direction: column; box-sizing: border-box;
+    background: color-mix(in srgb, var(--ej-ink) 5%, var(--ej-bg)); border-radius: var(--ej-radius);
+    transition: border-radius var(--ej-t), background-color var(--ej-t);
+  }
+  .ej__campo {
+    display: flex; align-items: center; color: var(--ej-ink-2); background: var(--ej-bg);
+    border: 1px solid color-mix(in srgb, var(--ej-ink) 22%, transparent); border-radius: calc(var(--ej-radius) * .5);
+    transition: border-radius var(--ej-t), background-color var(--ej-t);
+  }
+  .ej__campo--alto { align-items: flex-start; }
+  .ej__btn--form { justify-content: center; align-self: flex-start; }
+  .ej--escritorio .ej__ct { flex: 1; display: grid; grid-template-columns: 7fr 5fr; column-gap: 64px; padding-top: 64px; }
+  .ej--escritorio .ej__ct .ej__tit { font-size: 96px; line-height: .96; letter-spacing: -.045em; }
+  .ej--escritorio .ej__ct .ej__baj { margin-top: 22px; font-size: 21px; max-width: 26em; }
+  .ej--escritorio .ej__ct .ej__acc { margin-top: 32px; }
+  .ej--escritorio .ej__hor { margin-top: 44px; font-size: 18px; }
+  .ej--escritorio .ej__hor-f { padding: 14px 0; }
+  .ej--escritorio .ej__zona { margin-top: 18px; font-size: 18px; }
+  .ej--escritorio .ej__form { padding: 32px; gap: 14px; align-self: start; }
+  .ej--escritorio .ej__campo { height: 56px; padding: 0 18px; font-size: 18px; }
+  .ej--escritorio .ej__campo--alto { height: 120px; padding-top: 16px; }
+  .ej--escritorio .ej__btn--form { height: 56px; padding: 0 30px; font-size: 18px; margin-top: 6px; }
+
+  /* ═══ VERTICAL 400×520 · la web en columna ═══ */
+  .ej--vertical .ej__pg { padding: 0 24px; }
+  .ej--vertical .ej__nav { grid-template-columns: 1fr auto auto; column-gap: 12px; padding-top: 18px; }
+  .ej--vertical .ej__links { display: none; }
+  .ej--vertical .ej__navder { display: contents; }
+  .ej--vertical .ej__btn2 { height: 32px; padding: 0 14px; font-size: 13.5px; }
+  .ej--vertical .ej__menu { display: block; }
+  .ej--vertical .ej__abierto { grid-column: 1 / -1; grid-row: 2; margin-top: 14px; font-size: 13px; justify-self: start; }
+  .ej--vertical .ej__hero { flex: 1; padding-top: 26px; display: flex; flex-direction: column; }
+  .ej--vertical .ej__ante { font-size: 13px; }
+  .ej--vertical .ej__tit { margin-top: 14px; font-size: 44px; line-height: 1; letter-spacing: -.04em; max-width: 7.5em; }
+  .ej--vertical .ej__baj { margin-top: 14px; font-size: 15px; line-height: 1.45; max-width: 21em; }
+  .ej--vertical .ej__acc { margin-top: 20px; }
+  .ej--vertical .ej__btn { height: 46px; padding: 0 18px 0 14px; gap: 9px; font-size: 15px; }
+  /* hero: el signo ENTERO bajo la acción, alineado a la derecha y recortado a su caja real */
+  .ej--vertical .ej__arte { display: flex; justify-content: flex-end; margin: auto var(--ej-arte-r, 0) 10px 0; padding-top: 12px; }
+  .ej--vertical.ej--completa .ej__hero { flex: none; }
+  /* completa: sin signo (el logotipo ya lo lleva); 20 px de aire entre la acción y la franja */
+  .ej--vertical .ej__gar { margin-top: auto; margin-bottom: 20px; padding-top: 20px; border-top: 0; grid-template-columns: 1fr; }
+  .ej--vertical .ej__g { padding: 10px 0; border-bottom: 1px solid var(--ej-rule); }
+  .ej--vertical .ej__g:first-child { border-top: 1px solid var(--ej-rule); }
+  .ej--vertical .ej__g > span { gap: 10px; font-size: 13.5px; }
+  .ej--vertical .ej__sv { padding-top: 26px; }
+  .ej--vertical .ej__sv .ej__tit { margin-top: 12px; font-size: 44px; line-height: 1; letter-spacing: -.04em; }
+  .ej--vertical .ej__sv .ej__baj { margin-top: 10px; font-size: 15px; }
+  .ej--vertical .ej__sv-filas { margin-top: 22px; }
+  .ej--vertical .ej__sv-f { grid-template-columns: 1fr auto; grid-template-rows: auto auto; row-gap: 4px; padding: 13px 0; }
+  .ej--vertical .ej__sv-t { font-size: 19px; }
+  .ej--vertical .ej__sv-d { grid-row: 2; font-size: 13.5px; }
+  .ej--vertical .ej__sv-a { grid-row: 1 / span 2; grid-column: 2; font-size: 0; }
+  .ej--vertical .ej__ct { padding-top: 26px; }
+  .ej--vertical .ej__ct .ej__tit { font-size: 44px; line-height: 1; letter-spacing: -.04em; }
+  .ej--vertical .ej__ct .ej__baj { margin-top: 12px; font-size: 15px; line-height: 1.45; }
+  .ej--vertical .ej__ct .ej__acc { margin-top: 18px; }
+  .ej--vertical .ej__hor { margin-top: 22px; font-size: 13.5px; }
+  .ej--vertical .ej__hor-f { padding: 9px 0; }
+  .ej--vertical .ej__zona { margin-top: 10px; font-size: 13px; }
+  .ej--vertical .ej__form { display: none; }
+
+  /* ═══ MÓVIL 390×844 ═══ */
+  .ej--movil .ej__pg { padding: 52px 22px 0; }
+  .ej--movil .ej__nav { grid-template-columns: 1fr auto; column-gap: 12px; padding-top: 10px; }
+  .ej--movil .ej__links, .ej--movil .ej__btn2 { display: none; }
+  .ej--movil .ej__navder { display: contents; }
+  .ej--movil .ej__menu { display: block; }
+  .ej--movil .ej__abierto { grid-column: 1 / -1; grid-row: 2; margin-top: 18px; font-size: 15.5px; justify-self: start; }
+  .ej--movil .ej__hero { padding-top: 34px; }
+  .ej--movil .ej__ante { font-size: 15.5px; letter-spacing: .1em; }
+  .ej--movil .ej__tit { margin-top: 16px; font-size: 50px; line-height: 1; letter-spacing: -.04em; }
+  .ej--movil .ej__baj { margin-top: 16px; font-size: 17.5px; line-height: 1.45; max-width: 18em; }
+  .ej--movil .ej__acc { margin-top: 26px; }
+  .ej--movil .ej__btn { height: 56px; padding: 0 22px 0 18px; gap: 10px; font-size: 17.5px; }
+  .ej--movil.ej--hero .ej__hero { flex: 1; display: flex; flex-direction: column; }
+  .ej--movil .ej__arte { display: flex; justify-content: flex-end; margin: auto var(--ej-arte-r, 0) 40px 0; padding-top: 24px; }
+  .ej--movil.ej--completa .ej__arte { margin: 18px -18px 0 0; padding-top: 0; }
+  .ej--movil .ej__gar { margin-top: auto; margin-bottom: 26px; grid-template-columns: 1fr; }
+  .ej--movil .ej__g { padding: 15px 0; border-bottom: 1px solid var(--ej-rule); }
+  .ej--movil .ej__g > span { gap: 12px; font-size: 16.5px; }
+  .ej--movil .ej__sv { padding-top: 34px; }
+  .ej--movil .ej__sv .ej__tit { margin-top: 14px; font-size: 50px; line-height: 1; letter-spacing: -.04em; }
+  .ej--movil .ej__sv .ej__baj { margin-top: 14px; font-size: 17.5px; }
+  .ej--movil .ej__sv-filas { margin-top: 30px; }
+  .ej--movil .ej__sv-f { grid-template-columns: 1fr auto; row-gap: 6px; padding: 18px 0; }
+  .ej--movil .ej__sv-t { font-size: 23px; }
+  .ej--movil .ej__sv-d { grid-row: 2; font-size: 16px; }
+  .ej--movil .ej__sv-a { grid-row: 1 / span 2; grid-column: 2; font-size: 0; }
+  .ej--movil .ej__ct { padding-top: 34px; display: flex; flex-direction: column; gap: 30px; }
+  .ej--movil .ej__ct .ej__tit { font-size: 50px; line-height: 1; letter-spacing: -.04em; }
+  .ej--movil .ej__ct .ej__baj { margin-top: 14px; font-size: 17.5px; line-height: 1.45; }
+  .ej--movil .ej__ct .ej__acc { margin-top: 22px; }
+  .ej--movil .ej__hor { margin-top: 26px; font-size: 16px; }
+  .ej--movil .ej__hor-f { padding: 12px 0; }
+  .ej--movil .ej__zona { margin-top: 12px; font-size: 15.5px; }
+  .ej--movil .ej__form { padding: 18px; gap: 10px; }
+  .ej--movil .ej__campo { height: 50px; padding: 0 14px; font-size: 16px; }
+  .ej--movil .ej__campo--alto { display: none; }
+  .ej--movil .ej__btn--form { height: 50px; padding: 0 24px; font-size: 16.5px; }
+
+  /* ═══ MINI · logo + titular + 1 acción, tamaño natural ═══ */
+  .ej--mini .ej__pg { padding: 14px 16px 18px; height: auto; }
+  .ej--movil.ej--mini .ej__pg { padding-top: 40px; }
+  .ej--mini .ej__nav { grid-template-columns: 1fr auto; }
+  .ej--mini .ej__links, .ej--mini .ej__btn2, .ej--mini .ej__menu, .ej--mini .ej__ante, .ej--mini .ej__baj { display: none; }
+  .ej--mini .ej__navder { display: contents; }
+  .ej--mini .ej__abierto { grid-column: 1 / -1; grid-row: 2; margin-top: 10px; font-size: 11.5px; justify-self: start; }
+  .ej--mini .ej__hero { padding-top: 12px; }
+  .ej--mini .ej__tit { font-size: 22px; line-height: 1.04; letter-spacing: -.035em; }
+  .ej--mini .ej__acc { margin-top: 14px; }
+  .ej--mini .ej__btn { height: 34px; padding: 0 14px 0 11px; gap: 7px; font-size: 12.5px; }
+  .ej--mini .ej__sv .ej__tit, .ej--mini .ej__ct .ej__tit { font-size: 22px; }
+  .ej--mini .ej__sv-filas, .ej--mini .ej__hor, .ej--mini .ej__form, .ej--mini .ej__zona { display: none; }
+
+  /* ═══ ESTADO esqueleto: la misma estructura en bloques crema al 8 % sobre noche ═══ */
+  .ej[data-ej-estado='esqueleto'] .ej__vp,
+  .ej[data-ej-estado='esqueleto'] .ej__pg { background: var(--w-s2, #181817); }
+  .ej[data-ej-estado='esqueleto'] .ej-k {
+    color: transparent; background: rgba(var(--ej-crema), .08); border-color: transparent; border-radius: 6px;
+    box-decoration-break: clone; -webkit-box-decoration-break: clone;
+  }
+  .ej[data-ej-estado='esqueleto'] .ej-k :global(*) { visibility: hidden; }
+  .ej[data-ej-estado='esqueleto'] .ej__gar,
+  .ej[data-ej-estado='esqueleto'] .ej__g,
+  .ej[data-ej-estado='esqueleto'] .ej__sv-f,
+  .ej[data-ej-estado='esqueleto'] .ej__hor-f { border-color: rgba(var(--ej-crema), .06); }
+  .ej[data-ej-estado='esqueleto'] .ej__arte { border-radius: 12px; }
+
+  /* ═══ ESTADO alambre: la web en línea, con cotas (escáner P04, MiniPasos P03) ═══ */
+  .ej[data-ej-estado='alambre'] .ej__vp { background: var(--ej-alambre-bg, #1a1a19); }
+  .ej[data-ej-estado='alambre'] .ej__pg { background: transparent; }
+  /* UN contorno por bloque (no por línea): el texto de varias líneas se contornea como caja */
+  .ej[data-ej-estado='alambre'] :is(.ej__tit, .ej__baj) > .ej-k { display: inline-block; vertical-align: top; }
+  .ej[data-ej-estado='alambre'] .ej__pg { color: rgba(var(--ej-crema), .55); }
+  .ej[data-ej-estado='alambre'] .ej-k {
+    color: transparent; background: none; border-color: transparent; border-radius: 3px;
+    outline: 1px solid rgba(var(--ej-crema), .34); outline-offset: 2px;
+  }
+  .ej[data-ej-estado='alambre'] .ej-k :global(*) { visibility: hidden; }
+  .ej[data-ej-estado='alambre'] .ej__arte { outline-style: dashed; }
+  .ej[data-ej-estado='alambre'] .ej__arte :global(*) { visibility: visible; }
+  .ej[data-ej-estado='alambre'] .ej__arte { --ej-ilu-plano: none; --ej-ilu-gota: none; --ej-ilu-gota-trazo: currentColor; --ej-ink: rgba(var(--ej-crema), .5); }
+  .ej[data-ej-estado='alambre'] :is(.ej__gar, .ej__g, .ej__sv-f, .ej__hor-f) { border-color: rgba(var(--ej-crema), .18); }
+  .ej__cotas { display: none; }
+  .ej[data-ej-estado='alambre'] .ej__cotas {
+    display: block; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(90deg, rgba(var(--ej-crema), .05) 0 1px, transparent 1px calc((100% - var(--ej-cp, 128px)) / var(--ej-cn, 12)));
+  }
+  /* Cota: línea de 1 px con topes en los extremos y rótulo mono sobre la línea (fondo del lienzo). */
+  .ej__cota { position: absolute; left: var(--x); top: var(--y); color: rgba(var(--ej-crema), .42); }
+  .ej__cota::before, .ej__cota::after { content: ''; position: absolute; background: currentColor; }
+  .ej__cota > span {
+    position: absolute; white-space: nowrap; font: 500 var(--ej-cf, 15px)/1 var(--font-mono); letter-spacing: .06em;
+    color: rgba(var(--ej-crema), .78); background: var(--ej-alambre-bg, #1a1a19); padding: 2px 6px;
+  }
+  .ej__cota--h { width: var(--l); height: 0; border-top: 1px solid; }
+  .ej__cota--h::before, .ej__cota--h::after { top: -5px; width: 1px; height: 9px; }
+  .ej__cota--h::before { left: 0; } .ej__cota--h::after { right: 0; }
+  .ej__cota--h > span { left: 50%; top: 0; transform: translate(-50%, -50%); }
+  .ej__cota--v { height: var(--l); width: 0; border-left: 1px solid; }
+  .ej__cota--v::before, .ej__cota--v::after { left: -5px; height: 1px; width: 9px; }
+  .ej__cota--v::before { top: 0; } .ej__cota--v::after { bottom: 0; }
+  .ej__cota--v > span { left: 0; top: 50%; transform: translate(-50%, -50%) rotate(-90deg); }
+  .ej--escritorio .ej__cotas { --ej-cf: 18px; }
+  .ej--vertical .ej__cotas { --ej-cf: 13px; --ej-cp: 48px; --ej-cn: 4; }
+  .ej--movil .ej__cotas { --ej-cf: 15.5px; --ej-cp: 44px; --ej-cn: 4; }
+
+  /* ═══ ESTADO antes: web anticuada pero digna (tipografía de sistema, sin jerarquía) ═══ */
+  .ea { font-family: Verdana, Geneva, Tahoma, sans-serif; color: #2b2b2b; background: #ffffff; }
+  .ea__top {
+    display: flex; align-items: center; justify-content: space-between; flex: none;
+    background: linear-gradient(#36577a, #24415f); color: #fff;
+  }
+  .ea__logo { font-family: Georgia, 'Times New Roman', serif; font-weight: 700; font-style: italic; }
+  .ea__tel { color: #e8eef5; }
+  .ea__tel b { color: #ffd76a; }
+  .ea__nav { display: flex; flex: none; background: linear-gradient(#f3f3f3, #d9d9d9); border-bottom: 1px solid #b9b9b9; }
+  .ea__nav span { border-right: 1px solid #c4c4c4; color: #1d4f86; text-decoration: underline; }
+  .ea__nav span.is-on { background: #fff; color: #2b2b2b; text-decoration: none; font-weight: 700; }
+  /* "Foto" de banco: un plano difuso de tonos fríos, sin figuras dibujadas (E-38, E-49, E-53). */
+  .ea__foto {
+    flex: none; border: 4px solid #fff; outline: 1px solid #c9c9c9; box-sizing: border-box;
+    background:
+      radial-gradient(60% 80% at 22% 30%, rgba(236, 242, 246, .9), transparent 70%),
+      radial-gradient(55% 70% at 78% 72%, rgba(120, 138, 150, .55), transparent 75%),
+      linear-gradient(160deg, #b9cad6 0%, #9fb0bb 48%, #8d9a9f 100%);
+  }
+  .ea__cuerpo { flex: 1; }
+  .ea__bien { font-family: Georgia, 'Times New Roman', serif; color: #24415f; font-weight: 700; }
+  .ea__txt { text-align: justify; color: #444; }
+  .ea__pie { flex: none; text-align: center; color: #777; border-top: 1px solid #ddd; background: #f4f4f4; }
+  .ej--escritorio .ea { padding: 0 140px; background: #e9e9e9; }
+  .ej--escritorio .ea > * { background-color: #fff; }
+  .ej--escritorio .ea__top { padding: 22px 28px; background: linear-gradient(#36577a, #24415f); }
+  .ej--escritorio .ea__logo { font-size: 34px; }
+  .ej--escritorio .ea__tel { font-size: 18px; }
+  .ej--escritorio .ea__nav { background: linear-gradient(#f3f3f3, #d9d9d9); }
+  .ej--escritorio .ea__nav span { padding: 12px 22px; font-size: 18px; }
+  .ej--escritorio .ea__foto { height: 250px; }
+  .ej--escritorio .ea__cuerpo { padding: 26px 28px; }
+  .ej--escritorio .ea__bien { font-size: 26px; }
+  .ej--escritorio .ea__txt { margin-top: 12px; font-size: 18px; line-height: 1.55; }
+  .ej--escritorio .ea__pie { padding: 14px; font-size: 18px; background: #f4f4f4; }
+  .ej--vertical .ea__top { padding: 14px 16px; flex-direction: column; align-items: flex-start; gap: 4px; }
+  .ej--vertical .ea__logo { font-size: 22px; }
+  .ej--vertical .ea__tel { font-size: 13px; }
+  .ej--vertical .ea__nav { flex-wrap: wrap; }
+  .ej--vertical .ea__nav span { padding: 7px 9px; font-size: 13px; }
+  .ej--vertical .ea__foto { height: 120px; }
+  .ej--vertical .ea__cuerpo { padding: 14px 16px; }
+  .ej--vertical .ea__bien { font-size: 17px; }
+  .ej--vertical .ea__txt { margin-top: 8px; font-size: 13px; line-height: 1.5; }
+  .ej--vertical .ea__pie { padding: 9px; font-size: 13px; }
+  .ej--movil .ea { padding-top: 44px; }
+  .ej--movil .ea__top { padding: 16px; flex-direction: column; align-items: flex-start; gap: 6px; }
+  .ej--movil .ea__logo { font-size: 26px; }
+  .ej--movil .ea__tel { font-size: 15.5px; }
+  .ej--movil .ea__nav { flex-wrap: wrap; }
+  .ej--movil .ea__nav span { padding: 9px 11px; font-size: 15.5px; }
+  .ej--movil .ea__foto { height: 210px; }
+  .ej--movil .ea__cuerpo { padding: 18px 16px; }
+  .ej--movil .ea__bien { font-size: 21px; }
+  .ej--movil .ea__txt { margin-top: 10px; font-size: 15.5px; line-height: 1.5; }
+  .ej--movil .ea__pie { padding: 12px; font-size: 15.5px; }
+  .ej--mini .ea__foto, .ej--mini .ea__txt { display: none; }
+  .ej--mini .ea__top { padding: 10px 12px; flex-direction: column; align-items: flex-start; gap: 3px; }
+  .ej--mini .ea__logo { font-size: 17px; }
+  .ej--mini .ea__tel, .ej--mini .ea__nav span, .ej--mini .ea__pie, .ej--mini .ea__bien { font-size: 11.5px; }
+  .ej--mini .ea__nav { flex-wrap: wrap; }
+  .ej--mini .ea__nav span { padding: 5px 7px; }
+  .ej--mini .ea__cuerpo { padding: 10px 12px; }
+  .ej--mini .ea__pie { padding: 7px; }
+
+  @keyframes ej-late { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+  @media (prefers-reduced-motion: reduce) {
+    .ej__abierto::before { animation: none; }
+    .ej, .ej * { transition: none !important; }
+  }
+</style>

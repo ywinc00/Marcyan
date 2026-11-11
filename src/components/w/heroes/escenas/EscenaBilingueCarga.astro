@@ -1,0 +1,136 @@
+---
+// Doral · la web bilingüe de ejemplo (v7, 2026-11-08). Una agencia de carga junto al aeropuerto que
+// cambia sola de español a inglés (pastilla ES | EN cada 3,5 s mientras se ve).
+// Minimalista (dueño: "los ejemplos parecen PowerPoint"): principios de Refero Andercore (15fd028d):
+// lienzo casi negro, sans compacta en blanco y UN solo color de acción; y Aurora (67210028): pocas
+// piezas y mucho aire. En vez de dibujos, la UI que de verdad usa el cliente: rastrear su envío.
+// Todo en cqw para que se lea igual a cualquier ancho. Movimiento reducido: quieta en español.
+const L = {
+  es: { nav: ['Servicios', 'Rastreo', 'Contacto'], cta: 'Cotizar', zona: 'Doral · junto al aeropuerto de Miami', h: 'De Doral a Latinoamérica, sin vueltas.', lbl: 'Rastrea tu envío', btn: 'Rastrear', pasos: ['Recibido en Doral', 'En vuelo a Bogotá', 'Entregado'], pie: 'Aéreo · Marítimo · Aduanas · Puerta a puerta' },
+  en: { nav: ['Services', 'Tracking', 'Contact'], cta: 'Get a quote', zona: 'Doral · next to Miami airport', h: 'From Doral to Latin America, no detours.', lbl: 'Track your shipment', btn: 'Track', pasos: ['Received in Doral', 'In flight to Bogotá', 'Delivered'], pie: 'Air · Ocean · Customs · Door to door' },
+} as const;
+---
+<div class="bc" data-bc>
+  <p class="sr-only">Ejemplo: la web de una agencia de carga de Doral que cambia de español a inglés.</p>
+  <div class="bc__win" aria-hidden="true" data-nosnippet>
+    <div class="bc__bar">
+      <span class="bc__dots"><i></i><i></i><i></i></span>
+      <span class="bc__url">tucarga.example · Ejemplo</span>
+      <span class="bc__tog"><span class="bc__pill"></span><b>ES</b><b>EN</b></span>
+    </div>
+    <div class="bc__body">
+      {(['es', 'en'] as const).map((k) => {
+        const t = L[k];
+        return (
+          <div class:list={['bc__capa', `bc__capa--${k}`]} lang={k}>
+            <div class="bc__nav"><span class="bc__logo">Tu Carga</span><span class="bc__links">{t.nav.map((n) => <span>{n}</span>)}</span><b class="bc__cta">{t.cta}</b></div>
+            <div class="bc__hero">
+              <span class="bc__izq"><span class="bc__zona">{t.zona}</span><span class="bc__h">{t.h}</span></span>
+              <span class="bc__track">
+                <span class="bc__lbl">{t.lbl}</span>
+                <span class="bc__campo"><span>TC-2048-MIA</span><b>{t.btn}</b></span>
+                <span class="bc__pasos">
+                  {t.pasos.map((p, i) => <span class:list={['bc__paso', i === 0 && 'is-ok', i === 1 && 'is-ahora']}><i></i>{p}</span>)}
+                </span>
+              </span>
+            </div>
+            <span class="bc__foto"><img src="/fotos/ejemplos/carga-520.webp" srcset="/fotos/ejemplos/carga-520.webp 520w, /fotos/ejemplos/carga-900.webp 900w" sizes="(min-width: 1100px) 640px, 360px" width="520" height="650" alt="" loading="lazy" decoding="async" /><span>{k === 'en' ? 'Our Doral warehouse · ships daily' : 'Nuestra bodega en Doral · salida diaria'}</span></span>
+            <div class="bc__svc">{t.pie.split(' · ').map((x) => <span>{x}<i>→</i></span>)}</div>
+            <div class="bc__pie">{t.pie}</div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-bc]').forEach((el) => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    let en = false, t = 0;
+    const tick = () => { en = !en; el.classList.toggle('is-en', en); };
+    const io = new IntersectionObserver((es) => {
+      const on = es.some((e) => e.isIntersecting);
+      window.clearInterval(t);
+      if (on) t = window.setInterval(tick, 3500);
+    });
+    io.observe(el);
+  });
+</script>
+
+<style>
+  .bc { position: relative; width: 100%; }
+  .bc__win { border-radius: 14px; overflow: hidden; background: #101113; box-shadow: 0 60px 120px -40px rgba(0, 0, 0, .9), 0 0 0 1px rgba(255, 255, 255, .13), 0 0 80px -10px rgba(var(--accent-gold-rgb), .12); container-type: inline-size; }
+  .bc__bar { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #17181b; border-bottom: 1px solid rgba(255, 255, 255, .06); }
+  .bc__dots { display: inline-flex; gap: 6px; } .bc__dots i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, .16); }
+  .bc__url { flex: 1; min-width: 0; text-align: center; font: 12px var(--font-mono); color: rgba(255, 255, 255, .5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bc__tog { position: relative; display: inline-flex; background: rgba(255, 255, 255, .08); border-radius: 999px; padding: 3px; }
+  .bc__tog b { position: relative; z-index: 1; width: 38px; text-align: center; font: 600 11px/22px var(--font-mono); color: rgba(255, 255, 255, .55); transition: color .3s; }
+  .bc__tog b:first-of-type { color: #101113; }
+  .bc__pill { position: absolute; top: 3px; left: 3px; width: 38px; height: 22px; border-radius: 999px; background: #f2f0eb; transition: transform .45s cubic-bezier(.2, .8, .2, 1); }
+  .bc.is-en .bc__pill { transform: translateX(38px); }
+  .bc.is-en .bc__tog b:first-of-type { color: rgba(255, 255, 255, .55); }
+  .bc.is-en .bc__tog b:last-of-type { color: #101113; }
+  .bc__body { position: relative; aspect-ratio: 16 / 10; }
+  .bc__capa { position: absolute; inset: 0; display: flex; flex-direction: column; color: #f2f0eb; font-family: 'DM Sans', system-ui, sans-serif; transition: opacity .5s ease, transform .5s ease; }
+  .bc__capa--en { opacity: 0; transform: translateY(6px); }
+  /* un idioma sale del todo (.2 s) antes de que entre el otro: nunca se cruzan */
+  .bc__capa { transition: opacity .2s ease, transform .2s ease; }
+  .bc.is-en .bc__capa--en, .bc:not(.is-en) .bc__capa--es { transition: opacity .35s ease .22s, transform .35s ease .22s; }
+  .bc.is-en .bc__capa--es { opacity: 0; transform: translateY(-6px); }
+  .bc.is-en .bc__capa--en { opacity: 1; transform: none; }
+  .bc__nav { display: flex; align-items: center; gap: 3cqw; padding: 2.6cqw 4cqw; }
+  .bc__logo { font-size: 1.9cqw; font-weight: 700; letter-spacing: -.02em; }
+  .bc__links { display: inline-flex; gap: 2.6cqw; margin-left: auto; font-size: 1.45cqw; color: rgba(242, 240, 235, .6); }
+  .bc__cta { font-size: 1.45cqw; font-weight: 600; padding: .9cqw 1.8cqw; border-radius: 999px; background: #ff5a36; color: #101113; }
+  /* el titular y el rastreo van lado a lado, arriba: es lo que se ve aunque el borde de la portada corte la ventana */
+  .bc__hero { display: grid; grid-template-columns: 1.05fr .95fr; gap: 4cqw; align-items: start; padding: 3.4cqw 4cqw 0; }
+  .bc__izq { display: flex; flex-direction: column; gap: 1.6cqw; }
+  .bc__zona { font-size: 1.4cqw; color: rgba(242, 240, 235, .55); }
+  .bc__h { font-size: 3.6cqw; line-height: 1.04; font-weight: 700; letter-spacing: -.035em; text-wrap: balance; }
+  .bc__track { display: flex; flex-direction: column; gap: 1.4cqw; padding: 2.4cqw; border-radius: 1.6cqw; background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
+  .bc__pasos { flex-direction: column; gap: 1.1cqw; margin-top: .6cqw; }
+  .bc__lbl { font-size: 1.35cqw; color: rgba(242, 240, 235, .55); }
+  .bc__campo { display: flex; align-items: center; justify-content: space-between; padding: .7cqw .7cqw .7cqw 2cqw; border-radius: 999px; background: rgba(255, 255, 255, .07); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12); font: 1.6cqw var(--font-mono); }
+  .bc__campo b { font: 600 1.45cqw 'DM Sans', system-ui, sans-serif; padding: 1cqw 2.2cqw; border-radius: 999px; background: #ff5a36; color: #101113; }
+  .bc__pasos { display: flex; font-size: 1.35cqw; color: rgba(242, 240, 235, .45); }
+  .bc__paso { display: inline-flex; align-items: center; gap: .8cqw; }
+  .bc__paso i { width: .9cqw; height: .9cqw; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgba(242, 240, 235, .35); }
+  .bc__paso.is-ok { color: rgba(242, 240, 235, .8); } .bc__paso.is-ok i { background: #f2f0eb; box-shadow: none; }
+  .bc__paso.is-ahora { color: #f2f0eb; } .bc__paso.is-ahora i { background: #ff5a36; box-shadow: 0 0 0 .5cqw rgba(255, 90, 54, .2); }
+  .bc__pie { margin-top: auto; padding: 2cqw 4cqw; border-top: 1px solid rgba(255, 255, 255, .07); font-size: 1.3cqw; color: rgba(242, 240, 235, .45); }
+  /* teléfono: la web se reordena en una columna y pasa a tamaños fijos legibles (nunca 6 px) */
+  .bc__svc { display: none; }
+  /* Foto real de la bodega (Unsplash 1721937127582, licencia libre; dueño 2026-11-08: ejemplos con fotos). */
+  .bc__foto { position: relative; flex: 1; min-height: 0; margin: 2.6cqw 4cqw 0; border-radius: 1cqw; overflow: hidden; }
+  .bc__foto img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: 50% 60%; filter: saturate(.85); }
+  .bc__foto::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10, 10, 12, .7), rgba(10, 10, 12, 0) 60%); }
+  .bc__foto > span { position: absolute; z-index: 1; left: 2cqw; bottom: 1.8cqw; font-size: 1.4cqw; font-weight: 600; color: #f2f0eb; }
+  /* Dentro de un teléfono no hay barra de navegador de escritorio: solo queda el ES | EN. */
+  :global(.tw) .bc__dots, :global(.tw) .bc__url { display: none; }
+  :global(.tw) .bc__bar { justify-content: flex-end; }
+  @container (max-width: 560px) {
+    :global(.tw) .bc__svc { display: flex; flex-direction: column; margin: 18px 16px 0; }
+    .bc__svc span { display: flex; justify-content: space-between; padding: 13px 2px; border-top: 1px solid rgba(255, 255, 255, .08); font-size: 15px; color: rgba(242, 240, 235, .85); }
+    .bc__svc i { font-style: normal; color: #ff5a36; }
+    .bc__body { aspect-ratio: auto; height: 380px; }
+    :global(.tw) .bc__foto { flex: none; height: 150px; margin: 16px 16px 0; border-radius: 10px; }
+    :global(.tw) .bc__foto > span { left: 12px; bottom: 10px; font-size: 12px; }
+    .bc__nav { padding: 14px 16px; gap: 12px; }
+    .bc__logo { font-size: 15px; }
+    .bc__links { display: none; }
+    .bc__cta { margin-left: auto; font-size: 12.5px; padding: 7px 12px; }
+    .bc__hero { grid-template-columns: 1fr; gap: 14px; padding: 6px 16px 0; }
+    .bc__izq { gap: 6px; }
+    .bc__zona { font-size: 12px; }
+    .bc__h { font-size: 24px; }
+    .bc__track { padding: 12px; border-radius: 12px; gap: 8px; }
+    .bc__lbl, .bc__pasos { font-size: 12px; }
+    .bc__campo { font-size: 13px; padding: 5px 5px 5px 12px; }
+    .bc__campo b { font-size: 12.5px; padding: 7px 12px; }
+    .bc__pasos { gap: 6px; }
+    .bc__paso i { width: 7px; height: 7px; }
+    .bc__pie { font-size: 11.5px; padding: 12px 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .bc__capa, .bc__pill { transition: none; } }
+</style>

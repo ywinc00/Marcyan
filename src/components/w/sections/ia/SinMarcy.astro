@@ -1,0 +1,25 @@
+---
+// IA conversacional · 01 "Lo que se te escapa" (§4.12-2): cabecera numerada con H2 a dos
+// tonos + SinCon (W-CORE-25). "Sin": el caos de mensajes sin contestar (EJEMPLO, sin cifras).
+// "Con": la misma lista contestada, con su veredicto por fila (ChipsVeredicto en claro).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import SinCon from '../../SinCon.astro';
+import ChipsVeredicto from '../../ChipsVeredicto.astro';
+import type { IaChatCopy } from '../../../../i18n/w/ia-chat';
+
+interface Props { copy: IaChatCopy['sinCon']; n: number; lang?: 'es' | 'en' }
+const { copy, n, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="ws-gap">
+  <SinCon labels={copy.labels} sin={copy.sin} conTitle={copy.conTitle} tone="teal" lang={lang} id="ia-sincon">
+    <div slot="con" class="ws-con">
+      <ChipsVeredicto items={copy.con} on="light" tone="teal" label={copy.conTitle} />
+    </div>
+  </SinCon>
+</div>
+<style>
+  .ws-gap { margin-top: var(--w-chapter-gap); }
+  .ws-con { width: 100%; }
+  @media (--lt-md) { .ws-gap { margin-top: 40px; } }
+</style>

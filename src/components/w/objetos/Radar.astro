@@ -1,0 +1,209 @@
+---
+// Radar de búsquedas locales (W-CORE-09 · design/rediseno-workos.md §3.6; v2 G05, E-40).
+// Objeto de SISTEMA. Semicírculo de 5 anillos (mayor 623 px) anclado abajo y recortado; haz en
+// abanico oro que barre de izquierda a derecha (5 s por vuelta, media vuelta visible) y cada aviso
+// se ENCIENDE cuando el borde del haz pasa por él (como "blip-detect" del original; ciclo 5 s,
+// retraso = momento exacto del paso del haz, calculado aquí con el ángulo de cada aviso).
+// v2 (FI §3-11, "etiquetas ilegibles y solapadas sobre los anillos"):
+// · Avisos colocados por coordenadas POLARES desde el centro del radar, en la franja ENTRE dos
+//   anillos, y con un foso del color de la celda alrededor (box-shadow, 7 px): ningún anillo ni el
+//   haz toca la píldora. Fondo de la píldora OPACO.
+// · Letra 14 px (13 px en móvil), etiqueta a tinta 80 y estado a tinta 100: contraste medido en
+//   el informe de G05 (peor instante, con el haz debajo del foso).
+// · Punto de estado fuera de la píldora, del lado de fuera del radar, con un latido (2 s) mientras
+//   el aviso está encendido: el punto rojo pulsante del original, en oro (un solo acento, §2.11).
+// Quieto (reduced-motion o sin JS): haz a ~45° y los 4 avisos visibles. Bucle por loop.ts (pausa
+// fuera de pantalla, pestaña oculta, foco/puntero, botón de pausa porque dura más de 5 s) y la
+// pausa GLOBAL de la página (html[data-w-pausa], §1.5).
+import Ejemplo from '../Ejemplo.astro';
+
+interface Ping { label: string; status: string }
+interface Props {
+  lang?: 'es' | 'en';
+  size?: 'hero' | 'card' | 'mini';
+  pings?: Ping[];
+  class?: string;
+}
+const { lang = 'es', size = 'card', pings, class: cls } = Astro.props;
+const en = lang === 'en';
+const P: Ping[] = pings ?? (en
+  ? [
+      { label: 'restaurant near me', status: 'Found you' },
+      { label: 'Map listing', status: 'Called you' },
+      { label: 'Directions', status: 'On the way' },
+      { label: 'Your website', status: 'Saw the menu' },
+    ]
+  : [
+      { label: 'restaurante cerca de mí', status: 'Te encontró' },
+      { label: 'Ficha de mapa', status: 'Te llamó' },
+      { label: 'Cómo llegar', status: 'Viene en camino' },
+      { label: 'Tu web', status: 'Vio la carta' },
+    ]);
+const sr = en
+  ? 'Example: someone searches for a restaurant near them, finds your business on the map, calls you, asks for directions and looks at your menu on your website.'
+  : 'Ejemplo: alguien busca un restaurante cerca, encuentra tu negocio en el mapa, te llama, pide cómo llegar y mira la carta en tu web.';
+
+// Anillos: k × R. Franjas entre anillos (en fracción de R/2): 0,90 · 0,71 · 0,52 · 0,33.
+const RINGS = [1, 0.8, 0.61, 0.42, 0.23];
+// Ángulo φ (grados, desde la vertical, + a la derecha) y radio de franja de cada aviso, en
+// escritorio y en móvil. El lado del punto: fuera del centro.
+const POS = [
+  { d: { a: -46, r: 0.9 }, m: { a: 2, r: 0.9 } },
+  { d: { a: 20, r: 0.9 }, m: { a: 24, r: 0.705 } },
+  { d: { a: 34, r: 0.515 }, m: { a: -16, r: 0.46 } }, // rev2: a −36° tocaba el borde izquierdo en móvil
+  { d: { a: -62, r: 0.515 }, m: { a: -54, r: 0.33 } },
+];
+const rad = (g: number) => (g * Math.PI) / 180;
+// Paso del haz: rotate(-126deg → 234deg) en 5 s, borde delantero a +36° del cono →
+// el borde pasa por φ en t = (φ + 90) / 72 s. Retraso del aviso (ciclo 5 s, el del haz) = t − 5:
+// arranca ya encendido (lo encendió la vuelta anterior) y se vuelve a encender en cada paso.
+const hit = (a: number) => (a + 90) / 72;
+const pings4 = P.slice(0, 4).map((p, i) => {
+  const { d, m } = POS[i];
+  return {
+    ...p,
+    side: d.a < 0 ? 'l' : 'r',
+    sideM: m.a < 0 ? 'l' : 'r',
+    style: [
+      `--x:${+Math.sin(rad(d.a)).toFixed(4)}`, `--y:${+Math.cos(rad(d.a)).toFixed(4)}`, `--r:${d.r}`,
+      `--xm:${+Math.sin(rad(m.a)).toFixed(4)}`, `--ym:${+Math.cos(rad(m.a)).toFixed(4)}`, `--rm:${m.r}`,
+      `--dl:${(hit(d.a) - 5).toFixed(2)}s`, `--dlm:${(hit(m.a) - 5).toFixed(2)}s`,
+    ].join(';'),
+  };
+});
+---
+<div class:list={['wo-radar', `wo-radar--${size}`, cls]} data-wo-radar>
+  <p class="sr-only">{sr}</p>
+  <Ejemplo lang={lang} on="dark" class="wo-radar__ex" />
+  <div class="wo-radar__scope" aria-hidden="true">
+    {RINGS.map((k) => <span class="wo-radar__ring" style={`--k:${k}`}></span>)}
+    <span class="wo-radar__beam"></span>
+  </div>
+  <ul class="wo-radar__pings" aria-hidden="true" data-nosnippet>
+    {pings4.map((p, i) => (
+      <li class={`wo-radar__ping wo-radar__ping--${i + 1}`} data-side={p.side} data-side-m={p.sideM} style={p.style}>
+        <i></i><span>{p.label}</span><b>{p.status}</b>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<script>
+  import { registerLoop } from '../loop';
+  document.querySelectorAll<HTMLElement>('[data-wo-radar]').forEach((el) => {
+    const pausaGlobal = () => document.documentElement.hasAttribute('data-w-pausa');
+    let want = false;
+    const paint = () => el.classList.toggle('is-playing', want && !pausaGlobal());
+    registerLoop(el, {
+      start: () => { el.classList.remove('is-still'); el.classList.add('is-run'); want = true; paint(); },
+      stop: () => { want = false; paint(); },
+      still: () => { want = false; el.classList.remove('is-run', 'is-playing'); el.classList.add('is-still'); },
+    });
+    new MutationObserver(paint).observe(document.documentElement, { attributes: true, attributeFilter: ['data-w-pausa'] });
+  });
+</script>
+
+<style>
+  .wo-radar {
+    --R: 623px; --cx: 60%; --moat: var(--wo-radar-moat, var(--w-s1, #121211));
+    position: relative; width: 100%; height: 340px; overflow: hidden;
+    border-radius: var(--w-r-obj, 12px);
+    font-family: var(--font-body);
+  }
+  .wo-radar :global(.wo-radar__ex) { position: absolute; top: 0; right: 12px; z-index: 3; }
+  .wo-radar__scope {
+    position: absolute; inset: 0;
+    /* Recorte sin bordes rectos (E-36): los anillos se funden hacia los lados. */
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+  }
+  .wo-radar__ring, .wo-radar__beam {
+    position: absolute; left: calc(var(--cx) - var(--R) * var(--k, 1) / 2); bottom: calc(var(--R) * var(--k, 1) / -2);
+    width: calc(var(--R) * var(--k, 1)); height: calc(var(--R) * var(--k, 1)); border-radius: 50%;
+  }
+  .wo-radar__ring {
+    border: 1px solid rgba(var(--accent-gold-rgb), .14);
+    background: radial-gradient(closest-side, transparent 92%, rgba(var(--accent-gold-rgb), .06));
+  }
+  .wo-radar__beam {
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(var(--accent-gold-rgb), .02) 4deg, rgba(var(--accent-gold-rgb), .08) 33deg, rgba(var(--accent-gold-rgb), .22) 36deg, transparent 36.5deg);
+    transform: rotate(9deg); /* quieto: borde del haz a ~45° */
+  }
+  /* Capa de avisos con origen en el centro del radar (abajo, en --cx). */
+  .wo-radar__pings { list-style: none; margin: 0; padding: 0; position: absolute; left: var(--cx); bottom: 0; width: 0; height: 0; z-index: 2; }
+  .wo-radar__ping {
+    --px: calc(var(--x) * var(--r) * var(--R) / 2);
+    --py: calc(var(--y) * var(--r) * var(--R) / 2);
+    position: absolute; left: 0; bottom: 0;
+    transform: translate(calc(var(--px) - 50%), calc(50% - var(--py)));
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 13px; border-radius: 999px; white-space: nowrap;
+    background: var(--w-s2, #181817); border: 1px solid rgba(var(--star-rgb), .16);
+    /* Foso del color de la celda: ningún anillo ni el haz tocan la píldora (E-40). */
+    box-shadow: 0 0 0 7px var(--moat), 0 8px 18px -8px rgba(0,0,0,.6);
+    font-size: 14px; line-height: 1.2; color: var(--w-ink-80, rgba(240,237,232,.8));
+  }
+  .wo-radar__ping b { font-weight: 600; color: var(--w-ink, #f0ede8); }
+  .wo-radar__ping i {
+    position: absolute; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%;
+    background: var(--accent-gold);
+  }
+  .wo-radar__ping[data-side='l'] i { right: calc(100% + 14px); }
+  .wo-radar__ping[data-side='r'] i { left: calc(100% + 14px); }
+  .wo-radar__ping i::after {
+    content: ''; position: absolute; inset: -5px; border-radius: 50%;
+    background: rgba(var(--accent-gold-rgb), .35); opacity: 0;
+  }
+
+  /* En marcha: haz continuo (lineal, F-01) y avisos al paso del haz. */
+  .wo-radar.is-run .wo-radar__beam { animation: wo-radar-sweep 5s linear infinite; }
+  .wo-radar.is-run .wo-radar__ping { animation: wo-radar-ping 5s var(--w-ease-ui) infinite; animation-delay: var(--dl); }
+  .wo-radar.is-run .wo-radar__ping i::after { animation: wo-radar-beat 2s var(--w-ease-out) infinite; }
+  .wo-radar.is-run .wo-radar__beam,
+  .wo-radar.is-run .wo-radar__ping,
+  .wo-radar.is-run .wo-radar__ping i::after { animation-play-state: paused; }
+  .wo-radar.is-run.is-playing .wo-radar__beam,
+  .wo-radar.is-run.is-playing .wo-radar__ping,
+  .wo-radar.is-run.is-playing .wo-radar__ping i::after { animation-play-state: running; }
+  @keyframes wo-radar-sweep { from { transform: rotate(-126deg); } to { transform: rotate(234deg); } }
+  /* Opacidad de la píldora, al ritmo del haz (una vuelta = 5 s): 0 → 1 en 300 ms justo cuando el
+     borde del haz la toca; encendida 3,7 s; se apaga en 0,5 s y espera apagada el siguiente paso.
+     Así se ve el original: los avisos se encienden UNO A UNO detrás del barrido (r1: con 10 s
+     estaban siempre encendidos y el barrido no "detectaba" nada). */
+  @keyframes wo-radar-ping {
+    0% { opacity: 0; }
+    6% { opacity: 1; }
+    80% { opacity: 1; }
+    90%, 100% { opacity: 0; }
+  }
+  @keyframes wo-radar-beat { 0% { opacity: .8; transform: scale(.6); } 70%, 100% { opacity: 0; transform: scale(1.9); } }
+
+  /* El radar se adapta a SU celda, no a la pantalla (E-62): en tableta la celda mide ~350-480 px
+     y con la colocación de escritorio los avisos se salían por los lados. Por debajo de 560 px de
+     celda usa la colocación compacta; por debajo de 340, el radar encoge con la celda. */
+  .wo-radar { container: wor / inline-size; }
+  @media (--lt-md) { .wo-radar { height: 290px; } }
+  @container wor (max-width: 559.98px) {
+    .wo-radar__scope, .wo-radar__pings { --R: 440px; --cx: 50%; }
+    .wo-radar__pings { left: 50%; }
+    .wo-radar__ping {
+      --px: calc(var(--xm) * var(--rm) * var(--R) / 2);
+      --py: calc(var(--ym) * var(--rm) * var(--R) / 2);
+      font-size: 13px; padding: 6px 11px; gap: 6px;
+      box-shadow: 0 0 0 6px var(--moat), 0 8px 18px -8px rgba(0,0,0,.6);
+    }
+    .wo-radar.is-run .wo-radar__ping { animation-delay: var(--dlm); }
+    .wo-radar__ping[data-side-m='l'] i { left: auto; right: calc(100% + 10px); }
+    .wo-radar__ping[data-side-m='r'] i { right: auto; left: calc(100% + 10px); }
+  }
+  @container wor (max-width: 339.98px) {
+    .wo-radar__scope, .wo-radar__pings { --R: 130cqw; }
+    .wo-radar__ping { font-size: 12px; padding: 5px 10px; }
+  }
+  @container wor (max-width: 309.98px) {
+    .wo-radar__ping i { display: none; }
+  }
+  @media (--motion-reduce) {
+    .wo-radar .wo-radar__beam, .wo-radar .wo-radar__ping, .wo-radar .wo-radar__ping i::after { animation: none; }
+  }
+</style>

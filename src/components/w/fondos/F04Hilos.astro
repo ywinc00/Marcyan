@@ -1,0 +1,51 @@
+---
+// F04 · Hilos de voz (IA conversacional). FO/bocetos/f04-ia-conversacional.html + W-NEW-03.
+// 22 ondas finas teal que fluyen de lado a lado (30 s) y se cierran en un nudo
+// cada 1440 unidades, como una conversación. En PC la banda pasa detrás del objeto
+// (y alrededor del avatar); en móvil va ENTRE la bajada y el objeto.
+// Sin halo teal: solo trazo. Solo transform. Quieto: la banda parada.
+interface Props { estilos?: boolean; eco?: boolean }
+const { estilos = true, eco = false } = Astro.props;
+// Onda con envolvente seno: amplitud 0 en x = 0, 1440 y 2880 (el nudo).
+// Muestras cada 96 u. unidas con curvas suaves (T) para que el SVG quepa en 12 KB.
+const onda = (amp: number, fase: number, y: number) => {
+  let d = '';
+  for (let x = 0; x <= 2880; x += 96) {
+    const env = Math.sin(((x % 1440) / 1440) * Math.PI);
+    const yy = Math.round(y + Math.sin(x / 140 + fase) * amp * env);
+    d += x === 0 ? `M0 ${yy}Q48 ${yy} 96` : x === 96 ? ` ${yy}` : `T${x} ${yy}`;
+  }
+  return d;
+};
+const hilos = Array.from({ length: eco ? 12 : 22 }, (_, i) => ({
+  d: onda(150 - i * 5, i * 0.32, 190),
+  o: (0.1 + 0.018 * (i % 6)).toFixed(3),
+}));
+// Estilos en línea: solo viajan a las páginas que montan este fondo (una vez por página).
+const CSS = `
+  .wf-h {
+    position: absolute; inset: 0;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  }
+  .wf-h__banda {
+    position: absolute; left: 0; top: calc(var(--wf-obj, 560px) - 10px); width: 200%; height: 380px;
+    animation: wf-h-fluye 30s linear infinite;
+  }
+  .wf--eco .wf-h__banda { top: 50%; margin-top: -190px; }
+  .wf-h svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .wf-h path { fill: none; stroke: rgb(var(--wf-a)); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  @keyframes wf-h-fluye { to { transform: translateX(-50%); } }
+  @media (max-width: 767.98px) {
+    .wf-h__banda { top: calc(var(--wf-obj-movil, 535px) - 110px); height: 160px; width: 600%; }
+  }
+`;
+---
+{estilos && <style is:inline set:html={CSS}></style>}
+<div class="wf-h">
+  <div class="wf-h__banda">
+    <svg viewBox="0 0 2880 380" preserveAspectRatio="none" focusable="false">
+      {hilos.map((h) => <path d={h.d} stroke-opacity={h.o} />)}
+    </svg>
+  </div>
+</div>

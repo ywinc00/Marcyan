@@ -1,0 +1,158 @@
+---
+// Servicios · capítulo de contraste "Un capítulo por servicio" (§4.3-4; W-CORE-07 + W-CORE-08
+// + B-03): CapituloDosFrases + Bento2x2 de 7 celdas con la última ancha (wideLast), una por
+// servicio con su objeto y con id="<id del producto>" (destino de los enlaces del inventario,
+// de los perfiles y, tras la integración, del megamenú: #mantenimiento).
+// Cada celda lleva, entre el texto y el objeto, sus NIVELES con precio (Niveles.astro, de
+// `catalog`): el OfferCatalog declara los 15 niveles y aquí se ven los mismos (rev1, imp. 1).
+// Bento2x2 solo admite un slot por celda (la mini-UI dentro de su bandeja), así que las
+// celdas van con la bandeja "desnuda" (tray: false) y este envoltorio pinta dentro del slot
+// los niveles y, debajo, la bandeja del objeto con la MISMA piel que la del sistema
+// (.ws-tray = .wd-bento__tray). Pedido como [SISTEMA]: slot `extra-<n>` en Bento2x2.
+// v2 (G09): objetos NUEVOS por la situación de cada servicio, un solo rótulo "Ejemplos" para
+// toda la sección (§1.6; se ocultan los rótulos propios de cada pieza): web en el móvil de la
+// marca tienda (ObjWebTienda, con nombre, paleta y logotipo de P02a) · mapa con ficha y "te encuentran en" (ObjMapaLocal) · mazo de
+// hilos de Marcy con logos de canal (MazoHilos, P05) · respuesta de ChatGPT que te cita
+// (RespuestaAsistente, P05) · pedidos de hoy de la tienda (ObjPedidos, vivo) · plano de marca
+// (PlanoMarca, lo mejor de la v1, quieto) · registro de cuidado de hoy (ObjCuidado, vivo).
+// Reparto §1.6: tienda en la celda 1 y la 5 (nunca en la misma vista); mapa y cuidado neutros.
+// Móvil (v5): el plano de marca se ve igual que en escritorio, apilado bajo su texto.
+// rev1 de G09: filas iguales por subrejilla, ChatGPT en bandeja con las plataformas de IA, mapa y
+// pedidos llenan su bandeja, y en Mantenimiento los niveles pasan a la columna del texto.
+import CapituloDosFrases from '../../CapituloDosFrases.astro';
+import Bento2x2 from '../../Bento2x2.astro';
+import ObjWebTienda from './ObjWebTienda.astro';
+import MazoHilos from '../../agente/MazoHilos.astro';
+import RespuestaAsistente from '../../objetos/RespuestaAsistente.astro';
+import PlanoMarca from '../../objetos/PlanoMarca.astro';
+import ObjMapaLocal from './ObjMapaLocal.astro';
+import ObjPedidos from './ObjPedidos.astro';
+import ObjCuidado from './ObjCuidado.astro';
+import Niveles from './Niveles.astro';
+import PlataformasIa from './PlataformasIa.astro';
+import { catalog as catalogEs } from '../../../../i18n/pricing';
+import { catalog as catalogEn } from '../../../../i18n/pricing.en';
+import type { ServiciosCopy } from '../../../../i18n/w/servicios';
+
+interface Props { copy: ServiciosCopy['capitulo']; lang?: 'es' | 'en' }
+const { copy, lang = 'es' } = Astro.props;
+const en = lang === 'en';
+const cat = en ? catalogEn : catalogEs;
+const tiersOf = (id: string) => (cat.find((p) => p.id === id)?.tiers ?? []).map((t) => ({ name: t.name, display: t.display }));
+const labelOf = (name: string) => (en ? `${name}: tiers and prices` : `${name}: niveles y precios`);
+const cells = copy.cells.map((c) => ({ ...c, tray: false }));
+const T = Object.fromEntries(copy.cells.map((c) => [c.id, { tiers: tiersOf(c.id), label: labelOf(c.label) }]));
+---
+<div data-w-reveal><CapituloDosFrases tone1={copy.tone1} tone2={copy.tone2} sub={copy.sub} /></div>
+<p class="ws-ej"><span>{en ? 'Examples' : 'Ejemplos'}</span></p>
+<div class="ws-gap">
+  <Bento2x2 cells={cells} wideLast>
+    <div slot="ui-1" class="ws-ui">
+      <Niveles {...T['diseno-web']} />
+      <div class="ws-tray ws-tray--tel"><ObjWebTienda lang={lang} /></div>
+    </div>
+    <div slot="ui-2" class="ws-ui">
+      <Niveles {...T['seo-local']} />
+      <div class="ws-tray ws-tray--fill"><ObjMapaLocal lang={lang} /></div>
+    </div>
+    <div slot="ui-3" class="ws-ui">
+      <Niveles {...T['ia-conversacional']} />
+      <div class="ws-tray ws-tray--mazo"><MazoHilos lang={lang} canales={['whatsapp', 'web', 'instagram', 'google']} /></div>
+    </div>
+    <div slot="ui-4" class="ws-ui">
+      <Niveles {...T['seo-ia']} />
+      <div class="ws-tray ws-tray--ia"><div class="ws-ia"><RespuestaAsistente lang={lang} variant="tarjeta" tone="gold" size="card" plataforma="chatgpt" /><PlataformasIa lang={lang} /></div></div>
+    </div>
+    <div slot="ui-5" class="ws-ui">
+      <Niveles {...T['ecommerce']} />
+      <div class="ws-tray ws-tray--fill"><ObjPedidos lang={lang} /></div>
+    </div>
+    <div slot="ui-6" class="ws-ui">
+      <Niveles {...T['branding']} />
+      <div class="ws-tray ws-dm"><PlanoMarca lang={lang} size="mini" /></div>
+    </div>
+    <div slot="ui-7" class="ws-ui">
+      <Niveles {...T['mantenimiento']} />
+      <div class="ws-tray"><ObjCuidado lang={lang} /></div>
+    </div>
+  </Bento2x2>
+</div>
+<style>
+  .ws-gap { margin-top: 20px; }
+  /* UN rótulo de ejemplo por sección (§1.6): los objetos del bento no llevan el suyo. Visible
+     (rev1, menor): pastilla a la izquierda, pegada al bento, en tinta al 80 %. */
+  .ws-ej { margin: calc(var(--w-chapter-gap) - 40px) 0 0; display: flex; }
+  .ws-ej span {
+    display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 12px; border-radius: 999px;
+    border: 1px solid var(--w-line-strong); background: var(--w-s1);
+    font: 500 12px/1 var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--w-ink-80, rgba(240,237,232,.8));
+  }
+  .ws-ej span::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--w-accent, #C9A96E); }
+  .ws-gap :global(.w-example) { display: none; }
+  .ws-tray--tel { padding-block: 28px; }
+  .ws-tray--mazo { padding-block: 28px 20px; }
+  @media (--lt-md) { .ws-ej { margin-top: 32px; } }
+  /* Los niveles van pegados al texto; el objeto, con su aire de siempre debajo. */
+  .ws-gap :global(.wd-bento__ui) { margin-top: 28px; }
+  .ws-ui { justify-self: stretch; width: 100%; min-width: 0; display: grid; }
+  .ws-tray { margin-top: 40px; min-width: 0; }
+  @media (--md) {
+    .ws-gap :global(.wd-bento__ui) { margin-top: 32px; }
+    .ws-tray { margin-top: 56px; }
+  }
+  /* Misma piel que .wd-bento__tray (Bento2x2): radio 22, padding 14,5, un escalón más claro.
+     El objeto va centrado en su bandeja; las bandejas "fill" (mapa, pedidos) lo estiran. */
+  .ws-tray {
+    display: grid; justify-items: center; align-content: center;
+    padding: 14.5px; border-radius: var(--w-r-tray);
+    background: var(--w-tray-bg, var(--w-s1)); border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .ws-tray--fill { align-content: stretch; justify-items: stretch; }
+  .ws-tray > :global(*) { min-width: 0; }
+  .ws-tray > :global(.wo-mini),
+  .ws-tray > :global(.wo-map),
+  .ws-tray > :global(.wo-chat) { width: 100%; max-width: none; }
+  /* ChatGPT dentro de bandeja como el resto (rev1, imp. 1): su bandeja propia se aplana para no
+     enmarcar dos veces; debajo, dónde te puede recomendar la IA. */
+  .ws-ia { width: 100%; max-width: 520px; }
+  .ws-tray--ia :global(.wo-ans) { width: 100%; background: none; border: 0; box-shadow: none; padding: 0; }
+  /* v5 (dueño: «en móvil pierde elementos»): el plano de marca también se ve en móvil, a su tamaño mini
+     (PlanoMarca ya esconde sus cotas por debajo de md, E-40). */
+  /* Mazo en móvil (rev1, menor): controles a 44 px de alto (pieza P05 heredada); los puntos
+     siguen a 24 px de ancho porque a 390 px la fila no cabe con más (área 24×44, WCAG 2.5.8). */
+  @media (--lt-md) {
+    .ws-gap :global(.mz__btn), .ws-gap :global(.mz__punto) { height: 44px; }
+  }
+  /* Filas iguales (rev1, imp. 1; W-CORE-07/08): en dos columnas cada celda es una subrejilla de 5
+     filas (etiqueta, título, texto, niveles, bandeja) compartidas con su vecina, así que niveles y
+     bandeja arrancan a la misma altura y la bandeja mide lo mismo en las dos celdas de la fila. */
+  @media (--md) {
+    .ws-gap :global(.wd-bento__cell:not(.wd-bento__cell--wide)) {
+      display: grid; grid-row: span 5; grid-template-rows: subgrid; row-gap: 0; align-content: start;
+    }
+    .ws-gap :global(.wd-bento__cell:not(.wd-bento__cell--wide) > .wd-bento__ui),
+    .ws-gap :global(.wd-bento__cell:not(.wd-bento__cell--wide) .wd-bento__tray),
+    .ws-gap :global(.wd-bento__cell:not(.wd-bento__cell--wide) .ws-ui) {
+      grid-row: span 2; display: grid; grid-template-rows: subgrid; row-gap: 0; align-items: stretch;
+    }
+  }
+  /* Celda ancha (Mantenimiento) a dos columnas en escritorio: texto y niveles a la izquierda
+     (rev1: la izquierda quedaba vacía ~250 px), el panel a la derecha a todo el alto. */
+  @media (--lg) {
+    .ws-gap :global(.wd-bento__cell--wide) {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 96px;
+      grid-template-rows: 1fr auto auto auto auto 1fr; align-items: start;
+    }
+    .ws-gap :global(.wd-bento__cell--wide > :not(.wd-bento__ui)) { grid-column: 1; }
+    .ws-gap :global(.wd-bento__cell--wide > .wd-bento__ui),
+    .ws-gap :global(.wd-bento__cell--wide .wd-bento__tray),
+    .ws-gap :global(.wd-bento__cell--wide .ws-ui) { display: contents; }
+    /* rev2 (menor): la columna izquierda (etiqueta, título, texto, niveles) va centrada en alto
+       frente al panel, entre dos franjas flexibles, en vez de dejar el vacío debajo. */
+    .ws-gap :global(.wd-bento__cell--wide > .wd-bento__lab) { grid-row: 2; }
+    .ws-gap :global(.wd-bento__cell--wide > .wd-bento__t) { grid-row: 3; }
+    .ws-gap :global(.wd-bento__cell--wide > .wd-bento__x) { grid-row: 4; }
+    .ws-gap :global(.wd-bento__cell--wide .ws-niv) { grid-column: 1; grid-row: 5; margin-top: 40px; align-self: start; }
+    .ws-gap :global(.wd-bento__cell--wide .ws-tray) { grid-column: 2; grid-row: 1 / -1; margin-top: 0; align-self: center; }
+  }
+</style>

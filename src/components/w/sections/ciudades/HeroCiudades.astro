@@ -1,0 +1,96 @@
+---
+// Ciudades · hero (design/rediseno-workos.md §4.13; A-04 + W-CONV-01 + W-NEW-09).
+// Cabecera compacta de hub, centrada y SOLO texto (A-04, E-05: hub sin botones ni chips):
+// migas, eyebrow, H1 hub verbatim, cola en degradado (el único de la página) y bajada de
+// una línea. Debajo, asomando en la primera pantalla, las tarjetas por perfil: Houston y
+// Miami (sin silueta: a 72-96 px no se entendía, E-53) + la ancha de "otra ciudad", y debajo
+// el teléfono de cada ciudad (call_clicked). Va FUERA de las tarjetas porque cada tarjeta ya es
+// un enlace al hub (pendiente de sistema: `tel` por tarjeta en TarjetasPerfil).
+// · Marcado del texto = el de HeroTexto (mismas clases del sistema y mismos data-w-in de la
+//   coreografía §2.9), sin la fila de botones: HeroTexto exige `primary` (pendiente de
+//   sistema: hacerlo opcional y volver a montar HeroTexto aquí).
+// · TarjetasPerfil pinta su <h2>: aquí se oculta a la vista (sigue para lectores y para el
+//   esquema de titulares), porque el H1 y la bajada ya dicen "elige tu ciudad".
+import Eyebrow from '../../Eyebrow.astro';
+import TarjetasPerfil from '../../TarjetasPerfil.astro';
+import Icon from '../../../ui/Icon.astro';
+
+interface Card { title: string; text: string; href: string; cta: string }
+interface Wide { icon: string; title: string; text: string; href: string; cta: string; track?: string }
+interface Props {
+  eyebrow: string;
+  h1Html: string;
+  tail: string;
+  lead: string;
+  perfilesTitle: string;
+  cards: [Card, Card];
+  wide: Wide;
+  phones: { city: string; tel: string }[];
+  callLabel: string;
+}
+const { eyebrow, h1Html, tail, lead, perfilesTitle, cards, wide, phones, callLabel } = Astro.props;
+const telHref = (t: string) => 'tel:+1' + t.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
+---
+<section class="w-hero ciu-hero">
+  <div class="w-container">
+    <div class="ciu-hero__text" data-w-tone="gold">
+      {Astro.slots.has('crumbs') && <div class="ciu-hero__crumbs"><slot name="crumbs" /></div>}
+      <div class="ciu-hero__top" data-w-in="1">
+        <Eyebrow tone="gold">{eyebrow}</Eyebrow>
+      </div>
+      <h1 class="w-h1 w-h1--hub" data-w-in="1" set:html={h1Html} />
+      <p class="w-h1__tail w-h1__tail--hub w-grad-text" data-w-in="1">{tail}</p>
+      <p class="w-lead ciu-hero__lead" data-w-in="2">{lead}</p>
+    </div>
+    <div class="ciu-hero__cards" data-w-in="obj">
+      <TarjetasPerfil titleHtml={perfilesTitle} cards={cards} wide={wide} id="elige" class="ciu-prof" />
+      <ul class="ciu-tel" role="list">
+        {phones.map((p) => (
+          <li>
+            <a class="ciu-tel__a" href={telHref(p.tel)} data-track="call_clicked" aria-label={`${callLabel} ${p.city}: ${p.tel}`}>
+              <Icon name="lucide:phone" /><span class="ciu-tel__city">{p.city}</span>{p.tel}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ciu-hero { padding-bottom: var(--w-section-y); }
+  .ciu-hero__text { display: flex; flex-direction: column; align-items: center; text-align: center; max-width: 768px; margin-inline: auto; min-width: 0; }
+  .ciu-hero__crumbs { margin-bottom: 24px; }
+  .ciu-hero__crumbs :global(ol) { padding-inline-start: 0; margin: 0; }
+  /* Migas a la izquierda, en la línea del logo, como en HeroTexto (E-44). */
+  @media (--lg) {
+    .ciu-hero > .w-container { position: relative; }
+    .ciu-hero__crumbs { position: absolute; top: 4px; left: var(--container-pad); margin: 0; }
+  }
+  .ciu-hero__top { margin-bottom: var(--w-gap-eyebrow); }
+  .ciu-hero__lead { margin-top: var(--w-gap-h1); margin-inline: auto; }
+
+  /* Tarjetas asomando (W-CONV-01: ~80 px bajo la bajada). */
+  .ciu-hero__cards { margin-top: 64px; }
+  @media (--lt-md) { .ciu-hero__cards { margin-top: 40px; } }
+  /* El H2 de las tarjetas, solo para lectores (el hero ya lo dice). */
+  .ciu-hero :global(.ciu-prof .w-prof__title) {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  /* Teléfonos: una línea centrada bajo las tarjetas, en la letra de los enlaces de tarjeta. */
+  .ciu-tel {
+    list-style: none; margin: 24px auto 0; padding: 0; max-width: 920px;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 40px;
+  }
+  .ciu-tel__a {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+    font-family: var(--font-body); font-weight: 500; font-size: 15px; color: var(--w-ink);
+    text-decoration: none; transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .ciu-tel__a :global(svg) { width: 16px; height: 16px; color: var(--w-accent); }
+  .ciu-tel__city { color: var(--w-ink-60); font-weight: 400; }
+  @media (--hover-fine) { .ciu-tel__a:hover { color: var(--w-accent); } }
+  @media (--motion-reduce) { .ciu-tel__a { transition: none; } }
+</style>

@@ -1,0 +1,92 @@
+---
+// 404 bilingüe (barrido 2026-11-07): antes Vercel servía su página genérica en inglés, sin
+// navegación ni forma de contactar. Hay muchas rutas antiguas redirigidas, así que aquí llega
+// gente que buscaba algo concreto: se le da la salida (llamar, servicios, contacto) en su idioma.
+// El idioma se decide por la ruta pedida (/en/... → inglés) con un script mínimo; sin JS queda
+// en español con la línea en inglés debajo.
+import Layout from '../layouts/Layout.astro';
+import SiteNav from '../components/layout/SiteNav.astro';
+import SiteFooter from '../components/layout/SiteFooter.astro';
+import Button from '../components/ui/Button.astro';
+import { nap, content } from '../i18n/content';
+import { clusterNav, clusterNavEn } from '../i18n/clusters';
+
+const pageNav = { ...clusterNav, cta: { label: 'Propuesta gratis', href: '/es#contacto' } };
+const pageNavEn = { ...clusterNavEn, cta: { ...clusterNavEn.cta, href: '/en#contacto' } };
+const telH = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
+const telM = 'tel:' + nap.miami.replace(/[^\d+]/g, '');
+---
+<Layout title="Página no encontrada · Marcyan Studio" description="Esta página no existe o cambió de dirección." lang="es" path="/404" noindex hasEn={false}>
+  {/* Barra y pie en inglés para rutas /en/...: se cambian ANTES de que arranquen los scripts del
+      menú (módulos diferidos), así el menú se engancha a la versión que queda. Las piezas de la
+      barra son fijas, así que el envoltorio no cambia su colocación. */}
+  <div data-nf-nav="es"><SiteNav nav={pageNav} lang="es" homeHref="/es" currentPath="/404" /></div>
+  <template data-nf-tpl="nav"><div data-nf-nav="en"><SiteNav nav={pageNavEn} lang="en" homeHref="/en" currentPath="/404" /></div></template>
+  <script is:inline>
+    if (location.pathname.startsWith('/en')) {
+      var t = document.querySelector('template[data-nf-tpl="nav"]');
+      document.querySelector('[data-nf-nav="es"]').replaceWith(t.content.cloneNode(true));
+    }
+  </script>
+  <main id="main" class="nf">
+    <div class="nf__in">
+      <p class="nf__code" aria-hidden="true">404</p>
+      <h1 class="nf__h" data-es="Esta página no existe o cambió de sitio." data-en="This page doesn't exist or has moved.">Esta página no existe o cambió de sitio.</h1>
+      <p class="nf__p" data-es="Puede que el enlace sea antiguo. Lo que buscabas sigue aquí: elige por dónde seguir o llámanos y te orientamos." data-en="The link may be old. What you were looking for is still here: pick where to go next, or call us and we'll point you the right way.">Puede que el enlace sea antiguo. Lo que buscabas sigue aquí: elige por dónde seguir o llámanos y te orientamos.</p>
+      <div class="nf__acts">
+        <Button href={telH} size="lg" data-track="call_clicked" data-nf-call>
+          <span data-es={`Llamar a Houston ${nap.houston.replace(/^\+1\s*/, '')}`} data-en={`Call Houston ${nap.houston.replace(/^\+1\s*/, '')}`}>Llamar a Houston {nap.houston.replace(/^\+1\s*/, '')}</span>
+        </Button>
+        <Button href={telM} variant="secondary" size="lg" data-track="call_clicked">
+          <span data-es={`Llamar a Miami ${nap.miami.replace(/^\+1\s*/, '')}`} data-en={`Call Miami ${nap.miami.replace(/^\+1\s*/, '')}`}>Llamar a Miami {nap.miami.replace(/^\+1\s*/, '')}</span>
+        </Button>
+      </div>
+      <ul class="nf__links">
+        <li><a href="/es" data-href-en="/en" data-es="Inicio" data-en="Home">Inicio</a></li>
+        <li><a href="/es/servicios" data-href-en="/en/services" data-es="Servicios" data-en="Services">Servicios</a></li>
+        <li><a href="/es/precios" data-href-en="/en/pricing" data-es="Precios" data-en="Pricing">Precios</a></li>
+        <li><a href="/es/houston" data-href-en="/en/houston">Houston</a></li>
+        <li><a href="/es/miami" data-href-en="/en/miami">Miami</a></li>
+        <li><a href="/es#contacto" data-href-en="/en#contacto" data-es="Escríbenos" data-en="Write to us">Escríbenos</a></li>
+      </ul>
+      <p class="nf__alt" lang="en" data-nf-alt>Looking for the English site? <a href="/en">Go to the English home</a>.</p>
+    </div>
+  </main>
+  <div data-nf-foot="es"><SiteFooter footer={content.es.footer} /></div>
+  <template data-nf-tpl="foot"><SiteFooter footer={content.en.footer} lang="en" /></template>
+  <script is:inline>
+    if (location.pathname.startsWith('/en')) {
+      var tf = document.querySelector('template[data-nf-tpl="foot"]');
+      document.querySelector('[data-nf-foot="es"]').replaceWith(tf.content.cloneNode(true));
+    }
+  </script>
+</Layout>
+
+<script>
+  // Rutas /en/...: la página se muestra en inglés.
+  if (location.pathname.startsWith('/en')) {
+    document.documentElement.lang = 'en';
+    document.title = 'Page not found · Marcyan Studio';
+    document.querySelectorAll<HTMLElement>('[data-en]').forEach((el) => { el.textContent = el.dataset.en || el.textContent; });
+    document.querySelectorAll<HTMLAnchorElement>('[data-href-en]').forEach((a) => { a.href = a.dataset.hrefEn || a.href; });
+    document.querySelector('[data-nf-alt]')?.remove();
+  }
+</script>
+
+<style>
+  .nf { min-height: calc(70vh / var(--z, 1)); display: grid; place-items: center; padding-block: clamp(96px, calc(14vh / var(--z, 1)), 160px) clamp(64px, calc(10vh / var(--z, 1)), 120px); }
+  .nf__in { width: min(100%, 720px); padding-inline: var(--space-5, 20px); text-align: left; }
+  .nf__code {
+    margin: 0 0 8px; font-family: var(--font-display); font-weight: 400; letter-spacing: -.06em; line-height: .8;
+    font-size: clamp(120px, 26vw, 240px); color: rgba(240, 237, 232, .1);
+  }
+  .nf__h { margin: 0 0 16px; font-family: var(--font-display); font-weight: 500; font-size: clamp(30px, 4.6vw, 48px); line-height: 1.08; letter-spacing: -.02em; color: var(--fg-primary); }
+  .nf__p { margin: 0 0 28px; max-width: 58ch; font-size: 18px; line-height: 1.6; color: var(--fg-secondary); }
+  .nf__acts { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 32px; }
+  .nf__links { list-style: none; margin: 0 0 28px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; }
+  .nf__links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--fg-primary); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--accent-gold-line); font-weight: 600; }
+  .nf__links a:hover { text-decoration-color: var(--accent-gold); }
+  .nf__alt { margin: 0; color: var(--fg-secondary); font-size: 15px; }
+  .nf__alt a { color: var(--accent-gold); text-underline-offset: 3px; }
+  @media (max-width: 480px) { .nf__acts :global(.btn) { width: 100%; } }
+</style>

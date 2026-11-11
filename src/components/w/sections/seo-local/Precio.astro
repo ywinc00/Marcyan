@@ -1,0 +1,47 @@
+---
+// SEO local · precio (§4.16-7): PrecioPuntos (W-CORE-14). Cifra = ancla baja de
+// PRICE_ANCHORS con "Desde" (R6: optimización inicial, pago único), degradado único de la
+// página; abajo a la derecha el slice mensual (service.priceValue del JSON-LD, que no
+// cambia). Debajo, "Qué incluye el plan mensual" (Especificaciones, W-NEW-31, como el
+// piloto) con los 6 puntos de pricing.features VERBATIM (clusters.ts). Después, la nota de precio del dato y el enlace a la propuesta que conserva el
+// evento pricing_cta_clicked de la tarjeta de precio de antes (contrato de analítica).
+import PrecioPuntos from '../../PrecioPuntos.astro';
+import Especificaciones from '../../Especificaciones.astro';
+import Button from '../../../ui/Button.astro';
+import { catalog, PRICE_ANCHORS } from '../../../../i18n/pricing';
+import type { SeoCopy } from '../../../../i18n/w/seo-local';
+
+interface Props { copy: SeoCopy['precio']; note?: string; features?: string[] }
+const { copy, note, features = [] } = Astro.props;
+const specs = features.map((v, i) => ({ k: copy.specKeys[i] ?? '', v }));
+const seo = catalog.find((p) => p.id === 'seo-local')!;
+const [ini, mes] = seo.tiers;
+const mensual = `Desde $${PRICE_ANCHORS.seoLocal.toLocaleString('en-US')} al mes`;
+---
+<PrecioPuntos
+  eyebrow={copy.eyebrow}
+  titleHtml={copy.title}
+  anchor="seoInitial"
+  from="Desde"
+  bottomLeft={{ big: ini.name, text: ini.blurb }}
+  bottomRight={{ label: mes.name, value: mensual }}
+/>
+{specs.length > 0 && (
+  <div class="sl-gap sl-w">
+    <Especificaciones label={copy.specsLabel} cells={specs} />
+  </div>
+)}
+<div class="sl-foot sl-w">
+  {note && <p class="sl-note">{note}</p>}
+  <Button variant="link" href="#contacto" data-track="pricing_cta_clicked">{copy.cta}</Button>
+</div>
+<style>
+  .sl-w { max-width: var(--w-rail-max); margin-inline: auto; }
+  .sl-gap { margin-top: 72px; }
+  @media (--lt-md) { .sl-gap { margin-top: 48px; } }
+  .sl-foot {
+    margin-top: 24px; display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: 8px 32px;
+  }
+  .sl-note { margin: 0; max-width: 46rem; font-size: var(--w-small); line-height: 1.6; color: var(--fg-secondary); }
+</style>

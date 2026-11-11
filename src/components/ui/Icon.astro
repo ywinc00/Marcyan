@@ -10,7 +10,11 @@ interface Props {
   [key: string]: any;
 }
 const { name, title, ...rest } = Astro.props;
+// is:inline: cada icono lleva su propio dibujo. Sin él, astro-icon define el <symbol> solo en el
+// PRIMER uso de la página y las demás copias lo referencian; si ese primer uso queda oculto en un
+// ancho (menú, versión móvil, lista escondida), todas las copias salían vacías (barrido 2026-11-07:
+// X de cerrar del chat, lupas, pines, teléfonos a 2560...).
 ---
 {title
-  ? <AstroIcon name={name} title={title} {...rest} />
-  : <AstroIcon name={name} aria-hidden="true" {...rest} />}
+  ? <AstroIcon name={name} title={title} is:inline {...rest} />
+  : <AstroIcon name={name} aria-hidden="true" is:inline {...rest} />}

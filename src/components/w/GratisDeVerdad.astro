@@ -1,0 +1,102 @@
+---
+// "Gratis de verdad" (W-CORE-29, design/rediseno-workos.md §3.4).
+// A la izquierda, 4 rasgos: icono en cuadrado redondeado + 2 líneas de texto.
+// Tras una línea vertical de 1 px, a la derecha: el título ("Gratis") a 24 en
+// el acento, las comprobaciones con check y la acción como enlace con chevron.
+// NUNCA dentro de un formulario (va al lado de las tarjetas de precio).
+import Icon from '../ui/Icon.astro';
+
+interface Item { icon: string; text: string }
+interface Props {
+  items: [Item, Item, Item, Item];
+  /** Rótulo grande en el acento, p. ej. "Gratis" / "Free". */
+  title: string;
+  /** Línea bajo el título (opcional). */
+  sub?: string;
+  /** Comprobaciones con check (opcional, 2-4). */
+  checks?: string[];
+  cta: { label: string; href: string; track?: string };
+  tone?: 'gold' | 'teal';
+  id?: string;
+  class?: string;
+}
+const { items, title, sub, checks, cta, tone = 'gold', id, class: cls } = Astro.props;
+---
+<div class:list={['free', cls]} id={id} data-w-tone={tone}>
+  <ul class="free__items">
+    {items.map((it) => (
+      <li class="free__item">
+        <span class="free__ic"><Icon name={it.icon} /></span>
+        <p class="free__txt">{it.text}</p>
+      </li>
+    ))}
+  </ul>
+  <div class="free__side">
+    <p class="free__title">{title}</p>
+    {sub && <p class="free__sub">{sub}</p>}
+    {checks && checks.length > 0 && (
+      <ul class="free__checks">
+        {checks.map((c) => <li><Icon name="lucide:check" class="free__check" />{c}</li>)}
+      </ul>
+    )}
+    <a class="free__cta" href={cta.href} data-track={cta.track}>{cta.label}<span class="free__chev" aria-hidden="true">›</span></a>
+  </div>
+</div>
+
+<style>
+  .free {
+    max-width: var(--w-rail-max); margin-inline: auto;
+    display: grid; grid-template-columns: 1fr; gap: 32px;
+  }
+  .free__items {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px;
+  }
+  .free__item { display: grid; justify-items: center; gap: 14px; text-align: center; min-width: 0; }
+  .free__ic {
+    display: grid; place-items: center; inline-size: 36px; block-size: 36px;
+    border-radius: var(--w-r-cell);
+    background: rgba(var(--w-accent-rgb, var(--accent-gold-rgb)), .12);
+    border: 1px solid rgba(var(--w-accent-rgb, var(--accent-gold-rgb)), .28);
+    color: var(--w-accent);
+  }
+  .free__ic :global(svg) { width: 20px; height: 20px; }
+  .free__txt {
+    margin: 0; max-width: 24ch;
+    font-family: var(--font-body); font-size: 15px; line-height: 1.45; color: var(--w-ink-70);
+  }
+
+  .free__side { padding-top: 32px; border-top: 1px solid var(--w-line); min-width: 0; }
+  .free__title {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 24px; line-height: 1.15; letter-spacing: -0.02em; color: var(--w-accent);
+  }
+  .free__sub { margin: 4px 0 0; font-family: var(--font-body); font-size: 16px; line-height: 1.5; color: var(--w-ink-80); }
+  .free__checks { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 10px; }
+  .free__checks li {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-family: var(--font-body); font-size: 15px; line-height: 1.45; color: var(--w-ink-80);
+  }
+  .free__checks :global(.free__check) { flex: none; width: 16px; height: 16px; margin-top: 2px; color: var(--w-accent); }
+  .free__cta {
+    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 0; margin-top: 12px;
+    font: 500 16px/1 var(--font-body); color: var(--w-ink); text-decoration: none;
+    transition: color var(--w-dur-micro) var(--w-ease-ui);
+  }
+  .free__chev { font-size: 18px; line-height: 1; color: var(--w-accent); transition: transform var(--w-dur-hover) var(--w-ease-ui); }
+  @media (--hover-fine) {
+    .free__cta:hover { color: var(--w-accent); }
+    .free__cta:hover .free__chev { transform: translateX(3px); }
+  }
+  .free__cta:focus-visible .free__chev { transform: translateX(3px); }
+  @media (--motion-reduce) {
+    .free__chev { transition: none; }
+    .free__cta:hover .free__chev, .free__cta:focus-visible .free__chev { transform: none; }
+  }
+
+  @media (--lg) {
+    .free { grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 0; align-items: center; }
+    .free__items { grid-template-columns: repeat(4, minmax(0, 1fr)); padding-right: 48px; }
+    .free__side { padding: 8px 0 8px 56px; border-top: 0; border-left: 1px solid var(--w-line); }
+  }
+</style>

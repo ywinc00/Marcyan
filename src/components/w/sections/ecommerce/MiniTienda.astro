@@ -1,0 +1,239 @@
+---
+// Objetos del bento "Qué incluye" de tienda en línea (design/rediseno-workos-v2.md G04; W-CORE-07/08:
+// objeto grande con aire de bandeja, ~80 % de su celda). Marca de ejemplo `tienda` (§1.6). Rehechos en la
+// v2: productos ILUSTRADOS (ProductoArte) en lugar del icono de línea en un cuadrado beige (FI §3-2), sin
+// precios (donde iría el precio, "Ejemplo"), sin iconos de catálogo en caja; los logos de plataformas, solo
+// los que la página ya nombra, vía LogoMarca (P06).
+//   idiomas    la misma ficha en el OTRO idioma (EN encendido); la marca "Tu Tienda" no se traduce (E-24)
+//   variantes  ficha con colores y tamaños, y el carrito que asoma con dos productos
+//   recibo     tique del impuesto de ventas (datos reales de la página)
+//   plataforma Shopify / WooCommerce / A medida, elegida contigo
+//   busqueda   alguien busca tu producto y aparece tu tienda (resultado web + respuesta de asistente)
+// Contrato común (§1.6): aria-hidden + data-nosnippet + resumen sr-only; sin h1-h6, sin enlaces.
+import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
+import LogoMarca from '../../marcas/LogoMarca.astro';
+import ProductoArte from './ProductoArte.astro';
+import type { MiniKind, ShopCopy } from '../../../../i18n/w/ecommerce';
+
+interface Props {
+  kind: MiniKind;
+  tax: ShopCopy['tax'];
+  city: 'houston' | 'miami';
+  lang?: 'es' | 'en';
+  class?: string;
+}
+const { kind, tax, city, lang = 'es', class: cls } = Astro.props;
+const miami = city === 'miami';
+const SR: Partial<Record<MiniKind, string>> = {
+  idiomas: 'Ejemplo: la misma ficha de producto en inglés, con el nombre de la tienda sin traducir.',
+  variantes: 'Ejemplo: ficha de producto con colores y tamaños, y el carrito con dos productos.',
+  recibo: `Ejemplo: el impuesto de ventas de ${tax.state} desglosado, ${tax.total} en total.`,
+  plataforma: 'Ejemplo: elegimos contigo entre Shopify, WooCommerce o una tienda a medida.',
+  busqueda: 'Ejemplo: alguien busca velas artesanales en Miami y aparece tu tienda, en el buscador y en la respuesta de un asistente.',
+};
+const check = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+---
+<div class:list={['mt', `mt--${kind}`, cls]} data-nosnippet>
+  <p class="sr-only">{SR[kind]}</p>
+  <div class="mt__card" aria-hidden="true">
+
+    {kind === 'idiomas' && (
+      <div class="mt__pdp">
+        <span class="mt__img"><ProductoArte id="taza" size={92} /></span>
+        <div class="mt__info">
+          <span class="mt__top">
+            <LogoEjemplo marca="tienda" size={8} tono="mono" lang={lang} class="mt__logo" />
+            <span class="mt__seg"><span>ES</span><span class="is-on">EN</span></span>
+          </span>
+          <span class="mt__name" lang="en">Clay mug</span>
+          <span class="mt__sub" lang="en">Hand-thrown, glazed in sage. Made in small batches.</span>
+          <span class="mt__btn" lang="en">Add to cart</span>
+        </div>
+      </div>
+    )}
+
+    {kind === 'variantes' && (
+      <div class="mt__var">
+        <div class="mt__pdp">
+          <span class="mt__img"><ProductoArte id="vela" size={92} /></span>
+          <div class="mt__info">
+            <LogoEjemplo marca="tienda" size={8} tono="mono" lang={lang} class="mt__logo" />
+            <span class="mt__name">Vela aromática</span>
+            <span class="mt__lbl">Color · Cera natural</span>
+            <span class="mt__sw"><i class="is-on" style="--c:#B47A3C"></i><i style="--c:#7F8E66"></i><i style="--c:#7C8A8D"></i><i style="--c:#EFE6D4"></i></span>
+            <span class="mt__lbl">Tamaño</span>
+            <span class="mt__sizes"><span>S</span><span class="is-on">M</span><span>L</span></span>
+          </div>
+        </div>
+        <div class="mt__cart">
+          <span class="mt__thumbs"><span><ProductoArte id="vela" size={24} sombra={false} /></span><span><ProductoArte id="cafe" size={24} sombra={false} /></span></span>
+          <span class="mt__ctx"><b>Tu carrito · 2</b><span>Se guarda aunque cierres</span></span>
+          <span class="mt__go">Pagar</span>
+        </div>
+      </div>
+    )}
+
+    {kind === 'recibo' && (
+      <div class="mt__rec">
+        <span class="mt__rtop">
+          <LogoEjemplo marca="tienda" size={8} tono="mono" lang={lang} class="mt__logo" />
+          <span class="mt__mono">#1042</span>
+        </span>
+        <span class="mt__rt">Impuesto de ventas</span>
+        <dl class="mt__kv">
+          <div><dt>Estatal, {tax.state}</dt><dd>{tax.stateRate}</dd></div>
+          <div><dt>{tax.localLabel}</dt><dd>{tax.localRate}</dd></div>
+          <div class="mt__kv-total"><dt>Total en {miami ? 'Miami' : 'Houston'}</dt><dd>{tax.total}</dd></div>
+        </dl>
+        <span class="mt__note"><i set:html={check} />Se suma solo en cada pedido</span>
+      </div>
+    )}
+
+    {kind === 'plataforma' && (
+      <div class="mt__plat">
+        <span class="mt__pt">Tu plataforma</span>
+        <span class="mt__opt is-on">
+          <i></i>
+          <span class="mt__otx"><b class="mt__ob"><LogoMarca id="shopify" size={16} tono="color" titulo="" />Shopify</b><span>Lanzar rápido y vender simple</span></span>
+          <span class="mt__tag">Elegida</span>
+        </span>
+        <span class="mt__opt">
+          <i></i>
+          <span class="mt__otx"><b>WooCommerce</b><span>Más control, si ya usas WordPress</span></span>
+        </span>
+        <span class="mt__opt">
+          <i></i>
+          <span class="mt__otx"><b>A medida</b><span>Si tu caso no cabe en ninguna</span></span>
+        </span>
+      </div>
+    )}
+
+    {kind === 'busqueda' && (
+      <div class="mt__bus">
+        <span class="mt__field">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
+          velas artesanales en Miami
+        </span>
+        <span class="mt__res">
+          <span class="mt__rurl"><span class="mt__fav"><ProductoArte id="vela" size={14} sombra={false} /></span>tutienda.example › velas</span>
+          <b>Tu Tienda · Velas y café, hechos a mano</b>
+          <span>Velas de cera de soya y café de olla. Envío dentro de Miami y a otros estados.</span>
+        </span>
+        <span class="mt__ai">
+          <span class="mt__ail">Asistente de IA</span>
+          <span>Para velas artesanales en Miami, te recomiendo <b>Tu Tienda</b>: hace envíos y su catálogo está en español e inglés.</span>
+        </span>
+      </div>
+    )}
+  </div>
+</div>
+
+<style>
+  .mt {
+    --mt-bg: #F5F0E7; --mt-ink: #2A211B; --mt-ink2: #5C5249; --mt-line: rgba(42, 33, 27, .1);
+    --mt-acc: #4E5A3D; --mt-tile: #E6DBC8;
+    --marca-tinta: #2A211B;
+    width: 100%; max-width: 460px; font-family: var(--font-body); text-align: left;
+    container: mt / inline-size;
+  }
+  .mt__card {
+    background: var(--mt-bg); color: var(--mt-ink); border-radius: 14px; padding: 18px;
+    box-shadow: 0 0 0 1px rgba(42, 33, 27, .06), 0 22px 44px -24px rgba(0, 0, 0, .75);
+  }
+  .mt__ob { display: inline-flex; align-items: center; gap: 6px; }
+  .mt__foot { display: block; margin-top: 10px; text-align: center; font: 500 11px/1 var(--font-mono); letter-spacing: .02em; color: var(--w-ink-60); }
+  :global(.mt__logo) { color: var(--mt-ink2); }
+  .mt__mono { font-family: var(--font-mono); font-weight: 500; }
+  /* Ficha */
+  .mt__pdp { display: grid; grid-template-columns: 150px 1fr; gap: 18px; }
+  .mt__img { display: grid; place-items: center; min-height: 176px; border-radius: 10px; background: var(--mt-tile); box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .05); }
+  .mt__info { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+  .mt__top { display: flex; align-items: center; justify-content: space-between; align-self: stretch; margin-bottom: 12px; }
+  .mt__info > :global(.mt__logo) { margin-bottom: 10px; }
+  .mt__sw { display: flex; gap: 8px; margin-top: 6px; }
+  .mt__sw i { width: 20px; height: 20px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .18); }
+  .mt__sw i.is-on { box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .18), 0 0 0 2px var(--mt-bg), 0 0 0 3.5px var(--mt-ink); }
+  .mt__seg { display: inline-flex; padding: 2px; border-radius: 7px; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .16); font: 500 11px/1 var(--font-mono); }
+  .mt__seg span { padding: 5px 8px; border-radius: 5px; color: var(--mt-ink2); }
+  .mt__seg .is-on { background: var(--mt-ink); color: #F8F5EE; }
+  .mt__name { font: 500 17px/1.2 var(--font-display); letter-spacing: -.015em; }
+  .mt__sub { margin-top: 5px; font-size: 12.5px; line-height: 1.4; color: var(--mt-ink2); }
+  .mt__btn {
+    margin-top: auto; align-self: stretch; height: 32px; display: grid; place-items: center; border-radius: 7px;
+    background: var(--mt-acc); color: #F8F5EE; font-size: 13px; font-weight: 500;
+  }
+  .mt--idiomas .mt__sub { margin-bottom: 14px; }
+  .mt__lbl { margin-top: 12px; font-size: 11px; color: var(--mt-ink2); }
+  .mt__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
+  .mt__chips span { padding: 5px 9px; border-radius: 999px; font-size: 12px; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .18); color: var(--mt-ink2); }
+  .mt__chips .is-on { box-shadow: inset 0 0 0 1.5px var(--mt-ink); color: var(--mt-ink); font-weight: 500; }
+  .mt__sizes { display: flex; gap: 14px; margin-top: 5px; font: 500 13px/1 var(--font-display); }
+  .mt__sizes span { padding-bottom: 3px; color: var(--mt-ink2); }
+  .mt__sizes .is-on { color: var(--mt-ink); box-shadow: inset 0 -1.5px 0 var(--mt-ink); }
+  .mt__cart {
+    display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 10px 10px 10px 12px; border-radius: 10px;
+    background: #FBF8F2; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .1);
+  }
+  .mt__thumbs { display: flex; }
+  .mt__thumbs span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: var(--mt-tile); box-shadow: 0 0 0 2px #FBF8F2; }
+  .mt__thumbs span + span { margin-left: -6px; }
+  .mt__ctx { flex: 1; display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
+  .mt__ctx b { font-size: 13px; font-weight: 500; }
+  .mt__ctx span { font-size: 11.5px; color: var(--mt-ink2); }
+  .mt__go { padding: 0 14px; height: 30px; display: grid; place-items: center; border-radius: 7px; background: var(--mt-ink); color: #F8F5EE; font-size: 12.5px; font-weight: 500; }
+  /* Tique */
+  .mt__rec { display: flex; flex-direction: column; }
+  .mt__rtop { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px dashed rgba(42, 33, 27, .25); }
+  .mt__rtop .mt__mono { font-size: 11px; color: var(--mt-ink2); }
+  .mt__rt { margin: 14px 0 8px; font: 500 16px/1.2 var(--font-display); letter-spacing: -.01em; }
+  .mt__kv { margin: 0; }
+  .mt__kv div { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--mt-line); font-size: 13px; }
+  .mt__kv dt { color: var(--mt-ink2); }
+  .mt__kv dd { margin: 0; font-family: var(--font-mono); font-size: 12.5px; }
+  .mt__kv-total { border-bottom: 0 !important; padding-top: 12px !important; }
+  .mt__kv-total dt { color: var(--mt-ink); font-weight: 500; }
+  .mt__kv-total dd { font-weight: 600; font-size: 14px !important; }
+  .mt__note { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding: 9px 12px; border-radius: 8px; background: rgba(78, 90, 61, .1); font-size: 12.5px; color: var(--mt-acc); font-weight: 500; }
+  .mt__note i { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--mt-acc); color: #F8F5EE; }
+  /* Plataforma */
+  .mt__plat { display: flex; flex-direction: column; gap: 8px; }
+  .mt__pt { margin-bottom: 4px; font: 500 16px/1.2 var(--font-display); letter-spacing: -.01em; }
+  .mt__opt {
+    display: flex; align-items: center; gap: 12px; min-height: 58px; padding: 10px 12px; border-radius: 10px;
+    background: #FBF8F2; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .12);
+  }
+  .mt__opt.is-on { box-shadow: inset 0 0 0 1.5px var(--mt-ink); }
+  .mt__opt > i { width: 14px; height: 14px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1.5px rgba(42, 33, 27, .35); }
+  .mt__opt.is-on > i { box-shadow: inset 0 0 0 4.5px var(--mt-ink); }
+  .mt__otx { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
+  .mt__otx b { font-size: 14px; font-weight: 500; }
+  .mt__otx span { font-size: 12px; color: var(--mt-ink2); }
+  .mt__tag { padding: 4px 9px; border-radius: 999px; background: rgba(78, 90, 61, .14); color: var(--mt-acc); font-size: 11.5px; font-weight: 500; }
+  /* Búsqueda */
+  .mt__bus { display: flex; flex-direction: column; gap: 10px; }
+  .mt__field { display: flex; align-items: center; gap: 9px; height: 38px; padding: 0 14px; border-radius: 999px; background: #FBF8F2; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .16); font-size: 13px; }
+  .mt__res { display: flex; flex-direction: column; gap: 3px; padding: 4px 4px 10px; border-bottom: 1px solid var(--mt-line); }
+  .mt__rurl { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--mt-ink2); }
+  .mt__fav { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--mt-tile); }
+  .mt__res b { font: 500 15px/1.3 var(--font-display); color: var(--mt-acc); }
+  .mt__res > span:last-child { font-size: 12.5px; line-height: 1.4; color: var(--mt-ink2); }
+  .mt__ai { display: flex; flex-direction: column; gap: 5px; padding: 11px 13px; border-radius: 10px; background: #FBF8F2; box-shadow: inset 0 0 0 1px rgba(42, 33, 27, .1); font-size: 12.5px; line-height: 1.45; }
+  .mt__ail { font: 500 11px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mt-ink2); }
+  .mt__ai b { font-weight: 600; }
+  /* Se adapta a SU ancho, no a la pantalla (E-62; en tableta la celda mide ~210 px y la ficha se
+     rompía): estrecha → foto pequeña al lado; muy estrecha → foto arriba y texto debajo. */
+  @container mt (max-width: 400px) {
+    .mt__card { padding: 14px; }
+    .mt__pdp { grid-template-columns: 112px 1fr; gap: 12px; }
+    .mt__img { min-height: 150px; }
+  }
+  @container mt (max-width: 300px) {
+    .mt__pdp { grid-template-columns: 1fr; }
+    .mt__img { min-height: 120px; }
+    .mt__btn { margin-top: 12px; }
+    .mt__cart { flex-wrap: wrap; }
+    .mt__go { margin-left: auto; }
+  }
+  /* Foto de producto a sangre en su lámina (2026-11-08). */
+  .mt__img { overflow: hidden; position: relative; } .mt__img :global(.pa) { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; } .mt__thumbs span { overflow: hidden; position: relative; } .mt__thumbs span :global(.pa) { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; }
+</style>

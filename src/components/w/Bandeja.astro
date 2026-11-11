@@ -1,0 +1,37 @@
+---
+// Bandeja (G3, §2.4; W-ADV-37/40): contenedor de objetos, radio 22, padding 16,
+// borde 1 px oro al 9 % y filo de luz. Translúcida sobre noche lisa; `opaque`
+// cuando detrás corre un patrón (E-37).
+interface Props {
+  cols?: 1 | 2 | 3 | 4;
+  gap?: number;
+  as?: string;
+  opaque?: boolean;
+  class?: string;
+  [key: string]: any;
+}
+const { cols = 1, gap = 14, as: Tag = 'div', opaque = false, class: cls, ...rest } = Astro.props;
+---
+<Tag
+  class:list={['w-tray', 'w-bandeja', opaque && 'w-tray--opaque', cls]}
+  style={`--w-tray-cols:${cols};--w-tray-gap:${gap}px`}
+  data-cols={cols}
+  {...rest}
+>
+  <slot />
+</Tag>
+
+<style>
+  .w-bandeja { display: grid; gap: var(--w-tray-gap); grid-template-columns: 1fr; min-width: 0; }
+  /* Móvil: 1 columna. Las de 4 pasan a 2 solo desde 480 px: por debajo, cada columna se queda en
+     ~110 px de texto y un nombre de servicio ("IA conversacional", "E-commerce") se partía por la
+     mitad de la palabra. Nunca se parten palabras: a esa anchura, una tarjeta por fila. */
+  @media (--sm) {
+    .w-bandeja[data-cols='4'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  /* Mismo peso que la regla de 4 columnas (atributo incluido): si no, la de móvil
+     ganaba también en escritorio y cols={4} salía en 2 columnas a 1440. */
+  @media (--md) {
+    .w-bandeja[data-cols] { grid-template-columns: repeat(var(--w-tray-cols), minmax(0, 1fr)); }
+  }
+</style>

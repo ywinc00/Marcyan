@@ -199,6 +199,8 @@ export const houstonHub = {
       vig: {
         query: 'taller mecánico que hable español', result: 'Tu negocio', open: 'Abierto ahora', checks: ['✓ Google', '✓ Maps', '✓ La IA'],
         time: '11:42 p. m.', me1: '¿Me revisan los frenos mañana?', bot: 'Claro, a las 8:30 tenemos espacio. ¿Te lo aparto?', me2: 'Sí, porfa. Carlos.', ok: 'Cita apartada · mañana 8:30',
+        // 02 · Te eligen: web de ejemplo con su cambio ES/EN (orden fijo: español, luego inglés)
+        web: { url: 'tunegocio.example', art: 'disco', h: ['Frenos y motor, sin sorpresas.', 'Brakes and engines, no surprises.'], m: ['Abierto hoy hasta las 6:00 p. m.', 'Open today until 6:00 PM'], b: ['Agendar cita', 'Book a visit'] },
       },
       all: { label: 'Ver todos los precios', href: '/es/precios' },
     },

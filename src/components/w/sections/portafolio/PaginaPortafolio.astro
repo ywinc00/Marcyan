@@ -1,0 +1,161 @@
+---
+// Portafolio v3 · /es/portafolio y /en/portfolio (design/rediseno-workos.md §4.5, ola 3).
+// Las dos páginas son finas: montan esto con su idioma. Orden:
+// hero (W-PROOF-05: titular + captura de TRR + ficha pegajosa; tira de nombres reales y
+// "Tu negocio aquí" al pie) → 01 TRR (capítulo de CONTRASTE, sin repetir la captura grande)
+// → 02 MJA "Florida (Orlando)" (+ tarjeta lateral W-PROOF-07: el precio va junto a un SITIO
+// a medida, nunca junto a la web app de RN, que no tiene ancla en pricing.ts) → 03 JLS
+// → 04 RN (figura a ancho completo de raíl a raíl, para romper la repetición) → franja
+// "En pocas palabras" (answer VERBATIM) → FAQ (VERBATIM, todas cerradas) → cierre W-PROOF-14
+// con el ÚNICO degradado + CierreDosTarjetas (trío contractual) → Contact (#contacto).
+// Firma: ninguna (página de prueba). Contratos: CollectionPageLd idéntico (mismos items),
+// BreadcrumbList (migas), FAQPage (PreguntasFrecuentes, mismo texto), anclas #trr #mja #jls #rn.
+import Layout from '../../../../layouts/Layout.astro';
+import SiteNav from '../../../layout/SiteNav.astro';
+import SiteFooter from '../../../layout/SiteFooter.astro';
+import Breadcrumb from '../../../ui/Breadcrumb.astro';
+import Contact from '../../../sections/Contact.astro';
+import SpaceBackdrop from '../../../SpaceBackdrop.astro';
+import CollectionPageLd from '../../../seo/CollectionPageLd.astro';
+import WStyles from '../../WStyles.astro';
+import FranjaEnPocasPalabras from '../../FranjaEnPocasPalabras.astro';
+import PreguntasFrecuentes from '../../PreguntasFrecuentes.astro';
+import CierreDosTarjetas from '../../CierreDosTarjetas.astro';
+import HeroPortafolio from './HeroPortafolio.astro';
+import Caso from './Caso.astro';
+import TarjetaLateral from './TarjetaLateral.astro';
+import CierreHistoria from './CierreHistoria.astro';
+import { content, nap } from '../../../../i18n/content';
+import { clusterNav, clusterNavEn } from '../../../../i18n/clusters';
+import { portfolioPage as pES, portfolioProjects as projES } from '../../../../i18n/portfolio';
+import { portfolioPage as pEN, portfolioProjects as projEN } from '../../../../i18n/portfolio.en';
+import { PRICE_ANCHORS } from '../../../../i18n/pricing';
+import { portCopy } from '../../../../i18n/w/portafolio';
+
+interface Props { lang: 'es' | 'en' }
+const { lang } = Astro.props;
+const en = lang === 'en';
+const p = en ? pEN : pES;
+const projects = en ? projEN : projES;
+const t = portCopy[lang];
+const c = content[lang];
+
+// CollectionPage: mismos items que antes (CreativeWork con captura real, sin URL externa).
+const works = projects.map((w) => ({ name: w.name, description: w.did, about: w.cat, image: `/Galeria/${w.slug}-pc.webp` }));
+
+const tel = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
+const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
+
+type Proj = (typeof projects)[number];
+const cityOf = (w: Proj) => (w.slug === 'mja' ? 'Florida (Orlando)' : (w.cat.split('·')[1] ?? '').trim());
+const rowsOf = (w: Proj) => [
+  { label: t.side.sector, value: (w.cat.split('·')[0] ?? '').trim() },
+  { label: t.side.city, value: cityOf(w) },
+  { label: t.side.project, value: w.badge },
+  { label: t.side.service, value: w.serviceLabel, href: w.serviceHref },
+];
+const capOf = (w: Proj) => `<span translate="no">${w.name}</span> · ${(w.cat.split('·')[0] ?? '').trim()} · ${cityOf(w).replace(/,\s*[A-Z]{2}$/, '')}`;
+const first = projects[0];
+const rest = projects.slice(1);
+const price = '$' + PRICE_ANCHORS.web.toLocaleString('en-US');
+---
+<Layout title={p.meta.title} description={p.meta.description} lang={lang} path={en ? 'portfolio' : 'portafolio'} ds="v3">
+  {/* La captura del hero es el LCP: se pide con el <head>, no al llegar a ella tras el CSS en línea
+      (§6.6). Va en un Fragment con el schema: con el ternario suelto, Astro descartaba el <link>. */}
+  <Fragment slot="head">
+    <link rel="preload" as="image" fetchpriority="high"
+      href={`/Galeria/${first.slug}-pc-900.webp`}
+      imagesrcset={`/Galeria/${first.slug}-pc-480.webp 480w, /Galeria/${first.slug}-pc-640.webp 640w, /Galeria/${first.slug}-pc-900.webp 900w, /Galeria/${first.slug}-pc-1280.webp 1280w, /Galeria/${first.slug}-pc.webp 1920w`}
+      imagesizes="(min-width: 1024px) 736px, calc(100vw - 32px)" />
+    {en
+      ? <CollectionPageLd name={p.meta.title} description={p.meta.description} path={p.path} items={works} inLanguage="en" />
+      : <CollectionPageLd name={p.meta.title} description={p.meta.description} path={p.path} items={works} />}
+  </Fragment>
+  <WStyles />
+
+  <SiteNav nav={en ? clusterNavEn : clusterNav} lang={lang} homeHref={en ? '/en' : '/es'} currentPath={Astro.url.pathname} />
+
+  <main id="main" class="w-rails" data-w data-w-tone="gold" data-w-kind="portafolio">
+    <HeroPortafolio
+      h1Html={p.hero.h1}
+      tail={t.tail}
+      lead={p.hero.sub}
+      shot={{ slug: first.slug, name: first.name, label: t.heroShot(first.name), alt: `${first.name}, ${en ? 'desktop view' : 'vista de escritorio'}` }}
+      side={{ logoName: first.name, rows: rowsOf(first), label: t.side.label }}
+      wa={wa}
+      lang={lang}
+    >
+      <Breadcrumb slot="crumbs" items={p.breadcrumb} lang={lang} />
+    </HeroPortafolio>
+
+    <section class="w-cell w-contrast pp-case" id={first.slug}>
+      <div class="w-container" data-w-reveal>
+        <Caso project={first} n={1} acts={t.acts} phoneOnly phoneAlt={t.phoneAlt} caption={capOf(first)} lang={lang} />
+      </div>
+    </section>
+
+    {rest.map((w, i) => (
+      <section class="w-cell pp-case" id={w.slug}>
+        <div class="w-container" data-w-reveal>
+          <Caso project={w} n={i + 2} acts={t.acts} side={{ rows: rowsOf(w), label: t.side.label }} figSide={i % 2 ? 'left' : 'right'} figWide={i === rest.length - 1} lang={lang}>
+            {i === 0 && (
+              <TarjetaLateral
+                slot="aside"
+                title1={t.tarjeta.title1}
+                title2={t.tarjeta.title2(price)}
+                text={t.tarjeta.text}
+                cta={{ label: t.tarjeta.cta, href: '#contacto', track: 'proposal_requested' }}
+              />
+            )}
+          </Caso>
+        </div>
+      </section>
+    ))}
+
+    <div class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <FranjaEnPocasPalabras q={p.answer.q} a={p.answer.a} lang={lang} />
+      </div>
+    </div>
+
+    <div class="w-cell">
+      <div class="w-container" data-w-reveal>
+        <PreguntasFrecuentes id="faq" tag={p.faq.tag} titleHtml={p.faq.title} items={p.faq.items} lang={lang} />
+      </div>
+    </div>
+
+    <section class="w-cell pp-close" aria-labelledby="historia">
+      <div class="w-container" data-w-reveal>
+        <CierreHistoria title={t.historia.title} sub={t.historia.sub}>
+          <CierreDosTarjetas
+            titleHtml={p.cta.title}
+            proof={t.cierre.proof}
+            city="houston"
+            tel={tel}
+            wa={wa}
+            lang={lang}
+            warm={{
+              kind: 'diagnostico',
+              title: t.cierre.warmTitle,
+              text: t.cierre.warmText,
+              cta: t.cierre.warmCta,
+              href: en ? '/en/checkup' : '/es/diagnostico',
+            }}
+          />
+        </CierreHistoria>
+      </div>
+    </section>
+
+    <Contact contact={c.contact} />
+  </main>
+
+  <SpaceBackdrop tone="gold" />
+
+  <SiteFooter footer={c.footer} lang={lang} />
+</Layout>
+
+<style>
+  /* Las anclas #trr… caen bajo la barra fija, no detrás. */
+  .pp-case { scroll-margin-top: var(--nav-h, 64px); }
+  .pp-close { padding-top: clamp(32px, 2rem + 2vw, 64px); }
+</style>

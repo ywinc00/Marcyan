@@ -1,0 +1,56 @@
+---
+// IA · precio (§4.11-8 y §4.12-9): PrecioPuntos con la cifra = ancla baja de PRICE_ANCHORS
+// ("Desde $500", asistente básico) y el slice abajo a la derecha ("Asistente completo desde
+// $900", el priceValue del JSON-LD, que no cambia; R6). Debajo, lo incluido (pricing.features,
+// libre) y el enlace a la propuesta que conserva el evento pricing_cta_clicked de la tarjeta
+// de precio de antes (contrato de analítica). Ningún precio escrito a mano: todo de pricing.ts.
+import PrecioPuntos from '../../PrecioPuntos.astro';
+import Button from '../../../ui/Button.astro';
+import Icon from '../../../ui/Icon.astro';
+import { catalog, PRICE_ANCHORS } from '../../../../i18n/pricing';
+import { catalog as catalogEn } from '../../../../i18n/pricing.en';
+
+interface Props {
+  copy: { eyebrow: string; title: string; cta: string; includesLabel: string };
+  features: string[];
+  /** true = la cifra es el elemento degradado de la página (en las dos IA lo es). */
+  grad?: boolean;
+  lang?: 'es' | 'en';
+}
+const { copy, features, grad = true, lang = 'es' } = Astro.props;
+const ia = (lang === 'en' ? catalogEn : catalog).find((p) => p.id === 'ia-conversacional')!;
+const basic = ia.tiers.find((t) => t.key === 'iaBasic')!;
+const full = ia.tiers.find((t) => t.key === 'ia')!;
+const en = lang === 'en';
+const from = en ? 'From' : 'Desde';
+const usd = (v: number) => '$' + v.toLocaleString('en-US');
+---
+<PrecioPuntos
+  eyebrow={copy.eyebrow}
+  titleHtml={copy.title}
+  anchor="iaBasic"
+  from={from}
+  tone="teal"
+  grad={grad}
+  bottomLeft={{ big: basic.name, text: basic.blurb }}
+  bottomRight={{ label: full.name, value: `${from} ${usd(PRICE_ANCHORS.ia)}` }}
+/>
+<div class="ws-inc ws-w">
+  <p class="w-label ws-inc__l">{copy.includesLabel}</p>
+  <ul class="ws-inc__list" role="list">
+    {features.map((f) => <li><Icon name="lucide:check" class="ws-inc__i" />{f}</li>)}
+  </ul>
+</div>
+<div class="ws-foot ws-w">
+  <Button variant="link" href="#contacto" data-track="pricing_cta_clicked">{copy.cta}</Button>
+</div>
+<style>
+  .ws-w { max-width: var(--w-rail-max); margin-inline: auto; }
+  .ws-inc { margin-top: 40px; }
+  .ws-inc__l { margin: 0 0 16px; }
+  .ws-inc__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px 32px; grid-template-columns: 1fr; }
+  @media (--md) { .ws-inc__list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .ws-inc__list li { display: flex; gap: 10px; align-items: flex-start; font: 400 15px/1.5 var(--font-body); color: var(--w-ink-80); }
+  .ws-inc__list :global(.ws-inc__i) { width: 16px; height: 16px; margin-top: 3px; flex: none; color: var(--accent-teal); }
+  .ws-foot { margin-top: 20px; }
+</style>

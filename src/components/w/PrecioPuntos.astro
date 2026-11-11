@@ -1,0 +1,202 @@
+---
+// Precio en puntos (W-CORE-14, design/rediseno-workos.md §3.4, R6).
+// Tarjeta 1100×440: arriba 330 px de lienzo de puntos (3 px cada 6 px, crema al
+// 12 %); la cifra es TEXTO REAL en el DOM, pintada con el degradado oro→teal y
+// recortada por una máscara de puntos alineada con la retícula del lienzo.
+// "Desde" va dentro del lienzo, a la izquierda de la cifra y a 1/3 de su alto,
+// con la misma máscara. Abajo, tras una línea: título 28/500 + una línea 14 y,
+// a la derecha, etiqueta 14 + valor 14/600 (aquí va el slice, R6).
+//
+// Ola de encendido (una vez, 1,7 s, de izquierda a derecha): una ventana que
+// se traslada con transform y un contenido que se contra-traslada lo mismo
+// (red inmóvil: la máscara de puntos nunca se desalinea). Solo transform.
+// Estado final visible por defecto; solo arranca apagada con html.w-anim
+// (sin reduced-motion) y se enciende cuando reveal.ts marca .is-revealed.
+//
+// Ningún precio escrito aquí: `amount` llega por props o se toma de
+// PRICE_ANCHORS con `anchor` (el ancla baja, política de R6).
+import { PRICE_ANCHORS } from '../../i18n/pricing';
+
+type AnchorKey = keyof typeof PRICE_ANCHORS;
+interface Props {
+  eyebrow?: string;
+  titleHtml: string;
+  lead?: string;
+  /** Cifra grande, p. ej. "$400". Si falta, se forma con `anchor`. */
+  amount?: string;
+  /** Clave de PRICE_ANCHORS (ancla baja) para formar la cifra si no llega `amount`. */
+  anchor?: AnchorKey;
+  /** "Desde" / "From". */
+  from?: string;
+  bottomLeft: { big: string; text?: string };
+  bottomRight?: { label: string; value: string };
+  id?: string;
+  /** true = la cifra es el elemento degradado de la página (cuenta como el único, G11). */
+  grad?: boolean;
+  tone?: 'gold' | 'teal';
+  class?: string;
+}
+const {
+  eyebrow, titleHtml, lead, amount, anchor, from,
+  bottomLeft, bottomRight, id, grad = true, tone = 'gold', class: cls,
+} = Astro.props;
+
+const usd = (n: number) => '$' + n.toLocaleString('en-US');
+const figure = amount ?? (anchor ? usd(PRICE_ANCHORS[anchor]) : undefined);
+if (!figure) throw new Error('PrecioPuntos: falta `amount` o `anchor`');
+// Texto accesible completo de la cifra: "Desde $400".
+const spoken = from ? `${from} ${figure}` : figure;
+// Móvil: "Desde" pasa encima y la cifra llena el lienzo según su largo
+// ("$400" ≈ 96 px de alto de cifra a 358; "$1,500" algo menos).
+const fitSm = Math.min(37, Math.round(150 / figure.length));
+---
+<div class:list={['pp', cls]} id={id} data-w-tone={tone} data-w-reveal style={`--pp-fit-sm:${fitSm}`}>
+  {(eyebrow || titleHtml || lead) && (
+    <header class="pp__head">
+      {eyebrow && <p class="pp__eyebrow">{eyebrow}</p>}
+      <h2 class="pp__title" set:html={titleHtml} />
+      {lead && <p class="pp__lead">{lead}</p>}
+    </header>
+  )}
+
+  <div class="pp__card">
+    <div class="pp__canvas">
+      <p class="sr-only">{spoken}</p>
+      <div class="pp__win" aria-hidden="true">
+        <div class:list={['pp__lit', !grad && 'pp__lit--solid']}>
+          <span class="pp__fig">
+            {from && <span class="pp__from">{from}</span>}
+            <span class="pp__amount">{figure}</span>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="pp__foot">
+      <div class="pp__foot-l">
+        <p class="pp__big">{bottomLeft.big}</p>
+        {bottomLeft.text && <p class="pp__text">{bottomLeft.text}</p>}
+      </div>
+      {bottomRight && (
+        <p class="pp__foot-r">
+          <span class="pp__label">{bottomRight.label}</span>
+          <span class="pp__value">{bottomRight.value}</span>
+        </p>
+      )}
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Puntos de la cifra más gordos que los del lienzo (2,2 frente a 1,5 px): la cifra se lee
+     encendida sobre la trama (control 1: con el mismo punto quedaba apagada). */
+  .pp { --pp-dot: radial-gradient(circle, #000 2.2px, transparent 2.4px) 0 0 / 6px 6px; }
+
+  /* ── Cabecera (W-CORE-14: rótulo pequeño, H2 40/500, bajada) ── */
+  .pp__head { max-width: var(--w-rail-max, 1200px); margin: 0 auto 48px; }
+  .pp__eyebrow {
+    margin: 0 0 16px;
+    font-family: var(--font-display); font-weight: 500; font-size: var(--w-eyebrow);
+    line-height: 1.1; letter-spacing: var(--w-tr-eyebrow); color: var(--w-accent);
+  }
+  .pp__title {
+    margin: 0;
+    font-family: var(--font-display); font-weight: var(--w-weight-head);
+    font-size: var(--w-h2); line-height: var(--w-lh-h2); letter-spacing: var(--w-tr-h2);
+    color: var(--w-ink); text-wrap: balance;
+  }
+  .pp__title :global(em) { font-style: normal; color: var(--w-accent); }
+  .pp__lead {
+    margin: 16px 0 0; max-width: 32.5rem;
+    font-family: var(--font-body); font-size: var(--w-lead); line-height: var(--w-lh-lead);
+    color: var(--w-ink-80);
+  }
+
+  /* ── Tarjeta (objeto de sistema: opaca, E-37) ── */
+  .pp__card {
+    max-width: var(--w-rail-max, 1200px); margin-inline: auto; /* el ancho del contenido: borde en la línea del logo */
+    background: var(--w-s2); border: 1px solid var(--w-line);
+    border-radius: var(--w-r-obj); box-shadow: var(--w-edge);
+    overflow: hidden; container-type: inline-size;
+  }
+  .pp__canvas {
+    position: relative; overflow: hidden;
+    block-size: 220px;
+    background: radial-gradient(circle, rgba(var(--star-rgb), .12) 1.5px, transparent 1.6px) 0 0 / 6px 6px;
+  }
+  @media (--md) { .pp__canvas { block-size: 330px; } }
+
+  /* Ventana de la ola: 2× el lienzo. Su mitad izquierda es opaca; el borde de
+     la ola es un fundido entre el 50 % y el 62 % (fuera del lienzo al final). */
+  .pp__win {
+    position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: 200%;
+    -webkit-mask-image: linear-gradient(90deg, #000 0 50%, transparent 62%);
+    mask-image: linear-gradient(90deg, #000 0 50%, transparent 62%);
+  }
+  /* Contenido: mide lo que el lienzo (50 % de la ventana) y lleva la máscara
+     de puntos con origen 0 0, igual que la retícula del lienzo. */
+  .pp__lit {
+    position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: 50%;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-mask: var(--pp-dot); mask: var(--pp-dot);
+  }
+  .pp__fig {
+    display: inline-flex; flex-direction: column; align-items: center;
+    font-family: var(--font-display); font-weight: 500;
+    /* Móvil: apilado, la cifra llena el ancho según su largo (~96 px de alto). */
+    font-size: calc(var(--pp-fit-sm, 30) * 1cqi);
+    line-height: 1; letter-spacing: -0.04em; white-space: nowrap;
+    background: var(--w-grad); -webkit-background-clip: text; background-clip: text;
+    color: transparent; -webkit-text-fill-color: transparent;
+  }
+  .pp__lit--solid .pp__fig {
+    background: none; color: var(--w-accent); -webkit-text-fill-color: currentColor;
+  }
+  /* "Desde" (v2, G00; FI §3-17 "una mono con remates que no es de la marca"). Causa medida en
+     el archivo de la fuente: la D y la d de Space Grotesk TIENEN remates de losa (herencia de Space
+     Mono; contorno de la D: 48→148 arriba y abajo), en 700 y en 500. La cifra no los nota porque
+     son dígitos. Por eso "Desde" va en la otra letra de la marca, DM Sans (DESIGN.md), en 600 para
+     encender bastantes puntos por trazo, y dentro de la MISMA máscara de puntos que la cifra. */
+  .pp__from {
+    font-family: var(--font-body); font-weight: 600; font-size: 0.36em;
+    letter-spacing: -0.01em; margin-block-end: 0.04em;
+  }
+  @media (--md) {
+    /* Escritorio: "Desde" a la izquierda de la cifra, a 1/3 de su alto;
+       ~150 px de alto de cifra a 1100 (cap ≈ .72em). */
+    .pp__fig { flex-direction: row; align-items: flex-start; font-size: min(208px, 23cqi); }
+    .pp__from { font-size: 0.34em; margin-block: 0.24em 0; margin-inline-end: 0.22em; }
+  }
+  @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+    .pp__fig { color: var(--accent-gold); -webkit-text-fill-color: currentColor; }
+  }
+
+  /* Ola: solo con html.w-anim (sin reduced-motion) y dentro de main[data-w]. */
+  :global(:root[data-ds="v3"].w-anim main[data-w]) .pp .pp__win,
+  :global(:root[data-ds="v3"].w-anim main[data-w]) .pp .pp__lit {
+    transition: transform 1700ms var(--w-ease-text) 120ms;
+  }
+  :global(:root[data-ds="v3"].w-anim main[data-w]) .pp:not(.is-revealed) .pp__win { transform: translateX(-62%); }
+  :global(:root[data-ds="v3"].w-anim main[data-w]) .pp:not(.is-revealed) .pp__lit { transform: translateX(124%); }
+  :global(:root[data-ds="v3"].w-in-all) .pp .pp__win,
+  :global(:root[data-ds="v3"].w-in-all) .pp .pp__lit { transform: none; transition: none; }
+
+  /* ── Pie de la tarjeta (110 px tras línea) ── */
+  .pp__foot {
+    display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+    gap: 12px 32px; min-block-size: 110px; padding: 24px 32px;
+    border-top: 1px solid var(--w-line);
+  }
+  .pp__big {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 28px; line-height: 1.15; letter-spacing: -0.02em; color: var(--w-ink);
+  }
+  .pp__text { margin: 6px 0 0; font-family: var(--font-body); font-size: 14px; line-height: 1.45; color: var(--w-ink-70); }
+  .pp__foot-r { margin: 0; display: grid; justify-items: end; gap: 4px; text-align: end; font-family: var(--font-body); font-size: 14px; line-height: 1.4; }
+  .pp__label { color: var(--w-ink-70); }
+  .pp__value { color: var(--w-ink); font-weight: 600; }
+  @media (--lt-md) {
+    .pp__foot { padding: 20px; }
+    .pp__big { font-size: 24px; }
+    .pp__foot-r { justify-items: start; text-align: start; }
+  }
+</style>

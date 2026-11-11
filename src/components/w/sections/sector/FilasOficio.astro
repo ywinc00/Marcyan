@@ -1,0 +1,167 @@
+---
+// Sector · 03 "Lo que necesita tu web" (§4.19-4): W-CORE-21, filas alternas de texto +
+// objeto. Tres filas por página que agrupan de dos en dos los 6 `includes.items` (libres):
+// cada fila lleva H3 32/38, un párrafo y las dos ventajas del dato como lista con check.
+// El objeto vive en un escenario de noche (bandeja con trama de puntos en la franja alta,
+// sin texto encima, E-37) y es de PRODUCTO, en claro (§2.4): respuesta de asistente,
+// antes y después, chat de Marcy, listados, carta con QR o web de ejemplo. Todo de EJEMPLO
+// y rotulado. La respuesta del asistente se escribe una vez al entrar.
+// Ronda 2 (I-A): el chat ya no es estático. FilasOficio hace de marco (data-wo-marco, el mismo
+// contrato que MarcoPestanas): con la fila a la vista, pestaña visible y sin la pausa global
+// (<html data-w-pausa>) el guion entra con "escribiendo" y se repite tras una pausa; botón de
+// pausa propio (registerLoop, >5 s); con movimiento reducido, la conversación completa y quieta.
+// v2 (G08): antes/después, listados y mesa con QR pasan a ObjetoFila.astro (productos de las marcas
+// de ejemplo); la respuesta del asistente es la de P05 (con logos) y la web, WebEjemplo de P02a.
+// Ronda 1: la respuesta del asistente cita la marca de ejemplo del oficio (Tu Plomería, Tu Inmobiliaria),
+// no "Tu Negocio" (I5); la fila de fotos de restaurants enseña platos de verdad dibujados (B2, `platos`).
+// Alternancia: el DOM siempre es objeto → texto (el objeto es ilustración aria-hidden, sin
+// nada que enfocar); en escritorio las filas pares colocan el objeto a la derecha con la
+// rejilla, sin `order`. Móvil: objeto arriba, texto debajo (W-CORE-21).
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import Icon from '../../../ui/Icon.astro';
+import RespuestaAsistente from '../../objetos/RespuestaAsistente.astro';
+import ChatMarcy from '../../objetos/ChatMarcy.astro';
+import ObjetoFila from './ObjetoFila.astro';
+import { negocios, type NegocioId } from '../../objetos/ejemplos/negocios';
+import type { FeatureItem } from '../../../../i18n/clusters';
+import type { SectorCopy, SectorObj } from '../../../../i18n/w/sector';
+
+interface Props { copy: SectorCopy['filas']; n: number; items: FeatureItem[]; oficio: SectorObj; lang?: 'es' | 'en' }
+const { copy, n, items, oficio, lang = 'es' } = Astro.props;
+const en = lang === 'en';
+const NEGOCIO: Record<SectorObj, NegocioId> = { contratista: 'plomeria', inmobiliaria: 'inmobiliaria', restaurante: 'restaurante' };
+const biz = negocios[NEGOCIO[oficio]].nombre[lang];
+const T = en
+  ? { loc: { t: 'Today', s: 'East End · 11 AM to 3 PM' } }
+  : { loc: { t: 'Hoy', s: 'East End · de 11 a. m. a 3 p. m.' } };
+const pad = (k: number) => String(k).padStart(2, '0');
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="sf">
+  {copy.rows.map((row, i) => (
+    <article class:list={['sf__row', i % 2 === 1 && 'sf__row--flip']}>
+      <div class="sf__stage">
+        <div class="sf__obj">
+          {row.obj === 'respuesta' && (
+            <RespuestaAsistente lang={lang} tone="gold" size="card" question={copy.question} business={biz} />
+          )}
+          {row.obj === 'chat' && (
+            <div class="sf-chat" data-wo-marco data-sf-chat>
+              <ChatMarcy mode="compacto" tabsBar={false} tone="neutral" lang={lang} size="card" tabs={[copy.chat]} sr={copy.chatSr} />
+            </div>
+          )}
+          {row.obj === 'platos' && (
+            <div class="sf-web">
+              <ObjetoFila kind="platos" lang={lang} />
+              <p class="sf-loc" aria-hidden="true"><Icon name="lucide:map-pin" /><span><b>{T.loc.t}</b>{T.loc.s}</span></p>
+            </div>
+          )}
+          {(row.obj === 'antes-despues' || row.obj === 'listados' || row.obj === 'mesa-qr') && (
+            <ObjetoFila kind={row.obj} lang={lang} />
+          )}
+        </div>
+      </div>
+      <div class="sf__text">
+        <p class="sf__n" aria-hidden="true">{pad(n)}.{i + 1}</p>
+        <h3 class="sf__h">{row.title}</h3>
+        <p class="sf__p">{row.text}</p>
+        <ul class="sf__list">
+          {row.items.map((k) => items[k] && (
+            <li><Icon name="lucide:check" class="sf__ic" />{items[k].title}</li>
+          ))}
+        </ul>
+      </div>
+    </article>
+  ))}
+</div>
+
+<script>
+  import { registerLoop } from '../../loop';
+  const HOLD = 2600;
+  const pausaGlobal = () => document.documentElement.hasAttribute('data-w-pausa');
+  document.querySelectorAll<HTMLElement>('[data-sf-chat]').forEach((marco) => {
+    let corre = false;
+    let t = 0;
+    const play = () => { window.clearTimeout(t); if (corre && !pausaGlobal()) marco.dispatchEvent(new CustomEvent('wo:play', { detail: { index: 0 } })); };
+    const stop = () => { window.clearTimeout(t); marco.dispatchEvent(new CustomEvent('wo:stop')); };
+    marco.addEventListener('wo:done', () => { window.clearTimeout(t); t = window.setTimeout(play, HOLD); });
+    registerLoop(marco, {
+      start: () => { corre = true; play(); },
+      stop: () => { corre = false; stop(); },
+      still: () => { corre = false; window.clearTimeout(t); marco.dispatchEvent(new CustomEvent('wo:still')); },
+    }, { buttonTone: 'dark' });
+    const aplicar = () => { if (pausaGlobal()) stop(); else if (corre) play(); };
+    document.addEventListener('w:pausa', aplicar);
+    new MutationObserver(aplicar).observe(document.documentElement, { attributes: true, attributeFilter: ['data-w-pausa'] });
+  });
+</script>
+
+<style>
+  /* El botón de pausa cae en la bandeja, bajo la ventana: así no tapa la hora de la última burbuja. */
+  .sf-chat { position: relative; width: min(100%, 440px); display: flex; justify-content: center; padding-bottom: 60px; margin-bottom: -20px; }
+  .sf { margin-top: var(--w-chapter-gap); display: grid; gap: 64px; }
+  .sf__row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; align-items: center; }
+
+  /* Escenario (W-CORE-21 en la noche): bandeja opaca con trama de puntos solo arriba. */
+  .sf__stage {
+    position: relative; overflow: hidden; display: grid; place-items: center;
+    min-height: 420px; padding: 56px 24px 40px;
+    border-radius: var(--w-r-feature); background: var(--w-s1);
+    border: 1px solid var(--w-line); box-shadow: var(--w-edge);
+  }
+  .sf__stage::before {
+    content: ''; position: absolute; inset: 0 0 auto; height: 45%;
+    background: var(--w-dots);
+    -webkit-mask-image: linear-gradient(180deg, #000 30%, transparent);
+    mask-image: linear-gradient(180deg, #000 30%, transparent);
+    pointer-events: none;
+  }
+  .sf__obj { position: relative; width: 100%; min-width: 0; display: flex; justify-content: center; }
+
+  .sf__text { min-width: 0; max-width: 480px; }
+  .sf__n {
+    margin: 0 0 14px; font-family: var(--font-mono); font-weight: 500; font-size: 12px;
+    letter-spacing: var(--w-tr-micro); color: var(--w-accent);
+  }
+  .sf__h {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: clamp(1.5rem, 1.1rem + 1.1vw, 2rem); line-height: 1.2; letter-spacing: -0.04em;
+    color: var(--w-ink); text-wrap: balance;
+  }
+  .sf__p { margin: 16px 0 0; font-family: var(--font-body); font-size: 17px; line-height: 1.6; color: var(--w-ink-80); }
+  .sf__list { list-style: none; margin: 24px 0 0; padding: 0; display: grid; gap: 10px; }
+  .sf__list li { display: flex; align-items: flex-start; gap: 10px; font-family: var(--font-body); font-size: 15px; line-height: 1.45; color: var(--w-ink); }
+  .sf__list :global(.sf__ic) { width: 18px; height: 18px; flex: none; margin-top: 1px; color: var(--w-accent); }
+
+  @media (--md) {
+    .sf { gap: 96px; }
+    .sf__row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; }
+    /* Fila par: el objeto pasa a la derecha por colocación de rejilla (DOM intacto). */
+    .sf__row--flip .sf__stage { grid-column: 2; grid-row: 1; }
+    .sf__row--flip .sf__text { grid-column: 1; grid-row: 1; }
+    /* El texto se centra en su media columna: queda a la misma distancia del objeto en las dos alternancias. */
+    .sf__text { justify-self: center; }
+    .sf__stage { min-height: 460px; }
+  }
+  @media (--lt-md) {
+    .sf__stage { min-height: 0; padding: 48px 16px 28px; border-radius: var(--w-r-tray); }
+  }
+
+  /* Objetos de antes/después, listados y mesa con QR: ObjetoFila.astro (v2). */
+  /* Ubicación de hoy (food trucks): ficha clara pegada al teléfono, fuera de su pantalla. */
+  .sf-web { position: relative; display: flex; justify-content: center; }
+  .sf-loc {
+    position: absolute; right: calc(50% - 196px); top: 96px; margin: 0;
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+    background: #fff; color: var(--w-p-ink); border: 1px solid var(--w-p-line); border-radius: var(--w-r-obj);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, .35);
+    font-family: var(--font-body); font-size: 13px; white-space: nowrap;
+  }
+  .sf-loc :global(svg) { width: 18px; height: 18px; color: #8a4a30; flex: none; }
+  .sf-loc span { display: flex; flex-direction: column; gap: 1px; }
+  .sf-loc b { font: 600 14px/1.2 var(--font-display); }
+  @media (--lt-md) {
+    .sf-web { flex-direction: column; align-items: center; gap: 12px; }
+    .sf-loc { position: static; }
+  }
+</style>

@@ -1,0 +1,143 @@
+---
+// SEO local · 02 "Dónde te ponemos" (§4.16-3): pila de ventanas (W-CORE-27).
+// Izquierda: H2 de sección + bajada + lista de comprobación (como W-CORE-27, sin botones:
+// la acción dominante de la página es otra). Derecha: tres ventanas de navegador CLARAS
+// (objetos de producto, §2.4) apiladas en escalera, cada una con el nombre del mapa EN
+// cabecera (v2 G05, §1.4: Google Maps en monocromo sobre baldosa, Apple Maps y Bing en palabra) y sus pasos numerados; la de delante (Google)
+// abajo a la derecha y entera; las de detrás, más arriba, enseñan entera su cabecera.
+// Son los pasos reales del trabajo, no datos inventados: sin etiqueta "Ejemplo".
+// Estático (la firma de la página es el radar). Móvil: la pila cabe en 358 px con las
+// ventanas más estrechas y desplazadas menos.
+import Icon from '../../../ui/Icon.astro';
+import LogoMarca from '../../marcas/LogoMarca.astro';
+import type { SeoCopy } from '../../../../i18n/w/seo-local';
+
+interface Props { copy: SeoCopy['ventanas']; id?: string; class?: string }
+const { copy, id, class: cls } = Astro.props;
+const titleId = `${id ?? 'sl-pila'}-title`;
+---
+<div class:list={['sl-pila', cls]} id={id}>
+  <div class="sl-pila__text">
+    <h2 class="w-h2 sl-pila__h" id={titleId}>{copy.title}</h2>
+    <p class="sl-pila__lead">{copy.lead}</p>
+    <ul class="sl-pila__pts">
+      {copy.points.map((p) => (
+        <li><span class="sl-pila__ck" aria-hidden="true"><Icon name="lucide:check" /></span>{p}</li>
+      ))}
+    </ul>
+  </div>
+  <div class="sl-pila__stack" role="list" aria-label={copy.title}>
+    {copy.windows.map((w, i) => (
+      <div class={`sl-win sl-win--${i + 1}`} role="listitem">
+        <div class="sl-win__bar" aria-hidden="true"><i></i><i></i><i></i><span class="sl-win__side"></span><span class="sl-win__nav"><Icon name="lucide:chevron-left" /><Icon name="lucide:chevron-right" /></span></div>
+        <div class="sl-win__body">
+          <h3 class="sl-win__t">
+            {w.logo === 'googlemaps' ? (
+              <span class="sl-win__brand"><LogoMarca id="googlemaps" size={30} tono="color" baldosa titulo="" />{w.title}</span>
+            ) : w.logo ? (
+              <span class="sl-win__brand"><span class="sr-only">{w.title}</span><LogoMarca id={w.logo} size={26} tono="color" titulo="" />{w.resto && <span class="sl-win__resto" aria-hidden="true">{w.resto}</span>}</span>
+            ) : w.title}
+            <span class="sl-win__sub">{w.sub}</span>
+          </h3>
+          <p class="sl-win__lab">{copy.stepsLabel}</p>
+          <ol class="sl-win__steps">
+            {w.steps.map((s, j) => (
+              <li class:list={[j === 0 && 'is-first']}><span class="sl-win__n" aria-hidden="true">{j + 1}</span><span>{s}</span></li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .sl-pila { display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; align-items: center; }
+  .sl-pila__h { margin: 0; max-width: 560px; }
+  .sl-pila__lead {
+    margin: 16px 0 0; max-width: 520px;
+    font-size: var(--w-lead); line-height: var(--w-lh-lead); color: var(--w-ink-80);
+  }
+  .sl-pila__pts { list-style: none; margin: 32px 0 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+  .sl-pila__pts li { display: flex; align-items: center; gap: 12px; font-size: 16px; line-height: 1.45; color: var(--w-ink-80); }
+  .sl-pila__ck {
+    flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 5px;
+    background: rgba(var(--accent-gold-rgb), .15); color: var(--accent-gold);
+  }
+  .sl-pila__ck :global(svg) { width: 13px; height: 13px; }
+
+  /* Pila: altura reservada y ventanas en posición absoluta, de atrás (1) a delante (3). */
+  /* Escalera en diagonal hacia abajo: cada ventana de detrás asoma ENTERA su cabecera
+     (barra + nombre del mapa) por encima de la siguiente, como la identidad de cada
+     ventana en W-CORE-27 (revisión 1: "Bing Place", "Apple Map" salían cortados). */
+  .sl-pila__stack { position: relative; height: 600px; isolation: isolate; width: 100%; max-width: 600px; margin-inline: auto; }
+  .sl-win {
+    position: absolute; top: 0; width: 300px;
+    border-radius: 12px; overflow: hidden;
+    background: #fbfaf7; color: var(--w-p-ink, #0e0e0d);
+    border: 1px solid rgba(14,14,13,.10);
+    box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 24px 48px -16px rgba(0,0,0,.55), 0 2px 6px rgba(0,0,0,.25);
+    font-family: var(--font-body);
+  }
+  .sl-win--1 { left: 0; top: 0; z-index: 1; }
+  .sl-win--2 { left: 128px; top: 106px; z-index: 2; }
+  .sl-win--3 { left: 256px; top: 212px; z-index: 3; width: 320px; }
+  .sl-win__bar {
+    display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 14px;
+    background: #f1eee8; border-bottom: 1px solid rgba(14,14,13,.07);
+  }
+  /* Semáforo pastel como el original (contenido de una interfaz dibujada, no gramática: §0.2 E-15). */
+  .sl-win__bar i { width: 9px; height: 9px; border-radius: 50%; background: #EE9A93; }
+  .sl-win__bar i:nth-child(2) { background: #F0CB86; }
+  .sl-win__bar i:nth-child(3) { background: #9DCB97; }
+  .sl-win__nav { margin-left: 10px; display: inline-flex; gap: 2px; color: #b9b3a8; }
+  .sl-win__nav :global(svg) { width: 14px; height: 14px; }
+  .sl-win__nav :global(svg + svg) { opacity: .55; }
+  .sl-win__brand { display: inline-flex; align-items: center; gap: 10px; min-height: 30px; }
+  .sl-win__brand :global(.lm--word) { color: #1D1D1F; }
+  /* Baldosa blanca sobre la ventana crema: borde y sombra mínimos para que se lea como icono. */
+  .sl-win__brand :global(.lm--tile) { box-shadow: inset 0 0 0 1px rgba(14,14,13,.14), 0 1px 2px rgba(14,14,13,.10); }
+  .sl-win__resto { margin-left: -4px; font-size: 22px; font-weight: 400; letter-spacing: -.02em; color: #4a4743; }
+  .sl-win__side { margin-left: 12px; width: 16px; height: 12px; border-radius: 3px; box-shadow: inset 0 0 0 1.5px #cfc9bf; }
+  .sl-win__body { padding: 20px 20px 24px; }
+  .sl-win__t {
+    margin: 0; display: flex; flex-direction: column; gap: 2px;
+    font: 500 24px/1.15 var(--font-display); letter-spacing: -0.02em; color: var(--w-p-ink, #0e0e0d);
+    padding-bottom: 16px; border-bottom: 1px solid rgba(14,14,13,.08);
+  }
+  .sl-win__sub { font: 400 13px/1.3 var(--font-body); letter-spacing: 0; color: var(--w-p-ink-2, #4a4743); }
+  .sl-win__lab { margin: 16px 0 10px; font-size: 14px; font-weight: 600; color: var(--w-p-ink, #0e0e0d); }
+  .sl-win__steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+  .sl-win__steps li {
+    position: relative; display: flex; align-items: center; gap: 12px; min-height: 40px;
+    font-size: 14px; line-height: 1.3; color: var(--w-p-ink-2, #4a4743); white-space: nowrap;
+  }
+  /* Raíl vertical entre los números (W-CORE-27). */
+  .sl-win__steps li:not(:last-child)::after {
+    content: ''; position: absolute; left: 11px; top: 31px; height: 18px; width: 1px; background: rgba(14,14,13,.14);
+  }
+  .sl-win__steps li.is-first { color: var(--w-p-ink, #0e0e0d); font-weight: 600; }
+  .sl-win__n {
+    flex: none; display: grid; place-items: center; width: 23px; height: 23px; border-radius: 50%;
+    border: 1px solid rgba(14,14,13,.28); font-size: 12px; font-weight: 500; color: var(--w-p-ink-2, #4a4743);
+    background: #fbfaf7;
+  }
+  .sl-win__steps li.is-first .sl-win__n { border-color: var(--w-p-ink, #0e0e0d); color: var(--w-p-ink, #0e0e0d); }
+  /* Las de detrás, algo más apagadas (profundidad por valor, sin desenfoque). */
+  .sl-win--1 .sl-win__body, .sl-win--2 .sl-win__body { opacity: .82; }
+
+  @media (--xl) {
+    .sl-pila { grid-template-columns: minmax(0, 1fr) 600px; gap: 64px; }
+    .sl-pila__stack { margin-inline: 0; }
+  }
+  @media (--lt-md) {
+    .sl-pila__stack { height: 580px; max-width: 358px; }
+    .sl-win { width: 236px; }
+    .sl-win--1 { left: 0; top: 0; }
+    .sl-win--2 { left: 52px; top: 100px; }
+    .sl-win--3 { top: 200px; }
+    .sl-win--3 { left: auto; right: 0; width: 252px; }
+    .sl-win__body { padding: 16px 16px 20px; }
+    .sl-win__t { font-size: 20px; }
+  }
+</style>

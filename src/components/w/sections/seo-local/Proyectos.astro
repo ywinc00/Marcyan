@@ -1,0 +1,62 @@
+---
+// SEO local · 05 "Proyectos" (§4.16-8): FichaProyecto grande del proyecto de la ciudad
+// (Houston: TRR; Miami: MJA rotulado Florida (Orlando)) + TarjetasCaso con el resto de
+// proof.items. Ninguna cifra de posiciones. Capturas REALES: aquí sí, es prueba (E-32).
+// · Sin el enlace al servicio del proyecto en la ficha: en las dos ciudades apuntaría a
+//   esta misma página (TRR) o insinuaría un caso en Miami (MJA).
+// · Con un solo proyecto más, su tarjeta no queda huérfana: a su lado va la celda
+//   "Tu negocio aquí" (W-NEW-08, CeldaTuNegocio), que abre WhatsApp de la ciudad. En Miami
+//   su rótulo es el de proof.cta del dato ("Sé nuestro primer caso en Miami").
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import FichaProyecto from '../../FichaProyecto.astro';
+import TarjetasCaso from '../../TarjetasCaso.astro';
+import CeldaTuNegocio from '../../CeldaTuNegocio.astro';
+import type { ProjectItem } from '../../../../i18n/clusters';
+import type { SeoCopy } from '../../../../i18n/w/seo-local';
+
+interface Props {
+  copy: SeoCopy['proyectos']; n: number; items: ProjectItem[]; lead: string;
+  wa: string; addLabel?: string; addText: string; lang?: 'es' | 'en';
+}
+const { copy, n, items, lead, wa, addLabel, addText, lang = 'es' } = Astro.props;
+const main = items.find((p) => p.name === lead) ?? items[0];
+const rest = items.filter((p) => p !== main);
+const single = rest.length === 1;
+---
+<CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
+<div class="sl-gap">
+  <FichaProyecto project={main} variant="grande" lang={lang} as="h3" link={false} />
+</div>
+{rest.length > 0 && (
+  <div class:list={['sl-more', single && 'sl-more--single']}>
+    <TarjetasCaso items={rest} label={copy.more} lang={lang} as="h3" />
+    {single && (
+      <div class="sl-add">
+        <p class="sl-add__t">{addText}</p>
+        <CeldaTuNegocio href={wa} label={addLabel} lang={lang} />
+      </div>
+    )}
+  </div>
+)}
+<style>
+  .sl-gap { margin-top: var(--w-chapter-gap); }
+  .sl-more { position: relative; margin-top: 72px; }
+  .sl-add {
+    margin-top: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 20px; padding: 40px 24px; text-align: center;
+    border: 1px dashed var(--w-line-strong); border-radius: var(--w-r-cell, 8px);
+  }
+  /* La celda mide 205 de fábrica; con el rótulo de Miami ("Sé nuestro primer caso en
+     Miami") partía en dos líneas: aquí crece con su texto (composición, no gramática). */
+  .sl-add :global(.w-addcell) { width: auto; max-width: 100%; padding-inline: 22px; text-align: center; line-height: 1.3; }
+  @media (--md) { .sl-add :global(.w-addcell) { white-space: nowrap; } }
+  .sl-add__t { margin: 0; max-width: 300px; font-size: 16px; line-height: 1.5; color: var(--w-ink-80); }
+  @media (--md) {
+    /* A la derecha de la tarjeta, en la columna que dejaría vacía (rejilla de 2, hueco 36),
+       con su mismo alto: debajo de la etiqueta "Más proyectos" (12 px + 24 de margen). */
+    .sl-more--single .sl-add {
+      position: absolute; margin: 0; top: 38px; bottom: 0; right: 0; width: calc(50% - 18px);
+    }
+  }
+  @media (--lt-md) { .sl-gap { margin-top: 48px; } .sl-more { margin-top: 48px; } }
+</style>

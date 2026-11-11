@@ -21,16 +21,19 @@
 // ─────────────────────────────────────────────────────────────
 import Icon from './ui/Icon.astro';
 import MarcyAvatar from './chat/MarcyAvatar.astro';
-import { nap } from '../i18n/content';
+import { nap, content } from '../i18n/content';
+import FormContacto from './forms/FormContacto.astro';
 
-interface Props { lang?: 'es' | 'en'; }
-const { lang = 'es' } = Astro.props;
+interface Props { lang?: 'es' | 'en'; city?: 'houston' | 'miami'; }
+const { lang = 'es', city = 'houston' } = Astro.props;
+// En las páginas de Miami el chat da el número de Miami (WhatsApp, SMS y llamada), como el resto de la página.
+const cityPhone = city === 'miami' ? nap.miami : nap.houston;
 
 const telHref = (p: string) => 'tel:' + p.replace(/[^\d+]/g, '');
 
 // Canales directos (tarjeta "Mensaje directo") — derivados del NAP de Houston.
-const waHref = `https://wa.me/${nap.houston.replace(/\D/g, '')}`;        // WhatsApp
-const smsHref = `sms:${nap.houston.replace(/[^\d+]/g, '')}`;             // iMessage / SMS
+const waHref = `https://wa.me/${cityPhone.replace(/\D/g, '')}`;        // WhatsApp
+const smsHref = `sms:${cityPhone.replace(/[^\d+]/g, '')}`;             // iMessage / SMS
 
 const STR = {
   es: {
@@ -100,6 +103,7 @@ const STR = {
     optDirectSub: 'Habla con nosotros por tu canal favorito.',
     optFormTitle: 'Formulario de contacto',
     optFormSub: 'Cuéntanos sobre tu proyecto y te responderemos.',
+    formIntro: 'Cuéntanos tu proyecto. Te respondemos en menos de 1 hora hábil.',
     optDiagSub: 'Revisamos tu web, SEO y presencia online.',
     // Tarjetas de acción que Marcy inserta en el chat (canales directos / enlace)
     channelsTitle: 'Escríbenos por tu canal favorito',
@@ -179,6 +183,7 @@ const STR = {
     optDirectSub: 'Reach us on your favorite channel.',
     optFormTitle: 'Contact form',
     optFormSub: 'Tell us about your project and we’ll get back to you.',
+    formIntro: 'Tell us about your project. We reply within 1 business hour.',
     optDiagSub: 'We’ll review your site, SEO, and online presence.',
     channelsTitle: 'Reach us on your favorite channel',
     directCall: 'Call',
@@ -226,7 +231,7 @@ const links = [
 ];
 // Canales directos + páginas que Marcy puede insertar en el chat vía herramienta
 // (enlaces/hrefs NUESTROS, nunca texto del modelo → seguros). Bilingüe por routes.
-const channels = { wa: waHref, sms: smsHref, tel: telHref(nap.houston) };
+const channels = { wa: waHref, sms: smsHref, tel: telHref(cityPhone) };
 const pages = {
   precios:    { href: lang === 'en' ? '/en/pricing'  : '/es/precios',   label: t.pgPrecios },
   servicios:  { href: lang === 'en' ? '/en/services' : '/es/servicios', label: t.pgServicios },
@@ -238,7 +243,7 @@ const pages = {
   'calculadora-llamadas': { href: lang === 'en' ? '/en/tools#calls' : '/es/herramientas#llamadas', label: t.pgCalcLlamadas },
   'calculadora-citas': { href: lang === 'en' ? '/en/tools#appointments' : '/es/herramientas#citas', label: t.pgCalcCitas },
 };
-const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio (chatbot)', phone: nap.houston, channels, pages };
+const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio (chatbot)', phone: cityPhone, channels, pages };
 ---
 
 <div class="mrc-chat" id="mrc-chat" data-mrc-root data-stage="welcome">
@@ -292,10 +297,13 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
     <!-- Estado BIENVENIDA — selector de canal de contacto -->
     <div class="mrc-welcome" data-mrc-welcome>
-      <span class="mrc-hero-avatar"><MarcyAvatar variant="hero" defer lang={lang} /></span>
-      <h2 class="mrc-welcome-title">{t.welcomeTitle}</h2>
-      <p class="mrc-welcome-sub">{t.welcomeSub}</p>
-      <p class="mrc-welcome-hint">{t.welcomeHint}</p>
+      <!-- v5 (boceto B, dueño 2026-11-06): banda de noche con Marcy de cuerpo entero; las opciones montan sobre ella -->
+      <div class="mrc-wband">
+        <span class="mrc-hero-avatar"><MarcyAvatar variant="hero" defer lang={lang} /></span>
+        <h2 class="mrc-welcome-title">{t.welcomeTitle}</h2>
+        <p class="mrc-welcome-sub">{t.welcomeSub}</p>
+        <p class="mrc-welcome-hint">{t.welcomeHint}</p>
+      </div>
 
       <div class="mrc-options">
         <!-- Chat con Marcy → entra a la conversación -->
@@ -350,6 +358,14 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       </div>
     </div>
 
+    <!-- Estado CONTACTO (v5, dueño 2026-11-07): el formulario NORMAL del sitio, el mismo de #contacto
+         (forms/FormContacto.astro: misma validación, antispam y envío). Sustituye al formulario corto. -->
+    <div class="mrc-contacto" data-mrc-contacto>
+      <h2 class="mrc-ct-title">{t.optFormTitle}</h2>
+      <p class="mrc-ct-sub">{t.formIntro}</p>
+      <FormContacto f={content[lang].contact.form} idp="chat" source="chat_contact_form" class="mrc-ct-form" />
+    </div>
+
     <!-- Estado CONVERSACIÓN -->
     <div class="mrc-log" data-mrc-log role="log" aria-live="polite" aria-atomic="false"></div>
 
@@ -389,11 +405,6 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
 
 <style>
   .mrc-chat { position: fixed; right: clamp(12px, 3vw, 24px); bottom: clamp(12px, 3vw, 24px); z-index: var(--z-drawer); transition: bottom var(--duration-base) var(--ease-out-expo); }
-  /* móvil: cuando la barra CTA inferior "Iniciar Proyecto" está visible, el FAB sube por
-     encima de ella (altura de la barra + holgura) para que no coincidan. */
-  @media (max-width: 767px) {
-    :global(body.has-ctabar) .mrc-chat { bottom: calc(var(--tap-min) + var(--space-3) * 3 + env(safe-area-inset-bottom)); }
-  }
 
   /* ── Burbuja de atención ────────────────────────────────── */
   .mrc-nudge {
@@ -420,8 +431,10 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     border-radius: 50%; cursor: pointer;
     background: var(--accent-teal); color: var(--fg-inverse); border: none;
     box-shadow: var(--shadow-teal), 0 6px 24px rgba(0, 0, 0, 0.5);
-    transition: transform var(--duration-base) var(--ease-out-expo), box-shadow var(--duration-base) var(--ease-out-expo);
+    transition: transform var(--duration-base) var(--ease-out-expo), box-shadow var(--duration-base) var(--ease-out-expo), opacity .25s ease;
   }
+  :global(.is-aparta) .mrc-fab { transform: translateY(96px); opacity: 0; pointer-events: none; transition: transform .3s cubic-bezier(.4, 0, 1, 1), opacity .2s ease; }
+  @media (max-width: 767.98px) { .mrc-fab { width: 52px; height: 52px; } }
   .mrc-fab:hover { transform: translateY(-2px) scale(1.04); box-shadow: var(--shadow-teal), 0 10px 32px rgba(0, 0, 0, 0.6); }
   .mrc-fab:focus-visible { outline: 2px solid var(--accent-teal); outline-offset: 3px; }
   .mrc-fab-ic { position: absolute; display: inline-flex; align-items: center; justify-content: center; transition: opacity var(--duration-base), transform var(--duration-base); }
@@ -435,7 +448,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-panel {
     position: absolute; right: 0; bottom: calc(58px + var(--space-3));
     display: flex; flex-direction: column;
-    width: min(384px, calc(100vw - 24px)); height: min(760px, calc(100vh - 88px));
+    width: min(384px, calc(100vw - 24px)); height: min(760px, calc(calc(100vh / var(--z, 1)) - 88px));
     background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
     box-shadow: var(--shadow-modal); overflow: hidden;
     animation: mrc-in var(--duration-base) var(--ease-out-expo);
@@ -476,8 +489,10 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-head-tx { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
   .mrc-head-tx b { font-family: var(--font-display); font-size: var(--text-md); font-weight: 600; color: var(--fg-primary); }
   .mrc-status { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--fg-secondary); }
-  .mrc-live { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-teal); box-shadow: 0 0 0 0 var(--accent-teal); animation: mrc-pulse 2s ease-out infinite; }
-  @keyframes mrc-pulse { 0% { box-shadow: 0 0 0 0 var(--accent-teal-line); } 70% { box-shadow: 0 0 0 6px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  /* Halo con transform/opacity (compuesto): antes animaba box-shadow y repintaba en cada fotograma. */
+  .mrc-live { position: relative; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-teal); }
+  .mrc-live::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--accent-teal-line); animation: mrc-pulse 2s ease-out infinite; }
+  @keyframes mrc-pulse { 0% { transform: scale(1); opacity: 1; } 70%, 100% { transform: scale(3); opacity: 0; } }
   .mrc-close, .mrc-human, .mrc-back {
     flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center;
     width: var(--tap-min); height: var(--tap-min); border-radius: var(--radius-md);
@@ -604,6 +619,28 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-chat[data-stage="welcome"] .mrc-human { display: none; }
   .mrc-chat[data-stage="welcome"] .mrc-head { justify-content: flex-end; background: transparent; border-bottom-color: transparent; }
   .mrc-chat[data-stage="chat"] .mrc-welcome { display: none; }
+  /* Estado CONTACTO: cabecera con Volver + el formulario normal; nada de la conversación. */
+  .mrc-contacto { display: none; }
+  .mrc-chat[data-stage="contacto"] .mrc-welcome,
+  .mrc-chat[data-stage="contacto"] .mrc-log,
+  .mrc-chat[data-stage="contacto"] .mrc-chips,
+  .mrc-chat[data-stage="contacto"] .mrc-form,
+  .mrc-chat[data-stage="contacto"] .mrc-human,
+  .mrc-chat[data-stage="contacto"] .mrc-foot { display: none; }
+  .mrc-chat[data-stage="contacto"] .mrc-contacto {
+    position: relative; z-index: 1; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+    display: flex; flex-direction: column; gap: 6px; padding: var(--space-4) var(--space-4) var(--space-5);
+    background: var(--bg-card);
+  }
+  .mrc-ct-title { margin: 0; font-family: var(--font-display); font-size: 22px; font-weight: 500; letter-spacing: -.02em; color: var(--fg-primary); }
+  .mrc-ct-sub { margin: 0 0 10px; font-size: var(--text-sm); color: var(--fg-secondary); }
+  /* el formulario del sitio, en la piel clara del panel: tarjeta blanca y campos crema */
+  .mrc-contacto :global(.mrc-ct-form) {
+    padding: var(--space-4); gap: var(--space-3); border: 0; border-radius: 14px; background: #fff;
+    box-shadow: 0 10px 26px -16px rgba(14, 14, 13, .35), inset 0 0 0 1px rgba(14, 14, 13, .06);
+    --bg-elevated: #f6f4f0; --accent-gold: #8a6a3a; --accent-gold-dim: rgba(200, 169, 110, .22);
+  }
+  .mrc-contacto :global(.mrc-ct-form .field-row) { grid-template-columns: 1fr; gap: var(--space-3); }
   /* En bienvenida, el footer de acción ('Dejar mis datos') duplicaría la tarjeta
      'Formulario de contacto' del selector → ocultarlo en welcome. */
   .mrc-chat[data-stage="welcome"] .mrc-foot { display: none; }
@@ -666,12 +703,102 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     .mrc-panel {
       position: fixed; left: 0; right: 0; bottom: auto;
       top: var(--mrc-vvtop, 0px);
-      width: auto; height: var(--mrc-vvh, 100svh);
+      width: auto; height: var(--mrc-vvh, calc(100svh / var(--z, 1)));
       border-radius: 0; border: none;
     }
     .mrc-chat[data-open] .mrc-fab, .mrc-chat[data-open] .mrc-nudge { display: none; }
     .mrc-options { max-width: 460px; }
     .mrc-hero-avatar :global(.marcy img) { height: clamp(92px, 24vw, 112px); }
+  }
+
+
+  /* ═══ v5 · Boceto B (dueño, 2026-11-06): «el fondo negro no me acaba de encajar». ═══════════
+     Cabecera de noche con el oro del sitio y Marcy de cuerpo entero; cuerpo claro. Refero (mirado
+     en imagen): Alive 7121e4c0 (tarjetas que montan sobre la banda), On 255118e3 (burbujas), Copilot
+     59fa00e4 (sugerencias de borde). Catálogo: H-06 rampa de superficies, G-10 capas, F-09 cambio
+     de estado sin salto. Solo piel: el panel redefine los tokens en claro y la cabecera vuelve a la
+     noche; la lógica, la captura y los textos no cambian (design/chat-marcy.md). */
+  .mrc-panel {
+    --bg-card: #f6f4f0; --bg-elevated: #ffffff; --bg-2: #f6f4f0;
+    --border: rgba(14, 14, 13, .10);
+    --fg-primary: #0e0e0d; --fg-secondary: #5f5b56; --fg-subtle: #8a857e; --fg-inverse: #ffffff;
+    --accent-teal: #1f8a6c; --accent-teal-rgb: 31, 138, 108;
+    --accent-teal-dim: rgba(31, 138, 108, .10); --accent-teal-line: rgba(31, 138, 108, .32);
+    --accent-gold: #8a6a3a; --accent-gold-dim: rgba(200, 169, 110, .16); --accent-gold-line: rgba(160, 124, 62, .40);
+    --shadow-gold: 0 8px 24px -12px rgba(138, 106, 58, .45);
+    --mrc-noche: #121212;
+    border-color: rgba(255, 255, 255, .06);
+    box-shadow: 0 40px 80px -30px rgba(0, 0, 0, .75), 0 0 0 1px rgba(255, 255, 255, .04);
+  }
+  /* Noche: cabecera (siempre) y banda de bienvenida. Recupera los tokens oscuros del sitio. */
+  .mrc-head, .mrc-wband {
+    --fg-primary: #f0ede8; --fg-secondary: rgba(240, 237, 232, .66); --fg-subtle: rgba(240, 237, 232, .45);
+    --bg-elevated: rgba(255, 255, 255, .08); --accent-teal: #4fc3a1; --accent-teal-line: rgba(79, 195, 161, .4);
+    --accent-gold: #c8a96e; --accent-gold-dim: rgba(200, 169, 110, .14);
+    color: var(--fg-primary);
+  }
+  .mrc-fx { display: none; }
+  .mrc-head {
+    border-bottom: 0;
+    background:
+      radial-gradient(120% 160% at 92% -40%, rgba(200, 169, 110, .38), transparent 60%),
+      var(--mrc-noche);
+  }
+  .mrc-avatar { background: none; }
+  /* Bienvenida: la cabecera se funde con la banda (mismo fondo, sin el brillo propio). */
+  .mrc-chat[data-stage="welcome"] .mrc-head { position: absolute; top: 0; left: 0; right: 0; z-index: 3; background: transparent; }
+  .mrc-welcome { align-items: stretch; text-align: left; gap: 0; padding: 0 var(--space-4) var(--space-4); }
+  .mrc-wband {
+    position: relative; margin: 0 calc(-1 * var(--space-4)); padding: 58px 20px 72px;
+    display: flex; flex-direction: column; gap: 6px; min-height: 236px;
+    background:
+      radial-gradient(90% 120% at 88% -12%, rgba(200, 169, 110, .45), transparent 60%),
+      radial-gradient(70% 90% at 0% 115%, rgba(79, 195, 161, .16), transparent 70%),
+      var(--mrc-noche);
+  }
+  /* estrellas sutiles de la marca, solo en la banda */
+  .mrc-wband::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+    background-image:
+      radial-gradient(1.5px 1.5px at 14% 18%, rgba(var(--star-rgb), .6), transparent),
+      radial-gradient(1px 1px at 46% 10%, rgba(var(--star-rgb), .5), transparent),
+      radial-gradient(1px 1px at 30% 62%, rgba(var(--star-rgb), .4), transparent),
+      radial-gradient(1px 1px at 58% 44%, rgba(var(--star-rgb), .4), transparent);
+  }
+  .mrc-wband > :not(.mrc-hero-avatar) { position: relative; }
+  .mrc-hero-avatar {
+    position: absolute; right: 6px; bottom: 40px; margin: 0;
+    filter: drop-shadow(0 12px 24px rgba(0, 0, 0, .55));
+  }
+  .mrc-hero-avatar :global(.marcy img) { height: 150px; }
+  .mrc-welcome-title {
+    margin: 0; max-width: 11ch;
+    font-size: 30px; line-height: 1.04; font-weight: 500; letter-spacing: -.035em; color: var(--fg-primary);
+  }
+  .mrc-welcome-sub { margin: 4px 0 0; max-width: 21ch; font-size: var(--text-sm); color: var(--fg-secondary); }
+  .mrc-welcome-hint { max-width: 24ch; color: var(--fg-subtle); }
+  /* Las opciones montan sobre la banda */
+  .mrc-options { position: relative; z-index: 2; max-width: none; margin-top: -52px; gap: 8px; }
+  .mrc-opt {
+    border-radius: 14px; border-color: transparent; background: var(--bg-elevated);
+    box-shadow: 0 10px 26px -14px rgba(14, 14, 13, .35), inset 0 0 0 1px rgba(14, 14, 13, .06);
+  }
+  button.mrc-opt:hover { background: #fff; border-color: transparent; box-shadow: 0 14px 30px -14px rgba(14, 14, 13, .4), inset 0 0 0 1px var(--accent-teal-line); }
+  .mrc-opt-ic { width: 40px; height: 40px; border-color: transparent; }
+  .mrc-opt-arrow { border-color: transparent; }
+  .mrc-opt--gold { background: #fff; }
+  .mrc-opt--gold .mrc-opt-title { color: var(--fg-primary); }
+  .mrc-pill { background: #fff; }
+  /* Conversación: cuerpo claro */
+  .mrc-log { background: var(--bg-card); }
+  .mrc-chip { background: transparent; color: #1f6e57; border-color: rgba(31, 138, 108, .4); }
+  .mrc-form { background: var(--bg-card); border-top-color: var(--border); }
+  .mrc-input { background: #fff; }
+  .mrc-send { background: var(--mrc-noche); color: #c8a96e; }
+  .mrc-foot { background: var(--bg-card); }
+  @media (--lt-md) {
+    .mrc-hero-avatar :global(.marcy img) { height: clamp(124px, 34vw, 150px); }
+    .mrc-welcome-title { font-size: 32px; }
   }
 
   @media (--motion-reduce) {
@@ -690,6 +817,8 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     font-size: var(--text-sm); line-height: var(--leading-normal); word-wrap: break-word; white-space: pre-wrap;
   }
   .mrc-chat .mrc-ai { align-self: flex-start; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg-primary); border-bottom-left-radius: 4px; }
+  /* v5 (boceto B): burbuja de Marcy blanca con sombra corta sobre el cuerpo claro */
+  .mrc-chat .mrc-ai { border-color: transparent; box-shadow: 0 1px 2px rgba(14, 14, 13, .06), inset 0 0 0 1px rgba(14, 14, 13, .05); }
   .mrc-chat .mrc-user { align-self: flex-end; background: var(--accent-teal); color: var(--fg-inverse); border-bottom-right-radius: 4px; }
   .mrc-chat .mrc-sys { align-self: center; background: transparent; border: 1px dashed var(--border); color: var(--fg-secondary); font-size: var(--text-xs); max-width: 100%; display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
   .mrc-chat .mrc-retry {
@@ -1814,7 +1943,13 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       if (!el) return;
       const act = el.getAttribute('data-act');
       if (act === 'chat') { try { track('chat_channel_selected', { channel: 'chat' }); } catch {} ensureChat(); if (input) input.focus(); return; }
-      if (act === 'form') { try { track('chat_channel_selected', { channel: 'form' }); } catch {} openCapture('contacto'); return; }
+      if (act === 'form') {
+        try { track('chat_channel_selected', { channel: 'form' }); } catch {}
+        // v5: el formulario normal en su propio estado (antes, la captura corta en la conversación).
+        flushTyper(); setStage('contacto');
+        requestAnimationFrame(() => { const c = root.querySelector('[data-mrc-contacto]'); if (c) c.scrollTop = 0; (closeBtn || panel).focus(); });
+        return;
+      }
       const msg = el.getAttribute('data-msg');
       if (msg) { try { track('chat_channel_selected', { channel: 'diagnostic' }); } catch {} send(msg); }
     });
@@ -1873,20 +2008,39 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     }
 
     // Burbuja de atención: una vez por sesión, a los pocos segundos de cargar.
-    // Suprimida cuando la barra CTA móvil está visible (body.has-ctabar) para no
-    // solapar FAB + barra + nudge en la esquina (seam-12).
     try {
-      if (nudge && !sessionStorage.getItem('mrcNudge')) {
+      // En teléfonos la burbuja tapaba títulos y botones (rev. móvil 2026-11-08): solo en pantallas anchas.
+      if (nudge && !sessionStorage.getItem('mrcNudge') && matchMedia('(min-width: 768px)').matches) {
         setTimeout(() => {
-          const ctaBar = document.body && document.body.classList.contains('has-ctabar');
-          if (!opened && !ctaBar && nudge) {
+          if (!opened && nudge) {
             nudge.hidden = false;
             try { sessionStorage.setItem('mrcNudge', '1'); } catch (_) {}
             setTimeout(() => { if (nudge && !opened) nudge.hidden = true; }, 9000);
+            // Si la persona se pone a leer (scroll), la burbuja se retira: tapaba botones y precios
+            // del borde inferior en teléfonos (barrido 2026-11-07).
+            const y0 = scrollY;
+            const off = () => { if (Math.abs(scrollY - y0) > 240) { nudge.hidden = true; removeEventListener('scroll', off); } };
+            addEventListener('scroll', off, { passive: true });
           }
         }, 3500);
       }
     } catch (_) {}
+
+    // Teléfono: el botón se aparta mientras bajas leyendo (tapaba precios y finales de párrafo) y
+    // vuelve al subir o al parar 0,9 s. Nunca se esconde con el panel abierto.
+    if (matchMedia('(max-width: 767.98px)').matches) {
+      let yA = scrollY, tVuelve = 0, pend = false;
+      const mira = () => {
+        pend = false;
+        const y = scrollY, d = y - yA; yA = y;
+        if (opened) return;
+        if (d > 6 && y > 200) { if (!root.classList.contains('is-aparta')) root.classList.add('is-aparta'); }
+        else if (d < -6) root.classList.remove('is-aparta');
+        clearTimeout(tVuelve);
+        tVuelve = window.setTimeout(() => root.classList.remove('is-aparta'), 900);
+      };
+      addEventListener('scroll', () => { if (!pend) { pend = true; requestAnimationFrame(mira); } }, { passive: true });
+    }
 
     // Al enfocar un campo: reajusta al teclado y, si está dentro del log (campos
     // de la captura), lo deja a la vista por encima del teclado.
@@ -1895,7 +2049,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       setTimeout(() => {
         syncViewport();
         const a = document.activeElement;
-        if (a && a.scrollIntoView && log && log.contains(a)) a.scrollIntoView({ block: 'center' });
+        if (a && a.scrollIntoView && ((log && log.contains(a)) || a.closest('[data-mrc-contacto]'))) a.scrollIntoView({ block: 'center' });
       }, 280);
     });
 
@@ -1903,7 +2057,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     panel.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') { e.preventDefault(); closePanel(); return; }
       if (e.key !== 'Tab') return;
-      const nodes = panel.querySelectorAll('button, a[href], textarea, input, [tabindex]:not([tabindex="-1"])');
+      const nodes = panel.querySelectorAll('button, a[href], textarea, input, select, [tabindex]:not([tabindex="-1"])');
       const list = Array.prototype.filter.call(nodes, (el) => !el.disabled && el.offsetParent !== null);
       if (!list.length) return;
       const first = list[0]; const lastEl = list[list.length - 1];

@@ -3,3 +3,10 @@
 @import './tokens.css';
 @import './font-fallbacks.css';
 @import './base.css';
+@import './w-tokens.css';
+
+/* Iconos del sistema (lucide y propios): UN grosor de trazo real en pantalla, 1,5 px, se pinten al
+   tamaño que se pinten (auditoría de iconos, 2026-11-08: convivían trazos de 0,9 a 2,3 px en una
+   misma tarjeta). Los rellenos no cambian. */
+svg[data-icon] g[stroke], svg[data-icon] [stroke]:not(g) { stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+svg[data-icon] g[stroke] * { vector-effect: non-scaling-stroke; }

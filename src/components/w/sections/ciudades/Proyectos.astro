@@ -1,0 +1,27 @@
+---
+// Ciudades · 04 "Proyectos por ciudad" (§4.13-5): tarjetas de caso con captura real
+// (prueba, E-32). Houston: TRR, JLS, RN; Florida: MJA, rotulado Florida (Orlando).
+// Orden en la rejilla de 2: TRR junto a MJA (mismo servicio, "lo mismo en Orlando" se
+// lee al lado de su par) y debajo los otros dos de Houston.
+import CabeceraNumerada from '../../CabeceraNumerada.astro';
+import TarjetasCaso from '../../TarjetasCaso.astro';
+
+interface Props {
+  n: number;
+  label: string;
+  title: string;
+  lead: string;
+  more: string;
+  items: { name: string }[];
+  lang?: 'es' | 'en';
+}
+const { n, label, title, lead, more, items, lang = 'es' } = Astro.props;
+---
+<CabeceraNumerada n={n} label={label} titleHtml={title} lead={lead} />
+<div class="ciu-pf">
+  <TarjetasCaso items={items} label={more} lang={lang} as="h3" />
+</div>
+<style>
+  .ciu-pf { margin-top: 56px; }
+  @media (--lt-md) { .ciu-pf { margin-top: 32px; } }
+</style>

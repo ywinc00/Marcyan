@@ -1,0 +1,207 @@
+{
+  "cliente": "marcyan",
+  "estado": "ok",
+  "periodo": {
+    "desde": "2026-11-02",
+    "hasta": "2026-11-08"
+  },
+  "anterior": {
+    "desde": "2026-10-26",
+    "hasta": "2026-11-01"
+  },
+  "eventoContacto": "generate_lead",
+  "totales": {
+    "sesiones": 41,
+    "contactos": 0
+  },
+  "porCanal": {
+    "Direct": {
+      "actual": {
+        "sesiones": 27,
+        "contactos": 0
+      },
+      "anterior": {
+        "sesiones": 420,
+        "contactos": 0
+      }
+    },
+    "Organic Search": {
+      "actual": {
+        "sesiones": 11,
+        "contactos": 0
+      },
+      "anterior": {
+        "sesiones": 2,
+        "contactos": 0
+      }
+    },
+    "Unassigned": {
+      "actual": {
+        "sesiones": 2,
+        "contactos": 0
+      },
+      "anterior": {
+        "sesiones": 0,
+        "contactos": 0
+      }
+    },
+    "Referral": {
+      "actual": {
+        "sesiones": 1,
+        "contactos": 0
+      },
+      "anterior": {
+        "sesiones": 1,
+        "contactos": 0
+      }
+    }
+  },
+  "porIdioma": {
+    "es": {
+      "actual": {
+        "sesiones": 39,
+        "contactos": 0
+      },
+      "anterior": {
+        "sesiones": 322,
+        "contactos": 0
+      }
+    },
+    "en": {
+      "actual": {
+        "sesiones": 2,
+        "contactos": 0
+      },
+      "anterior": {
+        "sesiones": 101,
+        "contactos": 0
+      }
+    }
+  },
+  "ia": {
+    "actual": {
+      "sesiones": 0,
+      "contactos": 0
+    },
+    "anterior": {
+      "sesiones": 0,
+      "contactos": 0
+    },
+    "fuentes": {}
+  },
+  "nota": "Contactos = número de eventos de contacto (un mismo cliente puede enviar dos veces). Visitas de IA sin referrer caen en Direct.",
+  "contactos": {
+    "estado": "ok",
+    "formulario": {
+      "regla": "evento",
+      "eventos": [
+        "generate_lead"
+      ]
+    },
+    "vias": [
+      "form",
+      "whatsapp"
+    ],
+    "pais": null,
+    "medidoDesde": null,
+    "toques": {
+      "whatsapp": {
+        "eventos": [
+          "whatsapp_clicked"
+        ],
+        "enlace": null
+      }
+    },
+    "detectadas": {
+      "whatsapp": [
+        "whatsapp_clicked"
+      ]
+    },
+    "actual": {
+      "personas": 1,
+      "personasConFuera": 1,
+      "porCamino": {
+        "organic": 0,
+        "paid": 0,
+        "direct": 1,
+        "ai": 0,
+        "other": 0
+      },
+      "porVia": {
+        "form": {
+          "personas": 0,
+          "porCamino": {
+            "organic": 0,
+            "paid": 0,
+            "direct": 0,
+            "ai": 0,
+            "other": 0
+          }
+        },
+        "whatsapp": {
+          "personas": 1,
+          "porCamino": {
+            "organic": 0,
+            "paid": 0,
+            "direct": 1,
+            "ai": 0,
+            "other": 0
+          },
+          "toques": 1
+        }
+      },
+      "visitas": {
+        "organic": 11,
+        "paid": 0,
+        "direct": 27,
+        "ai": 0,
+        "other": 3
+      },
+      "visitasTotal": 41,
+      "fueraDelPais": []
+    },
+    "anterior": {
+      "personas": 0,
+      "personasConFuera": 0,
+      "porCamino": {
+        "organic": 0,
+        "paid": 0,
+        "direct": 0,
+        "ai": 0,
+        "other": 0
+      },
+      "porVia": {
+        "form": {
+          "personas": 0,
+          "porCamino": {
+            "organic": 0,
+            "paid": 0,
+            "direct": 0,
+            "ai": 0,
+            "other": 0
+          }
+        },
+        "whatsapp": {
+          "personas": 0,
+          "porCamino": {
+            "organic": 0,
+            "paid": 0,
+            "direct": 0,
+            "ai": 0,
+            "other": 0
+          },
+          "toques": 0
+        }
+      },
+      "visitas": {
+        "organic": 2,
+        "paid": 0,
+        "direct": 420,
+        "ai": 0,
+        "other": 1
+      },
+      "visitasTotal": 423,
+      "fueraDelPais": []
+    }
+  }
+}

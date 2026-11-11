@@ -1,6 +1,6 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-11-05",
+  "fecha": "2026-11-10",
   "primeraEjecucion": false,
   "sitemap": 52,
   "inspeccion": true,
@@ -18,7 +18,7 @@
     },
     "otras·en": {
       "total": 5,
-      "indexadas": 3
+      "indexadas": 2
     },
     "servicios·en": {
       "total": 2,
@@ -30,11 +30,11 @@
     },
     "herramientas·en": {
       "total": 2,
-      "indexadas": 2
+      "indexadas": 1
     },
     "ciudades·en": {
       "total": 2,
-      "indexadas": 1
+      "indexadas": 2
     },
     "landings·en": {
       "total": 2,
@@ -50,7 +50,7 @@
     },
     "blog·es": {
       "total": 7,
-      "indexadas": 3
+      "indexadas": 2
     },
     "otras·es": {
       "total": 5,
@@ -66,7 +66,7 @@
     },
     "landings·es": {
       "total": 12,
-      "indexadas": 7
+      "indexadas": 8
     },
     "servicios·es": {
       "total": 2,
@@ -74,12 +74,12 @@
     },
     "precios·es": {
       "total": 1,
-      "indexadas": 0
+      "indexadas": 1
     }
   },
-  "sinRastreoReciente": 19,
+  "sinRastreoReciente": 11,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 70,
+  "certificadoDias": 65,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 52
@@ -113,8 +113,8 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 40,
-    "sesionesDiaHabitual": 28.9,
+    "sesionesUltimos3Dias": 23,
+    "sesionesDiaHabitual": 8.6,
     "contactosSemanaHabitual": null,
     "diasSinContactos": 63,
     "probabilidadAzar": null
@@ -136,59 +136,188 @@
     "entrenamientoBloqueado": []
   },
   "google": {
-    "enCurso": [],
+    "enCurso": [
+      {
+        "nombre": "November 2026 core update",
+        "inicio": "2026-11-10T18:06:00+00:00",
+        "fin": null,
+        "url": "https://status.search.google.com/incidents/WLxcJyC6jMWMfryxsKMc",
+        "interpretableDesde": null
+      }
+    ],
     "recientes": []
   },
   "alertas": {
     "alta": [
       {
-        "fecha": "2026-11-05",
+        "fecha": "2026-11-10",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity"
+        "url": "https://marcyanstudio.com/en/checkup"
       },
       {
-        "fecha": "2026-11-05",
+        "fecha": "2026-11-10",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/houston/sugar-land"
+        "url": "https://marcyanstudio.com/en/cities"
+      },
+      {
+        "fecha": "2026-11-10",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/blog"
+      },
+      {
+        "fecha": "2026-11-10",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/houston/branding"
+      },
+      {
+        "fecha": "2026-11-10",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/houston/ecommerce"
+      },
+      {
+        "fecha": "2026-11-10",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/houston/seo-local"
       }
     ],
     "media": [
       {
-        "fecha": "2026-11-05",
+        "fecha": "2026-11-10",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "19 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "11 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
-    "info": []
+    "info": [
+      {
+        "fecha": "2026-11-10",
+        "cliente": "marcyan",
+        "nivel": "info",
+        "tipo": "indexacion",
+        "detalle": "Entró al índice",
+        "url": "https://marcyanstudio.com/en/houston"
+      },
+      {
+        "fecha": "2026-11-10",
+        "cliente": "marcyan",
+        "nivel": "info",
+        "tipo": "indexacion",
+        "detalle": "Entró al índice",
+        "url": "https://marcyanstudio.com/es/houston/diseno-web"
+      },
+      {
+        "fecha": "2026-11-10",
+        "cliente": "marcyan",
+        "nivel": "info",
+        "tipo": "indexacion",
+        "detalle": "Entró al índice",
+        "url": "https://marcyanstudio.com/es/houston/ia-conversacional"
+      },
+      {
+        "fecha": "2026-11-10",
+        "cliente": "marcyan",
+        "nivel": "info",
+        "tipo": "indexacion",
+        "detalle": "Entró al índice",
+        "url": "https://marcyanstudio.com/es/miami/ecommerce"
+      },
+      {
+        "fecha": "2026-11-10",
+        "cliente": "marcyan",
+        "nivel": "info",
+        "tipo": "indexacion",
+        "detalle": "Entró al índice",
+        "url": "https://marcyanstudio.com/es/miami/seo-local"
+      },
+      {
+        "fecha": "2026-11-10",
+        "cliente": "marcyan",
+        "nivel": "info",
+        "tipo": "indexacion",
+        "detalle": "Entró al índice",
+        "url": "https://marcyanstudio.com/es/precios"
+      },
+      {
+        "fecha": "2026-11-10",
+        "cliente": "marcyan",
+        "nivel": "info",
+        "tipo": "google",
+        "detalle": "Actualización en curso: November 2026 core update. No interpretar movimientos hasta una semana después de que termine.",
+        "url": null
+      }
+    ]
   },
   "alertasNuevas": [
     {
-      "fecha": "2026-11-05",
+      "fecha": "2026-11-10",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/blog/como-aparecer-en-chatgpt-perplexity"
+      "url": "https://marcyanstudio.com/en/checkup"
     },
     {
-      "fecha": "2026-11-05",
+      "fecha": "2026-11-10",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/houston/sugar-land"
+      "url": "https://marcyanstudio.com/en/cities"
+    },
+    {
+      "fecha": "2026-11-10",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/blog"
+    },
+    {
+      "fecha": "2026-11-10",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/houston/branding"
+    },
+    {
+      "fecha": "2026-11-10",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/houston/ecommerce"
+    },
+    {
+      "fecha": "2026-11-10",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/houston/seo-local"
     }
   ],
   "pedirIndexacion": [],
-  "colaPendiente": 20,
+  "colaPendiente": 32,
   "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"
 }

@@ -1,24 +1,24 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-11-04",
+  "fecha": "2026-11-09",
   "estado": "ok",
   "siteUrl": "https://marcyanstudio.com/",
   "busquedas": {
     "ultimos28": {
-      "clics": 1,
-      "impresiones": 21
+      "clics": 2,
+      "impresiones": 22
     },
     "anteriores28": {
       "clics": 0,
-      "impresiones": 2
+      "impresiones": 3
     }
   },
   "consultasSinMarca": [
     {
       "consulta": "diseño web en miami",
-      "clics": 0,
-      "impresiones": 9,
-      "posicionMedia": 3.1,
+      "clics": 1,
+      "impresiones": 10,
+      "posicionMedia": 3,
       "marca": false
     },
     {
@@ -29,24 +29,10 @@
       "marca": false
     },
     {
-      "consulta": "cuánto podría costar hacer un chatbot de whatsapp",
-      "clics": 0,
-      "impresiones": 1,
-      "posicionMedia": 10,
-      "marca": false
-    },
-    {
       "consulta": "poner una ia para que conteste las llamadas y los whatsapp cuando yo no puedo",
       "clics": 1,
       "impresiones": 1,
       "posicionMedia": 2,
-      "marca": false
-    },
-    {
-      "consulta": "poner una ia para que conteste las llamadas y los whatsapp",
-      "clics": 0,
-      "impresiones": 1,
-      "posicionMedia": 4,
       "marca": false
     },
     {
@@ -57,6 +43,13 @@
       "marca": false
     },
     {
+      "consulta": "poner una ia para que conteste las llamadas y los whatsapp",
+      "clics": 0,
+      "impresiones": 1,
+      "posicionMedia": 4,
+      "marca": false
+    },
+    {
       "consulta": "páginas web houston",
       "clics": 0,
       "impresiones": 1,
@@ -64,17 +57,17 @@
       "marca": false
     },
     {
-      "consulta": "que ia contesta las llamasdas en eeu y pide un mesnaje del caller para comunicarle al destinatario",
-      "clics": 0,
-      "impresiones": 1,
-      "posicionMedia": 6,
-      "marca": false
-    },
-    {
       "consulta": "¿cómo lograr que gemini recomiende mi marca en méxico?",
       "clics": 0,
       "impresiones": 1,
       "posicionMedia": 4,
+      "marca": false
+    },
+    {
+      "consulta": "que ia contesta las llamasdas en eeu y pide un mesnaje del caller para comunicarle al destinatario",
+      "clics": 0,
+      "impresiones": 1,
+      "posicionMedia": 6,
       "marca": false
     },
     {
@@ -89,6 +82,13 @@
       "clics": 0,
       "impresiones": 1,
       "posicionMedia": 6,
+      "marca": false
+    },
+    {
+      "consulta": "diseño de página web en houston",
+      "clics": 0,
+      "impresiones": 1,
+      "posicionMedia": 2,
       "marca": false
     }
   ],

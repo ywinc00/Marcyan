@@ -32,53 +32,53 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
   <input type="text" name="website_hp" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
   <div class="field-row">
-    <label class="field">
+    <label class="field" for={`${idp}-name`}>
       <span class="field__lbl">{f.name.label}</span>
-      <input type="text" name="owner_name" placeholder={f.name.ph} autocomplete="name" />
+      <input type="text" id={`${idp}-name`} name="owner_name" placeholder={f.name.ph} autocomplete="name" />
     </label>
-    <label class="field">
+    <label class="field" for={`${idp}-company`}>
       <span class="field__lbl">{f.company.label}</span>
-      <input type="text" name="business_name" placeholder={f.company.ph} autocomplete="organization" />
+      <input type="text" id={`${idp}-company`} name="business_name" placeholder={f.company.ph} autocomplete="organization" />
     </label>
   </div>
 
   <div class="field-row">
-    <label class="field">
+    <label class="field" for={`${idp}-email`}>
       <span class="field__lbl">{f.email.label}</span>
-      <input type="email" name="email" placeholder={f.email.ph} autocomplete="email" />
+      <input type="email" id={`${idp}-email`} name="email" placeholder={f.email.ph} autocomplete="email" />
     </label>
-    <label class="field">
+    <label class="field" for={`${idp}-phone`}>
       <span class="field__lbl">{phone.label}</span>
-      <input type="tel" name="phone" placeholder={phone.ph} autocomplete="tel" />
+      <input type="tel" id={`${idp}-phone`} name="phone" placeholder={phone.ph} autocomplete="tel" />
     </label>
   </div>
 
-  <label class="field">
+  <label class="field" for={`${idp}-city`}>
     <span class="field__lbl">{f.city.label}</span>
-    <select name="city_state">
+    <select id={`${idp}-city`} name="city_state">
       <option value="">{f.city.ph}</option>
       {f.city.opts.map((o: string) => <option value={o} selected={o === defaultCity}>{o}</option>)}
     </select>
   </label>
 
-  <label class="field">
+  <label class="field" for={`${idp}-service`}>
     <span class="field__lbl">{f.service.label}</span>
-    <select name="main_objective">
+    <select id={`${idp}-service`} name="main_objective">
       <option value="">{f.service.ph}</option>
       {f.service.opts.map((o: string) => <option value={o} selected={o === defaultService}>{o}</option>)}
     </select>
   </label>
 
-  <label class="field">
+  <label class="field" for={`${idp}-message`}>
     <span class="field__lbl">{f.message.label}</span>
-    <textarea name="additional_notes" rows="4" placeholder={f.message.ph}></textarea>
+    <textarea id={`${idp}-message`} name="additional_notes" rows="4" placeholder={f.message.ph}></textarea>
   </label>
 
   <Button type="submit" variant="primary" size="lg" class="u-full bstate" data-submit>
     <BtnStates sending={f.sending} done={doneLbl}>{f.submit}</BtnStates>
   </Button>
 
-  <p class="form-status form-status--error" id={`${idp}-form-error`} data-form-error role="alert" hidden></p>
+  <p class="form-status form-status--error" id={`${idp}-form-error`} data-form-error hidden></p>
   <p class="form-status form-status--ok" id={`${idp}-form-success`} data-form-ok role="status" hidden></p>
 </form>
 
@@ -125,6 +125,7 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
 
 <script>
   import { track } from '../../lib/track.js';
+  import { anunciar } from '../../lib/anunciar.js';
   for (const form of document.querySelectorAll<HTMLFormElement>('form[data-contact-form]')) {
     if (form.dataset.cfListo) continue;
     form.dataset.cfListo = '1';
@@ -183,8 +184,13 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
       errorBox.hidden = true; okBox.hidden = true;
       const emailEl = form.querySelector('[name="email"]') as HTMLInputElement | null;
       const phoneEl = form.querySelector('[name="phone"]') as HTMLInputElement | null;
-      emailEl?.removeAttribute('aria-invalid');
-      phoneEl?.removeAttribute('aria-invalid');
+      // El mensaje de error va enlazado al campo SOLO mientras se ve (pieza E-10):
+      // con la caja oculta, el lector no debe seguir leyendo una descripción vacía.
+      [emailEl, phoneEl].forEach((el) => {
+        if (!el) return;
+        el.removeAttribute('aria-invalid');
+        if (el.getAttribute('aria-describedby') === errId) el.removeAttribute('aria-describedby');
+      });
 
       const fd = new FormData(form);
       const data: Record<string, string> = {};
@@ -230,6 +236,8 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
 
         if (!res.ok || !payload || !payload.ok) {
           renderError((payload && payload.error) || S.error || 'Error.');
+          // El foco se queda en el botón: el fallo se anuncia por la región común.
+          anunciar(errorBox.textContent || '');
           reenable();
           return;
         }
@@ -275,6 +283,7 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
         setState('done');
       } catch (err) {
         renderError(S.error || 'Error de red.');
+        anunciar(errorBox.textContent || '');
         reenable();
       } finally {
         window.clearTimeout(timer);

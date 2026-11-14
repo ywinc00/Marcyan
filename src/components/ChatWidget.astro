@@ -964,9 +964,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     // Invariante: sum(topes fase) 39s < NET_TIMEOUT 42s < maxDuration server 60s. El turno
     // típico responde en 3-8s; esto solo importa en la cola de latencia.
     const NET_TIMEOUT = 42000;
-    function fetchWithTimeout(url, opts) {
+    function fetchWithTimeout(url, opts, ms) {
       const ctrl = new AbortController();
-      const id = setTimeout(() => ctrl.abort(), NET_TIMEOUT);
+      const id = setTimeout(() => ctrl.abort(), ms || NET_TIMEOUT);
       return fetch(url, Object.assign({}, opts, { signal: ctrl.signal }))
         .finally(() => clearTimeout(id));
     }
@@ -1093,9 +1093,15 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         if (!human && saved && saved.personAt) {
           const wait = Number(saved.personWait) || PERSON_WAIT_MS;
           const left = Number(saved.personAt) + wait - Date.now();
-          if (left > 0) { personAsked = Number(saved.personAt); personWait = wait; armPersonWait(left); }
+          personAsked = Number(saved.personAt); personWait = wait;
+          if (left > 0) armPersonWait(left);
+          // El minuto pasó con la página cerrada o en otra: última comprobación y,
+          // si nadie la tomó, la oferta de agendar sale al abrir el chat. Con más
+          // de 30 min solo se comprueba (la oferta ya no viene a cuento).
+          else if (left > -30 * 60 * 1000) offerBooking();
+          else pollOwner(true);
         }
-        if (history.length || human) startPolling();
+        if (history.length || human || (saved && saved.personAt)) startPolling();
         if (opened && closeBtn) closeBtn.focus();
       } else if (first) {
         started = true;
@@ -1280,7 +1286,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         if (data && data.human) {
           // Lo lleva el dueño: sin respuesta de Marcy; se guarda para el historial.
           waitingUser = userText;
-          if (!human) { human = true; appendNote(T.humanOn); setHuman(true); }
+          if (!human) { human = true; stopPersonWait(); appendNote(T.humanOn); setHuman(true); }
           startPolling();
         } else if (data && data.reply) {
           waitingUser = '';
@@ -1359,7 +1365,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       if (!force && (!opened || document.visibilityState !== 'visible')) return;
       if (Date.now() - lastActivity > 30 * 60 * 1000) { clearInterval(pollTimer); pollTimer = null; return; }
       try {
-        const res = await fetch('/api/chat-updates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: sid, after: lastOwnerId }) });
+        const res = await fetchWithTimeout('/api/chat-updates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: sid, after: lastOwnerId }) }, 8000);
         if (!res.ok) return;
         const d = await res.json();
         if (d.takeover && !human) { human = true; stopPersonWait(); appendNote(T.humanOn); setHuman(true); }
@@ -1437,7 +1443,13 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     async function requestPerson(opts = {}) {
       ensureChat();
       if (human) return;
-      if (Date.now() - personAsked < 3 * 60 * 1000) { if (!opts.fromMarcy) appendNote(T.connecting); return; }
+      if (Date.now() - personAsked < 3 * 60 * 1000) {
+        // Ya está avisado el equipo. Esperando: se le recuerda. Si ya se le ofreció
+        // agendar, se le vuelve a abrir la cajita en vez de otra conexión que no llega.
+        if (waitingPerson) { if (!opts.fromMarcy) appendNote(T.connecting); }
+        else openCapture('cita');
+        return;
+      }
       personAsked = Date.now();
       try { track('chat_person_requested'); } catch {}
       appendNote(T.connecting);
@@ -1453,7 +1465,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         if (res.ok && secs >= 20 && secs <= 300) espera = secs * 1000;
       } catch (_) {}
       personWait = espera;
-      armPersonWait(espera);
+      if (!human) armPersonWait(espera);
       saveConv();
     }
 

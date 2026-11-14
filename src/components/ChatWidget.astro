@@ -1006,6 +1006,13 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     let waitingUser = '';
     let human = false;
     let lastOwnerId = saved ? Number(saved.lastOwnerId) || 0 : 0;
+    // Espera a una persona del equipo (ver requestPerson): declarada aquí arriba
+    // porque guardar y restaurar la conversación la usan.
+    const PERSON_WAIT_MS = 60000;
+    let personAsked = 0;
+    let personTimer = null;
+    let personWait = PERSON_WAIT_MS;
+    let waitingPerson = false;
     let pollTimer = null;
     let lastActivity = Date.now();
     let lastUserText = '';
@@ -1042,7 +1049,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     function saveConv() {
       if (!started) return;
       try {
-        localStorage.setItem(STORE_KEY, JSON.stringify({ sid, lang, ts: Date.now(), view: view.slice(-60), history: history.slice(-18), lastOwnerId, human, captured }));
+        localStorage.setItem(STORE_KEY, JSON.stringify({ sid, lang, ts: Date.now(), view: view.slice(-60), history: history.slice(-18), lastOwnerId, human, captured, personAt: waitingPerson ? personAsked : 0, personWait }));
       } catch (_) {}
     }
     function remember(item) { if (!restoring) { view.push(item); if (view.length > 80) view = view.slice(-60); } }
@@ -1082,6 +1089,12 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         log.scrollTop = log.scrollHeight;
         if (captured && root) root.setAttribute('data-captured', '');
         if (saved && saved.human) { human = true; setHuman(true); }
+        // Recargó la página mientras esperaba a una persona: la espera sigue donde iba.
+        if (!human && saved && saved.personAt) {
+          const wait = Number(saved.personWait) || PERSON_WAIT_MS;
+          const left = Number(saved.personAt) + wait - Date.now();
+          if (left > 0) { personAsked = Number(saved.personAt); personWait = wait; armPersonWait(left); }
+        }
         if (history.length || human) startPolling();
         if (opened && closeBtn) closeBtn.focus();
       } else if (first) {
@@ -1342,14 +1355,14 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         history = history.concat([{ role: 'user', content: '…' }, { role: 'assistant', content: text }]).slice(-18);
       }
     }
-    async function pollOwner() {
-      if (!opened || document.visibilityState !== 'visible') return;
+    async function pollOwner(force) {
+      if (!force && (!opened || document.visibilityState !== 'visible')) return;
       if (Date.now() - lastActivity > 30 * 60 * 1000) { clearInterval(pollTimer); pollTimer = null; return; }
       try {
         const res = await fetch('/api/chat-updates', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: sid, after: lastOwnerId }) });
         if (!res.ok) return;
         const d = await res.json();
-        if (d.takeover && !human) { human = true; clearTimeout(personTimer); appendNote(T.humanOn); setHuman(true); }
+        if (d.takeover && !human) { human = true; stopPersonWait(); appendNote(T.humanOn); setHuman(true); }
         if (!d.takeover && human && !waitingUser) { human = false; appendNote(T.humanOff); setHuman(false); }
         if (human && d.typing && !(d.mensajes || []).length) showOwnerTyping(); else hideOwnerTyping();
         for (const m of d.mensajes || []) {
@@ -1363,9 +1376,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     }
     function startPolling() {
       lastActivity = Date.now();
-      if (!pollTimer) pollTimer = setInterval(pollOwner, human ? 5000 : 10000);
+      if (!pollTimer) pollTimer = setInterval(pollOwner, human || waitingPerson ? 5000 : 10000);
     }
-    // Con una persona atendiendo se pregunta cada 5 s (para ver "escribiendo…" a tiempo).
+    function restartPolling() { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } startPolling(); }
+    // Con una persona atendiendo, o esperándola, se pregunta cada 5 s (para ver
+    // "escribiendo…" y la toma a tiempo).
     function setHuman(on) {
       if (on) root.setAttribute('data-human', ''); else root.removeAttribute('data-human');
       saveConv();
@@ -1394,12 +1409,28 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     }
 
     // "Hablar con una persona": avisa al equipo (Orbit y móvil), dice que lo está
-    // conectando y espera. Si no hay nadie en Orbit, o nadie la toma en 2 minutos,
-    // le ofrece agendar una llamada con la cajita de horas.
-    let personAsked = 0;
-    let personTimer = null;
-    function offerBooking() {
-      if (human) return;
+    // conectando y espera 1 minuto (el número lo manda /api/handoff, el mismo que
+    // lee el aviso del dueño). Si nadie la toma en ese tiempo, le ofrece agendar
+    // una llamada con la cajita de horas.
+    function armPersonWait(ms) {
+      clearTimeout(personTimer);
+      waitingPerson = true;
+      personTimer = setTimeout(offerBooking, ms);
+      restartPolling();
+    }
+    function stopPersonWait() {
+      clearTimeout(personTimer);
+      personTimer = null;
+      if (waitingPerson) { waitingPerson = false; saveConv(); }
+    }
+    async function offerBooking() {
+      if (human) return stopPersonWait();
+      // Última comprobación en el momento: si el equipo la tomó después del último
+      // sondeo (o con la pestaña en segundo plano), no se le ofrece agendar.
+      await pollOwner(true);
+      if (human) return stopPersonWait();
+      stopPersonWait();
+      restartPolling();
       marcySaysLocal(T.noOne);
       openCapture('cita');
     }
@@ -1411,17 +1442,18 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       try { track('chat_person_requested'); } catch {}
       appendNote(T.connecting);
       startPolling();
-      let disponible = false;
+      let espera = PERSON_WAIT_MS;
       try {
         const res = await fetchWithTimeout('/api/handoff', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ pide: true, sessionId: sid, lang }),
         });
         const d = await res.json().catch(() => null);
-        disponible = !!(res.ok && d && d.disponible);
+        const secs = d && Number(d.espera);
+        if (res.ok && secs >= 20 && secs <= 300) espera = secs * 1000;
       } catch (_) {}
-      clearTimeout(personTimer);
-      personTimer = setTimeout(offerBooking, disponible ? 120000 : 2500);
+      personWait = espera;
+      armPersonWait(espera);
       saveConv();
     }
 

@@ -158,6 +158,17 @@ await check('handoff: freno guardado, 3 cada 10 min por conexión, el 4.º → 4
   assert.ok(Number(r.headers['Retry-After']) > 0);
   assert.ok(db.calls.some((c) => /INSERT INTO rate_limit_hits/.test(c.t) && c.vals[0] === 'handoff'), 'cuenta en la tabla, no en memoria');
 });
+await check('pedir persona: espera de 1 minuto, la misma en la respuesta y en el aviso al dueño', async () => {
+  const r = await call(handoff, { pide: true, sessionId: '3f2b8c1e-5d4a-4e7b-9c0d-1a2b3c4d5e6f', lang: 'es' });
+  assert.equal(r.code, 200);
+  assert.equal(r.body.espera, 60, 'el chat espera 60 s antes de ofrecer agendar');
+  assert.equal(r.body.disponible, false, 'sin sesión reciente en Orbit');
+  const aviso = db.calls.find((c) => /INSERT INTO notifications/.test(c.t));
+  assert.ok(aviso, 'avisa al dueño');
+  assert.match(String(aviso.vals[2]), /1 minuto/, 'el aviso dice el mismo plazo');
+  assert.doesNotMatch(String(aviso.vals[2]), /2 minutos/);
+  assert.ok(!db.calls.some((c) => /INSERT INTO leads/.test(c.t)), 'pedir persona no crea lead');
+});
 await check('handoff: la trampa invisible no guarda nada', async () => {
   const r = await call(handoff, { contact: 'bot@example.com', website_hp: 'x' });
   assert.equal(r.code, 200);

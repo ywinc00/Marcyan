@@ -118,7 +118,8 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
   />
   <WStyles />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es" hasEn={false} currentPath="/es/blog" />
+  {/* La ruta real del artículo: «Blog» queda marcado como sección (aria-current="true"), no como página actual. */}
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es" hasEn={false} currentPath={Astro.url.pathname} />
 
   <main id="main" class="w-rails" data-w data-w-tone="gold" data-w-kind="articulo">
     <div class="w-container art">

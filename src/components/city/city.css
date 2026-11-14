@@ -367,6 +367,8 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .cloud{position:absolute;display:block;pointer-events:none;animation:hx-cloud-in .8s var(--ease) both}
 @keyframes hx-cloud-in{from{opacity:0}}
 @media (prefers-reduced-motion:reduce){.hx .cloud{animation:none}}
+/* Flechas y marcas que se desplazan al pasar el ratón: quietas con movimiento reducido (F-02). */
+@media (prefers-reduced-motion:reduce){.hx .arr,.hx .zones__z--link svg,.hx .mp i{transition:none}}
 .hx .cloudbank{position:relative;z-index:0;height:calc(46vh / var(--z, 1));pointer-events:none;overflow:hidden;margin-top:-6vh;-webkit-mask-image:linear-gradient(180deg,transparent,#000 18%,#000 72%,transparent);mask-image:linear-gradient(180deg,transparent,#000 18%,#000 72%,transparent)}
 .hx .local__right{min-width:0}
 .hx .zones{list-style:none;margin:10px 0 0;padding:0 2px 2px;display:flex;flex-wrap:wrap;gap:6px}

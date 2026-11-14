@@ -175,6 +175,9 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
       btn.disabled = false;
       setState('');
       delete form.dataset.busy;
+      // Al enviar se desactivó el botón enfocado y el foco cayó al cuerpo de la
+      // página: vuelve al botón, junto al aviso del fallo.
+      if (!document.activeElement || document.activeElement === document.body) btn.focus();
     };
 
     form.addEventListener('submit', async (e) => {
@@ -238,7 +241,8 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
 
         if (!res.ok || !payload || !payload.ok) {
           renderError((payload && payload.error) || S.error || 'Error.');
-          // El foco se queda en el botón: el fallo se anuncia por la región común.
+          // El fallo se anuncia por la región común (o la de la ventana abierta) y
+          // reenable() devuelve el foco al botón.
           anunciar(errorBox.textContent || '');
           reenable();
           return;

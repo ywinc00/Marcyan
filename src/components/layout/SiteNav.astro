@@ -38,9 +38,15 @@ const uin = t(lang as Lang);
 // cosa (p. ej. WhatsApp en el brief y el kit) pasa nav.cta.track.
 const ctaTrack = nav.cta.track || 'proposal_requested';
 
-// aria-current: marca el link activo (no aplica al ancla de #contacto).
+// aria-current: marca el link activo (no aplica al ancla de #contacto). La página
+// exacta lleva 'page'; una página de dentro de esa sección (un artículo del blog,
+// una landing de Houston) lleva 'true': se ve igual, pero no se anuncia como
+// «página actual» a quien no está en ella.
 const isActive = (href: string) =>
   !!currentPath && href !== '#contacto' && currentPath.startsWith(href);
+const sinBarra = (p: string) => p.replace(/\/+$/, '') || '/';
+const ariaCurrent = (href: string) =>
+  !isActive(href) ? undefined : sinBarra(currentPath || '') === sinBarra(href) ? 'page' : 'true';
 
 // Megamenú: se acopla al enlace cuyo href termina en /servicios o /services.
 const navLang = (lang === 'en' ? 'en' : 'es') as 'es' | 'en';
@@ -60,7 +66,7 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
       {nav.links.map((l: any) => hasMega && isServicesLink(l.href)
         ? (
           <span class="nav__mega" data-nav-mega-wrap>
-            <a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>
+            <a href={l.href} aria-current={ariaCurrent(l.href)}>{l.label}</a>
             <button class="nav__mega-btn" type="button" aria-expanded="false" aria-controls="nav-mega" aria-label={uiw.megaBtn} data-nav-mega-btn>
               {/* SVG propio (navIcon), no astro-icon: así ningún icono de la página
                   (p. ej. el hero de portada) cambia de marcado por el megamenú. */}
@@ -71,7 +77,7 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
             <MegaServicios lang={navLang} currentPath={currentPath} />
           </span>
         )
-        : <a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
+        : <a href={l.href} aria-current={ariaCurrent(l.href)}>{l.label}</a>)}
     </nav>
 
     <div class="nav__actions">
@@ -107,7 +113,7 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
     </button>
   </div>
   <nav class="nav__drawer-links" aria-label={uin.nav.mobileMenu}>
-    {drawerLinks.map((l: any) => <a href={l.href} data-nav-link aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
+    {drawerLinks.map((l: any) => <a href={l.href} data-nav-link aria-current={ariaCurrent(l.href)}>{l.label}</a>)}
   </nav>
   {hasMega
     ? <DrawerGrupos lang={navLang} currentPath={currentPath} />
@@ -180,7 +186,7 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
   /* página actual (aria-current), en barra y drawer, todos los breakpoints: color y
      además un subrayado de 2 px, para que no dependa solo del color y se distinga
      del hover (DESIGN.md de la agencia, NAVEGACIÓN). */
-  .nav__links a[aria-current="page"], .nav__drawer-links a[aria-current="page"] {
+  .nav__links a[aria-current], .nav__drawer-links a[aria-current] {
     color: var(--accent-gold); text-decoration-line: underline; text-decoration-thickness: 2px; text-decoration-color: var(--accent-gold); text-underline-offset: 6px;
   }
 
@@ -376,6 +382,7 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
     const links = Array.from(drawer.querySelectorAll<HTMLElement>('[data-nav-link], a'));
     let lastFocus: HTMLElement | null = null;
     let closeTimer = 0;
+    let porEnlace = false;   // cerrado por un enlace: el foco lo decide el salto, no se devuelve
     const quieto = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const focusables = () =>
@@ -409,6 +416,9 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
       drawer.removeAttribute('data-open');
       toggle.setAttribute('aria-expanded', 'false');
       document.body.classList.remove('has-drawer-open');
+      // Tras un enlace (p. ej. un ancla de la misma página) el foco sigue al destino:
+      // devolverlo a la hamburguesa haría que Tab volviera arriba del todo.
+      if (porEnlace) { porEnlace = false; return; }
       // Safari (iOS/macOS) no da foco a un <button> al tocarlo, así que lastFocus suele
       // ser el <body> y devolverle el foco lo mandaría al inicio del documento.
       (lastFocus && lastFocus !== document.body ? lastFocus : toggle).focus();
@@ -445,6 +455,7 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
     // Links del drawer: cerrar primero; si apuntan a #contacto, scroll+focus en el
     // siguiente frame para evitar el salto a medias mientras el drawer se cierra.
     links.forEach((l) => l.addEventListener('click', () => {
+      porEnlace = true;
       close(true);
       if (isContactLink(l)) requestAnimationFrame(focusContact);
     }));

@@ -275,6 +275,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     tabindex="-1"
   >
     <div class="mrc-fx" aria-hidden="true"></div>
+    <!-- Región de avisos DENTRO del panel: con el panel abierto como ventana modal (teléfono),
+         lo de fuera queda inerte y la región común de la página no se oye (src/lib/anunciar.js). -->
+    <div class="mrc-sr" data-sr-avisos aria-live="polite" aria-atomic="true"></div>
 
     <header class="mrc-head">
       <span class="mrc-head-id">
@@ -807,7 +810,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   }
 
   @media (--motion-reduce) {
-    .mrc-fab, .mrc-fab-ic, .mrc-panel, .mrc-live, .mrc-send, .mrc-nudge, .mrc-opt, .mrc-pill { animation: none !important; transition: none !important; }
+    .mrc-fab, .mrc-fab-ic, .mrc-panel, .mrc-live, .mrc-live::after, .mrc-send, .mrc-nudge, .mrc-opt, .mrc-pill { animation: none !important; transition: none !important; }
   }
   @media print { .mrc-chat { display: none !important; } }
 </style>
@@ -1553,7 +1556,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
           '<button type="button" class="mrc-cap-send" data-mrc-capsend></button>' +
           '<button type="button" class="mrc-cap-dismiss" data-mrc-capdismiss></button>' +
         '</div>' +
-        '<p class="mrc-cap-result" data-mrc-capresult hidden></p>';
+        '<p class="mrc-cap-result" id="mrc-c-result" data-mrc-capresult hidden></p>';
       // Rellenar textos por separado (textContent / placeholder → seguro).
       card.querySelector('.mrc-cap-title').textContent = title;
       card.querySelector('.mrc-cap-sub').textContent = kind === 'handoff' ? (T.capSubHuman || T.capSub)
@@ -1688,18 +1691,18 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       const showErr = (txt) => { if (result) { result.hidden = false; result.className = 'mrc-cap-result err'; result.textContent = txt; } };
 
       // Limpia estado de validación previo.
-      if (emailEl) emailEl.removeAttribute('aria-invalid');
-      if (phoneEl) phoneEl.removeAttribute('aria-invalid');
+      // El mensaje va enlazado al campo solo mientras se ve (pieza E-10).
+      [emailEl, phoneEl].forEach((el) => { if (el) { el.removeAttribute('aria-invalid'); el.removeAttribute('aria-describedby'); } });
 
       // 1) Presencia: al menos uno.
       if (!email && !phone) { showErr(T.capRequired); return; }
       // 2) Formato (Chat-F01 / Lead-F1): si hay email, regex; si hay teléfono, >=7 dígitos.
       if (email && !isValidEmail(email)) {
-        if (emailEl) { emailEl.setAttribute('aria-invalid', 'true'); emailEl.focus(); }
+        if (emailEl) { emailEl.setAttribute('aria-invalid', 'true'); emailEl.setAttribute('aria-describedby', 'mrc-c-result'); emailEl.focus(); }
         showErr(T.capEmailInvalid || T.capRequired); return;
       }
       if (phone && !isValidPhone(phone)) {
-        if (phoneEl) { phoneEl.setAttribute('aria-invalid', 'true'); phoneEl.focus(); }
+        if (phoneEl) { phoneEl.setAttribute('aria-invalid', 'true'); phoneEl.setAttribute('aria-describedby', 'mrc-c-result'); phoneEl.focus(); }
         showErr(T.capPhoneInvalid || T.capRequired); return;
       }
 
@@ -1860,7 +1863,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       const onBpChange = () => {
         if (!opened) return;
         if (isMobileFull()) freezeBody(); else unfreezeBody();
-        showDialog();   // modal en el teléfono, flotante en escritorio
+        // Modal en el teléfono, flotante en escritorio. Reabrir mueve el foco: se
+        // devuelve a donde estaba (p. ej. el campo de escribir) para no cerrar el teclado.
+        const antes = document.activeElement;
+        showDialog();
+        if (antes && panel.contains(antes) && antes.focus) antes.focus({ preventScroll: true });
         syncViewport();
       };
       if (mqFull.addEventListener) mqFull.addEventListener('change', onBpChange);

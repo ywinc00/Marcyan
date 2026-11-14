@@ -570,7 +570,7 @@ export function initHero(GEO, C) {
   function unlock() { if (locked) unlockAt = performance.now(); locked = false; clearTimeout(lockT); }
   const DOWN_KEYS = new Set(['ArrowDown', 'PageDown', ' ', 'Spacebar']);
   // los gestos dentro del chat, de un diálogo o del menú no son para la portada
-  const foreign = (e) => e.target instanceof Element && !!e.target.closest('#mrc-chat, [role="dialog"], [aria-modal="true"], #nav-drawer');
+  const foreign = (e) => e.target instanceof Element && !!e.target.closest('#mrc-chat, dialog[open], [role="dialog"], [aria-modal="true"], #nav-drawer');
   // un salto a una sección (enlace interno) siempre llega a su sitio
   addEventListener('click', (e) => { if (e.target instanceof Element && e.target.closest('a[href^="#"]')) { unlock(); swallowWheel = false; } }, true);
   addEventListener('hashchange', unlock);

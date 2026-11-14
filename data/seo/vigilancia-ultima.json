@@ -1,6 +1,6 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-11-13",
+  "fecha": "2026-11-14",
   "primeraEjecucion": false,
   "sitemap": 52,
   "inspeccion": true,
@@ -77,9 +77,9 @@
       "indexadas": 1
     }
   },
-  "sinRastreoReciente": 9,
+  "sinRastreoReciente": 10,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 62,
+  "certificadoDias": 61,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 52
@@ -113,11 +113,11 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 15,
-    "sesionesDiaHabitual": 8.9,
-    "contactosSemanaHabitual": null,
-    "diasSinContactos": 63,
-    "probabilidadAzar": null
+    "sesionesUltimos3Dias": 5,
+    "sesionesDiaHabitual": 9.1,
+    "contactosSemanaHabitual": 0.1,
+    "diasSinContactos": 0,
+    "probabilidadAzar": 1
   },
   "lectoresIa": {
     "bloqueadosPorRobots": {},
@@ -148,29 +148,20 @@
     "recientes": []
   },
   "alertas": {
-    "alta": [
-      {
-        "fecha": "2026-11-13",
-        "cliente": "marcyan",
-        "nivel": "alta",
-        "tipo": "indexacion",
-        "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/en/privacy"
-      }
-    ],
+    "alta": [],
     "media": [
       {
-        "fecha": "2026-11-13",
+        "fecha": "2026-11-14",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "9 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "10 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
     "info": [
       {
-        "fecha": "2026-11-13",
+        "fecha": "2026-11-14",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",
@@ -179,16 +170,7 @@
       }
     ]
   },
-  "alertasNuevas": [
-    {
-      "fecha": "2026-11-13",
-      "cliente": "marcyan",
-      "nivel": "alta",
-      "tipo": "indexacion",
-      "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/en/privacy"
-    }
-  ],
+  "alertasNuevas": [],
   "pedirIndexacion": [],
   "colaPendiente": 32,
   "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"

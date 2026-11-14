@@ -259,7 +259,7 @@
       </div>
       <div class="why card">
         <p class="cap">Dónde se van este mes</p>
-        <ul>{#each [0, 1, 2, 3, 4] as i (i)}<li><button type="button" tabindex="-1" disabled><span class="why__t"><span class="ui-skel sk-t"></span></span><span class="why__bar"><i style="width:0"></i></span><b><span class="ui-skel sk-b"></span></b></button></li>{/each}</ul>
+        <ul>{#each [0, 1, 2, 3, 4] as i (i)}<li><button type="button" tabindex="-1" disabled aria-label="Cargando"><span class="why__t"><span class="ui-skel sk-t"></span></span><span class="why__bar"><i style="width:0"></i></span><b><span class="ui-skel sk-b"></span></b></button></li>{/each}</ul>
       </div>
     </section>
   {/snippet}

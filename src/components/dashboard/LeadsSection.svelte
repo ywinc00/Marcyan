@@ -170,7 +170,7 @@
   </PageHeader>
 
   <!-- Primera carga: hueco de las cifras para que la lista no baje al llegar (E-09). -->
-  {#snippet kpiSkel()}<KpiSkeleton labels={['Este mes', 'Por atender', 'Convertidos']} notes={['2 el mes pasado', 'Nuevos sin contactar todavía', '23 % de 13 leads']} />{/snippet}
+  {#snippet kpiSkel()}<KpiSkeleton labels={['Este mes', 'Por atender', 'Convertidos']} notes={['en el mes pasado', 'Nuevos sin contactar todavía', 'del total de leads']} />{/snippet}
   <LoadingState loading={loading && !loaded} skeleton={kpiSkel} label="Cargando las cifras de leads">
   {#if stats}
     <KpiGrid count={3} label="Resumen de leads">
@@ -182,7 +182,7 @@
   </LoadingState>
 
   <div class="toolbar">
-    <FilterPills label="Filtrar por estado" options={statusPills} value={filters.status} pending={!loaded}
+    <FilterPills label="Filtrar por estado" options={statusPills} value={filters.status} pending={loading && !loaded}
       onchange={(id) => setQuery(leadQueryPatch({ status: id, page: 1 }))} />
     <div class="toolbar__row">
       <label class="search">
@@ -204,7 +204,7 @@
   {#if error && !loaded}
     <ErrorState title="No se pudieron cargar los leads" message={error} onretry={loadList} />
   {:else if !loaded}
-    <LoadingState loading={true} rows={10} height={54} head={40} gap={1} label="Cargando leads" />
+    <LoadingState loading={true} rows={10} height={54} head={40} gap={1} movil={233} label="Cargando leads" />
   {:else}
     {#if error}
       <div class="stale"><ErrorState compact title="No se pudo actualizar la lista" message={error} onretry={loadList} /></div>

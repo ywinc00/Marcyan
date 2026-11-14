@@ -88,6 +88,11 @@
   // ── KPIs globales ────────────────────────────────────────────
   const by = $derived(summary?.by_status || { active: 0, on_hold: 0, completed: 0, cancelled: 0 });
   const kpiCount = $derived(by.cancelled ? 5 : 4);
+  // La quinta cifra (Cancelados) solo sale si hay alguno: el hueco de la primera
+  // carga recuerda cuántas hubo la última vez para no saltar al llegar (E-09).
+  const KPI_KEY = 'orbit:progreso-cifras';
+  const kpiPrevio = (() => { try { return Number(localStorage.getItem(KPI_KEY)) === 5 ? 5 : 4; } catch { return 4; } })();
+  $effect(() => { if (summary) { try { localStorage.setItem(KPI_KEY, String(kpiCount)); } catch { /* da igual */ } } });
   const onHoldCents = $derived(Number(summary?.on_hold_cents) || 0);
   const filtered = $derived(!!(status || q));
 
@@ -129,7 +134,7 @@
   </PageHeader>
 
   <!-- Primera carga: hueco de las cifras para que las tarjetas no bajen al llegar (E-09). -->
-  {#snippet kpiSkel()}<div class="pl-kpis"><KpiSkeleton labels={['Activos', 'En pausa', 'Completados', 'Valor en cartera']} notes={['en curso ahora', 'detenidos por ahora', 'entregados', 'solo proyectos activos']} /></div>{/snippet}
+  {#snippet kpiSkel()}<div class="pl-kpis"><KpiSkeleton labels={kpiPrevio === 5 ? ['Activos', 'En pausa', 'Completados', 'Valor en cartera', 'Cancelados'] : ['Activos', 'En pausa', 'Completados', 'Valor en cartera']} notes={['en curso ahora', 'detenidos por ahora', 'entregados', 'solo proyectos activos', 'archivados']} /></div>{/snippet}
   {#if loading && !loaded}
     <LoadingState loading={true} skeleton={kpiSkel} label="Cargando las cifras de proyectos" />
   {:else if summary && summary.total > 0}
@@ -170,7 +175,7 @@
 
   <!-- Esqueleto solo en la primera carga; al filtrar o buscar, las tarjetas
        se quedan a la vista atenuadas mientras llegan las nuevas (E-09). -->
-  <LoadingState loading={loading && !loaded}>
+  <LoadingState loading={loading && !loaded} label="Cargando los proyectos">
     {#snippet skeleton()}
       <div class="pl-cards">{#each Array(6) as _, i (i)}<div class="ui-skel" style="height:178px;border-radius:var(--radius-lg)"></div>{/each}</div>
     {/snippet}

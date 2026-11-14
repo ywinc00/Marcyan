@@ -287,14 +287,14 @@
 <!-- KPIs con conteos del servidor (la bandeja entera, sin archivados).
      Los de tipo filtran la lista: el KPI es el anfitrión del atajo (E-19). -->
 <KpiGrid count={4} label="Resumen de avisos">
-  <Kpi label="Sin leer" value={kv(unread)} art="bell" tone={unread ? 'accent' : ''}
+  <Kpi loading={loading && !loaded} label="Sin leer" value={kv(unread)} art="bell" tone={unread ? 'accent' : ''}
        href={href('avisos', [], { tipo: filters.tipo, estado: 'sin-leer' })}
        note={!loaded ? 'Sin datos' : unread ? (unread === 1 ? '1 aviso pendiente' : `${unread} avisos pendientes`) : 'Todo al día'} />
-  <Kpi label="Leads" value={kv(counts.by_type.new_lead.total)} art="inbox"
+  <Kpi loading={loading && !loaded} label="Leads" value={kv(counts.by_type.new_lead.total)} art="inbox"
        href={href('avisos', [], { tipo: 'lead', estado: filters.estado })} note={kpiNote('new_lead')} />
-  <Kpi label="Briefs" value={kv(counts.by_type.new_brief.total)} art="docs"
+  <Kpi loading={loading && !loaded} label="Briefs" value={kv(counts.by_type.new_brief.total)} art="docs"
        href={href('avisos', [], { tipo: 'brief', estado: filters.estado })} note={kpiNote('new_brief')} />
-  <Kpi label="Quieren hablar" value={kv(counts.by_type.chat_handoff.total)} art="users"
+  <Kpi loading={loading && !loaded} label="Quieren hablar" value={kv(counts.by_type.chat_handoff.total)} art="users"
        href={href('avisos', [], { tipo: 'persona', estado: filters.estado })} note={kpiNote('chat_handoff')} />
 </KpiGrid>
 

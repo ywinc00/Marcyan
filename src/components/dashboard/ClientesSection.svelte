@@ -140,7 +140,7 @@
   </LoadingState>
 
   <div class="toolbar">
-    <FilterPills label="Filtrar por estado" options={pills} value={filters.status} pending={!loaded}
+    <FilterPills label="Filtrar por estado" options={pills} value={filters.status} pending={loading && !loaded}
       onchange={(id) => setQuery(clientQueryPatch({ status: id, page: 1 }))} />
     <label class="search">
       <span class="sr-only">Buscar clientes</span>
@@ -153,7 +153,7 @@
   {#if error && !loaded}
     <ErrorState title="No se pudieron cargar los clientes" message={error} onretry={loadList} />
   {:else if !loaded}
-    <LoadingState loading={true} rows={10} height={54} head={40} gap={1} label="Cargando clientes" />
+    <LoadingState loading={true} rows={10} height={54} head={40} gap={1} movil={193} label="Cargando clientes" />
   {:else}
     {#if error}
       <div class="stale"><ErrorState compact title="No se pudo actualizar la lista" message={error} onretry={loadList} /></div>

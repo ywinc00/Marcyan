@@ -194,8 +194,11 @@ y **E-08** (vacíos ya existentes en `EmptyState`, sin tocar). Movimiento reduci
 global de `dashboard.css`.
 CONSERVADO: superficies, acento naranja, radios, botones, `LoadingState`, `ErrorState`, `EmptyState` y el límite
 de 15 s del cliente de datos (ya convierte una espera colgada en error con «Reintentar»).
-CAMBIA: al comprobar la sesión se ve el armazón del panel (barra lateral, cabecera y huecos del contenido) en vez de
-la rueda centrada; el brillo del esqueleto usa una mezcla del token de superficie en vez de un blanco escrito a mano.
+CAMBIA: al comprobar la sesión se ve el armazón del panel (barra lateral, cabecera y título; en Inicio también sus
+cifras y gráficos, la única forma que se sabe de antemano) en vez de la rueda centrada; el brillo del esqueleto usa
+una mezcla del token de superficie en vez de un blanco escrito a mano. Cambio global del panel: el hueco de la barra
+de desplazamiento queda reservado (`scrollbar-gutter: stable`), para que la página no se estreche 10 px cuando llega
+una lista larga. Los avisos de carga al lector de pantalla salen de una sola región en la carcasa.
 NO → SÍ: NO rueda en mitad de la pantalla → SÍ armazón con la forma del panel. NO hueco de 48 px que luego crece →
 SÍ hueco con la altura real reservado desde el principio. NO volver al esqueleto al actualizar → SÍ datos a la vista
 y «Actualizando». NO `*{.01ms !important}` → SÍ variante reducida por pieza (brillo quieto, avisos sin desplazamiento).

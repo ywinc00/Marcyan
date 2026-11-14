@@ -403,7 +403,7 @@
       {#if data.projectsError && !recentProjects.length}
         <ErrorState compact title="No se pudieron cargar los proyectos" message={data.projectsError} onretry={loadProjects} />
       {:else if !data.projectsLoaded}
-        <LoadingState loading={true} rows={5} height={52} label="Cargando proyectos" />
+        <LoadingState loading={true} rows={5} height={70} gap={1} label="Cargando proyectos" />
       {:else if recentProjects.length}
         <ul class="rows">
           {#each recentProjects as p (p.id)}
@@ -440,7 +440,7 @@
       {#if data.leadsError && !leads.length}
         <ErrorState compact title="No se pudieron cargar los leads" message={data.leadsError} onretry={loadLeads} />
       {:else if !data.leadsLoaded}
-        <LoadingState loading={true} rows={5} height={52} label="Cargando leads" />
+        <LoadingState loading={true} rows={5} height={70} gap={1} label="Cargando leads" />
       {:else if leads.length}
         <ul class="rows">
           {#each leads.slice(0, 5) as lead (lead.ref_id)}

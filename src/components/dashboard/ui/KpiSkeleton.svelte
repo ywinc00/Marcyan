@@ -5,8 +5,9 @@
   // snippet `skeleton` de LoadingState, que pone el umbral y el aria-busy.
   // `extra`: snippet opcional para una celda distinta (p. ej. el embudo de Briefs).
   import KpiGrid from './KpiGrid.svelte';
-  // `notes`: texto típico de cada nota; se pinta como hueco del mismo largo para que
-  // en el teléfono parta línea igual que la nota real y la tarjeta mida lo mismo.
+  // `notes`: texto típico de cada nota, sin cifras; solo da el largo del hueco para
+  // que en el teléfono parta línea igual que la nota real. Va en un ::before
+  // transparente: no se lee, no se encuentra con Ctrl+F y no sale en alto contraste.
   let { labels = [], notes = [], extra } = $props();
 </script>
 
@@ -15,7 +16,7 @@
     <article class="ui-kpi">
       <p class="ui-kpi__label">{l}</p>
       <div class="ui-kpi__row"><span class="ui-skel ui-kpi__skel-num"></span></div>
-      <p class="ui-kpi__note">{#if notes[i]}<span class="ui-skel ui-kpi__skel-text">{notes[i]}</span>{:else}<span class="ui-skel ui-kpi__skel-note"></span>{/if}</p>
+      <p class="ui-kpi__note">{#if notes[i]}<span class="ui-skel ui-kpi__skel-text" data-t={notes[i]}></span>{:else}<span class="ui-skel ui-kpi__skel-note"></span>{/if}</p>
     </article>
   {/each}
   {#if extra}{@render extra()}{/if}

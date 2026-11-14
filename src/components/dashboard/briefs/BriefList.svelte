@@ -156,7 +156,7 @@
 {:else}
   <!-- Mientras llegan las cifras: su hueco, con la celda del embudo (E-09). -->
   {#snippet embudoSkel()}<article class="ui-kpi funnel-cell"><p class="ui-kpi__label">Briefs por estado</p><div class="funnel">{#each [92, 70, 52, 40, 30] as w (w)}<div class="funnel__row"><span class="ui-skel funnel__skel" style="width:{w}%"></span></div>{/each}</div></article>{/snippet}
-  {#snippet kpiSkel()}<div class="kpis"><KpiSkeleton labels={['Total briefs', 'Por atender', 'Completados']} notes={['+3 este mes', 'Pendientes y contactados', 'Ninguno este mes']} extra={embudoSkel} /></div>{/snippet}
+  {#snippet kpiSkel()}<div class="kpis"><KpiSkeleton labels={['Total briefs', 'Por atender', 'Completados']} notes={['altas este mes', 'Pendientes y contactados', 'Ninguno este mes']} extra={embudoSkel} /></div>{/snippet}
   <LoadingState loading={true} skeleton={kpiSkel} label="Cargando las cifras de briefs" />
 {/if}
 

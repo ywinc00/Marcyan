@@ -19,6 +19,7 @@
   import Icon from './ui/Icon.svelte';
   import Toast from './ui/Toast.svelte';
   import { continueSkeletons } from './ui/LoadingState.svelte';
+  import { textoCarga } from './lib/cargando.svelte.js';
   import { api, MSG, errorMessage, onUnauthorized, onMutation, onNetwork } from './lib/api.js';
   import { toast, pushLayer, popLayer } from './lib/toast.svelte.js';
   import { route, href, navigate, startRouter, parseHash } from './lib/router.svelte.js';
@@ -50,7 +51,9 @@
   }
   let hadSession = $state(readHint());
   let bootShown = $state(false);
+  let bootShownAt = 0;
   let bootTimer = null;
+  let retryBtn = $state(null);
   const booting = $derived(phase === 'loading');
 
   // Búsqueda (Ctrl K / ⌘K) de la barra lateral.
@@ -137,14 +140,18 @@
     phase = 'loading';
     bootShown = false;
     clearTimeout(bootTimer);
-    bootTimer = setTimeout(() => { bootShown = true; }, 300);
+    bootTimer = setTimeout(() => { bootShown = true; bootShownAt = performance.now(); }, 300);
     try {
       const j = await api('/api/admin/me', { auth: false });
       if (j && j.email) {
         restoreReturn(); user = j.email; writeHint(true);
-        // El armazón ya estaba a la vista: las secciones siguen con su
-        // esqueleto sin pasar por un hueco en blanco.
-        if (bootShown) continueSkeletons();
+        // El armazón ya estaba a la vista: se queda al menos 400 ms (sin
+        // destello) y las secciones siguen con su esqueleto sin pasar por blanco.
+        if (bootShown) {
+          const falta = 400 - (performance.now() - bootShownAt);
+          if (falta > 0) await new Promise((r) => setTimeout(r, falta));
+          continueSkeletons();
+        }
         phase = 'app'; loadAll(); return;
       }
       rememberReturn(window.location.hash);
@@ -155,6 +162,8 @@
       // Sin red o servidor caído: NO es "perdiste la sesión" (SH-16).
       unreachableMsg = errorMessage(e, MSG.network);
       phase = 'unreachable';
+      // Si se pulsó Reintentar y vuelve a fallar, el foco vuelve al botón.
+      setTimeout(() => retryBtn?.focus(), 0);
     } finally {
       clearTimeout(bootTimer);
     }
@@ -360,9 +369,10 @@
   </div>
 {/snippet}
 
-<!-- Texto del arranque para el lector de pantalla: región propia, fuera de lo
-     que está ocupado, y solo cuando el armazón ya se ve. -->
-<span class="sr-only" role="status">{booting && bootShown ? 'Cargando el panel…' : ''}</span>
+<!-- Región ÚNICA de avisos de carga para el lector de pantalla (comprobación
+     global c): el arranque y los esqueletos de las secciones escriben aquí, fuera
+     de lo que está ocupado, y solo cuando el hueco ya se ve. -->
+<span class="sr-only" role="status">{booting && bootShown ? 'Cargando el panel…' : textoCarga()}</span>
 
 {#if booting && !hadSession}
   <!-- Sin sesión conocida en este dispositivo: el hueco tiene la forma de la
@@ -386,7 +396,7 @@
         <Icon name={browserOnline ? 'alert' : 'wifiOff'} size={20} />
         <p>{browserOnline ? unreachableMsg : 'Sin conexión. Cuando vuelva internet, el panel se recarga solo.'}</p>
       </div>
-      <button type="button" class="b b--primary" onclick={checkSession}><Icon name="refresh" size={16} />Reintentar</button>
+      <button type="button" class="b b--primary" bind:this={retryBtn} onclick={checkSession}><Icon name="refresh" size={16} />Reintentar</button>
     </div>
   </div>
 
@@ -481,7 +491,7 @@
           {#if section === 'inicio' && data.loadedAt}<span class="updated">Actualizado {fmtTime(data.loadedAt)}</span>{/if}
           {#if installPrompt}<button class="b b--ghost" onclick={doInstall}><Icon name="install" size={16} />Instalar app</button>{/if}
           {#if booting}
-            <span class="me ui-skel" aria-hidden="true"></span>
+            <span class="ui-skel boot__me" aria-hidden="true"></span>
           {:else}
             <span class="me" title={user} aria-hidden="true">{userInitial}</span>
           {/if}
@@ -490,20 +500,18 @@
       </header>
 
       {#if booting}
-        <!-- Huecos del contenido con la forma de la sección pedida: Inicio
-             (cifras y gráficos) o una lista. Al llegar la sesión, cada sección
-             sigue con su propio esqueleto sin pasar por blanco. -->
+        <!-- Huecos del contenido: el título siempre; las cifras y gráficos solo en
+             Inicio, que es la única forma que se sabe de antemano. Al llegar la
+             sesión, cada sección sigue con su propio esqueleto sin pasar por blanco. -->
         <div class="boot" aria-hidden="true">
           <div class="ui-page-head">
             <div class="ui-page-head__text"><span class="ui-skel boot__title"></span></div>
           </div>
+          <!-- Solo Inicio tiene un armazón con forma fija; el resto de secciones
+               abre con cabeceras distintas y su esqueleto llega justo después. -->
           {#if section === 'inicio'}
             <div class="ui-kpis" data-count="4">{#each [0, 1, 2, 3] as i (i)}<span class="ui-skel boot__kpi"></span>{/each}</div>
             <div class="boot__charts"><span class="ui-skel boot__chart"></span><span class="ui-skel boot__chart"></span></div>
-          {:else}
-            <!-- El resto de secciones abre con una fila de cifras y una lista. -->
-            <div class="ui-kpis" data-count="3">{#each [0, 1, 2] as i (i)}<span class="ui-skel boot__kpi"></span>{/each}</div>
-            <div class="boot__rows">{#each [0, 1, 2, 3, 4, 5] as i (i)}<span class="ui-skel boot__row"></span>{/each}</div>
           {/if}
         </div>
       {:else if !online}
@@ -683,11 +691,10 @@
   .boot-login__lbl { display: block; height: 19px; width: 34%; }
   .boot-login__field { display: block; height: var(--tap-min); }
   .boot__title { display: block; height: 32px; width: 300px; max-width: 70vw; }
+  .boot__me { display: inline-block; width: 32px; height: 32px; border-radius: var(--radius-pill); flex: 0 0 auto; }
   .boot__kpi { display: block; height: 144px; border-radius: var(--radius-lg); }
   .boot__charts { display: grid; gap: 14px; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
   .boot__chart { display: block; height: 300px; border-radius: var(--radius-lg); }
-  .boot__rows { display: flex; flex-direction: column; gap: 1px; }
-  .boot__row { display: block; height: 54px; }
   @media (max-width: 719px) { .boot__kpi { height: 136px; } .boot__chart:first-child { height: 288px; } .boot__chart { height: 298px; } }
   @media (max-width: 1099px) { .boot__charts { grid-template-columns: minmax(0, 1fr); } }
 </style>

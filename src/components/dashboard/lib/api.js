@@ -66,6 +66,12 @@ export function onUnauthorized(fn) {
 export function onMutation(fn) { mutationListeners.add(fn); return () => mutationListeners.delete(fn); }
 export function onNetwork(fn) { networkListeners.add(fn); return () => networkListeners.delete(fn); }
 
+// Retención de lecturas (pieza E-09): si hay un esqueleto a la vista, la respuesta
+// de una lectura espera a que cumpla su mínimo de 400 ms antes de pintarse, para
+// que no destelle aunque la sección lo quite al llegar el dato. La fija LoadingState.
+let retencion = null;
+export function setRetencion(fn) { retencion = fn; }
+
 function emit(set, ...args) {
   for (const fn of set) { try { fn(...args); } catch (err) { console.error('[orbit] listener', err); } }
 }
@@ -148,6 +154,7 @@ export async function api(url, opts = {}) {
     else throw new ApiError(MSG.invalid, { status: res.status, kind: 'parse' });
   }
   if (auth && m !== 'GET' && m !== 'HEAD') emit(mutationListeners, { url, method: m });
+  if (retencion && m === 'GET') await retencion();
   return data;
 }
 

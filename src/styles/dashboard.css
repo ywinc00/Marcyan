@@ -528,12 +528,21 @@ select.inp,
 .ui-loading__shape--tabla > .ui-skel { border-radius: 0; }
 .ui-loading__shape--tabla > .ui-skel:first-child { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
 .ui-loading__shape--tabla > .ui-skel:last-child { border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+/* En el teléfono esas tablas pasan a tarjetas: el hueco también (alto de cada
+   tarjeta en --h-movil, sin cabecera, separadas como las reales). !important
+   porque el alto y la separación de escritorio van en el propio elemento. */
+@media (max-width: 719px) {
+  .ui-loading__shape--tabla[style*="--h-movil"] { gap: 10px !important; }
+  .ui-loading__shape--tabla[style*="--h-movil"] > .ui-skel { height: var(--h-movil) !important; border-radius: var(--radius-lg); }
+  .ui-loading__shape--tabla[style*="--h-movil"] > .ui-skel--head { display: none; }
+}
 /* Huecos de una fila de cifras (KpiSkeleton) y del embudo de Briefs: misma altura
    que la cifra (30 px), la nota (una línea) y cada píldora del embudo. */
 .ui-kpi__skel-num { display: block; width: 64px; height: 30px; }
 .ui-kpi__skel-note { display: inline-block; width: 62%; height: 12px; vertical-align: middle; }
 .funnel__skel { display: block; height: 32px; border-radius: var(--radius-pill); }
-.ui-kpi__skel-text { color: transparent; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.ui-kpi__skel-text { border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.ui-kpi__skel-text::before { content: attr(data-t); color: transparent; forced-color-adjust: none; }
 @media (max-width: 719px) { .ui-kpi__skel-num { height: 26px; } }
 .ui-skel {
   border-radius: var(--radius-md);

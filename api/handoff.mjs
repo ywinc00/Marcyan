@@ -189,6 +189,12 @@ export async function teamOnline(sqlImpl) {
   } catch { return false; }
 }
 
+// Cuánto espera el cliente a que alguien del equipo tome la conversación antes de
+// que el chat le ofrezca agendar una llamada. El widget usa el número que le
+// devuelve esta ruta, así el aviso al dueño y la espera real no se separan.
+export const PERSON_WAIT_SECS = 60;
+const waitText = (secs) => (secs % 60 === 0 ? `${secs / 60} ${secs === 60 ? 'minuto' : 'minutos'}` : `${secs} segundos`);
+
 async function requestPerson(req, res, body) {
   const { originOk, validSessionId } = await import('./chat.mjs');
   if (!originOk(req)) return res.status(403).json({ ok: false });
@@ -206,10 +212,10 @@ async function requestPerson(req, res, body) {
   await createNotification({
     type: 'chat_handoff',
     title: 'Un cliente quiere hablar con una persona',
-    body: disponible ? 'Está esperando en el chat de la web. Entra y pulsa Tomo yo.' : 'Está en el chat de la web. Si no entras en 2 minutos, Marcy le ofrece agendar una llamada.',
+    body: `${disponible ? 'Está esperando en el chat de la web: entra y pulsa Tomo yo.' : 'Está en el chat de la web.'} Si no entras en ${waitText(PERSON_WAIT_SECS)}, Marcy le ofrece agendar una llamada.`,
     ref: `persona:${sid}`.slice(0, 100),
     url: `/dashboard#/marcy/${sid}`,
     dedupeMinutes: 10,
   }).catch((err) => console.warn('[handoff] aviso falló', err && err.message));
-  return res.status(200).json({ ok: true, disponible });
+  return res.status(200).json({ ok: true, disponible, espera: PERSON_WAIT_SECS });
 }

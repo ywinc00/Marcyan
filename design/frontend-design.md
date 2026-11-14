@@ -64,9 +64,26 @@ nunca contenido del mensaje.
 - [ ] `SpaceBackdrop` exactamente uno por página; la home no lo lleva (tiene su atmósfera).
 - [ ] Un solo `<h1>`; foco visible (`:focus-visible`); tap-targets ≥44px (`--tap-min`);
       `aria-hidden` en decoración.
-- [ ] Responsive 320→1440 sin scroll-x (`min-width:0` en hijos de flex/grid).
+- [ ] ¿Existe la hoja de contacto de la matriz de la puerta de salida de design-director,
+      con todas las capturas base y las condicionales que apliquen, y el registro del
+      script sin scroll lateral en ninguna? Falta una captura o hay scroll lateral: NO PASA.
+      ¿En NINGÚN ancho de la matriz hay contenido cortado, solapado, palabras partidas o
+      texto que se sale de su botón? ¿Ninguna pieza con información **desaparece** por
+      tamaño (`display:none` en una media query sin que esa información siga visible de
+      otra forma; lo puramente decorativo y los enlaces que pasan al menú móvil no
+      cuentan)? ¿Ninguna portada ni producto se **reduce** con zoom o escala para caber en
+      el alto (ledger E-65)? ¿Lo que en escritorio se revela al pasar el ratón tiene
+      equivalente visible o por toque en táctil? ¿El teléfono muestra la composición
+      escrita en el registro del gate? Verificación: listar cada `display:none` dentro de
+      una media query con su equivalente o «decorativo» al lado, y mirar la hoja de
+      contacto. Un solo fallo: NO PASA. Pista del repo para el scroll lateral: `min-width:0`
+      en los hijos de flex y grid.
 - [ ] Toda animación se apaga en `@media (--motion-reduce)`; animaciones aprobadas
       existentes inventariadas y CONSERVADAS (E-02).
+- [ ] Lo que espera a la red (datos de panel, chat, islas que piden datos) reserva el hueco
+      con su forma real, usa el indicador que marca la pieza de catálogo E-09, lleva
+      aria-busy en el contenedor mientras espera y tiene su vacío (pieza E-08) y su error
+      con reintento (pieza E-10). Lo que ya llega en el HTML no lleva esqueleto ni spinner.
 - [ ] Presupuesto PSI: no bajar de 95/97 móvil (Lighthouse local antes de entregar).
       Imágenes: solo si DESIGN.md §3 lo permite para este caso, AVIF/WebP con
       width/height, ≤150KB above-the-fold.

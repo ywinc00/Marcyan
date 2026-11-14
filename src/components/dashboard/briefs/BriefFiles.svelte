@@ -27,6 +27,7 @@
   let files = $state([]);
   let available = $state(true);
   let loading = $state(true);
+  let loaded = $state(false);         // tras borrar, los archivos se quedan a la vista hasta la respuesta
   let error = $state('');
   let broken = $state({});   // miniaturas que no cargaron → genérica
   let retention = $state(null);
@@ -38,6 +39,7 @@
       files = j.files || [];
       available = j.available !== false;
       retention = j.retention || null;
+      loaded = true;
       onloaded?.(files);
     } catch (e) { error = e.message; }
     finally { loading = false; }
@@ -81,7 +83,7 @@
 
   {#if error}
     <ErrorState title="No se pudieron cargar los archivos" message={error} onretry={load} compact />
-  {:else if loading}
+  {:else if loading && !loaded}
     <LoadingState loading={true} label="Cargando archivos">
       {#snippet skeleton()}<div class="tiles">{#each Array(4) as _, i (i)}<div class="ui-skel skel-tile"></div>{/each}</div>{/snippet}
     </LoadingState>

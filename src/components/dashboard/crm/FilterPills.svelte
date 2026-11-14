@@ -4,7 +4,9 @@
   // no con naranja (presupuesto del acento, H-07) y nunca solo por color
   // (aria-pressed + peso). El estado vive en la URL: lo decide el padre.
   //   options: [{ id, label, count? }]  (id '' = "Todos")
-  let { options = [], value = '', label = 'Filtro', onchange } = $props();
+  //   pending: la primera carga aún no trae los recuentos; cada pastilla guarda
+  //   el hueco de su número para que la fila no cambie de ancho al llegar (E-09).
+  let { options = [], value = '', label = 'Filtro', pending = false, onchange } = $props();
 </script>
 
 <div class="pills" role="group" aria-label={label}>
@@ -12,7 +14,7 @@
     <button type="button" class="pill" class:on={value === o.id} aria-pressed={value === o.id}
       onclick={() => { if (value !== o.id) onchange?.(o.id); }}>
       <span>{o.label}</span>
-      {#if o.count != null}<span class="pill__n">{o.count}</span>{/if}
+      {#if o.count != null}<span class="pill__n">{o.count}</span>{:else if pending}<span class="pill__n pill__n--hueco ui-skel" aria-hidden="true"></span>{/if}
     </button>
   {/each}
 </div>
@@ -36,5 +38,6 @@
     font-size: var(--dash-caption); font-weight: 600; text-align: center; font-variant-numeric: tabular-nums;
   }
   .pill.on .pill__n { background: var(--bg-base); color: var(--fg-primary); }
+  .pill__n--hueco { box-sizing: border-box; height: 16px; min-width: 26px; }
   @media (pointer: coarse) { .pill { min-height: var(--tap-min); padding-left: 14px; } }
 </style>

@@ -11,6 +11,7 @@
   import { route, href, setQuery, navigate } from './lib/router.svelte.js';
   import PageHeader from './ui/PageHeader.svelte';
   import KpiGrid from './ui/KpiGrid.svelte';
+  import KpiSkeleton from './ui/KpiSkeleton.svelte';
   import Kpi from './ui/Kpi.svelte';
   import StatusChip from './ui/StatusChip.svelte';
   import EmptyState from './ui/EmptyState.svelte';
@@ -39,6 +40,7 @@
   let total = $state(0);
   let summary = $state(null);
   let loading = $state(true);
+  let loaded = $state(false);         // ya hubo una respuesta: al filtrar, los datos se quedan a la vista
   let error = $state('');
   let reqSeq = 0;
 
@@ -52,7 +54,7 @@
     try {
       const j = await api('/api/admin/projects?' + p.toString());
       if (seq !== reqSeq) return;          // llegó tarde: hay otra búsqueda más nueva
-      rows = j.rows || []; total = j.total || 0; summary = j.summary || null;
+      rows = j.rows || []; total = j.total || 0; summary = j.summary || null; loaded = true;
     } catch (e) {
       if (seq !== reqSeq) return;
       error = e?.message || 'No se pudieron cargar los proyectos.';
@@ -126,7 +128,11 @@
     {/snippet}
   </PageHeader>
 
-  {#if summary && summary.total > 0}
+  <!-- Primera carga: hueco de las cifras para que las tarjetas no bajen al llegar (E-09). -->
+  {#snippet kpiSkel()}<div class="pl-kpis"><KpiSkeleton labels={['Activos', 'En pausa', 'Completados', 'Valor en cartera']} notes={['en curso ahora', 'detenidos por ahora', 'entregados', 'solo proyectos activos']} /></div>{/snippet}
+  {#if loading && !loaded}
+    <LoadingState loading={true} skeleton={kpiSkel} label="Cargando las cifras de proyectos" />
+  {:else if summary && summary.total > 0}
     <div class="pl-kpis">
     <KpiGrid count={kpiCount} label="Resumen de proyectos">
       <Kpi label="Activos" value={by.active} art="rocket" note="en curso ahora" href={href('progreso', [], { estado: 'activo' })} />
@@ -145,11 +151,11 @@
     <div class="pl-tools">
       <div class="pl-pills" role="group" aria-label="Filtrar por estado">
         <button type="button" class="pl-pill" aria-pressed={!status} onclick={() => setFilter('')}>
-          Todos{#if summary}<span class="pl-pill__n">{summary.total}</span>{/if}
+          Todos{#if summary}<span class="pl-pill__n">{summary.total}</span>{:else if loading}<span class="pl-pill__n pl-pill__hueco ui-skel" aria-hidden="true"></span>{/if}
         </button>
         {#each P_STATUSES as s (s.id)}
           <button type="button" class="pl-pill" aria-pressed={status === s.id} onclick={() => setFilter(s.id)}>
-            {s.label}{#if summary}<span class="pl-pill__n">{by[s.id] || 0}</span>{/if}
+            {s.label}{#if summary}<span class="pl-pill__n">{by[s.id] || 0}</span>{:else if loading}<span class="pl-pill__n pl-pill__hueco ui-skel" aria-hidden="true"></span>{/if}
           </button>
         {/each}
       </div>
@@ -162,9 +168,11 @@
     </div>
   {/if}
 
-  <LoadingState {loading}>
+  <!-- Esqueleto solo en la primera carga; al filtrar o buscar, las tarjetas
+       se quedan a la vista atenuadas mientras llegan las nuevas (E-09). -->
+  <LoadingState loading={loading && !loaded}>
     {#snippet skeleton()}
-      <div class="pl-cards">{#each Array(6) as _, i (i)}<div class="ui-skel" style="height:150px;border-radius:var(--radius-lg)"></div>{/each}</div>
+      <div class="pl-cards">{#each Array(6) as _, i (i)}<div class="ui-skel" style="height:178px;border-radius:var(--radius-lg)"></div>{/each}</div>
     {/snippet}
     {#if error}
       <ErrorState title="No se pudieron cargar los proyectos" message={error} onretry={loadList} />
@@ -179,7 +187,7 @@
       {/if}
     {:else}
       <p class="sr-only" aria-live="polite">{total} {total === 1 ? 'proyecto' : 'proyectos'}</p>
-      <div class="pl-cards">
+      <div class="pl-cards" class:is-busy={loading} aria-busy={loading}>
         {#each rows as r (r.id)}
           {@const st = pStatus(r.status)}
           {@const pct = r.progress || 0}
@@ -246,6 +254,8 @@
   .pl-pill[aria-pressed="true"] { background: var(--surface-3); border-color: var(--border-strong); color: var(--fg-primary); }
   .pl-pill__n { font-size: var(--dash-caption); color: var(--fg-subtle); font-variant-numeric: tabular-nums; }
   .pl-pill[aria-pressed="true"] .pl-pill__n { color: var(--fg-secondary); }
+  /* Hueco del recuento en la primera carga: la fila no cambia de ancho al llegar (E-09). */
+  .pl-pill__hueco { display: inline-block; width: 1ch; height: 12px; vertical-align: middle; }
   .pl-search { position: relative; flex: 0 1 340px; min-width: 220px; color: var(--fg-subtle); }
   .pl-search :global(.ui-icon) { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; }
   .pl-search .ui-input { padding-left: 36px; }
@@ -255,6 +265,7 @@
      monograma; el hover sube borde y superficie). Ahora son enlaces reales
      a la ficha (#/progreso/PRJ-…): se abren en otra pestaña y se comparten. */
   .pl-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .pl-cards.is-busy { opacity: .6; }
   .pcard {
     display: flex; flex-direction: column; gap: 10px; min-width: 0;
     background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);

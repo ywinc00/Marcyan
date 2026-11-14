@@ -195,7 +195,7 @@
     {#if summary}
       <RevenueChart revenue={summary.revenue_by_month || []} delta={collectedDelta} prevLabel={prevMonthName} />
     {:else if !summaryError}
-      <LoadingState loading={true} rows={1} height={260} label="Cargando el gráfico…" />
+      <LoadingState loading={true} rows={1} height={346} label="Cargando el gráfico…" />
     {/if}
   </div>
 
@@ -233,7 +233,7 @@
       {#if invError}
         <ErrorState compact title="No se pudieron cargar las facturas" message={invError} onretry={loadInvoices} />
       {:else}
-        <LoadingState loading={invLoading && !invoices.length} rows={4}>
+        <LoadingState loading={invLoading && !invoices.length} rows={10} height={54} head={40} gap={1}>
           {#if !invoices.length}
             {#if filter.id || search || projectFilter}
               <EmptyState compact title="Ninguna factura con estos filtros" text={search ? `No hay resultados para "${search}".` : `No hay facturas en estado ${filter.label.toLowerCase()}.`}>

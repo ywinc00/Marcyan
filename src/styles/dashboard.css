@@ -91,6 +91,9 @@
   --chart-idle-top:  #2a2a2f;
   --chart-idle-base: var(--bg-elevated);
   --icon-muted:      #4a4a55;
+  /* Brillo del esqueleto de carga (pieza E-09): la superficie elevada un 6 %
+     más clara, nunca un blanco suelto escrito a mano. */
+  --skel-shine: color-mix(in srgb, var(--bg-elevated), #fff 6%);
 
   /* Escala tipográfica del panel (SH-25): 12 · 13 · 14 · 15 · 22 · 28 · 30 */
   --dash-caption: 12px;
@@ -110,6 +113,9 @@
 
 /* Números alineados (tabular) en datos/tablas — Inter trae tnum */
 body { font-feature-settings: "cv05", "ss01"; }
+/* El hueco de la barra de desplazamiento queda reservado: cuando una lista llega y la
+   página pasa a desplazarse, el contenido no se estrecha 10 px de golpe (E-09). */
+html { scrollbar-gutter: stable; }
 .mono, table, .kpi__num, .stat__num, [class*="num"] { font-variant-numeric: tabular-nums; }
 
 /* Scrollbar sutil acorde al panel */
@@ -340,7 +346,7 @@ select.inp,
    ACCESIBILIDAD GLOBAL DEL PANEL (SH-10)
    · Anillo de foco visible y único: 2 px acento, separación 2 px. Solo con
      teclado (:focus-visible); los clics no lo pintan.
-   · prefers-reduced-motion: sin animaciones ni transiciones.
+   · prefers-reduced-motion: variante por pieza (F-02), ver más abajo.
    ═══════════════════════════════════════════════════════════════ */
 :where(a, button, input, select, textarea, summary, dialog, [tabindex]):focus-visible {
   outline: 2px solid var(--accent-gold);
@@ -363,14 +369,16 @@ select.inp,
   white-space: nowrap; border: 0;
 }
 
+/* Movimiento reducido (pieza F-02): en vez de apagarlo todo de golpe, cada
+   pieza declara su variante. Se quita lo que se desplaza, crece, gira o late;
+   se conservan los cambios de color, el anillo de foco y lo que indica estado
+   (el texto «Actualizando…», «Enviando…»). Las variantes de las piezas de cada
+   sección viven junto a su estilo, en su componente. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .01ms !important;
-    scroll-behavior: auto !important;
-  }
+  .funnel__pill { transition: none; }
 }
+/* Las variantes del esqueleto y del aviso flotante van justo después de su regla
+   (misma fuerza: si fueran aquí, la regla de abajo las pisaría). */
 
 /* ═══════════════════════════════════════════════════════════════
    PRIMITIVAS DE UI (ui/*.svelte) — una sola definición por componente,
@@ -512,17 +520,29 @@ select.inp,
 .ui-error__text { margin: 2px 0 0; font-size: var(--dash-small); color: var(--fg-secondary); line-height: 1.45; }
 
 /* ── Carga honesta (E-09): esqueleto con la geometría real ── */
-.ui-loading { display: flex; flex-direction: column; gap: 10px; }
-.ui-loading--hold { min-height: 48px; }
+.ui-loading__shape { display: flex; flex-direction: column; gap: 10px; }
+/* Antes del umbral de 300 ms el hueco ya ocupa lo que ocupará el contenido,
+   pero no se pinta: en las cargas rápidas no hay destello ni salto. */
+.ui-loading--wait { visibility: hidden; }
+/* Esqueleto de tabla: filas pegadas como las de la tabla real, esquinas solo arriba y abajo. */
+.ui-loading__shape--tabla > .ui-skel { border-radius: 0; }
+.ui-loading__shape--tabla > .ui-skel:first-child { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+.ui-loading__shape--tabla > .ui-skel:last-child { border-radius: 0 0 var(--radius-lg) var(--radius-lg); }
+/* Huecos de una fila de cifras (KpiSkeleton) y del embudo de Briefs: misma altura
+   que la cifra (30 px), la nota (una línea) y cada píldora del embudo. */
+.ui-kpi__skel-num { display: block; width: 64px; height: 30px; }
+.ui-kpi__skel-note { display: inline-block; width: 62%; height: 12px; vertical-align: middle; }
+.funnel__skel { display: block; height: 32px; border-radius: var(--radius-pill); }
+.ui-kpi__skel-text { color: transparent; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+@media (max-width: 719px) { .ui-kpi__skel-num { height: 26px; } }
 .ui-skel {
   border-radius: var(--radius-md);
-  background: linear-gradient(100deg, var(--bg-elevated) 30%, rgba(255,255,255,0.045) 50%, var(--bg-elevated) 70%);
+  background: linear-gradient(100deg, var(--bg-elevated) 30%, var(--skel-shine) 50%, var(--bg-elevated) 70%);
   background-size: 200% 100%;
   animation: ui-shimmer 1.3s ease-in-out infinite;
 }
 @keyframes ui-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
-@keyframes ui-spin { to { transform: rotate(360deg); } }
-.ui-spinner { width: 24px; height: 24px; border: 2px solid var(--accent-gold-line); border-top-color: var(--accent-gold); border-radius: 50%; animation: ui-spin .7s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .ui-skel { animation: none; } }   /* quieto y plano (F-02) */
 
 /* ── Botón de icono (cerrar, menú) ── */
 .ui-icon-btn {
@@ -632,6 +652,8 @@ select.inp,
 .ui-toast--info .ui-toast__icon { color: var(--color-info); }
 .ui-toast__msg { flex: 1; margin: 0; font-size: var(--dash-small); line-height: 1.45; color: var(--fg-primary); }
 @keyframes ui-toast-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ui-toast { animation: ui-toast-fade var(--duration-fast) ease-out; } }   /* solo opacidad (F-02) */
+@keyframes ui-toast-fade { from { opacity: 0; } to { opacity: 1; } }
 @media (max-width: 899px) {
   .ui-toasts { left: 16px; right: 16px; bottom: calc(16px + var(--safe-bottom)); width: auto; }
 }

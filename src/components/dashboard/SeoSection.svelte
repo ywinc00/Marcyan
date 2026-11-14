@@ -481,4 +481,6 @@
     .seo-bar__pick { flex-basis: 100%; max-width: none; }
     .seo-bar__sync { margin-left: 0; }
   }
+  /* Movimiento reducido (pieza F-02): sin desplazamiento ni giro; el dato o el texto de estado se ven igual. */
+  @media (prefers-reduced-motion: reduce) { .seo-spin { animation: none; } }
 </style>

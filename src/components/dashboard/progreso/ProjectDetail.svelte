@@ -215,4 +215,6 @@
   .pd-danger p { margin: 0; font-size: var(--dash-caption); color: var(--fg-subtle); line-height: 1.45; }
 
   @media (max-width: 1100px) { .pd-grid { grid-template-columns: 1fr; } }
+  /* Movimiento reducido (pieza F-02): sin desplazamiento ni giro; el dato o el texto de estado se ven igual. */
+  @media (prefers-reduced-motion: reduce) { .pd-bar span { transition: none; } }
 </style>

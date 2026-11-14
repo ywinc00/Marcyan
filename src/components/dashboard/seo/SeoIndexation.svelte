@@ -160,4 +160,6 @@
   .ix__url { display: block; max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg-primary); }
   .ix__date { font-variant-numeric: tabular-nums; color: var(--fg-secondary); }
   @media (max-width: 719px) { .ix__url { max-width: 100%; white-space: normal; overflow-wrap: anywhere; } }
+  /* Movimiento reducido (pieza F-02): sin desplazamiento ni giro; el dato o el texto de estado se ven igual. */
+  @media (prefers-reduced-motion: reduce) { .ix__fill { transition: none; } }
 </style>

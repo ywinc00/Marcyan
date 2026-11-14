@@ -11,6 +11,7 @@
   import { onDestroy, untrack } from 'svelte';
   import PageHeader from './ui/PageHeader.svelte';
   import KpiGrid from './ui/KpiGrid.svelte';
+  import KpiSkeleton from './ui/KpiSkeleton.svelte';
   import Kpi from './ui/Kpi.svelte';
   import DataTable from './ui/DataTable.svelte';
   import StatusChip from './ui/StatusChip.svelte';
@@ -126,6 +127,9 @@
     {/snippet}
   </PageHeader>
 
+  <!-- Primera carga: hueco de las cifras para que la lista no baje al llegar (E-09). -->
+  {#snippet kpiSkel()}<KpiSkeleton labels={['Clientes activos', 'Con proyecto en curso', 'Saldo por cobrar']} notes={['Ninguno inactivo', 'Ver el avance en Progreso', 'Facturas emitidas sin pagar, sin borradores']} />{/snippet}
+  <LoadingState loading={loading && !loaded} skeleton={kpiSkel} label="Cargando las cifras de clientes">
   {#if summary}
     <KpiGrid count={3} label="Resumen de clientes">
       <Kpi label="Clientes activos" value={summary.active} note={summary.inactive ? `${plural(summary.inactive, 'inactivo', 'inactivos')} aparte` : 'Ninguno inactivo'} />
@@ -133,9 +137,10 @@
       <Kpi label="Saldo por cobrar" value={money(summary.balance_cents)} note="Facturas emitidas sin pagar, sin borradores" />
     </KpiGrid>
   {/if}
+  </LoadingState>
 
   <div class="toolbar">
-    <FilterPills label="Filtrar por estado" options={pills} value={filters.status}
+    <FilterPills label="Filtrar por estado" options={pills} value={filters.status} pending={!loaded}
       onchange={(id) => setQuery(clientQueryPatch({ status: id, page: 1 }))} />
     <label class="search">
       <span class="sr-only">Buscar clientes</span>
@@ -148,7 +153,7 @@
   {#if error && !loaded}
     <ErrorState title="No se pudieron cargar los clientes" message={error} onretry={loadList} />
   {:else if !loaded}
-    <LoadingState loading={true} rows={6} height={52} label="Cargando clientes" />
+    <LoadingState loading={true} rows={10} height={54} head={40} gap={1} label="Cargando clientes" />
   {:else}
     {#if error}
       <div class="stale"><ErrorState compact title="No se pudo actualizar la lista" message={error} onretry={loadList} /></div>

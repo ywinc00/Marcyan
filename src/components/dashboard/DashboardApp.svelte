@@ -54,6 +54,15 @@
   let bootShownAt = 0;
   let bootTimer = null;
   let retryBtn = $state(null);
+
+  // Texto de la región de carga: se fija 150 ms después del último cambio, para que
+  // varias secciones que empiezan a la vez no lo cambien dos veces seguidas.
+  let avisoCarga = $state('');
+  $effect(() => {
+    const t = textoCarga();
+    const id = setTimeout(() => { avisoCarga = t; }, 150);
+    return () => clearTimeout(id);
+  });
   const booting = $derived(phase === 'loading');
 
   // Búsqueda (Ctrl K / ⌘K) de la barra lateral.
@@ -141,26 +150,34 @@
     bootShown = false;
     clearTimeout(bootTimer);
     bootTimer = setTimeout(() => { bootShown = true; bootShownAt = performance.now(); }, 300);
+    // Si el armazón ya se veía y lo que sigue NO es el panel (entrada o «sin
+    // conexión»), se queda al menos 400 ms: sin destello. Hacia el panel no se
+    // espera: el esqueleto de la sección sigue al instante y cumple su propio mínimo.
+    const minimoArmazon = async () => {
+      if (!bootShown) return;
+      const falta = 400 - (performance.now() - bootShownAt);
+      if (falta > 0) await new Promise((r) => setTimeout(r, falta));
+    };
     try {
       const j = await api('/api/admin/me', { auth: false });
       if (j && j.email) {
         restoreReturn(); user = j.email; writeHint(true);
-        // El armazón ya estaba a la vista: se queda al menos 400 ms (sin
-        // destello) y las secciones siguen con su esqueleto sin pasar por blanco.
-        if (bootShown) {
-          const falta = 400 - (performance.now() - bootShownAt);
-          if (falta > 0) await new Promise((r) => setTimeout(r, falta));
-          continueSkeletons();
-        }
+        // Las secciones siguen con su esqueleto sin pasar por un hueco en blanco.
+        if (bootShown) continueSkeletons();
         phase = 'app'; loadAll(); return;
       }
       rememberReturn(window.location.hash);
+      clearTimeout(bootTimer);
+      // La pista se borra DESPUÉS del mínimo: si no, el armazón cambiaría de forma a mitad.
+      await minimoArmazon();
       writeHint(false);
       phase = 'login';
     } catch (e) {
-      if (e && e.status === 401) { rememberReturn(window.location.hash); writeHint(false); phase = 'login'; return; }
+      clearTimeout(bootTimer);
+      if (e && e.status === 401) { rememberReturn(window.location.hash); await minimoArmazon(); writeHint(false); phase = 'login'; return; }
       // Sin red o servidor caído: NO es "perdiste la sesión" (SH-16).
       unreachableMsg = errorMessage(e, MSG.network);
+      await minimoArmazon();
       phase = 'unreachable';
       // Si se pulsó Reintentar y vuelve a fallar, el foco vuelve al botón.
       setTimeout(() => retryBtn?.focus(), 0);
@@ -372,7 +389,7 @@
 <!-- Región ÚNICA de avisos de carga para el lector de pantalla (comprobación
      global c): el arranque y los esqueletos de las secciones escriben aquí, fuera
      de lo que está ocupado, y solo cuando el hueco ya se ve. -->
-<span class="sr-only" role="status">{booting && bootShown ? 'Cargando el panel…' : textoCarga()}</span>
+<span class="sr-only" role="status">{booting && bootShown ? 'Cargando el panel…' : avisoCarga}</span>
 
 {#if booting && !hadSession}
   <!-- Sin sesión conocida en este dispositivo: el hueco tiene la forma de la

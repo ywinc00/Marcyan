@@ -263,9 +263,12 @@
   </div>
 {/snippet}
 {#snippet paginaSkel()}
-  <div class="seo-bar"><div class="ui-skel sk-seo-bar"></div></div>
-  <div class="seo-meta"><span class="ui-skel sk-seo-meta"></span></div>
-  {@render detalleSkel()}
+  <!-- Un solo bloque: así el hueco no suma la separación del contenedor de carga. -->
+  <div>
+    <div class="seo-bar"><div class="ui-skel sk-seo-bar"></div></div>
+    <div class="seo-meta"><span class="ui-skel sk-seo-meta"></span></div>
+    {@render detalleSkel()}
+  </div>
 {/snippet}
 <LoadingState loading={listLoading} skeleton={paginaSkel} label="Cargando proyectos de SEO">
   {#if listError}
@@ -473,11 +476,13 @@
   /* Huecos de SEO con las medidas del contenido real (1440): tarjeta de fuentes 128,
      cifras 162, línea del rango 18, gráficos 331. */
   .sk-seo-bar { height: 38px; width: min(560px, 100%); }
-  .sk-seo-meta { display: inline-block; height: 12px; width: min(520px, 90%); }
+  .sk-seo-meta { display: inline-block; height: 15px; width: min(520px, 90%); }
   .sk-seo-card { height: 128px; border-radius: var(--radius-lg); }
   .sk-seo-kpi { height: 162px; border-radius: var(--radius-lg); }
   .sk-seo-line { height: 18px; width: 40%; }
   .sk-seo-chart { height: 331px; border-radius: var(--radius-lg); }
+  /* Teléfono: la barra parte en varias líneas y la tarjeta de fuentes crece. */
+  @media (max-width: 719px) { .sk-seo-bar { height: 158px; } .sk-seo-card { height: 310px; } }
   .seo-stack.is-reloading { opacity: .7; }
   .seo-window { margin: -6px 0 0; font-size: var(--dash-caption); color: var(--fg-subtle); line-height: 1.5; }
   .seo-window--warn { color: var(--color-warning); }

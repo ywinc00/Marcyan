@@ -104,6 +104,20 @@ function isPlainBody(b) {
  *   JSON aunque no sea ok, en vez de lanzar).
  */
 export async function api(url, opts = {}) {
+  // Lecturas: la respuesta, buena o mala, espera a que el esqueleto visible cumpla
+  // su mínimo (un error que llega a los 50 ms no hace destellar el hueco).
+  const lectura = String(opts.method || 'GET').toUpperCase() === 'GET';
+  try {
+    const data = await apiCrudo(url, opts);
+    if (retencion && lectura) await retencion();
+    return data;
+  } catch (e) {
+    if (retencion && lectura && !(e && e.kind === 'session')) await retencion();
+    throw e;
+  }
+}
+
+async function apiCrudo(url, opts = {}) {
   const { timeout = DEFAULT_TIMEOUT, auth = true, acceptErrors = false, body, headers, method = 'GET', ...rest } = opts;
   const m = String(method).toUpperCase();
   const payload = isPlainBody(body) ? JSON.stringify(body) : body;
@@ -154,7 +168,6 @@ export async function api(url, opts = {}) {
     else throw new ApiError(MSG.invalid, { status: res.status, kind: 'parse' });
   }
   if (auth && m !== 'GET' && m !== 'HEAD') emit(mutationListeners, { url, method: m });
-  if (retencion && m === 'GET') await retencion();
   return data;
 }
 

@@ -172,7 +172,11 @@ const spec: KindSpec = {
           recursos: [
             { icon: 'lucide:book-open', title: t.guia.title, text: t.guia.text, href: '/es/blog/precio-pagina-web-houston-guia' },
             { icon: 'lucide:scan-search', title: t.diag.title, text: t.diag.text, href: '/es/diagnostico', track: 'tool_cta_clicked' },
-            { icon: 'lucide:tag', title: t.precios.title, text: t.precios.text, href: '/es/precios' },
+            // Houston: el sitio para agentes de bienes raíces ocupa el hueco de Precios (ya está en el
+            // menú y el pie), para que la página siga enlazando su sector. Miami no tiene esa página.
+            t.sector
+              ? { icon: 'lucide:home', title: t.sector.title, text: t.sector.text, href: t.sector.href }
+              : { icon: 'lucide:tag', title: t.precios.title, text: t.precios.text, href: '/es/precios' },
           ],
         };
       },

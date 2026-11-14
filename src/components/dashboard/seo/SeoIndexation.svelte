@@ -86,7 +86,7 @@
           <circle cx="44" cy="44" r={DONUT_R} fill="none" stroke="var(--bg-elevated)" stroke-width="11" />
           <circle cx="44" cy="44" r={DONUT_R} fill="none" stroke="url(#seoIdxDonut)" stroke-width="11" stroke-linecap="round"
             stroke-dasharray="{(ratio * DONUT_C).toFixed(1)} {DONUT_C.toFixed(1)}" transform="rotate(-90 44 44)"
-            style="transition: stroke-dasharray var(--duration-base) var(--ease)" />
+            class="ix__arco" />
           <text x="44" y="48" text-anchor="middle" class="ix__pct">{pctTxt}</text>
         </svg>
         <div class="ix__body">
@@ -160,4 +160,8 @@
   .ix__url { display: block; max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg-primary); }
   .ix__date { font-variant-numeric: tabular-nums; color: var(--fg-secondary); }
   @media (max-width: 719px) { .ix__url { max-width: 100%; white-space: normal; overflow-wrap: anywhere; } }
+  /* Movimiento reducido (pieza F-02): sin desplazamiento ni giro; el dato o el texto de estado se ven igual. */
+  /* El arco del anillo crece con transición; con movimiento reducido cambia de golpe. */
+  .ix__arco { transition: stroke-dasharray var(--duration-base) var(--ease); }
+  @media (prefers-reduced-motion: reduce) { .ix__fill, .ix__arco { transition: none; } }
 </style>

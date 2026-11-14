@@ -183,3 +183,22 @@ y "Devolver a Marcy" (secundario). Chip de la cabecera "La llevas tú" en naranj
 acción). Tus mensajes en verde de datos ("Tú · hora"), distintos de los de Marcy (filo naranja). En el chat de la
 web, nota centrada "Ahora te atiende una persona del equipo" con el estilo de nota que ya existe.
 Captura: `design/orbit-correo/tomo-yo.png`.
+
+## Añadido 2026-11-14 · Cargas con la forma real, vacíos y errores (encargo del dueño desde Estructura)
+Estado: VALIDADO por: el dueño (OK al encargo `encargos/2026-11-10-orbit-cargas-con-forma.md`, 2026-11-10).
+El render se le enseña antes de mergear. Modo REDISEÑO/IDENTIDAD: solo estados de espera, vacío y error;
+ninguna sección se rediseña. Piezas del catálogo: **E-09** (carga honesta: hueco reservado desde el primer
+instante, nada visible antes de 300 ms, mínimo 400 ms, esqueleto con la geometría real, aria-busy, «Actualizando»
+sin volver al esqueleto al recargar), **E-10** (error con «Reintentar» sin recargar, ya existente en `ErrorState`)
+y **E-08** (vacíos ya existentes en `EmptyState`, sin tocar). Movimiento reducido con **F-02** en lugar del apagón
+global de `dashboard.css`.
+CONSERVADO: superficies, acento naranja, radios, botones, `LoadingState`, `ErrorState`, `EmptyState` y el límite
+de 15 s del cliente de datos (ya convierte una espera colgada en error con «Reintentar»).
+CAMBIA: al comprobar la sesión se ve el armazón del panel (barra lateral, cabecera y título; en Inicio también sus
+cifras y gráficos, la única forma que se sabe de antemano) en vez de la rueda centrada; el brillo del esqueleto usa
+una mezcla del token de superficie en vez de un blanco escrito a mano. Cambio global del panel: el hueco de la barra
+de desplazamiento queda reservado (`scrollbar-gutter: stable`), para que la página no se estreche 10 px cuando llega
+una lista larga. Los avisos de carga al lector de pantalla salen de una sola región en la carcasa.
+NO → SÍ: NO rueda en mitad de la pantalla → SÍ armazón con la forma del panel. NO hueco de 48 px que luego crece →
+SÍ hueco con la altura real reservado desde el principio. NO volver al esqueleto al actualizar → SÍ datos a la vista
+y «Actualizando». NO `*{.01ms !important}` → SÍ variante reducida por pieza (brillo quieto, avisos sin desplazamiento).

@@ -20,6 +20,7 @@
   } from './lib/avisos.svelte.js';
   import PageHeader from './ui/PageHeader.svelte';
   import KpiGrid from './ui/KpiGrid.svelte';
+  import KpiSkeleton from './ui/KpiSkeleton.svelte';
   import Kpi from './ui/Kpi.svelte';
   import StatusChip from './ui/StatusChip.svelte';
   import EmptyState from './ui/EmptyState.svelte';
@@ -286,6 +287,9 @@
 
 <!-- KPIs con conteos del servidor (la bandeja entera, sin archivados).
      Los de tipo filtran la lista: el KPI es el anfitrión del atajo (E-19). -->
+<!-- Primera carga: hueco de las cifras con su umbral y su mínimo (E-09). -->
+{#snippet kpiSkel()}<KpiSkeleton labels={['Sin leer', 'Leads', 'Briefs', 'Quieren hablar']} notes={['avisos pendientes', 'sin leer', 'sin leer', 'sin leer']} />{/snippet}
+<LoadingState loading={loading && !loaded} skeleton={kpiSkel} label="Cargando las cifras de avisos">
 <KpiGrid count={4} label="Resumen de avisos">
   <Kpi label="Sin leer" value={kv(unread)} art="bell" tone={unread ? 'accent' : ''}
        href={href('avisos', [], { tipo: filters.tipo, estado: 'sin-leer' })}
@@ -297,6 +301,7 @@
   <Kpi label="Quieren hablar" value={kv(counts.by_type.chat_handoff.total)} art="users"
        href={href('avisos', [], { tipo: 'persona', estado: filters.estado })} note={kpiNote('chat_handoff')} />
 </KpiGrid>
+</LoadingState>
 
 <!-- Filtros en pastillas con el estado en la URL (E-06). -->
 <div class="filters">

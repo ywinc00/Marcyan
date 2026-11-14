@@ -14,6 +14,7 @@
   import { onDestroy, untrack } from 'svelte';
   import PageHeader from './ui/PageHeader.svelte';
   import KpiGrid from './ui/KpiGrid.svelte';
+  import KpiSkeleton from './ui/KpiSkeleton.svelte';
   import Kpi from './ui/Kpi.svelte';
   import DataTable from './ui/DataTable.svelte';
   import StatusChip from './ui/StatusChip.svelte';
@@ -168,6 +169,9 @@
     {/snippet}
   </PageHeader>
 
+  <!-- Primera carga: hueco de las cifras para que la lista no baje al llegar (E-09). -->
+  {#snippet kpiSkel()}<KpiSkeleton labels={['Este mes', 'Por atender', 'Convertidos']} notes={['en el mes pasado', 'Nuevos sin contactar todavía', 'del total de leads']} />{/snippet}
+  <LoadingState loading={loading && !loaded} skeleton={kpiSkel} label="Cargando las cifras de leads">
   {#if stats}
     <KpiGrid count={3} label="Resumen de leads">
       <Kpi label="Este mes" value={stats.this_month ?? 0} note={`${stats.prev_month ?? 0} el mes pasado`} />
@@ -175,9 +179,10 @@
       <Kpi label="Convertidos" value={stats.converted ?? 0} note={`${conversion} % de ${stats.total} leads`} />
     </KpiGrid>
   {/if}
+  </LoadingState>
 
   <div class="toolbar">
-    <FilterPills label="Filtrar por estado" options={statusPills} value={filters.status}
+    <FilterPills label="Filtrar por estado" options={statusPills} value={filters.status} pending={loading && !loaded}
       onchange={(id) => setQuery(leadQueryPatch({ status: id, page: 1 }))} />
     <div class="toolbar__row">
       <label class="search">
@@ -199,7 +204,7 @@
   {#if error && !loaded}
     <ErrorState title="No se pudieron cargar los leads" message={error} onretry={loadList} />
   {:else if !loaded}
-    <LoadingState loading={true} rows={6} height={52} label="Cargando leads" />
+    <LoadingState loading={true} rows={10} height={54} head={40} gap={1} movil={233} label="Cargando leads" />
   {:else}
     {#if error}
       <div class="stale"><ErrorState compact title="No se pudo actualizar la lista" message={error} onretry={loadList} /></div>

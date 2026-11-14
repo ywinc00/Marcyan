@@ -403,7 +403,7 @@
       {#if data.projectsError && !recentProjects.length}
         <ErrorState compact title="No se pudieron cargar los proyectos" message={data.projectsError} onretry={loadProjects} />
       {:else if !data.projectsLoaded}
-        <LoadingState loading={true} rows={5} height={52} label="Cargando proyectos" />
+        <LoadingState loading={true} rows={5} height={70} gap={1} label="Cargando proyectos" />
       {:else if recentProjects.length}
         <ul class="rows">
           {#each recentProjects as p (p.id)}
@@ -440,7 +440,7 @@
       {#if data.leadsError && !leads.length}
         <ErrorState compact title="No se pudieron cargar los leads" message={data.leadsError} onretry={loadLeads} />
       {:else if !data.leadsLoaded}
-        <LoadingState loading={true} rows={5} height={52} label="Cargando leads" />
+        <LoadingState loading={true} rows={5} height={70} gap={1} label="Cargando leads" />
       {:else if leads.length}
         <ul class="rows">
           {#each leads.slice(0, 5) as lead (lead.ref_id)}
@@ -508,8 +508,10 @@
 
 <style>
   .block { margin-bottom: var(--space-4); }
-  .kpi-skel { height: 142px; border-radius: var(--radius-lg); }
-  .chart-skel { height: 298px; border-radius: var(--radius-lg); }
+  /* Medidas reales de las tarjetas (1440: 144 y 300; teléfono: 136, 288 y 298). */
+  .kpi-skel { height: 144px; border-radius: var(--radius-lg); }
+  .chart-skel { height: 300px; border-radius: var(--radius-lg); }
+  @media (max-width: 719px) { .kpi-skel { height: 136px; } .chart-skel:first-child { height: 288px; } .chart-skel { height: 298px; } }
 
   /* ── Filas de tarjetas ── */
   .stack { display: flex; flex-direction: column; gap: 14px; }
@@ -633,4 +635,6 @@
     .m-amount { font-size: 26px; }
     .prow, .lrow { gap: 10px; padding: 8px 4px; }
   }
+  /* Movimiento reducido (pieza F-02): sin desplazamiento ni giro; el dato o el texto de estado se ven igual. */
+  @media (prefers-reduced-motion: reduce) { .st__fill, .prog__bar { transition: none; } }
 </style>

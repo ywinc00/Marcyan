@@ -10,6 +10,7 @@
   import { route, setQuery, href } from '../lib/router.svelte.js';
   import PageHeader from '../ui/PageHeader.svelte';
   import KpiGrid from '../ui/KpiGrid.svelte';
+  import KpiSkeleton from '../ui/KpiSkeleton.svelte';
   import Kpi from '../ui/Kpi.svelte';
   import StatusChip from '../ui/StatusChip.svelte';
   import EmptyState from '../ui/EmptyState.svelte';
@@ -152,13 +153,18 @@
   </div>
 {:else if statsError}
   <div class="block"><ErrorState title="No se pudieron cargar las cifras" message={statsError} onretry={loadStats} compact /></div>
+{:else}
+  <!-- Mientras llegan las cifras: su hueco, con la celda del embudo (E-09). -->
+  {#snippet embudoSkel()}<article class="ui-kpi funnel-cell"><p class="ui-kpi__label">Briefs por estado</p><div class="funnel">{#each [92, 70, 52, 40, 30] as w (w)}<div class="funnel__row"><span class="ui-skel funnel__skel" style="width:{w}%"></span></div>{/each}</div></article>{/snippet}
+  {#snippet kpiSkel()}<div class="kpis"><KpiSkeleton labels={['Total briefs', 'Por atender', 'Completados']} notes={['altas este mes', 'Pendientes y contactados', 'Ninguno este mes']} extra={embudoSkel} /></div>{/snippet}
+  <LoadingState loading={true} skeleton={kpiSkel} label="Cargando las cifras de briefs" />
 {/if}
 
 <div class="filters" role="group" aria-label="Filtrar por estado">
   {#each [{ id: '', label: 'Todos' }, ...STATUSES] as f (f.id)}
     <button type="button" class="pill" aria-pressed={status === f.id} onclick={() => setStatus(f.id)}>
       {f.label}
-      {#if countFor(f.id) !== null}<span class="pill__n">{countFor(f.id)}</span>{/if}
+      {#if countFor(f.id) !== null}<span class="pill__n">{countFor(f.id)}</span>{:else if !statsError}<span class="pill__n pill__hueco ui-skel" aria-hidden="true"></span>{/if}
     </button>
   {/each}
 </div>
@@ -254,6 +260,8 @@
   }
   .pill:hover { border-color: var(--border-strong); color: var(--fg-primary); }
   .pill[aria-pressed="true"] { background: var(--accent-gold-dim); border-color: var(--accent-gold-line); color: var(--fg-primary); }
+  /* Hueco del recuento mientras llegan las cifras: la fila no cambia de ancho (E-09). */
+  .pill__hueco { display: inline-block; width: 22px; height: 14px; vertical-align: middle; }
   .pill__n { min-width: 18px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--bg-elevated); color: var(--fg-secondary); font-size: var(--dash-caption); text-align: center; font-variant-numeric: tabular-nums; }
   @media (pointer: coarse) { .pill { min-height: var(--tap-min); } }
 
@@ -266,7 +274,7 @@
   /* Tarjetas de briefs (aprobadas): rejilla de 14 px, hairline, hover = borde fuerte. */
   .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(278px, 1fr)); gap: 14px; transition: opacity var(--duration-fast); }
   .cards.is-busy { opacity: .6; }
-  .skel-card { height: 156px; border-radius: var(--radius-lg); }
+  .skel-card { height: 166px; border-radius: var(--radius-lg); }
   .bcard {
     display: flex; flex-direction: column; gap: 11px; min-width: 0;
     background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px;

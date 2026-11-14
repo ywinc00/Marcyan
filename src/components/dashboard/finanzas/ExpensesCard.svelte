@@ -28,6 +28,7 @@
   let total = $state(0);
   let totalCents = $state(0);
   let loading = $state(false);
+  let loaded = $state(false);         // ya hubo respuesta: al filtrar, la tabla se queda a la vista
   let loadingMore = $state(false);
   let error = $state('');
   let formOpen = $state(false);
@@ -47,7 +48,7 @@
     loading = true; error = '';
     try {
       const j = await api('/api/admin/expenses?' + qs(0));
-      rows = j.rows || []; total = j.total || 0; totalCents = Number(j.total_cents || 0);
+      rows = j.rows || []; total = j.total || 0; totalCents = Number(j.total_cents || 0); loaded = true;
     } catch (e) {
       if (!isSessionError(e)) error = errorMessage(e, 'No se pudieron cargar los gastos.');
     } finally { loading = false; }
@@ -119,7 +120,9 @@
   {#if error}
     <ErrorState compact title="No se pudieron cargar los gastos" message={error} onretry={load} />
   {:else}
-    <LoadingState {loading} rows={3}>
+    <!-- Esqueleto solo la primera vez; al cambiar de mes o categoría la tabla
+         se queda atenuada mientras llega la nueva (E-09). -->
+    <LoadingState loading={loading && !loaded} rows={6} height={66} head={40} gap={1}>
       {#if !rows.length}
         <EmptyState compact title={month || cat ? 'Nada con estos filtros' : 'Aún no hay gastos'}
           text={month || cat ? 'Prueba con otro mes o categoría.' : 'Apunta aquí lo que pagas una sola vez: dominios, fotos, asesorías.'}>
@@ -128,7 +131,7 @@
           {/snippet}
         </EmptyState>
       {:else}
-        <div class="xc-table">
+        <div class="xc-table" class:is-busy={loading} aria-busy={loading}>
           <DataTable {columns} {rows} caption="Gastos">
             {#snippet cell(r, col)}
               {#if col.key === 'label'}
@@ -189,4 +192,5 @@
     .xc-table :global(.ui-table-wrap) { border-top: 0; }
     .xc-table :global(.ui-table td:first-child) { padding-left: 0; }
   }
+  .xc-table.is-busy { opacity: .6; }
 </style>

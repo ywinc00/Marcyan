@@ -79,6 +79,7 @@
   let invTotal = $state(0);
   let counts = $state(null);
   let invLoading = $state(false);
+  let invLoaded = $state(false);      // tras la primera respuesta, al filtrar no se vuelve al esqueleto
   let invError = $state('');
   let searchText = $state('');
   let searchTimer;
@@ -91,7 +92,7 @@
     if (projectFilter) p.set('projectId', projectFilter);
     try {
       const j = await api('/api/admin/invoices?' + p.toString());
-      invoices = j.rows || []; invTotal = j.total || 0; counts = j.counts || null;
+      invoices = j.rows || []; invTotal = j.total || 0; counts = j.counts || null; invLoaded = true;
       // Página fuera de rango (enlace viejo o tras borrar la última factura de
       // la página): se salta a la última página que sí tiene facturas.
       if (!invoices.length && invTotal > 0 && page > 1) {
@@ -195,7 +196,7 @@
     {#if summary}
       <RevenueChart revenue={summary.revenue_by_month || []} delta={collectedDelta} prevLabel={prevMonthName} />
     {:else if !summaryError}
-      <LoadingState loading={true} rows={1} height={260} label="Cargando el gráfico…" />
+      <LoadingState loading={true} rows={1} height={346} label="Cargando el gráfico…" />
     {/if}
   </div>
 
@@ -233,7 +234,7 @@
       {#if invError}
         <ErrorState compact title="No se pudieron cargar las facturas" message={invError} onretry={loadInvoices} />
       {:else}
-        <LoadingState loading={invLoading && !invoices.length} rows={4}>
+        <LoadingState loading={invLoading && !invLoaded} rows={10} height={54} head={40} gap={1} label="Cargando las facturas">
           {#if !invoices.length}
             {#if filter.id || search || projectFilter}
               <EmptyState compact title="Ninguna factura con estos filtros" text={search ? `No hay resultados para "${search}".` : `No hay facturas en estado ${filter.label.toLowerCase()}.`}>

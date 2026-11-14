@@ -18,6 +18,8 @@
   import NotificationsSection from './NotificationsSection.svelte';
   import Icon from './ui/Icon.svelte';
   import Toast from './ui/Toast.svelte';
+  import { continueSkeletons } from './ui/LoadingState.svelte';
+  import { textoCarga } from './lib/cargando.svelte.js';
   import { api, MSG, errorMessage, onUnauthorized, onMutation, onNetwork } from './lib/api.js';
   import { toast, pushLayer, popLayer } from './lib/toast.svelte.js';
   import { route, href, navigate, startRouter, parseHash } from './lib/router.svelte.js';
@@ -36,6 +38,32 @@
   let unreachableMsg = $state('');
   let loggingOut = $state(false);
   let installPrompt = $state(null);
+
+  // Arranque (pieza E-09): mientras se comprueba la sesión se ve el armazón
+  // del panel (o el de la entrada, si este dispositivo no tiene sesión
+  // conocida), nunca una rueda en mitad de la pantalla. Solo pasados 300 ms,
+  // para no destellar cuando la comprobación es rápida.
+  const SESSION_HINT = 'orbit:sesion';
+  function readHint() { try { return localStorage.getItem(SESSION_HINT) === '1'; } catch { return false; } }
+  function writeHint(on) {
+    hadSession = on;
+    try { if (on) localStorage.setItem(SESSION_HINT, '1'); else localStorage.removeItem(SESSION_HINT); } catch { /* sin almacenamiento: da igual */ }
+  }
+  let hadSession = $state(readHint());
+  let bootShown = $state(false);
+  let bootShownAt = 0;
+  let bootTimer = null;
+  let retryBtn = $state(null);
+
+  // Texto de la región de carga: se fija 150 ms después del último cambio, para que
+  // varias secciones que empiezan a la vez no lo cambien dos veces seguidas.
+  let avisoCarga = $state('');
+  $effect(() => {
+    const t = textoCarga();
+    const id = setTimeout(() => { avisoCarga = t; }, 150);
+    return () => clearTimeout(id);
+  });
+  const booting = $derived(phase === 'loading');
 
   // Búsqueda (Ctrl K / ⌘K) de la barra lateral.
   let navQuery = $state('');
@@ -119,16 +147,42 @@
   }
   async function checkSession() {
     phase = 'loading';
+    bootShown = false;
+    clearTimeout(bootTimer);
+    bootTimer = setTimeout(() => { bootShown = true; bootShownAt = performance.now(); }, 300);
+    // Si el armazón ya se veía y lo que sigue NO es el panel (entrada o «sin
+    // conexión»), se queda al menos 400 ms: sin destello. Hacia el panel no se
+    // espera: el esqueleto de la sección sigue al instante y cumple su propio mínimo.
+    const minimoArmazon = async () => {
+      if (!bootShown) return;
+      const falta = 400 - (performance.now() - bootShownAt);
+      if (falta > 0) await new Promise((r) => setTimeout(r, falta));
+    };
     try {
       const j = await api('/api/admin/me', { auth: false });
-      if (j && j.email) { restoreReturn(); user = j.email; phase = 'app'; loadAll(); return; }
+      if (j && j.email) {
+        restoreReturn(); user = j.email; writeHint(true);
+        // Las secciones siguen con su esqueleto sin pasar por un hueco en blanco.
+        if (bootShown) continueSkeletons();
+        phase = 'app'; loadAll(); return;
+      }
       rememberReturn(window.location.hash);
+      clearTimeout(bootTimer);
+      // La pista se borra DESPUÉS del mínimo: si no, el armazón cambiaría de forma a mitad.
+      await minimoArmazon();
+      writeHint(false);
       phase = 'login';
     } catch (e) {
-      if (e && e.status === 401) { rememberReturn(window.location.hash); phase = 'login'; return; }
+      clearTimeout(bootTimer);
+      if (e && e.status === 401) { rememberReturn(window.location.hash); await minimoArmazon(); writeHint(false); phase = 'login'; return; }
       // Sin red o servidor caído: NO es "perdiste la sesión" (SH-16).
       unreachableMsg = errorMessage(e, MSG.network);
+      await minimoArmazon();
       phase = 'unreachable';
+      // Si se pulsó Reintentar y vuelve a fallar, el foco vuelve al botón.
+      setTimeout(() => retryBtn?.focus(), 0);
+    } finally {
+      clearTimeout(bootTimer);
     }
   }
 
@@ -161,6 +215,7 @@
       await api('/api/admin/logout', { method: 'POST', auth: false });
       clearData();
       user = '';
+      writeHint(false);
       window.location.replace('/dashboard');
     } catch (err) {
       loggingOut = false;
@@ -230,6 +285,7 @@
       loginTone = 'info';
       loginMsg = MSG.session;
       rememberReturn(window.location.hash);
+      writeHint(false);
       phase = 'login';
     });
 
@@ -330,8 +386,23 @@
   </div>
 {/snippet}
 
-{#if phase === 'loading'}
-  <div class="center" role="status" aria-live="polite"><span class="ui-spinner"></span><span class="sr-only">Cargando el panel…</span></div>
+<!-- Región ÚNICA de avisos de carga para el lector de pantalla (comprobación
+     global c): el arranque y los esqueletos de las secciones escriben aquí, fuera
+     de lo que está ocupado, y solo cuando el hueco ya se ve. -->
+<span class="sr-only" role="status">{booting && bootShown ? 'Cargando el panel…' : avisoCarga}</span>
+
+{#if booting && !hadSession}
+  <!-- Sin sesión conocida en este dispositivo: el hueco tiene la forma de la
+       entrada (lo más probable es que haya que entrar). -->
+  <div class="center" class:boot-wait={!bootShown} aria-busy="true">
+    <div class="login" aria-hidden="true">
+      {@render brandMark(true)}
+      <p class="login__tag">Panel de operaciones</p>
+      <span class="ui-skel boot-login__lbl"></span>
+      <span class="ui-skel boot-login__field"></span>
+      <span class="ui-skel boot-login__field"></span>
+    </div>
+  </div>
 
 {:else if phase === 'unreachable'}
   <div class="center">
@@ -342,7 +413,7 @@
         <Icon name={browserOnline ? 'alert' : 'wifiOff'} size={20} />
         <p>{browserOnline ? unreachableMsg : 'Sin conexión. Cuando vuelva internet, el panel se recarga solo.'}</p>
       </div>
-      <button type="button" class="b b--primary" onclick={checkSession}><Icon name="refresh" size={16} />Reintentar</button>
+      <button type="button" class="b b--primary" bind:this={retryBtn} onclick={checkSession}><Icon name="refresh" size={16} />Reintentar</button>
     </div>
   </div>
 
@@ -362,7 +433,9 @@
   </div>
 
 {:else}
-  <div class="shell">
+  <!-- Mientras se comprueba la sesión, el mismo armazón con los huecos en su
+       sitio: nada se puede pulsar y ninguna sección pide datos todavía. -->
+  <div class="shell" class:boot-wait={booting && !bootShown} inert={booting} aria-busy={booting ? 'true' : undefined}>
     <!-- ═══ Escritorio: barra lateral ═══ -->
     <aside class="sidebar">
       {@render brandMark(false)}
@@ -434,19 +507,40 @@
         <div class="topbar__right">
           {#if section === 'inicio' && data.loadedAt}<span class="updated">Actualizado {fmtTime(data.loadedAt)}</span>{/if}
           {#if installPrompt}<button class="b b--ghost" onclick={doInstall}><Icon name="install" size={16} />Instalar app</button>{/if}
-          <span class="me" title={user} aria-hidden="true">{userInitial}</span>
+          {#if booting}
+            <span class="ui-skel boot__me" aria-hidden="true"></span>
+          {:else}
+            <span class="me" title={user} aria-hidden="true">{userInitial}</span>
+          {/if}
           <button class="b b--ghost" onclick={logout} disabled={loggingOut}>{loggingOut ? 'Saliendo…' : 'Salir'}</button>
         </div>
       </header>
 
-      {#if !online}
+      {#if booting}
+        <!-- Huecos del contenido: el título siempre; las cifras y gráficos solo en
+             Inicio, que es la única forma que se sabe de antemano. Al llegar la
+             sesión, cada sección sigue con su propio esqueleto sin pasar por blanco. -->
+        <div class="boot" aria-hidden="true">
+          <div class="ui-page-head">
+            <div class="ui-page-head__text"><span class="ui-skel boot__title"></span></div>
+          </div>
+          <!-- Solo Inicio tiene un armazón con forma fija; el resto de secciones
+               abre con cabeceras distintas y su esqueleto llega justo después. -->
+          {#if section === 'inicio'}
+            <div class="ui-kpis" data-count="4">{#each [0, 1, 2, 3] as i (i)}<span class="ui-skel boot__kpi"></span>{/each}</div>
+            <div class="boot__charts"><span class="ui-skel boot__chart"></span><span class="ui-skel boot__chart"></span></div>
+          {/if}
+        </div>
+      {:else if !online}
         <div class="offline" role="status">
           <Icon name="wifiOff" size={16} />
           <span>Sin conexión. Lo que ves puede estar desactualizado y los cambios no se guardarán hasta que vuelva.</span>
         </div>
       {/if}
 
-      {#if section === 'inicio'}
+      {#if booting}
+        <!-- Sin sesión comprobada ninguna sección se monta (pediría datos). -->
+      {:else if section === 'inicio'}
         <InicioSection {user} />
       {:else if section === 'leads'}
         <LeadsSection />
@@ -601,8 +695,23 @@
     .mnav__foot .b { min-height: var(--tap-min); }
   }
   @keyframes mnav-in { from { transform: translateX(-12px); opacity: 0; } to { transform: none; opacity: 1; } }
+  /* Movimiento reducido (F-02): el menú aparece sin desplazarse. */
+  @media (prefers-reduced-motion: reduce) { .mnav__panel { animation: mnav-fade var(--duration-fast) ease-out; } }
+  @keyframes mnav-fade { from { opacity: 0; } to { opacity: 1; } }
 
   @media (pointer: coarse) {
     .nav__item { min-height: var(--tap-min); }
   }
+  /* ── Arranque: armazón mientras se comprueba la sesión (pieza E-09). Las
+     medidas copian las de la entrada y las de Inicio para que nada salte. ── */
+  .boot-wait { visibility: hidden; }
+  .boot-login__lbl { display: block; height: 19px; width: 34%; }
+  .boot-login__field { display: block; height: var(--tap-min); }
+  .boot__title { display: block; height: 32px; width: 300px; max-width: 70vw; }
+  .boot__me { display: inline-block; width: 32px; height: 32px; border-radius: var(--radius-pill); flex: 0 0 auto; }
+  .boot__kpi { display: block; height: 144px; border-radius: var(--radius-lg); }
+  .boot__charts { display: grid; gap: 14px; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
+  .boot__chart { display: block; height: 300px; border-radius: var(--radius-lg); }
+  @media (max-width: 719px) { .boot__kpi { height: 136px; } .boot__chart:first-child { height: 288px; } .boot__chart { height: 298px; } }
+  @media (max-width: 1099px) { .boot__charts { grid-template-columns: minmax(0, 1fr); } }
 </style>

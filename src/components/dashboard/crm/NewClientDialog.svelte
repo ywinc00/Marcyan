@@ -49,7 +49,8 @@
         dupMatches = d.matches;
         // En móvil el aviso queda bajo los campos: se trae a la vista.
         await tick();
-        dupEl?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        const quieto = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+        dupEl?.scrollIntoView({ block: 'nearest', behavior: quieto ? 'auto' : 'smooth' });
       }
       else if (d?.fields) errors = d.fields;
       else toastError(e, 'No se pudo crear el cliente.');

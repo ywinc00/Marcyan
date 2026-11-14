@@ -246,7 +246,24 @@
     {/if}
   </section>
 {:else}
-  <!-- ── Embudo del mes (B) ── -->
+  <!-- ── Embudo del mes (B) ──
+       Primera carga: el mismo marcado con los números en hueco (pieza E-09), así
+       la consola de abajo no baja de golpe y no se lee «Aún no hay…» mientras carga. -->
+  {#snippet topSkeleton()}
+    <section class="top">
+      <div class="funnel card">
+        {#each ['Conversaciones', 'Pidieron precio', 'Les pidió contacto', 'Dejaron contacto'] as l (l)}
+          <button type="button" class="step" tabindex="-1" disabled><span class="step__label">{l}</span><span class="step__n"><span class="ui-skel sk-n"></span></span><span class="step__bar"><i style="width:0"></i></span></button>
+        {/each}
+        <button type="button" class="step step--side" tabindex="-1" disabled><span class="step__label">Pasadas a ti</span><span class="step__n"><span class="ui-skel sk-n"></span></span></button>
+      </div>
+      <div class="why card">
+        <p class="cap">Dónde se van este mes</p>
+        <ul>{#each [0, 1, 2, 3, 4] as i (i)}<li><button type="button" tabindex="-1" disabled aria-label="Cargando"><span class="why__t"><span class="ui-skel sk-t"></span></span><span class="why__bar"><i style="width:0"></i></span><b><span class="ui-skel sk-b"></span></b></button></li>{/each}</ul>
+      </div>
+    </section>
+  {/snippet}
+  <LoadingState loading={loading && !loaded} skeleton={topSkeleton} label="Cargando el embudo del mes">
   <section class="top">
     <div class="funnel card" role="group" aria-label="Embudo del mes">
       {#each steps as s, i (s.label)}
@@ -276,6 +293,7 @@
       {/if}
     </div>
   </section>
+  </LoadingState>
 
   <!-- ── Consola (A) ── -->
   <section class="console card" class:has-open={!!selectedSid} bind:this={consoleEl}>
@@ -448,6 +466,12 @@
   .why button:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 1px; }
   .why__t { font-size: var(--dash-small); color: var(--fg-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .why b { text-align: right; font-variant-numeric: tabular-nums; }
+  /* Huecos de la primera carga: misma línea que el número y el motivo reales. */
+  .sk-n { display: inline-block; width: 52px; height: .9em; vertical-align: middle; }
+  .sk-t { display: block; height: 12px; width: 78%; }
+  .sk-b { display: inline-block; width: 18px; height: 12px; }
+  .step:disabled, .why button:disabled { cursor: default; }
+  .step:disabled:hover, .why button:disabled:hover { background: transparent; }
   .why__bar { height: 6px; border-radius: 4px; background: var(--bg-elevated); overflow: hidden; }
   .why__bar i { display: block; height: 100%; background: var(--color-warning, #f5b338); border-radius: 4px; }
 

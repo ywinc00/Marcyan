@@ -126,4 +126,6 @@
   @media (max-width: 719px) {
     .rc-amount { font-size: 26px; }
   }
+  /* Movimiento reducido (pieza F-02): sin desplazamiento ni giro; el dato o el texto de estado se ven igual. */
+  @media (prefers-reduced-motion: reduce) { .rc-bar { transition: none; } }
 </style>

@@ -252,7 +252,25 @@
   {/if}
 {/snippet}
 
-<LoadingState loading={listLoading} rows={3} height={64} label="Cargando proyectos de SEO…">
+<!-- Huecos con la forma real (pieza E-09): la barra de trabajo, la línea de fuentes y
+     el bloque de datos (tarjeta de fuentes, cinco cifras, rango y dos gráficos). -->
+{#snippet detalleSkel()}
+  <div class="seo-stack">
+    <div class="ui-skel sk-seo-card"></div>
+    <div class="ui-kpis" data-count="5">{#each [0, 1, 2, 3, 4] as i (i)}<div class="ui-skel sk-seo-kpi"></div>{/each}</div>
+    <div class="ui-skel sk-seo-line"></div>
+    <div class="seo-charts"><div class="ui-skel sk-seo-chart"></div><div class="ui-skel sk-seo-chart"></div></div>
+  </div>
+{/snippet}
+{#snippet paginaSkel()}
+  <!-- Un solo bloque: así el hueco no suma la separación del contenedor de carga. -->
+  <div>
+    <div class="seo-bar"><div class="ui-skel sk-seo-bar"></div></div>
+    <div class="seo-meta"><span class="ui-skel sk-seo-meta"></span></div>
+    {@render detalleSkel()}
+  </div>
+{/snippet}
+<LoadingState loading={listLoading} skeleton={paginaSkel} label="Cargando proyectos de SEO">
   {#if listError}
     <ErrorState title="No se pudieron cargar los proyectos" message={listError} onretry={loadProjects} />
   {:else if !projects.length}
@@ -303,7 +321,7 @@
       {#if detailError && !detail}
         <ErrorState title="No se pudieron cargar los datos" message={detailError} onretry={() => loadDetail(String(selected.id), days)} />
       {:else}
-        <LoadingState loading={detailLoading && !detail} rows={4} height={96} label="Cargando datos del proyecto…">
+        <LoadingState loading={detailLoading && !detail} skeleton={detalleSkel} label="Cargando datos del proyecto">
           {#if detail}
             <div class="seo-stack" class:is-reloading={detailLoading}>
               {#if detailError}
@@ -455,6 +473,16 @@
   .seo-meta span { overflow-wrap: anywhere; }
 
   .seo-stack { display: flex; flex-direction: column; gap: var(--space-4); transition: opacity var(--duration-fast); }
+  /* Huecos de SEO con las medidas del contenido real (1440): tarjeta de fuentes 128,
+     cifras 162, línea del rango 18, gráficos 331. */
+  .sk-seo-bar { height: 38px; width: min(560px, 100%); }
+  .sk-seo-meta { display: inline-block; height: 15px; width: min(520px, 90%); }
+  .sk-seo-card { height: 128px; border-radius: var(--radius-lg); }
+  .sk-seo-kpi { height: 162px; border-radius: var(--radius-lg); }
+  .sk-seo-line { height: 18px; width: 40%; }
+  .sk-seo-chart { height: 331px; border-radius: var(--radius-lg); }
+  /* Teléfono: la barra parte en varias líneas y la tarjeta de fuentes crece. */
+  @media (max-width: 719px) { .sk-seo-bar { height: 158px; } .sk-seo-card { height: 310px; } }
   .seo-stack.is-reloading { opacity: .7; }
   .seo-window { margin: -6px 0 0; font-size: var(--dash-caption); color: var(--fg-subtle); line-height: 1.5; }
   .seo-window--warn { color: var(--color-warning); }
@@ -481,4 +509,6 @@
     .seo-bar__pick { flex-basis: 100%; max-width: none; }
     .seo-bar__sync { margin-left: 0; }
   }
+  /* Movimiento reducido (pieza F-02): sin desplazamiento ni giro; el dato o el texto de estado se ven igual. */
+  @media (prefers-reduced-motion: reduce) { .seo-spin { animation: none; } }
 </style>

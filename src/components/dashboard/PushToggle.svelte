@@ -89,7 +89,11 @@
   };
 </script>
 
-{#if state === 'activo'}
+{#if state === 'cargando'}
+  <!-- Mientras comprueba: el sitio del botón más habitual, invisible, para que la
+       cabecera no cambie de alto al aparecer (E-09). -->
+  <span class="b b--ghost push-hold" aria-hidden="true"><Icon name="avisos" size={16} />Avisos en este dispositivo</span>
+{:else if state === 'activo'}
   <button type="button" class="b b--ghost" disabled={busy} onclick={probar}><Icon name="avisos" size={16} />Probar aviso</button>
   <button type="button" class="b b--ghost" disabled={busy} onclick={apagar}>Apagar en este dispositivo</button>
 {:else if state === 'apagado'}
@@ -99,5 +103,6 @@
 {/if}
 
 <style>
+  .push-hold { visibility: hidden; }
   .push-note { margin: 0; max-width: 340px; font-size: var(--dash-caption); line-height: 1.4; color: var(--fg-subtle); }
 </style>

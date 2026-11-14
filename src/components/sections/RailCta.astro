@@ -7,9 +7,12 @@ import Icon from '../ui/Icon.astro';
 import BtnStates from '../ui/BtnStates.astro';
 import { nap } from '../../i18n/content';
 import { PRICE_ANCHORS } from '../../i18n/pricing';
+import { siguienteId } from '../../lib/uid';
 
 interface Props { t: any; postTitle: string }
 const { t, postTitle } = Astro.props;
+// El artículo pinta dos copias (columna en escritorio y versión móvil): ids por copia.
+const uid = siguienteId('rcta');
 
 const usd = (n: number) => '$' + n.toLocaleString('en-US');
 const priceNote = (t.priceNote as string)
@@ -31,24 +34,24 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
     <span>{t.chip}</span>
   </a>
 
-  <form class="rcta__form" id="rail-cta-form" novalidate
+  <form class="rcta__form" id={`${uid}-form`} novalidate data-rail-cta data-err-id={`${uid}-error`}
     data-objective={`Blog: ${postTitle}`}
     data-success={t.form.success}
     data-error={t.form.error} data-invalid={t.form.invalid}
   >
     <input type="text" name="website_hp" class="rcta__hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
-    <label class="rcta__field" for="rcta-name">
+    <label class="rcta__field" for={`${uid}-name`}>
       <span class="rcta__lbl">{t.form.name.label}</span>
-      <input type="text" id="rcta-name" name="owner_name" placeholder={t.form.name.ph} autocomplete="name" />
+      <input type="text" id={`${uid}-name`} name="owner_name" placeholder={t.form.name.ph} autocomplete="name" />
     </label>
-    <label class="rcta__field" for="rcta-contact">
+    <label class="rcta__field" for={`${uid}-contact`}>
       <span class="rcta__lbl">{t.form.contact.label}</span>
-      <input type="text" id="rcta-contact" name="contact" placeholder={t.form.contact.ph} autocomplete="email" inputmode="email" />
+      <input type="text" id={`${uid}-contact`} name="contact" placeholder={t.form.contact.ph} autocomplete="email" inputmode="email" />
     </label>
     <button class="rcta__submit bstate" type="submit" data-submit>
       <BtnStates sending={t.form.sending} done={t.form.done}>{t.form.submit}</BtnStates>
     </button>
-    <p class="rcta__status rcta__status--err" id="rcta-error" hidden></p>
+    <p class="rcta__status rcta__status--err" id={`${uid}-error`} hidden></p>
     <!-- El acuse y los fallos de envío se anuncian por la región común de la
          página (src/lib/anunciar.js, pieza E-10): destapar una región viva oculta
          no se lee de forma fiable. NO se le mueve el foco: con el techo de 15 s de
@@ -167,8 +170,13 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
   // se mapea a email si lleva @, si no a phone. Validación email-O-teléfono
   // idéntica a Contact.astro. Sin innerHTML. Timeout 15s. Guard anti doble envío.
   import { anunciar } from '../../lib/anunciar.js';
-  const form = document.getElementById('rail-cta-form') as HTMLFormElement | null;
-  if (form) {
+  // TODAS las copias del formulario (el artículo pinta dos: columna y móvil).
+  // Antes solo se enganchaba la primera, la de escritorio: en el teléfono el
+  // formulario visible se enviaba solo, recargaba la página con los datos en la
+  // dirección y el contacto se perdía.
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-rail-cta]')) {
+    if (form.dataset.rcListo) continue;
+    form.dataset.rcListo = '1';
     const btn = form.querySelector('[data-submit]') as HTMLButtonElement;
     const errBox = form.querySelector('.rcta__status--err') as HTMLElement;
     const okBox = form.querySelector('.rcta__status--ok') as HTMLElement;
@@ -203,7 +211,7 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
         errBox.textContent = S.invalid || 'Revisa tu email o teléfono.';
         errBox.hidden = false;
         // El mensaje queda enlazado al campo mientras se ve; el foco lo lee.
-        if (contactEl) { contactEl.setAttribute('aria-invalid', 'true'); contactEl.setAttribute('aria-describedby', 'rcta-error'); contactEl.focus(); }
+        if (contactEl) { contactEl.setAttribute('aria-invalid', 'true'); contactEl.setAttribute('aria-describedby', S.errId || ''); contactEl.focus(); }
         delete form.dataset.busy;
         return;
       }

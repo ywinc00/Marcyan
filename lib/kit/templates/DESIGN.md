@@ -63,10 +63,10 @@ rounded:
 # ── COMPONENTS ──────────────────────────────────────────────────────────────
 # Estructura fija (estados, a11y, jerarquía). Los valores referencian los tokens de arriba.
 components:
-  button:  { height_px: "<44..52>", radius: "rounded.md", primary: "fill=accent / text=accent-ink", states: ["rest","hover","focus-visible","active","disabled","loading"] }
+  button:  { min_height_px: "<44..52>", radius: "rounded.md", primary: "fill=accent / text=accent-ink", states: ["rest","hover","focus-visible","active","disabled","loading"] }
   card:    { radius: "rounded.md", separation: "<border | shadow | fill, elige UNA>" }
-  input:   { height_px: "<44..52>", radius: "rounded.sm", focus: "2px solid accent + ring offset 2px" }
-  nav:     { bg: "<sólido de marca, NO glassmorphism>", active_marker: "<subrayado 2px accent | peso | color ≥4.5:1>" }
+  input:   { min_height_px: "<44..52>", radius: "rounded.sm", focus: "2px solid accent + ring offset 2px" }
+  nav:     { bg: "<sólido de marca, NO glassmorphism>", active_marker: "<subrayado 2px accent | cambio de peso>, siempre además del color y con aria-current" }
   section: { archetypes_min: 4, bg_alternation: ["paper", "surface-dark", "surface"] }
   cta:     { primary_per_view: 1, style: "fill=accent / text=accent-ink", copy: "verbo + objeto" }
 ---
@@ -153,7 +153,7 @@ Paleta funcional acotada: **1 neutro oscuro de marca + 1 acento de acción + fon
 - **Escala de espaciado base 4/8:** `4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96 · 128 · 160 px`. Sin valores huérfanos (`7px`, `13px`).
 - **Ritmo vertical VARIABLE, no fijo:** secciones densas `clamp(48px, 8vh, 80px)`; respiro/hero `clamp(96px, 18vh, 200px)`. Separación entre secciones **≥2×** el gap interno; entre vecinas, cambiar ≥1 escalón.
 - **Composición con tensión:** rompe la simetría central por defecto (asimetría, foto a sangre, número grande junto a label pequeño, ≥40% de aire en el hero). El centrado total es decisión puntual, no el default.
-- **Responsive:** en móvil reduce cada paso ~33% (128→80, 96→64, 64→40). Verificar en 360 / 768 / ≥1280.
+- **Responsive:** en móvil reduce cada paso ~33% (128→80, 96→64, 64→40). Verificar en la matriz de la puerta de salida de design-director. Reducir el espaciado no sustituye a decidir la composición en teléfono: esa se escribe por sección en `responsive behavior`.
 
 ---
 
@@ -172,27 +172,34 @@ Paleta funcional acotada: **1 neutro oscuro de marca + 1 acento de acción + fon
 - **Una unidad de información**, anatomía fija y repetida.
 - **Separación: elige UNA**: borde `1px` (≥3:1) **o** sombra **o** fill; nunca las tres. Radio = `rounded.md`.
 - **PROHIBIDO:** la "card SaaS" (blanco + radius grande + sombra difusa + icono lineal en círculo pastel) repetida idéntica; misma sombra en todo.
-- **Si interactiva:** 5 estados; hover sutil (sin escalar texto); skeleton con misma geometría (CLS < 0.1).
+- **Si interactiva:** 5 estados; hover sutil (sin escalar texto); carga según la pieza de catálogo E-09.
 - **A11y:** cuerpo y meta ≥4.5:1; target ≥44×44px; respeta `prefers-reduced-motion`.
 
 ### BOTONES
 - **Jerarquía estricta, 1 primario por vista:** primary → secondary → ghost → link.
-- **Tokens:** `height components.button.height_px`, radio `rounded.md`; primary = fill `accent` / texto `accent-ink`; hover `accent-hover`; focus‑visible anillo 2px `accent` + offset; disabled `*-muted` + `aria-disabled`.
+- **Tokens:** `min-height components.button.min_height_px` (alto mínimo, nunca fijo: WCAG 1.4.12), radio `rounded.md`; primary = fill `accent` / texto `accent-ink`; hover `accent-hover`; focus‑visible anillo 2px `accent` + offset; disabled `*-muted` + `aria-disabled`.
 - **6 estados obligatorios** por variante. Loading mantiene ancho y bloquea reenvío.
 - **PROHIBIDO:** `outline:none` sin reemplazo; gradiente/glow morado; cambiar de tamaño en hover; copy vago.
 - **Copy = verbo + objeto.**
 
 ### FORMULARIOS
 - Una columna; `<label>` visible y persistente ligada por `for`/`id`; pide lo imprescindible.
-- **Tokens:** input `height components.input.height_px`, radio `rounded.sm`, borde `border` (≥3:1), `font-size ≥16px`, focus `2px accent` + ring.
-- **EXIGIDO:** `type`/`inputmode`/`autocomplete` correctos; error específico junto al campo con `aria-invalid` + `aria-describedby`; foco al primer error tras submit.
-- **PROHIBIDO:** placeholder como label; validación solo por color; validar al primer carácter.
+- **Tokens:** input `min-height components.input.min_height_px`, radio `rounded.sm`, borde `border` (≥3:1), `font-size ≥16px`, focus `2px accent` + ring.
+- **EXIGIDO:**
+  - `type`/`inputmode`/`autocomplete` correctos en cada campo, dirección incluida (detalle en la pieza D-08);
+  - de 2 a 5 opciones excluyentes como radios visibles;
+  - pista de formato encima del campo;
+  - error específico junto al campo, que dice cómo arreglarlo, con `aria-invalid` + `aria-describedby`;
+  - foco al primer error tras submit;
+  - el resultado del envío visible en la página, no solo en un aviso flotante;
+  - si hay fecha, «hoy» en la hora del negocio.
+- **PROHIBIDO:** placeholder como label; validación solo por color; validar al primer carácter; deshabilitar el botón para forzar la validación (solo mientras envía).
 - En chatbots/automatizaciones con formulario embebido aplican las mismas reglas.
 
 ### NAVEGACIÓN
 - Vehículo de marca, no patrón importado. **Test:** si quitas el logo y podría ser de cualquiera, está mal.
 - **Tokens:** fondo **sólido** (`surface-dark` u otro de marca, NO glassmorphism), o transparente sobre hero con transición a sólido en scroll; altura `components.nav`.
-- **EXIGIDO:** estado de página actual visible y distinto del hover; `<nav aria-label="Principal">`; foco visible; menú mobile con `aria-expanded`, focus trap, cierre con `Esc`.
+- **EXIGIDO:** estado de página actual visible, distinto del hover y marcado con `aria-current` y algo más que el color; `<nav aria-label="Principal">`; foco visible; menú mobile con `aria-expanded`, como `<dialog>` abierto con `showModal()` (foco contenido y cierre con `Esc` sin programarlos, pieza E-03).
 - **PROHIBIDO:** combo pill morado "Get Started"; hamburguesa visible en ≥1024px si los links caben; hairline‑sombra genérica.
 
 ### SECCIONES (ritmo y composición)
@@ -224,7 +231,7 @@ Paleta funcional acotada: **1 neutro oscuro de marca + 1 acento de acción + fon
 | CTA verbo+objeto orientado a conversión | **Weak CTA text** ("Enviar", "Get Started") |
 | Foto/ilustración real del cliente | Stock genérico, unDraw, blobs, dashboards inventados |
 
-**Cada sección debe tener:** `purpose` (qué pregunta/objeción resuelve) · `hierarchy` (orden de lectura medible) · `clear copy` (real, del cliente) · `responsive behavior` (360/768/1280 sin overflow) · `conversion logic` (qué acción provoca y su métrica). Si una sección no tiene un trabajo distinto del de sus vecinas, se fusiona o se elimina.
+**Cada sección debe tener:** `purpose` (qué pregunta/objeción resuelve) · `hierarchy` (orden de lectura medible) · `clear copy` (real, del cliente) · `responsive behavior` (qué va primero en el teléfono y qué se reordena, decidido antes de construir; se verifica en la matriz de la puerta de salida de design-director) · `conversion logic` (qué acción provoca y su métrica). Si una sección no tiene un trabajo distinto del de sus vecinas, se fusiona o se elimina.
 
 ---
 
@@ -295,7 +302,7 @@ Cada elección visible se justifica en UNA frase ligada al cliente. Válido: *"R
 - [ ] Jerarquía por ≥2 ejes; 1 solo CTA primario por vista; 1 solo `<h1>`.
 - [ ] Espaciado en escala 4/8; separación entre secciones ≥2× el gap interno; ≥4 arquetipos de sección.
 - [ ] Contraste WCAG AA (texto ≥4.5:1, grande ≥3:1, non‑text ≥3:1); `:focus-visible` ≥3:1/2px; targets ≥44px.
-- [ ] Responsive en 360/768/1280 sin overflow; tipografía/espaciado escalan (`clamp`).
+- [ ] Responsive sin overflow en la matriz de la puerta de salida de design-director; tipografía/espaciado escalan (`clamp`).
 - [ ] Cada sección tiene purpose · hierarchy · clear copy · responsive · conversion logic.
 
 **Regla de bloqueo:** un solo item en NO PASA → no se entrega. Se corrige, o se documenta la excepción (item, justificación, quién aprueba) en el chat "Estructura". Detalle en `.claude/rules/frontend-design.md`.

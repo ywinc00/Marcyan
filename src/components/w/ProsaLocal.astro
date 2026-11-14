@@ -107,4 +107,6 @@ const rest = fold ? paragraphs.slice(fold.visible) : [];
   @media (--lg) {
     .w-prose { grid-template-columns: minmax(0, 330px) minmax(0, 763px); justify-content: space-between; gap: 64px; }
   }
+  /* Movimiento reducido (F-02): el signo cambia sin girar. */
+  @media (prefers-reduced-motion: reduce) { .w-prose__sum span { transition: none; } }
 </style>

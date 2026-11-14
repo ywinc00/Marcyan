@@ -321,7 +321,7 @@
     background-image: linear-gradient(45deg, transparent 50%, var(--fg-secondary) 50%), linear-gradient(135deg, var(--fg-secondary) 50%, transparent 50%);
     background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
   .sf__in:hover { border-color: var(--border-accent); }
-  .sf__in:focus { outline: none; border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
+  .sf__in:focus { border-color: var(--accent-gold); outline: 2px solid var(--accent-gold); outline-offset: 2px; }
   .sf__in[aria-invalid='true'] { border-color: var(--color-error); }
   .sf__in[aria-invalid='true']:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-error) 22%, transparent); }
 

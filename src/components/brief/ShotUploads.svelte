@@ -169,7 +169,7 @@
   }
   .tag input[aria-invalid='true'] { border-color: var(--color-error); }
   .tag__err { font-size: var(--text-xs); color: color-mix(in srgb, var(--color-error), white 22%); }
-  .tag input:focus { outline: none; border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
+  .tag input:focus { border-color: var(--accent-gold); outline: 2px solid var(--accent-gold); outline-offset: 2px; }
   .tag legend { padding: 0; margin-bottom: 4px; }
   .seg { display: flex; flex-wrap: wrap; gap: var(--space-2); }
   .seg__o {

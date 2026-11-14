@@ -8,8 +8,11 @@ import BtnStates from '../ui/BtnStates.astro';
 import { nap } from '../../i18n/content';
 import { PRICE_ANCHORS } from '../../i18n/pricing';
 
-interface Props { t: any; postTitle: string }
-const { t, postTitle } = Astro.props;
+// El artículo pinta dos copias (columna en escritorio y versión móvil): cada una
+// trae su prefijo de ids (`idp`) para que etiquetas y avisos no apunten a la otra.
+interface Props { t: any; postTitle: string; idp?: string }
+const { t, postTitle, idp = 'rcta' } = Astro.props;
+const uid = idp;
 
 const usd = (n: number) => '$' + n.toLocaleString('en-US');
 const priceNote = (t.priceNote as string)
@@ -31,29 +34,30 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
     <span>{t.chip}</span>
   </a>
 
-  <form class="rcta__form" id="rail-cta-form" novalidate
+  <form class="rcta__form" id={`${uid}-form`} novalidate data-rail-cta data-err-id={`${uid}-error`}
     data-objective={`Blog: ${postTitle}`}
     data-success={t.form.success}
     data-error={t.form.error} data-invalid={t.form.invalid}
   >
     <input type="text" name="website_hp" class="rcta__hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
-    <label class="rcta__field">
+    <label class="rcta__field" for={`${uid}-name`}>
       <span class="rcta__lbl">{t.form.name.label}</span>
-      <input type="text" name="owner_name" placeholder={t.form.name.ph} autocomplete="name" />
+      <input type="text" id={`${uid}-name`} name="owner_name" placeholder={t.form.name.ph} autocomplete="name" />
     </label>
-    <label class="rcta__field">
+    <label class="rcta__field" for={`${uid}-contact`}>
       <span class="rcta__lbl">{t.form.contact.label}</span>
-      <input type="text" name="contact" placeholder={t.form.contact.ph} autocomplete="email" inputmode="email" />
+      <input type="text" id={`${uid}-contact`} name="contact" placeholder={t.form.contact.ph} autocomplete="email" inputmode="email" />
     </label>
     <button class="rcta__submit bstate" type="submit" data-submit>
       <BtnStates sending={t.form.sending} done={t.form.done}>{t.form.submit}</BtnStates>
     </button>
-    <p class="rcta__status rcta__status--err" role="alert" hidden></p>
-    <!-- role="status" (aria-live polite) basta para anunciar el acuse. NO se le
-         mueve el foco: al ser región viva ya se lee al revelarlo, enfocarlo lo
-         haría sonar dos veces, y con el techo de 15s de la petición el tirón de
-         foco podría llegar cuando el lector ya está en otra parte del artículo. -->
-    <p class="rcta__status rcta__status--ok" role="status" hidden></p>
+    <p class="rcta__status rcta__status--err" id={`${uid}-error`} hidden></p>
+    <!-- El acuse y los fallos de envío se anuncian por la región común de la
+         página (src/lib/anunciar.js, pieza E-10): destapar una región viva oculta
+         no se lee de forma fiable. NO se le mueve el foco: con el techo de 15 s de
+         la petición, el tirón podría llegar cuando el lector ya está en otra
+         parte del artículo. -->
+    <p class="rcta__status rcta__status--ok" hidden></p>
   </form>
 
   <div class="rcta__alt">
@@ -115,7 +119,7 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
     padding: 9px 12px; transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
   }
   .rcta__field input::placeholder { color: var(--fg-subtle); }
-  .rcta__field input:focus { outline: none; border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
+  .rcta__field input:focus { border-color: var(--accent-gold); outline: 2px solid var(--accent-gold); outline-offset: 2px; }
 
   .rcta__submit {
     display: inline-flex; align-items: center; justify-content: center;
@@ -165,8 +169,14 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
   // (owner_name/email/phone/main_objective/website_hp); el campo único "contact"
   // se mapea a email si lleva @, si no a phone. Validación email-O-teléfono
   // idéntica a Contact.astro. Sin innerHTML. Timeout 15s. Guard anti doble envío.
-  const form = document.getElementById('rail-cta-form') as HTMLFormElement | null;
-  if (form) {
+  import { anunciar } from '../../lib/anunciar.js';
+  // TODAS las copias del formulario (el artículo pinta dos: columna y móvil).
+  // Antes solo se enganchaba la primera, la de escritorio: en el teléfono el
+  // formulario visible se enviaba solo, recargaba la página con los datos en la
+  // dirección y el contacto se perdía.
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-rail-cta]')) {
+    if (form.dataset.rcListo) continue;
+    form.dataset.rcListo = '1';
     const btn = form.querySelector('[data-submit]') as HTMLButtonElement;
     const errBox = form.querySelector('.rcta__status--err') as HTMLElement;
     const okBox = form.querySelector('.rcta__status--ok') as HTMLElement;
@@ -195,11 +205,13 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
 
       const contactEl = form.querySelector('[name="contact"]') as HTMLInputElement | null;
       contactEl?.removeAttribute('aria-invalid');
+      contactEl?.removeAttribute('aria-describedby');
       const valid = data.email ? isEmail(data.email) : digits(data.phone || '').length >= 7;
       if (!valid) {
         errBox.textContent = S.invalid || 'Revisa tu email o teléfono.';
         errBox.hidden = false;
-        if (contactEl) { contactEl.setAttribute('aria-invalid', 'true'); contactEl.focus(); }
+        // El mensaje queda enlazado al campo mientras se ve; el foco lo lee.
+        if (contactEl) { contactEl.setAttribute('aria-invalid', 'true'); contactEl.setAttribute('aria-describedby', S.errId || ''); contactEl.focus(); }
         delete form.dataset.busy;
         return;
       }
@@ -219,6 +231,7 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
         if (!res.ok || !payload || !payload.ok) {
           errBox.textContent = (payload && payload.error) || S.error || 'Error.';
           errBox.hidden = false;
+          anunciar(errBox.textContent);
           btn.disabled = false; delete btn.dataset.state;
           delete form.dataset.busy;
           return;
@@ -228,6 +241,7 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
         try { import('../../lib/track.js').then((m) => m.track('generate_lead', { source: 'blog_rail', ref: payload.refId || '' })).catch(() => {}); } catch {}
         okBox.textContent = (S.success || '✓') + (payload.refId ? ' · ' + payload.refId : '');
         okBox.hidden = false;
+        anunciar(okBox.textContent);
         form.querySelectorAll('input').forEach((el) => (el.disabled = true));
         // El botón queda deshabilitado y con la piel del estado completado.
         btn.dataset.state = 'done';
@@ -235,6 +249,7 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
       } catch (_) {
         errBox.textContent = S.error || 'Error de red.';
         errBox.hidden = false;
+        anunciar(errBox.textContent);
         btn.disabled = false; delete btn.dataset.state;
         delete form.dataset.busy;
       } finally {

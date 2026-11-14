@@ -59,3 +59,8 @@
   --w-d1: 100ms; --w-d2: 300ms; --w-d3: 400ms; --w-d-obj: 500ms; --w-d-sat: 750ms;
   --w-rise: 12px; --w-rise-section: 16px;
 }
+
+/* Movimiento reducido (pieza F-02): duraciones instantáneas. */
+@media (prefers-reduced-motion: reduce) {
+  :root { --w-dur-ui: 1ms; --w-dur-reveal: 1ms; --w-dur-text: 1ms; --w-dur-obj: 1ms; --w-dur-sat: 1ms; --w-dur-layer: 1ms; }
+}

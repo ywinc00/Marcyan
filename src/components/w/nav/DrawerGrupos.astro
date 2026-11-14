@@ -17,6 +17,10 @@ const res = recursos[lang] ?? recursos.es;
 const cities = ciudades[lang] ?? ciudades.es;
 const c = contactoPara(currentPath);
 const isActive = (href: string) => !!currentPath && currentPath.startsWith(href);
+// Página exacta = 'page'; página de dentro de esa sección = 'true' (se ve igual).
+const sinBarra = (p: string) => p.replace(/\/+$/, '') || '/';
+const ariaCurrent = (href: string) =>
+  !isActive(href) ? undefined : sinBarra(currentPath || '') === sinBarra(href) ? 'page' : 'true';
 ---
 <div class="dg">
   <div class="dg__group" role="group" aria-labelledby="dg-services">
@@ -34,7 +38,7 @@ const isActive = (href: string) => !!currentPath && currentPath.startsWith(href)
         </li>
       ))}
       <li>
-        <a class="dg__all" href={ui.allServices.href} aria-current={isActive(ui.allServices.href) ? 'page' : undefined}>
+        <a class="dg__all" href={ui.allServices.href} aria-current={ariaCurrent(ui.allServices.href)}>
           {ui.allServices.label}<span class="dg__chev" aria-hidden="true">›</span>
         </a>
       </li>
@@ -46,13 +50,13 @@ const isActive = (href: string) => !!currentPath && currentPath.startsWith(href)
     <ul class="dg__cols">
       {cities.map((l) => (
         <li>
-          <a class="dg__line" href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>
+          <a class="dg__line" href={l.href} aria-current={ariaCurrent(l.href)}>
             <Fragment set:html={navIcon('lucide:map-pin', 'dg__icon')} /><span>{l.label}</span>
           </a>
         </li>
       ))}
       <li>
-        <a class="dg__line" href={ui.allCities.href} aria-current={isActive(ui.allCities.href) ? 'page' : undefined}>
+        <a class="dg__line" href={ui.allCities.href} aria-current={ariaCurrent(ui.allCities.href)}>
           <span>{ui.allCities.label}</span><span class="dg__chev" aria-hidden="true">›</span>
         </a>
       </li>
@@ -64,7 +68,7 @@ const isActive = (href: string) => !!currentPath && currentPath.startsWith(href)
     <ul class="dg__cols">
       {res.map((r) => (
         <li>
-          <a class="dg__line" href={r.href} aria-current={isActive(r.href) ? 'page' : undefined}>
+          <a class="dg__line" href={r.href} aria-current={ariaCurrent(r.href)}>
             <Fragment set:html={navIcon(r.icon, 'dg__icon')} /><span>{r.label}</span>
           </a>
         </li>
@@ -84,7 +88,7 @@ const isActive = (href: string) => !!currentPath && currentPath.startsWith(href)
   .dg__group:first-child { border-top: 0; padding-top: 0; }
   .dg__head {
     margin: 0 0 8px;
-    font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+    font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500;
     letter-spacing: var(--w-tr-micro, .1em); text-transform: uppercase;
     color: var(--w-ink-60);
   }
@@ -107,7 +111,8 @@ const isActive = (href: string) => !!currentPath && currentPath.startsWith(href)
   .dg__all { font-weight: 500; }
   .dg__line :global(.dg__icon) { width: 16px; height: 16px; flex: none; stroke-width: 1.75; color: var(--accent-gold); }
   .dg__chev { font-size: 18px; line-height: 1; color: var(--accent-gold); }
-  .dg a[aria-current="page"] { color: var(--accent-gold); }
+  /* Página actual: color y subrayado de 2 px, no solo el color (igual que la barra). */
+  .dg a[aria-current] { color: var(--accent-gold); text-decoration-line: underline; text-decoration-thickness: 2px; text-decoration-color: var(--accent-gold); text-underline-offset: 6px; }
   @media (--hover-fine) {
     .dg__svc:hover .dg__name, .dg__all:hover, .dg__line:hover { color: var(--accent-gold); }
   }

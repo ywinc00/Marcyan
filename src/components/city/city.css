@@ -378,6 +378,9 @@ html:has(.hx #hx-stage){overscroll-behavior-y:none}
 .hx .zones__z--link:hover svg{transform:translateX(2px)}
 .hx .mp i{transition:transform .25s var(--ease)}
 .hx .mp.hl i{transform:scale(1.4)}
+/* Flechas y marcas que se desplazan al pasar el ratón: quietas con movimiento reducido (F-02).
+   Va DESPUÉS de sus reglas: con la misma fuerza, la última manda. */
+@media (prefers-reduced-motion:reduce){.hx .arr,.hx .zones__z--link svg,.hx .mp i{transition:none}}
 .hx .mp.hl span,.hx .mp.hl a{border-color:var(--accent-gold);color:var(--accent-gold)}
 
 /* pantallas cortas (iPhone SE y similares): titular algo menor y el párrafo de entrada se recoge al acercarse */

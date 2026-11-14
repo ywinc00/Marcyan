@@ -197,10 +197,30 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
       </>
     )}
 
+    {/* Precarga de la página siguiente (pieza F-11): solo prefetch, nunca
+        prerender (el prerender ejecutaría el chat y la analítica antes de la
+        visita). Moderate = al pasar el ratón o empezar a tocar el enlace. Fuera
+        las rutas privadas o que cambian algo. Solo Chrome y Edge; en el resto no
+        hace nada y no rompe nada. */}
+    <script type="speculationrules" is:inline set:html={JSON.stringify({
+      prefetch: [{
+        where: { and: [
+          { href_matches: '/*' },
+          { not: { href_matches: ['/api/*', '/dashboard', '/dashboard/*', '/es/kit', '/es/kit/*', '/en/kit', '/en/kit/*'] } },
+          { not: { selector_matches: '[download], [rel~="nofollow"]' } },
+        ] },
+        eagerness: 'moderate',
+      }],
+    })} />
     <slot name="head" />
   </head>
   <body>
     <a href="#main" class="skip-link">{lang === 'es' ? 'Saltar al contenido' : 'Skip to content'}</a>
+    {/* Regiones vivas compartidas por toda la página (pieza E-10): los avisos que
+        no se ven, como un envío fallido, se leen desde aquí (src/lib/anunciar.js).
+        Existen desde la carga: una región creada al vuelo no se anuncia. */}
+    <div id="sr-avisos" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+    <div id="sr-avisos-urgente" class="sr-only" aria-live="assertive" aria-atomic="true"></div>
     <slot />
     {/* Aviso de idioma sin redirección (plan maestro 0.3): solo donde hay espejo
         publicado (mismo mapa routes.ts que el conmutador de la nav). Emite un

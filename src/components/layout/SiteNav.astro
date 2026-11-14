@@ -21,6 +21,9 @@ interface Props {
   homeHref?: string;
   hasEn?: boolean;
   currentPath?: string;
+  /** Ruta para el enlace del otro idioma, si no es la actual (un artículo del blog
+   *  sin traducción manda al índice del blog en el otro idioma). */
+  langPath?: string;
   /** Megamenú de Servicios + grupos del drawer. false = nav de siempre (plan B, §2.12). */
   mega?: boolean;
 }
@@ -30,17 +33,24 @@ const {
   homeHref = '/es',
   hasEn = true,
   currentPath,
+  langPath,
   mega = true,
 } = Astro.props;
-const otherHref = toggleHref(currentPath ?? '/', lang as Lang);
+const otherHref = toggleHref(langPath ?? currentPath ?? '/', lang as Lang);
 const uin = t(lang as Lang);
 // Evento del CTA: por defecto "propuesta pedida"; una página cuyo CTA es otra
 // cosa (p. ej. WhatsApp en el brief y el kit) pasa nav.cta.track.
 const ctaTrack = nav.cta.track || 'proposal_requested';
 
-// aria-current: marca el link activo (no aplica al ancla de #contacto).
+// aria-current: marca el link activo (no aplica al ancla de #contacto). La página
+// exacta lleva 'page'; una página de dentro de esa sección (un artículo del blog,
+// una landing de Houston) lleva 'true': se ve igual, pero no se anuncia como
+// «página actual» a quien no está en ella.
 const isActive = (href: string) =>
   !!currentPath && href !== '#contacto' && currentPath.startsWith(href);
+const sinBarra = (p: string) => p.replace(/\/+$/, '') || '/';
+const ariaCurrent = (href: string) =>
+  !isActive(href) ? undefined : sinBarra(currentPath || '') === sinBarra(href) ? 'page' : 'true';
 
 // Megamenú: se acopla al enlace cuyo href termina en /servicios o /services.
 const navLang = (lang === 'en' ? 'en' : 'es') as 'es' | 'en';
@@ -60,7 +70,7 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
       {nav.links.map((l: any) => hasMega && isServicesLink(l.href)
         ? (
           <span class="nav__mega" data-nav-mega-wrap>
-            <a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>
+            <a href={l.href} aria-current={ariaCurrent(l.href)}>{l.label}</a>
             <button class="nav__mega-btn" type="button" aria-expanded="false" aria-controls="nav-mega" aria-label={uiw.megaBtn} data-nav-mega-btn>
               {/* SVG propio (navIcon), no astro-icon: así ningún icono de la página
                   (p. ej. el hero de portada) cambia de marcado por el megamenú. */}
@@ -71,7 +81,7 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
             <MegaServicios lang={navLang} currentPath={currentPath} />
           </span>
         )
-        : <a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
+        : <a href={l.href} aria-current={ariaCurrent(l.href)}>{l.label}</a>)}
     </nav>
 
     <div class="nav__actions">
@@ -93,13 +103,12 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
   </div>
 </header>
 
-{/* Overlay y drawer van FUERA del <header>: .nav aplica backdrop-filter, y un
-    ancestro con filtro/transform pasa a ser el containing block de sus
-    descendientes position:fixed. Dentro del header quedaban recortados a la
-    altura de la barra (64px) y el menú no llegaba a verse. */}
-<div class="nav__overlay" data-nav-overlay></div>
-
-<aside id="nav-drawer" class="nav__drawer" data-nav-drawer aria-label={uin.nav.menu} aria-hidden="true" inert>
+{/* El menú móvil es un <dialog> abierto con showModal() (pieza E-03): el navegador
+    da el foco atrapado, la página inerte detrás, Escape y el gesto atrás de
+    Android, sin trampa hecha a mano. Va FUERA del <header>: .nav aplica
+    backdrop-filter y un ancestro con filtro o transform es el containing block
+    de sus descendientes fijos. El velo es su ::backdrop. */}
+<dialog id="nav-drawer" class="nav__drawer" data-nav-drawer aria-label={uin.nav.menu}>
   <div class="nav__drawer-head">
     <BrandType />
     <button class="nav__close" type="button" data-nav-close>
@@ -108,7 +117,7 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
     </button>
   </div>
   <nav class="nav__drawer-links" aria-label={uin.nav.mobileMenu}>
-    {drawerLinks.map((l: any) => <a href={l.href} data-nav-link aria-current={isActive(l.href) ? 'page' : undefined}>{l.label}</a>)}
+    {drawerLinks.map((l: any) => <a href={l.href} data-nav-link aria-current={ariaCurrent(l.href)}>{l.label}</a>)}
   </nav>
   {hasMega
     ? <DrawerGrupos lang={navLang} currentPath={currentPath} />
@@ -117,7 +126,7 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
         <Button href={nav.cta.href} variant="primary" size="lg" class="u-full" data-nav-link data-track={ctaTrack}>{nav.cta.label}</Button>
       </div>
     )}
-</aside>
+</dialog>
 
 {/* v5 (dueño, 2026-11-07): sin barra fija de «Propuesta gratis» en móvil; el formulario normal
     vive en el chat de Marcy («Formulario de contacto») y en la sección #contacto. */}
@@ -178,8 +187,12 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
   }
   .nav__toggle :global(svg) { width: 26px; height: 26px; stroke-width: 1.75; }
 
-  /* página actual (aria-current) — aplica en barra y drawer, todos los breakpoints */
-  .nav__links a[aria-current="page"], .nav__drawer-links a[aria-current="page"] { color: var(--accent-gold); }
+  /* página actual (aria-current), en barra y drawer, todos los breakpoints: color y
+     además un subrayado de 2 px, para que no dependa solo del color y se distinga
+     del hover (DESIGN.md de la agencia, NAVEGACIÓN). */
+  .nav__links a[aria-current], .nav__drawer-links a[aria-current] {
+    color: var(--accent-gold); text-decoration-line: underline; text-decoration-thickness: 2px; text-decoration-color: var(--accent-gold); text-underline-offset: 6px;
+  }
 
   /* ── ≥ md: barra completa ─────────────────────────────── */
   @media (--md) {
@@ -222,12 +235,11 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
   @media (--lg) { .nav__links { gap: var(--space-6); } }
 
   /* ── Drawer (off-canvas) ──────────────────────────────── */
-  /* El FAB del chat también vive en --z-drawer y va después en el DOM: el velo
-     sube un escalón para taparlo, y el drawer otro más para quedar sobre el velo. */
-  .nav__overlay {
-    position: fixed; inset: 0; z-index: calc(var(--z-drawer) + 1);
+  /* El velo es el ::backdrop del <dialog>: vive en la capa superior del navegador,
+     por encima del botón del chat sin pelear con z-index. */
+  .nav__drawer::backdrop {
     background: var(--bg-scrim);
-    opacity: 0; pointer-events: none; transition: opacity var(--duration-base) var(--ease-out-expo);
+    opacity: 0; transition: opacity var(--duration-base) var(--ease-out-expo);
   }
   /* Bloqueo de scroll con el drawer abierto. Va por clase, no por estilo inline, para
      que el propio CSS lo levante al pasar a ≥md: si se rota a horizontal con el menú
@@ -236,20 +248,25 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
   @media (--md) { :global(body.has-drawer-open) { overflow: visible; } }
   /* El desenfoque solo mientras está abierto: en la regla base dejaría una capa de
      composición a pantalla completa en cada página móvil, aunque no se vea. */
-  .nav__overlay[data-open] {
-    opacity: 1; pointer-events: auto;
+  .nav__drawer[data-open]::backdrop {
+    opacity: 1;
     backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
   }
 
+  /* Se anulan los estilos del navegador para <dialog> (margen, borde, tope de
+     alto y ancho) para que el panel mida y se vea igual que antes. Cerrado no se
+     pinta; abierto entra deslizándose desde la derecha. */
   .nav__drawer {
-    position: fixed; inset: 0 0 0 auto; z-index: calc(var(--z-drawer) + 2);
-    width: min(86vw, 360px); max-width: 100%;
-    display: flex; flex-direction: column; gap: var(--space-6);
+    position: fixed; inset: 0 0 0 auto; margin: 0; border: 0;
+    width: min(86vw, 360px); max-width: 100%; height: 100%; max-height: none;
+    color: inherit;
+    display: none; flex-direction: column; gap: var(--space-6);
     padding: var(--space-5) var(--space-5) calc(var(--space-6) + env(safe-area-inset-bottom));
     background: var(--bg-elevated); border-left: 1px solid var(--border);
     transform: translateX(100%); transition: transform var(--duration-slow) var(--ease-out-expo);
     overflow-y: auto; overscroll-behavior: contain;
   }
+  .nav__drawer[open] { display: flex; }
   .nav__drawer[data-open] { transform: translateX(0); }
 
   .nav__drawer-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
@@ -272,21 +289,20 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
 
   .nav__drawer-foot { margin-top: auto; display: flex; flex-direction: column; gap: var(--space-4); }
 
-  @media (--md) { .nav__overlay, .nav__drawer { display: none; } }
+  @media (--md) { .nav__drawer[open] { display: none; } }
 
   @media (--motion-reduce) {
-    .nav, .nav__overlay, .nav__drawer { transition: none; }
+    .nav, .nav__drawer, .nav__drawer::backdrop { transition: none; }
   }
 
 </style>
 
 <script>
   const root = document.querySelector('[data-nav]');
-  // drawer y overlay son HERMANOS del header (ver nota en el markup), así que se
-  // buscan en el documento, no dentro de [data-nav].
+  // El drawer es HERMANO del header (ver nota en el markup), así que se busca en
+  // el documento, no dentro de [data-nav].
   const toggle = document.querySelector('[data-nav-toggle]') as HTMLButtonElement;
-  const drawer = document.querySelector('[data-nav-drawer]') as HTMLElement;
-  const overlay = document.querySelector('[data-nav-overlay]') as HTMLElement;
+  const drawer = document.querySelector('[data-nav-drawer]') as HTMLDialogElement;
   const closeBtn = document.querySelector('[data-nav-close]') as HTMLButtonElement;
   // Estado "scrolled" de la barra. Va en su propio guard porque no depende del drawer:
   // así un cambio en el menú no puede dejar la nav sin fondo en todo el sitio.
@@ -366,35 +382,61 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
   document.querySelectorAll<HTMLAnchorElement>('a.nav__lang-opt[hreflang]').forEach((a) =>
     a.addEventListener('click', () => { try { localStorage.setItem('mrc_lang_pref', a.hreflang); } catch {} }));
 
-  if (toggle && drawer && overlay && closeBtn) {
+  if (toggle && drawer && closeBtn && typeof drawer.showModal === 'function') {
     const links = Array.from(drawer.querySelectorAll<HTMLElement>('[data-nav-link], a'));
     let lastFocus: HTMLElement | null = null;
+    let closeTimer = 0;
+    let porEnlace = false;   // cerrado por un enlace: el foco lo decide el salto, no se devuelve
+    const quieto = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const focusables = () =>
       Array.from(drawer.querySelectorAll<HTMLElement>('a[href], button:not([disabled])'))
         .filter((el) => el.offsetParent !== null);
 
+    // showModal() da el foco atrapado, la página inerte y Escape. data-open va un
+    // fotograma después para que el panel entre deslizándose como siempre.
     function open() {
+      if (drawer.open) return;
+      clearTimeout(closeTimer);
       lastFocus = document.activeElement as HTMLElement;
-      drawer.setAttribute('data-open', '');
-      overlay.setAttribute('data-open', '');
-      drawer.removeAttribute('inert');
-      drawer.setAttribute('aria-hidden', 'false');
+      drawer.showModal();
       toggle.setAttribute('aria-expanded', 'true');
       document.body.classList.add('has-drawer-open');
       focusables()[0]?.focus();
+      requestAnimationFrame(() => requestAnimationFrame(() => drawer.setAttribute('data-open', '')));
     }
-    function close() {
+    // Al cerrar se deja salir el panel y luego se cierra el <dialog>. Con
+    // movimiento reducido, o si se pide al instante (un enlace del menú), sin espera.
+    function close(instant = false) {
+      if (!drawer.open) return;
       drawer.removeAttribute('data-open');
-      overlay.removeAttribute('data-open');
-      drawer.setAttribute('inert', '');
-      drawer.setAttribute('aria-hidden', 'true');
+      clearTimeout(closeTimer);
+      if (instant || quieto.matches) { drawer.close(); return; }
+      closeTimer = window.setTimeout(() => drawer.close(), 400);   // --duration-slow
+    }
+    // Lo que pasa al cerrarse, venga de donde venga (aspa, velo, Escape, enlace).
+    drawer.addEventListener('close', () => {
+      clearTimeout(closeTimer);
+      drawer.removeAttribute('data-open');
       toggle.setAttribute('aria-expanded', 'false');
       document.body.classList.remove('has-drawer-open');
+      // Tras un enlace (p. ej. un ancla de la misma página) el foco sigue al destino:
+      // devolverlo a la hamburguesa haría que Tab volviera arriba del todo.
+      if (porEnlace) { porEnlace = false; return; }
       // Safari (iOS/macOS) no da foco a un <button> al tocarlo, así que lastFocus suele
       // ser el <body> y devolverle el foco lo mandaría al inicio del documento.
       (lastFocus && lastFocus !== document.body ? lastFocus : toggle).focus();
-    }
+    });
+    // Escape: el navegador lo cierra de golpe; se intercepta para que salga animado.
+    drawer.addEventListener('cancel', (e) => { e.preventDefault(); close(); });
+    // Toque en el velo: cae sobre el propio <dialog> pero fuera de su rectángulo
+    // (no se mira solo event.target, que cerraría al tocar un hueco del panel).
+    drawer.addEventListener('click', (e) => {
+      if (e.target !== drawer) return;
+      const r = drawer.getBoundingClientRect();
+      const fuera = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+      if (fuera) close();
+    });
 
     // Tras el scroll a #contacto, mover el foco al primer campo del formulario.
     // Si #contacto no existe en la página, no hace nada (no lanza error).
@@ -413,12 +455,20 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
       (el.getAttribute('href') || '').endsWith('#contacto');
 
     toggle.addEventListener('click', open);
-    closeBtn.addEventListener('click', close);
-    overlay.addEventListener('click', close);
+    closeBtn.addEventListener('click', () => close());
     // Links del drawer: cerrar primero; si apuntan a #contacto, scroll+focus en el
     // siguiente frame para evitar el salto a medias mientras el drawer se cierra.
+    // Solo un ancla de esta misma página manda el foco al destino. Teléfono, correo,
+    // WhatsApp u otra página: el foco vuelve a la hamburguesa como al cerrar con el aspa.
+    const esAnclaDeAqui = (a: HTMLElement) => {
+      const href = a.getAttribute('href') || '';
+      if (!href.includes('#')) return false;
+      try { const u = new URL(href, location.href); return u.origin === location.origin && u.pathname === location.pathname; }
+      catch { return false; }
+    };
     links.forEach((l) => l.addEventListener('click', () => {
-      close();
+      porEnlace = esAnclaDeAqui(l);
+      close(true);
       if (isContactLink(l)) requestAnimationFrame(focusContact);
     }));
 
@@ -431,24 +481,12 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
       focusContact();
     });
 
-    document.addEventListener('keydown', (e) => {
-      if (!drawer.hasAttribute('data-open')) return;
-      if (e.key === 'Escape') { close(); return; }
-      if (e.key === 'Tab') {
-        const f = focusables();
-        if (!f.length) return;
-        const first = f[0], last = f[f.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
-    });
-
     // Al rotar a horizontal (o ensanchar) el drawer pasa a display:none y con él
     // desaparecen el velo y la hamburguesa: sin esto nadie llamaría a close() y el
     // body se quedaría con el scroll bloqueado y sin manera visible de cerrarlo.
     // Se consulta el display real para no duplicar aquí el breakpoint de media.css.
     window.addEventListener('resize', () => {
-      if (drawer.hasAttribute('data-open') && getComputedStyle(drawer).display === 'none') close();
+      if (drawer.open && getComputedStyle(drawer).display === 'none') close(true);
     }, { passive: true });
   }
 </script>

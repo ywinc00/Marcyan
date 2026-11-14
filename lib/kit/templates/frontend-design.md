@@ -107,7 +107,7 @@ Las reglas completas de **hero, cards, botones, formularios, navegación, seccio
 
 ### Bloque 6: Componentes
 
-- [ ] ¿Cada componente interactivo (botón, link, input, card clicable, tab) tiene los **5 estados** definidos y verificados en el render: default, hover, focus-visible, active, disabled? Estado asumido pero no probado = NO PASA.
+- [ ] ¿Cada componente interactivo (botón, link, input, card clicable, tab) tiene los **5 estados** definidos y verificados en el render: default, hover, focus-visible, active, disabled? Estado asumido pero no probado = NO PASA. Los botones que envían o piden datos tienen además el sexto estado, cargando (pieza de catálogo F-10): mismo ancho que en reposo y una sola petición aunque se pulse dos veces.
 - [ ] ¿El `border-radius` viene del token del sistema, con el **mismo radio** dentro de cada familia (todos los botones igual, todos los inputs igual)? Mezcla arbitraria de `4px`/`8px`/`16px` en componentes hermanos = NO PASA.
 - [ ] ¿Las `box-shadow` salen de una **escala de elevación definida** (ej. sm/md/lg con offsets y blur escalados) y NO es la sombra default difusa gris de card SaaS (`0 1px 3px rgba(0,0,0,.1)`) repetida en todo? Sombras de marca con tinte (`rgba(<hue-marca>, ...)`) preferidas sobre negro puro.
 - [ ] ¿Los íconos son de **un solo set** (mismo `stroke-width`, mismo estilo line o solid, sin mezclar) y alineados ópticamente con el texto (centro del ícono al centro de la x-height, tamaño ≈ 1em–1.25em del texto adyacente)?
@@ -125,11 +125,11 @@ Las reglas completas de **hero, cards, botones, formularios, navegación, seccio
 
 ### Bloque 8: Responsive
 
-- [ ] ¿Se verificó el render en **360px (móvil), 768px (tablet) y ≥ 1280px (desktop)** sin overflow horizontal (cero scroll lateral; `document.scrollingElement.scrollWidth` = ancho del viewport)?
-- [ ] ¿Tipografía y espaciado **escalan entre breakpoints** vía `clamp()` o pasos por media query (ej. heading `clamp(2rem, 5vw, 4rem)`)? El mismo `64px` de heading en 360px que en 1280px = NO PASA.
+- [ ] ¿Existe la hoja de contacto de la matriz de la puerta de salida de design-director, con todas las capturas base y las condicionales que apliquen, y el registro del script sin scroll lateral en ninguna? Falta una captura o hay scroll lateral: NO PASA.
+- [ ] ¿Tipografía y espaciado **escalan entre breakpoints** vía `clamp()` o pasos por media query (ej. heading `clamp(2rem, 1.5rem + 2.5vw, 4rem)`: parte fluida con rem sumado y máximo ≤ 2,5× el mínimo, pieza H-01)? El mismo `64px` de heading en 360px que en 1280px = NO PASA. Con vw puro el texto no crece con el tamaño de letra del visitante, y con un máximo mayor el zoom al 200 % puede no alcanzarse = NO PASA (salvo texto decorativo con `aria-hidden`, H-04).
 - [ ] ¿En móvil real los targets táctiles cumplen ≥ 44×44px, los botones no están pegados (gap ≥ 8px) y el menú es operable con el pulgar (zona alcanzable, no solo top-bar)?
 - [ ] ¿Las imágenes usan `srcset`/`sizes` o tamaños adecuados al contenedor? Cargar un asset de 2000px en una columna de 360px = NO PASA.
-- [ ] ¿No hay contenido cortado, solapado, ni texto que desborda su contenedor en NINGUNO de los 3 breakpoints probados?
+- [ ] ¿En NINGÚN ancho de la matriz hay contenido cortado, solapado, palabras partidas o texto que se sale de su botón? ¿Ninguna pieza con información **desaparece** por tamaño (`display:none` en una media query sin que esa información siga visible de otra forma; lo puramente decorativo y los enlaces que pasan al menú móvil no cuentan)? ¿Ninguna portada ni producto se **reduce** con zoom o escala para caber en el alto (ledger E-65)? ¿Lo que en escritorio se revela al pasar el ratón tiene equivalente visible o por toque en táctil? ¿El teléfono muestra la composición escrita en el registro del gate? Verificación: listar cada `display:none` dentro de una media query con su equivalente o 'decorativo' al lado, y mirar la hoja de contacto. Un solo fallo: NO PASA.
 
 ### Bloque 9: Anti-genérico
 

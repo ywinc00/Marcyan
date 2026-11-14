@@ -264,17 +264,20 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     <span class="mrc-fab-ic mrc-fab-ic--close"><Icon name="lucide:x" /></span>
   </button>
 
-  <!-- Panel -->
-  <section
+  <!-- Panel: <dialog> nativo (pieza E-03). En el teléfono ocupa la pantalla y se
+       abre con showModal() (foco dentro, página inerte, Escape y gesto atrás del
+       navegador). En escritorio flota en la esquina y la página sigue usable, así
+       que se abre con show(): no es modal y no atrapa el foco. -->
+  <dialog
     id="mrc-chat-panel"
     class="mrc-panel"
-    role="dialog"
-    aria-modal="true"
     aria-label={t.title}
     tabindex="-1"
-    hidden
   >
     <div class="mrc-fx" aria-hidden="true"></div>
+    <!-- Región de avisos DENTRO del panel: con el panel abierto como ventana modal (teléfono),
+         lo de fuera queda inerte y la región común de la página no se oye (src/lib/anunciar.js). -->
+    <div class="mrc-sr" data-sr-avisos aria-live="polite" aria-atomic="true"></div>
 
     <header class="mrc-head">
       <span class="mrc-head-id">
@@ -398,7 +401,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         <button type="button" class="mrc-foot-link" data-mrc-leave>{t.leaveData}</button>
       </span>
     </p>
-  </section>
+  </dialog>
 
   <script type="application/json" data-mrc-config set:html={JSON.stringify(clientConfig)} />
 </div>
@@ -444,9 +447,14 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-chat[data-open] .mrc-fab-ic--close { opacity: 1; transform: none; }
 
   /* ── Panel ──────────────────────────────────────────────── */
-  .mrc-panel[hidden] { display: none; }
+  /* <dialog>: cerrado no se pinta. Se anulan sus estilos del navegador (margen,
+     relleno, topes de alto y ancho, posición centrada) para que mida y se vea
+     igual que antes. */
+  .mrc-panel:not([open]) { display: none; }
+  .mrc-panel::backdrop { background: transparent; }
   .mrc-panel {
-    position: absolute; right: 0; bottom: calc(58px + var(--space-3));
+    position: absolute; right: 0; bottom: calc(58px + var(--space-3)); left: auto; top: auto;
+    margin: 0; padding: 0; max-width: none; max-height: none; color: inherit;
     display: flex; flex-direction: column;
     width: min(384px, calc(100vw - 24px)); height: min(760px, calc(calc(100vh / var(--z, 1)) - 88px));
     background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
@@ -661,7 +669,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     padding: 10px var(--space-3);
   }
   .mrc-input::placeholder { color: var(--fg-subtle); }
-  .mrc-input:focus-visible { outline: none; border-color: var(--accent-teal-line); box-shadow: 0 0 0 2px var(--accent-teal-dim); }
+  .mrc-input:focus-visible { border-color: var(--accent-teal-line); outline: 2px solid var(--accent-teal); outline-offset: 2px; }
   .mrc-input:disabled { opacity: 0.6; cursor: not-allowed; }
   /* iOS hace auto-zoom al enfocar un input con font-size < 16px y descuadra el
      panel fijo en móvil. En táctil subimos el campo a 16px para evitarlo
@@ -802,7 +810,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   }
 
   @media (--motion-reduce) {
-    .mrc-fab, .mrc-fab-ic, .mrc-panel, .mrc-live, .mrc-send, .mrc-nudge, .mrc-opt, .mrc-pill { animation: none !important; transition: none !important; }
+    .mrc-fab, .mrc-fab-ic, .mrc-panel, .mrc-live, .mrc-live::after, .mrc-send, .mrc-nudge, .mrc-opt, .mrc-pill { animation: none !important; transition: none !important; }
   }
   @media print { .mrc-chat { display: none !important; } }
 </style>
@@ -860,15 +868,17 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-chat .mrc-cap-sub { font-size: var(--text-xs); color: var(--fg-secondary); line-height: var(--leading-normal); }
   .mrc-chat .mrc-cap-row { display: flex; gap: var(--space-2); }
   .mrc-chat .mrc-cap-row > * { flex: 1; min-width: 0; }
+  .mrc-chat .mrc-cap-field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .mrc-chat .mrc-cap-lbl { font-size: var(--text-xs); font-weight: 600; color: var(--fg-secondary); }
   .mrc-chat .mrc-capture input {
     width: 100%; font-family: var(--font-body); font-size: var(--text-sm); color: var(--fg-primary);
     background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 9px var(--space-3);
   }
-  .mrc-chat .mrc-capture input:focus-visible { outline: none; border-color: var(--accent-teal-line); box-shadow: 0 0 0 2px var(--accent-teal-dim); }
+  .mrc-chat .mrc-capture input:focus-visible { border-color: var(--accent-teal-line); outline: 2px solid var(--accent-teal); outline-offset: 2px; }
   /* iOS: evitar auto-zoom al enfocar (font-size >= 16px en táctil). */
   @media (pointer: coarse), (max-width: 479.98px) { .mrc-chat .mrc-capture input { font-size: var(--text-base); } }
   .mrc-chat .mrc-cap-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
-  .mrc-chat .mrc-cap-consent { font-size: 10px; color: var(--fg-subtle); line-height: var(--leading-normal); }
+  .mrc-chat .mrc-cap-consent { font-size: var(--text-xs); color: var(--fg-subtle); line-height: var(--leading-normal); }
   .mrc-chat .mrc-cap-consent a { color: var(--accent-teal); text-decoration: underline; }
   .mrc-chat .mrc-cap-actions { display: flex; gap: var(--space-2); align-items: center; }
   .mrc-chat .mrc-cap-send {
@@ -883,7 +893,12 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-chat .mrc-cap-result.err { color: var(--color-error); }
   /* Citas: días y horas libres (botones creados por el JS). */
   .mrc-chat .mrc-cap-slots { display: flex; flex-direction: column; gap: var(--space-2); }
-  .mrc-chat .mrc-cap-days { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  /* La fila de días se desliza: barra fina visible en escritorio y, donde hay más
+     días, el borde se desvanece (en el iPhone la barra se oculta sola). */
+  .mrc-chat .mrc-cap-days { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--accent-teal) transparent; padding-bottom: 2px; }
+  .mrc-chat .mrc-cap-days[data-mas] { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 44px), transparent); }
+  .mrc-chat .mrc-cap-days[data-menos] { -webkit-mask-image: linear-gradient(to right, transparent, #000 44px); mask-image: linear-gradient(to right, transparent, #000 44px); }
+  .mrc-chat .mrc-cap-days[data-menos][data-mas] { -webkit-mask-image: linear-gradient(to right, transparent, #000 44px, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(to right, transparent, #000 44px, #000 calc(100% - 44px), transparent); }
   .mrc-chat .mrc-cap-times { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 6px; max-height: 148px; overflow-y: auto; }
   .mrc-chat .mrc-cap-day, .mrc-chat .mrc-cap-slot {
     font-family: var(--font-body); font-size: var(--text-xs); white-space: nowrap; cursor: pointer;
@@ -1569,10 +1584,15 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         '<div class="mrc-cap-title"></div>' +
         '<p class="mrc-cap-sub"></p>' +
         (kind === 'cita' ? '<div class="mrc-cap-slots" data-mrc-slots></div>' : '') +
-        '<input id="mrc-c-name" type="text" autocomplete="name" maxlength="120" />' +
+        // Etiqueta visible y ligada por for/id en cada campo (DESIGN.md de la agencia,
+        // FORMULARIOS): el texto de ejemplo desaparecía al escribir.
+        '<label class="mrc-cap-field" for="mrc-c-name"><span class="mrc-cap-lbl" data-mrc-lbl="name"></span>' +
+          '<input id="mrc-c-name" type="text" autocomplete="name" maxlength="120" /></label>' +
         '<div class="mrc-cap-row">' +
-          '<input id="mrc-c-email" type="email" autocomplete="email" inputmode="email" maxlength="200" />' +
-          '<input id="mrc-c-phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="50" />' +
+          '<label class="mrc-cap-field" for="mrc-c-email"><span class="mrc-cap-lbl" data-mrc-lbl="email"></span>' +
+            '<input id="mrc-c-email" type="email" autocomplete="email" inputmode="email" maxlength="200" /></label>' +
+          '<label class="mrc-cap-field" for="mrc-c-phone"><span class="mrc-cap-lbl" data-mrc-lbl="phone"></span>' +
+            '<input id="mrc-c-phone" type="tel" autocomplete="tel" inputmode="tel" maxlength="50" /></label>' +
         '</div>' +
         '<input id="mrc-c-hp" class="mrc-cap-hp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />' +
         '<p class="mrc-cap-consent"></p>' +
@@ -1580,7 +1600,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
           '<button type="button" class="mrc-cap-send" data-mrc-capsend></button>' +
           '<button type="button" class="mrc-cap-dismiss" data-mrc-capdismiss></button>' +
         '</div>' +
-        '<p class="mrc-cap-result" data-mrc-capresult hidden></p>';
+        '<p class="mrc-cap-result" id="mrc-c-result" data-mrc-capresult hidden></p>';
       // Rellenar textos por separado (textContent / placeholder → seguro).
       card.querySelector('.mrc-cap-title').textContent = title;
       card.querySelector('.mrc-cap-sub').textContent = kind === 'handoff' ? (T.capSubHuman || T.capSub)
@@ -1589,13 +1609,9 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       const nameInput = card.querySelector('#mrc-c-name');
       const emailInput = card.querySelector('#mrc-c-email');
       const phoneInput = card.querySelector('#mrc-c-phone');
-      nameInput.placeholder = T.capName;
-      emailInput.placeholder = T.capEmail;
-      phoneInput.placeholder = T.capPhone;
-      // Labels accesibles (Chat-F04): los inputs no tienen <label> visible.
-      if (T.capName) nameInput.setAttribute('aria-label', T.capName);
-      if (T.capEmail) emailInput.setAttribute('aria-label', T.capEmail);
-      if (T.capPhone) phoneInput.setAttribute('aria-label', T.capPhone);
+      card.querySelector('[data-mrc-lbl="name"]').textContent = T.capName || '';
+      card.querySelector('[data-mrc-lbl="email"]').textContent = T.capEmail || '';
+      card.querySelector('[data-mrc-lbl="phone"]').textContent = T.capPhone || '';
       card.querySelector('[data-mrc-capsend]').textContent = T.capSend;
       card.querySelector('[data-mrc-capdismiss]').textContent = T.capDismiss;
       const consent = card.querySelector('.mrc-cap-consent');
@@ -1673,6 +1689,15 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         dayRow.appendChild(b);
       });
       box.appendChild(dayRow); box.appendChild(times);
+      // Pista de que la fila sigue (guía de accesibilidad, filas desplazables): el
+      // borde por donde hay más días se desvanece; al llegar al final, se quita.
+      const pista = () => {
+        const fin = dayRow.scrollWidth - dayRow.clientWidth;
+        dayRow.toggleAttribute('data-mas', dayRow.scrollLeft < fin - 2);
+        dayRow.toggleAttribute('data-menos', dayRow.scrollLeft > 2);
+      };
+      dayRow.addEventListener('scroll', pista, { passive: true });
+      requestAnimationFrame(pista);
       // Si el cliente ya dijo día y hora y Marcy la encontró libre, queda marcada.
       let start = 0;
       if (wantedAt) {
@@ -1710,18 +1735,18 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       const showErr = (txt) => { if (result) { result.hidden = false; result.className = 'mrc-cap-result err'; result.textContent = txt; } };
 
       // Limpia estado de validación previo.
-      if (emailEl) emailEl.removeAttribute('aria-invalid');
-      if (phoneEl) phoneEl.removeAttribute('aria-invalid');
+      // El mensaje va enlazado al campo solo mientras se ve (pieza E-10).
+      [emailEl, phoneEl].forEach((el) => { if (el) { el.removeAttribute('aria-invalid'); el.removeAttribute('aria-describedby'); } });
 
       // 1) Presencia: al menos uno.
       if (!email && !phone) { showErr(T.capRequired); return; }
       // 2) Formato (Chat-F01 / Lead-F1): si hay email, regex; si hay teléfono, >=7 dígitos.
       if (email && !isValidEmail(email)) {
-        if (emailEl) { emailEl.setAttribute('aria-invalid', 'true'); emailEl.focus(); }
+        if (emailEl) { emailEl.setAttribute('aria-invalid', 'true'); emailEl.setAttribute('aria-describedby', 'mrc-c-result'); emailEl.focus(); }
         showErr(T.capEmailInvalid || T.capRequired); return;
       }
       if (phone && !isValidPhone(phone)) {
-        if (phoneEl) { phoneEl.setAttribute('aria-invalid', 'true'); phoneEl.focus(); }
+        if (phoneEl) { phoneEl.setAttribute('aria-invalid', 'true'); phoneEl.setAttribute('aria-describedby', 'mrc-c-result'); phoneEl.focus(); }
         showErr(T.capPhoneInvalid || T.capRequired); return;
       }
 
@@ -1882,6 +1907,11 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       const onBpChange = () => {
         if (!opened) return;
         if (isMobileFull()) freezeBody(); else unfreezeBody();
+        // Modal en el teléfono, flotante en escritorio. Reabrir mueve el foco: se
+        // devuelve a donde estaba (p. ej. el campo de escribir) para no cerrar el teclado.
+        const antes = document.activeElement;
+        showDialog();
+        if (antes && panel.contains(antes) && antes.focus) antes.focus({ preventScroll: true });
         syncViewport();
       };
       if (mqFull.addEventListener) mqFull.addEventListener('change', onBpChange);
@@ -1904,13 +1934,20 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     }
 
     // ── Abrir / cerrar panel ──
+    // Teléfono (pantalla completa): showModal(). Escritorio (flota en la esquina,
+    // la página sigue usable): show(), sin modal ni foco atrapado.
+    function showDialog() {
+      if (panel.open) panel.close();
+      try { if (isMobileFull()) panel.showModal(); else panel.show(); }
+      catch (_) { panel.setAttribute('open', ''); }
+    }
     function openPanel() {
       try { track('chat_opened'); } catch {}
       loadDeferredAssets();
       // Congela el documento de fondo para que el teclado no arrastre la página
       // por detrás del panel a pantalla completa (solo móvil).
       if (isMobileFull()) freezeBody();
-      panel.hidden = false;
+      showDialog();
       root.setAttribute('data-open', '');
       fab.setAttribute('aria-expanded', 'true');
       opened = true;
@@ -1935,7 +1972,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     }
     function closePanel() {
       flushTyper();
-      panel.hidden = true;
+      if (panel.open) panel.close();
       root.removeAttribute('data-open');
       fab.setAttribute('aria-expanded', 'false');
       opened = false;
@@ -2097,16 +2134,12 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       }, 280);
     });
 
-    // ESC + focus-trap dentro del panel
+    // Escape cierra en los dos modos. En modal (teléfono) el navegador lanza
+    // «cancel» (también con el gesto atrás de Android): se cierra por closePanel
+    // para restaurar el scroll y el estado. El foco atrapado lo da showModal().
+    panel.addEventListener('cancel', (e) => { e.preventDefault(); closePanel(); });
     panel.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') { e.preventDefault(); closePanel(); return; }
-      if (e.key !== 'Tab') return;
-      const nodes = panel.querySelectorAll('button, a[href], textarea, input, select, [tabindex]:not([tabindex="-1"])');
-      const list = Array.prototype.filter.call(nodes, (el) => !el.disabled && el.offsetParent !== null);
-      if (!list.length) return;
-      const first = list[0]; const lastEl = list[list.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); lastEl.focus(); }
-      else if (!e.shiftKey && document.activeElement === lastEl) { e.preventDefault(); first.focus(); }
+      if (e.key === 'Escape') { e.preventDefault(); closePanel(); }
     });
   }
 </script>

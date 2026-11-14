@@ -16,7 +16,7 @@ const { headings, tocLabel, rail, postTitle } = Astro.props;
 <div class="rail">
   <ArticleToc headings={headings} label={tocLabel} embedded />
   <div class="rail__cards">
-    <RailCta t={rail.cta} postTitle={postTitle} />
+    <RailCta t={rail.cta} postTitle={postTitle} idp="rcta-rail" />
     <RailTools t={rail.tools} />
   </div>
 </div>

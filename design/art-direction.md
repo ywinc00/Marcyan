@@ -425,3 +425,20 @@ número fabricado en resultados (solo la calculadora produce cifras, con inputs 
    digital gratis" / "Free digital checkup".
 
 Sub-agentes: ninguno (visuales prescritos en PLAN.md §6; ilustración = SVG inline del propio plan).
+
+---
+
+## Añadido 2026-11-14 · Accesibilidad de formularios, menú y chat (encargo del dueño desde Estructura)
+
+Estado: VALIDADO por: el dueño (OK al encargo `encargos/2026-11-13-guias-web-google.md`, 2026-11-13). El render se le enseña
+antes de mergear (PR #72). Modo REDISEÑO/IDENTIDAD: no se rediseña ninguna sección; solo estados y piezas de accesibilidad.
+Piezas del catálogo: **H-09** (foco de 2 px con outline, visible en alto contraste), **E-03** (menú móvil y chat como
+`<dialog>`), **E-10** (errores enlazados solo mientras se ven y una región común de avisos), **F-02** (movimiento reducido
+por pieza, sin apagón global), **F-11** (solo la precarga de la página siguiente).
+CONSERVADO: botones, superficies, oro y teal, animación de entrada del menú, piel clara del chat, bloqueo de scroll del iPhone.
+CAMBIA (se ve): anillo de foco de 2 px en todos los campos (contacto, raíl, brief, diagnóstico, chat) en vez del borde con
+halo al 15 %; subrayado de 2 px en la página actual del menú, además del color; etiquetas visibles en la tarjeta de datos
+del chat; borde que se desvanece en la fila de días de cita; letra auxiliar de 11 a 12 px (`--text-xs`, en su propio commit).
+NO → SÍ: NO marcar la página actual solo con color → SÍ color y subrayado de 2 px. NO texto de ejemplo como etiqueta → SÍ
+etiqueta visible y ligada. NO fila que se desliza sin pista → SÍ borde desvanecido donde hay más. NO `*{.01ms !important}` →
+SÍ duraciones instantáneas por token y variante por pieza.

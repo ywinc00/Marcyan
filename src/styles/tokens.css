@@ -89,7 +89,7 @@
   --font-mono:    'JetBrains Mono Variable', 'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, monospace;
 
   /* ── Escala de tipo FIJA (UI, cuerpo, datos) ── */
-  --text-xs:   11px;
+  --text-xs:   12px;   /* mínimo para texto auxiliar (guía de accesibilidad, 2026-11-13); antes 11 px */
   --text-sm:   13px;
   --text-base: 16px;
   --text-md:   18px;
@@ -149,4 +149,12 @@
   --z-nav:    100;
   --z-drawer: 200;
   --z-modal:  300;
+}
+
+/* Movimiento reducido (pieza F-02): en vez de apagar todo con !important, las
+   duraciones del sistema pasan a instantáneas. Lo que informa (colores, foco,
+   estados) cambia igual, sin desplazarse. Cada pieza con bucle o recorrido
+   declara además su propia variante (ver media.css: --motion-reduce). */
+@media (prefers-reduced-motion: reduce) {
+  :root { --duration-fast: 1ms; --duration-base: 1ms; --duration-slow: 1ms; }
 }

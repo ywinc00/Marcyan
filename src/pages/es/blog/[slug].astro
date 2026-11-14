@@ -118,7 +118,8 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
   />
   <WStyles />
 
-  <SiteNav nav={clusterNav} lang="es" homeHref="/es" hasEn={false} currentPath="/es/blog" />
+  {/* La ruta real del artículo: «Blog» queda marcado como sección (aria-current="true"), no como página actual. */}
+  <SiteNav nav={clusterNav} lang="es" homeHref="/es" hasEn={false} currentPath={Astro.url.pathname} langPath="/es/blog" />
 
   <main id="main" class="w-rails" data-w data-w-tone="gold" data-w-kind="articulo">
     <div class="w-container art">
@@ -151,7 +152,7 @@ const wa = 'https://wa.me/' + nap.houston.replace(/\D/g, '');
         <div class="art__body">
           <Article><Content /></Article>
           <div class="art__tools-m">
-            <RailCta t={postChrome.rail.cta} postTitle={d.title} />
+            <RailCta t={postChrome.rail.cta} postTitle={d.title} idp="rcta-movil" />
             <RailTools t={postChrome.rail.tools} />
           </div>
         </div>

@@ -264,15 +264,15 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     <span class="mrc-fab-ic mrc-fab-ic--close"><Icon name="lucide:x" /></span>
   </button>
 
-  <!-- Panel -->
-  <section
+  <!-- Panel: <dialog> nativo (pieza E-03). En el teléfono ocupa la pantalla y se
+       abre con showModal() (foco dentro, página inerte, Escape y gesto atrás del
+       navegador). En escritorio flota en la esquina y la página sigue usable, así
+       que se abre con show(): no es modal y no atrapa el foco. -->
+  <dialog
     id="mrc-chat-panel"
     class="mrc-panel"
-    role="dialog"
-    aria-modal="true"
     aria-label={t.title}
     tabindex="-1"
-    hidden
   >
     <div class="mrc-fx" aria-hidden="true"></div>
 
@@ -398,7 +398,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
         <button type="button" class="mrc-foot-link" data-mrc-leave>{t.leaveData}</button>
       </span>
     </p>
-  </section>
+  </dialog>
 
   <script type="application/json" data-mrc-config set:html={JSON.stringify(clientConfig)} />
 </div>
@@ -444,9 +444,14 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
   .mrc-chat[data-open] .mrc-fab-ic--close { opacity: 1; transform: none; }
 
   /* ── Panel ──────────────────────────────────────────────── */
-  .mrc-panel[hidden] { display: none; }
+  /* <dialog>: cerrado no se pinta. Se anulan sus estilos del navegador (margen,
+     relleno, topes de alto y ancho, posición centrada) para que mida y se vea
+     igual que antes. */
+  .mrc-panel:not([open]) { display: none; }
+  .mrc-panel::backdrop { background: transparent; }
   .mrc-panel {
-    position: absolute; right: 0; bottom: calc(58px + var(--space-3));
+    position: absolute; right: 0; bottom: calc(58px + var(--space-3)); left: auto; top: auto;
+    margin: 0; padding: 0; max-width: none; max-height: none; color: inherit;
     display: flex; flex-direction: column;
     width: min(384px, calc(100vw - 24px)); height: min(760px, calc(calc(100vh / var(--z, 1)) - 88px));
     background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
@@ -1838,6 +1843,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       const onBpChange = () => {
         if (!opened) return;
         if (isMobileFull()) freezeBody(); else unfreezeBody();
+        showDialog();   // modal en el teléfono, flotante en escritorio
         syncViewport();
       };
       if (mqFull.addEventListener) mqFull.addEventListener('change', onBpChange);
@@ -1860,13 +1866,20 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     }
 
     // ── Abrir / cerrar panel ──
+    // Teléfono (pantalla completa): showModal(). Escritorio (flota en la esquina,
+    // la página sigue usable): show(), sin modal ni foco atrapado.
+    function showDialog() {
+      if (panel.open) panel.close();
+      try { if (isMobileFull()) panel.showModal(); else panel.show(); }
+      catch (_) { panel.setAttribute('open', ''); }
+    }
     function openPanel() {
       try { track('chat_opened'); } catch {}
       loadDeferredAssets();
       // Congela el documento de fondo para que el teclado no arrastre la página
       // por detrás del panel a pantalla completa (solo móvil).
       if (isMobileFull()) freezeBody();
-      panel.hidden = false;
+      showDialog();
       root.setAttribute('data-open', '');
       fab.setAttribute('aria-expanded', 'true');
       opened = true;
@@ -1891,7 +1904,7 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
     }
     function closePanel() {
       flushTyper();
-      panel.hidden = true;
+      if (panel.open) panel.close();
       root.removeAttribute('data-open');
       fab.setAttribute('aria-expanded', 'false');
       opened = false;
@@ -2053,16 +2066,12 @@ const clientConfig = { lang, strings: t, links, referredBy: 'Asistente del sitio
       }, 280);
     });
 
-    // ESC + focus-trap dentro del panel
+    // Escape cierra en los dos modos. En modal (teléfono) el navegador lanza
+    // «cancel» (también con el gesto atrás de Android): se cierra por closePanel
+    // para restaurar el scroll y el estado. El foco atrapado lo da showModal().
+    panel.addEventListener('cancel', (e) => { e.preventDefault(); closePanel(); });
     panel.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') { e.preventDefault(); closePanel(); return; }
-      if (e.key !== 'Tab') return;
-      const nodes = panel.querySelectorAll('button, a[href], textarea, input, select, [tabindex]:not([tabindex="-1"])');
-      const list = Array.prototype.filter.call(nodes, (el) => !el.disabled && el.offsetParent !== null);
-      if (!list.length) return;
-      const first = list[0]; const lastEl = list[list.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); lastEl.focus(); }
-      else if (!e.shiftKey && document.activeElement === lastEl) { e.preventDefault(); first.focus(); }
+      if (e.key === 'Escape') { e.preventDefault(); closePanel(); }
     });
   }
 </script>

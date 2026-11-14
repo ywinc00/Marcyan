@@ -66,3 +66,8 @@
   --w-ease-ui:    cubic-bezier(.4, 0, .2, 1);       /* hover, megamenú, pestañas */
   --w-dur-micro: 150ms; --w-dur-hover: 200ms;
 }
+
+/* Movimiento reducido (pieza F-02): duraciones instantáneas. */
+@media (prefers-reduced-motion: reduce) {
+  :root { --w-dur-micro: 1ms; --w-dur-hover: 1ms; }
+}

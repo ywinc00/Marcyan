@@ -150,3 +150,11 @@
   --z-drawer: 200;
   --z-modal:  300;
 }
+
+/* Movimiento reducido (pieza F-02): en vez de apagar todo con !important, las
+   duraciones del sistema pasan a instantáneas. Lo que informa (colores, foco,
+   estados) cambia igual, sin desplazarse. Cada pieza con bucle o recorrido
+   declara además su propia variante (ver media.css: --motion-reduce). */
+@media (prefers-reduced-motion: reduce) {
+  :root { --duration-fast: 1ms; --duration-base: 1ms; --duration-slow: 1ms; }
+}

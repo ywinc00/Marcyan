@@ -840,7 +840,8 @@ const COTAS: Record<Lienzo, Cota[]> = {
 
   @keyframes ej-late { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
   @media (prefers-reduced-motion: reduce) {
-    .ej__abierto::before { animation: none; }
+    /* Misma fuerza que la regla del latido (antes la ganaba y seguía latiendo). */
+    .ej__abierto::before, .ej[data-ej-vivo][data-ej-estado='lista'] .ej__abierto::before { animation: none; }
     .ej, .ej * { transition: none !important; }
   }
 </style>

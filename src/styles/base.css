@@ -74,15 +74,9 @@ a { color: inherit; text-decoration: none; }
 
 ::selection { background: var(--accent-gold-dim); color: var(--fg-primary); }
 
-/* Backstop global a reduced-motion (los componentes igual deben apagar
-   sus animaciones explícitamente; esto es la red de seguridad) */
-@media (--motion-reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
+/* Movimiento reducido: ya no hay apagón global con !important (pieza F-02).
+   Las duraciones del sistema pasan a instantáneas en tokens.css y cada pieza
+   con bucle, recorrido o giro declara su variante junto a su estilo. */
 
 /* ── Helpers de layout ───────────────────────────────────────── */
 .u-min0 { min-width: 0; }   /* aplicar a hijos de flex/grid que desbordan */

@@ -46,7 +46,7 @@ export interface WebCopy {
   proyectos: { label: string; title: string; lead: string; more: string };
   precio: { eyebrow: string; title: string; specsLabel: string; cta: string; specs: { k: string; v: string; note?: string }[] };
   franja: { queEs: string; desde: (landing: string, medida: string) => string; tiempo: string; verQue: string; verPrecios: string; pedir: string };
-  hermanas: { title: string; lead: string; guia: { title: string; text: string }; diag: { title: string; text: string }; precios: { title: string; text: string } };
+  hermanas: { title: string; lead: string; guia: { title: string; text: string }; diag: { title: string; text: string }; precios: { title: string; text: string }; sector?: { title: string; text: string; href: string } };
   cierre: { proof: string; warmTitle: string; warmText: string; warmCta: string };
   /** v2 (G03): cierre en la pantalla del portátil (EscenaCierre, P08). */
   escena: { titulo: string; bajada: string; form: string; calido: string; calidoCta: string };
@@ -249,6 +249,7 @@ export const webCopy: Record<WebCity, WebCopy> = {
       guia: { title: 'Guía de precios de una web', text: 'Cuánto cuesta una página web en Houston.' },
       diag: { title: 'Diagnóstico gratis', text: 'Revisa si tu negocio pierde clientes online.' },
       precios: { title: 'Precios', text: 'Todos los precios de entrada, a la vista.' },
+      sector: { title: 'Sitios para bienes raíces', text: '¿Eres agente? Sitio con tus propiedades y SEO por zona.', href: '/es/houston/bienes-raices' },
     },
     cierre: { proof: 'Texas Rush Remove ya posiciona en su zona de Houston con su sitio nuevo.', ...warm },
     escena,

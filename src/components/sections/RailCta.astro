@@ -116,7 +116,7 @@ const waHref = 'https://wa.me/' + tel.replace(/\D/g, '');
     padding: 9px 12px; transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
   }
   .rcta__field input::placeholder { color: var(--fg-subtle); }
-  .rcta__field input:focus { outline: none; border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
+  .rcta__field input:focus { border-color: var(--accent-gold); outline: 2px solid var(--accent-gold); outline-offset: 2px; }
 
   .rcta__submit {
     display: inline-flex; align-items: center; justify-content: center;

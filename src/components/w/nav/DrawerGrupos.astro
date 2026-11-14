@@ -107,7 +107,8 @@ const isActive = (href: string) => !!currentPath && currentPath.startsWith(href)
   .dg__all { font-weight: 500; }
   .dg__line :global(.dg__icon) { width: 16px; height: 16px; flex: none; stroke-width: 1.75; color: var(--accent-gold); }
   .dg__chev { font-size: 18px; line-height: 1; color: var(--accent-gold); }
-  .dg a[aria-current="page"] { color: var(--accent-gold); }
+  /* Página actual: color y subrayado de 2 px, no solo el color (igual que la barra). */
+  .dg a[aria-current="page"] { color: var(--accent-gold); text-decoration-line: underline; text-decoration-thickness: 2px; text-decoration-color: var(--accent-gold); text-underline-offset: 6px; }
   @media (--hover-fine) {
     .dg__svc:hover .dg__name, .dg__all:hover, .dg__line:hover { color: var(--accent-gold); }
   }

@@ -102,7 +102,9 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
   .field input::placeholder, .field textarea::placeholder { color: var(--fg-subtle); }
   .field select { appearance: none; cursor: pointer; }
   .field input:focus, .field select:focus, .field textarea:focus {
-    outline: none; border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim);
+    /* Foco de 2 px con outline (pieza H-09): se ve también en alto contraste,
+       donde las sombras desaparecen. Es el mismo anillo que el resto del sitio. */
+    border-color: var(--accent-gold); outline: 2px solid var(--accent-gold); outline-offset: 2px;
   }
 
   .form-status { font-size: var(--text-sm); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); }

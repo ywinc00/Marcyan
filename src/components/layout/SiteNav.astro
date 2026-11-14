@@ -177,8 +177,12 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
   }
   .nav__toggle :global(svg) { width: 26px; height: 26px; stroke-width: 1.75; }
 
-  /* página actual (aria-current) — aplica en barra y drawer, todos los breakpoints */
-  .nav__links a[aria-current="page"], .nav__drawer-links a[aria-current="page"] { color: var(--accent-gold); }
+  /* página actual (aria-current), en barra y drawer, todos los breakpoints: color y
+     además un subrayado de 2 px, para que no dependa solo del color y se distinga
+     del hover (DESIGN.md de la agencia, NAVEGACIÓN). */
+  .nav__links a[aria-current="page"], .nav__drawer-links a[aria-current="page"] {
+    color: var(--accent-gold); text-decoration-line: underline; text-decoration-thickness: 2px; text-decoration-color: var(--accent-gold); text-underline-offset: 6px;
+  }
 
   /* ── ≥ md: barra completa ─────────────────────────────── */
   @media (--md) {

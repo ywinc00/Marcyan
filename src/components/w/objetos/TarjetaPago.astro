@@ -1,0 +1,84 @@
+---
+// Tarjeta de pago de la tarjeta «Pago por proyecto» en Precios (pedido del dueño,
+// 2026-11-14): una tarjeta de crédito suelta, sin recuadro, que al pasar el ratón
+// da la vuelta sobre su eje horizontal como la de workos.com/pricing.
+// Mecanismo medido en la referencia: cara y dorso con perspectiva de 300 px; zona
+// de ratón algo mayor que la tarjeta; media vuelta en ~400 ms con un rebote de ~22°
+// que se asienta en ~1,2 s; al salir, lo mismo al revés. Aquí con la paleta de la
+// marca (oro) y la curva medida escrita con linear().
+// Decorativa: aria-hidden. Solo con ratón (pieza F-07); con movimiento reducido no
+// gira (F-02). Relieve con filo de luz y sombra tintada en oro (G-10).
+---
+<span class="tp" aria-hidden="true">
+  <span class="tp__card">
+    <span class="tp__face tp__front">
+      <span class="tp__chip"></span>
+      <span class="tp__logo"><i></i><i></i></span>
+      <span class="tp__shine"></span>
+    </span>
+    <span class="tp__face tp__back">
+      <span class="tp__stripe"></span>
+      <span class="tp__mark"></span>
+    </span>
+  </span>
+  <span class="tp__target"></span>
+</span>
+
+<style>
+  .tp {
+    position: relative; display: inline-block; inline-size: 44px; block-size: 30px;
+    perspective: 300px;
+  }
+  /* Zona de ratón mayor que la tarjeta (84 × 80 en la referencia), centrada. */
+  .tp__target { position: absolute; inset: -25px -20px; }
+
+  .tp__card {
+    position: absolute; inset: 0; display: block;
+    transform-style: preserve-3d;
+    /* Curva medida en la referencia (rebote de ~12 % que se asienta); donde no hay
+       linear(), una curva con rebote parecido. */
+    transition: transform 1.2s cubic-bezier(.34, 1.4, .64, 1);
+    transition: transform 1.2s linear(0, .051 4.2%, .142 7.6%, .248 11.1%, .382 14.3%, .52 17.8%, .648 21.2%, .757 24.3%, .86 27.8%, .94 30.9%, 1.01 34.3%, 1.06 37.8%, 1.092 41%, 1.114 44.4%, 1.123 47.6%, 1.123 51.1%, 1.105 57.7%, 1.075 64.3%, 1.044 70.8%, 1.016 77.8%, .998 84.4%, .99 90.9%, 1);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .tp:hover .tp__card { transform: rotateX(180deg); }
+  }
+
+  .tp__face {
+    position: absolute; inset: 0; display: block; overflow: hidden;
+    border-radius: 3px;
+    -webkit-backface-visibility: hidden; backface-visibility: hidden;
+    /* Oro de la marca en metal: del oro hondo al claro, con filo de luz arriba. */
+    background: linear-gradient(135deg, var(--accent-gold-deep, #8a6630) 0%, var(--accent-gold, #c8a96e) 58%, #e2cfa4 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .38), inset 0 -1px 0 rgba(0, 0, 0, .18), 0 6px 14px -6px rgba(var(--accent-gold-rgb, 200, 169, 110), .55);
+  }
+  .tp__back { transform: rotateX(180deg); }
+
+  .tp__chip {
+    position: absolute; left: 6px; top: 8px; inline-size: 9px; block-size: 7px; border-radius: 1.5px;
+    background:
+      linear-gradient(90deg, transparent 45%, rgba(0, 0, 0, .22) 45% 55%, transparent 55%),
+      linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, .22) 45% 55%, transparent 55%),
+      linear-gradient(135deg, #f3e6c4, #b8955a);
+  }
+  .tp__logo { position: absolute; right: 5px; bottom: 5px; display: flex; }
+  .tp__logo i { display: block; inline-size: 7px; block-size: 7px; border-radius: 50%; }
+  .tp__logo i:first-child { background: rgba(12, 11, 9, .38); }
+  .tp__logo i:last-child { margin-inline-start: -3px; background: rgba(255, 255, 255, .6); }
+  .tp__shine {
+    position: absolute; inset: -40% 10% auto -20%; block-size: 120%;
+    background: radial-gradient(circle closest-side, rgba(255, 255, 255, .28), transparent);
+  }
+
+  .tp__stripe { position: absolute; left: 0; right: 0; top: 6px; block-size: 6px; background: linear-gradient(90deg, #1a1712, #3a3328); }
+  .tp__mark {
+    position: absolute; right: 6px; bottom: 6px; inline-size: 7px; block-size: 7px; border-radius: 50%;
+    border: 1.5px solid rgba(12, 11, 9, .4);
+  }
+
+  /* Movimiento reducido (F-02): la tarjeta no gira. */
+  @media (prefers-reduced-motion: reduce) {
+    .tp__card { transition: none; }
+    .tp:hover .tp__card { transform: none; }
+  }
+</style>

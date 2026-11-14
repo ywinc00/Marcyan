@@ -68,7 +68,8 @@ const detail = lang === 'en' ? 'See details' : 'Ver detalle';
 const m = t.modelo;
 const cards = [
   {
-    title: m.proyecto.title, text: m.proyecto.text, icon: MODELO_ICONS[0],
+    // Tarjeta de pago que gira (pedido del dueño, 2026-11-14) en vez del icono en recuadro.
+    title: m.proyecto.title, text: m.proyecto.text, icon: MODELO_ICONS[0], objeto: 'tarjeta-pago' as const,
     itemsLead: m.proyecto.lead, items: m.proyecto.items,
     cta: { label: m.proyecto.cta, href: '#precios', variant: 'link' as const },
   },

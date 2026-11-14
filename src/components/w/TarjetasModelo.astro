@@ -5,6 +5,7 @@
 // con máscara; icono-objeto 44; título 28/500; texto; acción; divisoria a todo
 // el ancho; ventajas con check 16. Precios: solo los que lleguen por props.
 import IconoObjeto from './IconoObjeto.astro';
+import TarjetaPago from './objetos/TarjetaPago.astro';
 import Button from '../ui/Button.astro';
 import Icon from '../ui/Icon.astro';
 import type { IconoId } from './objects/registry';
@@ -13,6 +14,8 @@ interface Card {
   title: string;
   text: string;
   icon: IconoId;
+  /** Objeto propio en lugar del icono en recuadro: la tarjeta de pago que gira. */
+  objeto?: 'tarjeta-pago';
   items: string[];
   cta: { label: string; href: string; track?: string; variant?: 'primary' | 'link' };
   /** Frase previa a la lista, p. ej. "Incluye:" (opcional). */
@@ -30,7 +33,9 @@ const { cards, tone = 'gold', class: cls } = Astro.props;
     <article class:list={['tm__card', i === 1 && 'tm__card--contrast', c.items.length >= 5 && 'tm__card--tall']}>
       <span class="tm__stripes" aria-hidden="true"></span>
       <div class="tm__top">
-        <IconoObjeto id={c.icon} size={44} />
+        {c.objeto === 'tarjeta-pago'
+          ? <span class="tm__objeto"><TarjetaPago /></span>
+          : <IconoObjeto id={c.icon} size={44} />}
         <h2 class="tm__title">{c.title}</h2>
         <p class="tm__text">{c.text}</p>
         <div class="tm__cta">
@@ -86,6 +91,8 @@ const { cards, tone = 'gold', class: cls } = Astro.props;
   .tm__card--contrast .tm__stripes { opacity: 1; }
 
   .tm__top { padding: 40px 40px 32px; }
+  /* La tarjeta de pago (30 px) ocupa el mismo alto que el icono (44 px): el título no se mueve. */
+  .tm__objeto { display: flex; align-items: center; block-size: 44px; }
   .tm__title {
     margin: 24px 0 0; font-family: var(--font-display); font-weight: 500;
     font-size: 28px; line-height: 1.15; letter-spacing: -0.02em; color: var(--w-ink);

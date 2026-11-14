@@ -197,6 +197,21 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
       </>
     )}
 
+    {/* Precarga de la página siguiente (pieza F-11): solo prefetch, nunca
+        prerender (el prerender ejecutaría el chat y la analítica antes de la
+        visita). Moderate = al pasar el ratón o empezar a tocar el enlace. Fuera
+        las rutas privadas o que cambian algo. Solo Chrome y Edge; en el resto no
+        hace nada y no rompe nada. */}
+    <script type="speculationrules" is:inline set:html={JSON.stringify({
+      prefetch: [{
+        where: { and: [
+          { href_matches: '/*' },
+          { not: { href_matches: ['/api/*', '/dashboard', '/dashboard/*', '/es/kit', '/es/kit/*', '/en/kit', '/en/kit/*'] } },
+          { not: { selector_matches: '[download], [rel~="nofollow"]' } },
+        ] },
+        eagerness: 'moderate',
+      }],
+    })} />
     <slot name="head" />
   </head>
   <body>

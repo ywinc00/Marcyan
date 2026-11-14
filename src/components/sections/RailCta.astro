@@ -7,12 +7,12 @@ import Icon from '../ui/Icon.astro';
 import BtnStates from '../ui/BtnStates.astro';
 import { nap } from '../../i18n/content';
 import { PRICE_ANCHORS } from '../../i18n/pricing';
-import { siguienteId } from '../../lib/uid';
 
-interface Props { t: any; postTitle: string }
-const { t, postTitle } = Astro.props;
-// El artículo pinta dos copias (columna en escritorio y versión móvil): ids por copia.
-const uid = siguienteId('rcta');
+// El artículo pinta dos copias (columna en escritorio y versión móvil): cada una
+// trae su prefijo de ids (`idp`) para que etiquetas y avisos no apunten a la otra.
+interface Props { t: any; postTitle: string; idp?: string }
+const { t, postTitle, idp = 'rcta' } = Astro.props;
+const uid = idp;
 
 const usd = (n: number) => '$' + n.toLocaleString('en-US');
 const priceNote = (t.priceNote as string)

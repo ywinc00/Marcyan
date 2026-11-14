@@ -21,6 +21,9 @@ interface Props {
   homeHref?: string;
   hasEn?: boolean;
   currentPath?: string;
+  /** Ruta para el enlace del otro idioma, si no es la actual (un artículo del blog
+   *  sin traducción manda al índice del blog en el otro idioma). */
+  langPath?: string;
   /** Megamenú de Servicios + grupos del drawer. false = nav de siempre (plan B, §2.12). */
   mega?: boolean;
 }
@@ -30,9 +33,10 @@ const {
   homeHref = '/es',
   hasEn = true,
   currentPath,
+  langPath,
   mega = true,
 } = Astro.props;
-const otherHref = toggleHref(currentPath ?? '/', lang as Lang);
+const otherHref = toggleHref(langPath ?? currentPath ?? '/', lang as Lang);
 const uin = t(lang as Lang);
 // Evento del CTA: por defecto "propuesta pedida"; una página cuyo CTA es otra
 // cosa (p. ej. WhatsApp en el brief y el kit) pasa nav.cta.track.
@@ -454,8 +458,16 @@ const drawerLinks = hasMega ? nav.links.filter((l: any) => !cubiertoPorGrupos(l.
     closeBtn.addEventListener('click', () => close());
     // Links del drawer: cerrar primero; si apuntan a #contacto, scroll+focus en el
     // siguiente frame para evitar el salto a medias mientras el drawer se cierra.
+    // Solo un ancla de esta misma página manda el foco al destino. Teléfono, correo,
+    // WhatsApp u otra página: el foco vuelve a la hamburguesa como al cerrar con el aspa.
+    const esAnclaDeAqui = (a: HTMLElement) => {
+      const href = a.getAttribute('href') || '';
+      if (!href.includes('#')) return false;
+      try { const u = new URL(href, location.href); return u.origin === location.origin && u.pathname === location.pathname; }
+      catch { return false; }
+    };
     links.forEach((l) => l.addEventListener('click', () => {
-      porEnlace = true;
+      porEnlace = esAnclaDeAqui(l);
       close(true);
       if (isContactLink(l)) requestAnimationFrame(focusContact);
     }));

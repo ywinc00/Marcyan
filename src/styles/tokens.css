@@ -89,7 +89,7 @@
   --font-mono:    'JetBrains Mono Variable', 'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, monospace;
 
   /* ── Escala de tipo FIJA (UI, cuerpo, datos) ── */
-  --text-xs:   11px;
+  --text-xs:   12px;   /* mínimo para texto auxiliar (guía de accesibilidad, 2026-11-13); antes 11 px */
   --text-sm:   13px;
   --text-base: 16px;
   --text-md:   18px;

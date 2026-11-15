@@ -212,6 +212,9 @@ export const content = {
         emailInvalid: 'Ingresa un email válido para que podamos contactarte.',
         needContact: 'Déjanos un email o un teléfono para contestarte.',
         briefLink: 'formulario de proyecto completo',
+        // Encargo legal 2026-11-15 §2a-2b (textos de MSA Legales, no suavizar).
+        smsConsent: 'Acepto recibir mensajes de texto o WhatsApp de Marcyan sobre mi solicitud. Pueden aplicar tarifas de mensajes. Responde STOP para dejar de recibirlos.',
+        privacy: { pre: 'Al enviar aceptas nuestra ', link: 'política de privacidad', href: '/privacidad', post: '. Te contestamos por correo o teléfono.' },
       },
     },
 
@@ -238,6 +241,7 @@ export const content = {
           { label: 'Blog', href: '/es/blog' },
           { label: 'Privacidad', href: '/privacidad' },
           { label: 'Términos', href: '/terminos' },
+          { label: 'Accesibilidad', href: '/accesibilidad' },
         ] },
         { title: 'Ciudades', links: [
           { label: 'Houston y Miami', href: '/es/ciudades' },
@@ -252,6 +256,7 @@ export const content = {
       legal: [
         { label: 'Privacidad', href: '/privacidad' },
         { label: 'Términos', href: '/terminos' },
+        { label: 'Accesibilidad', href: '/accesibilidad' },
       ],
       copy: '© 2026 Marcyan Studio · Todos los derechos reservados',
     },
@@ -431,6 +436,8 @@ export const content = {
         emailInvalid: 'Please enter a valid email so we can reach you.',
         needContact: 'Leave us an email or a phone number so we can get back to you.',
         briefLink: 'full project form',
+        smsConsent: 'I agree to receive text or WhatsApp messages from Marcyan about my request. Message rates may apply. Reply STOP to opt out.',
+        privacy: { pre: 'By submitting you accept our ', link: 'privacy policy', href: '/en/privacy', post: '. We reply by email or phone.' },
       },
     },
 
@@ -452,6 +459,7 @@ export const content = {
           { label: 'Blog', href: '/en/blog' },
           { label: 'Privacy', href: '/en/privacy' },
           { label: 'Terms', href: '/en/terms' },
+          { label: 'Accessibility', href: '/en/accessibility' },
         ] },
         { title: 'Cities', links: [
           { label: 'Houston & Miami', href: '/en/cities' },
@@ -462,6 +470,7 @@ export const content = {
       legal: [
         { label: 'Privacy', href: '/en/privacy' },
         { label: 'Terms', href: '/en/terms' },
+        { label: 'Accessibility', href: '/en/accessibility' },
       ],
       copy: '© 2026 Marcyan Studio · All rights reserved',
     },

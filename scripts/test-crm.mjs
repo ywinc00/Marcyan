@@ -32,7 +32,7 @@ import {
 import {
   leadFiltersFromQuery, leadQueryPatch, leadApiParams, leadFilterPhrase,
   clientFiltersFromQuery, clientApiParams, clientQueryPatch, money, phoneHref, whatsappHref,
-  deleteImpactText, leadEventText, leadStatus, leadSource, leavingConvertedMessage,
+  deleteImpactText, keepsBooks, leadEventText, leadStatus, leadSource, leavingConvertedMessage,
 } from '../src/components/dashboard/crm/crm.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -350,8 +350,13 @@ await check('formato: dinero, teléfono y WhatsApp', () => {
   assert.equal(phoneHref('12'), '');
 });
 await check('textos: impacto del borrado dice exactamente qué se pierde', () => {
-  assert.equal(deleteImpactText({ projects: 2, milestones: 9, invoices: 3, payments: 1, payments_cents: 50000 }),
-    'También se borrarán para siempre 2 proyectos (con 9 hitos), 3 facturas y 1 pago ($500 cobrados).');
+  // Solo se borra un cliente sin facturas emitidas ni cobros: lo que cuenta son borradores.
+  assert.equal(deleteImpactText({ projects: 2, milestones: 9, invoices: 3, payments: 0 }),
+    'También se borrarán para siempre 2 proyectos (con 9 hitos) y 3 borradores de factura.');
+  // Con facturas emitidas o cobros guarda libros (7 años) y no se ofrece borrar.
+  assert.equal(keepsBooks({ invoices: 3, issued_invoices: 0, payments: 0 }), false);
+  assert.equal(keepsBooks({ invoices: 3, issued_invoices: 1, payments: 0 }), true);
+  assert.equal(keepsBooks({ invoices: 0, issued_invoices: 0, payments: 1 }), true);
   assert.match(deleteImpactText({ projects: 0, invoices: 0, payments: 0 }), /solo se borra su ficha/);
 });
 await check('textos: historial y etiquetas legibles (nunca códigos crudos)', () => {

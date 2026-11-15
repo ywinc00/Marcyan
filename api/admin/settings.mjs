@@ -5,7 +5,7 @@
 //          limits:  topes de seguridad de Marcy y de los formularios (lib/ratelimit.mjs, solo lectura)
 //   POST { key, value } → guarda un ajuste de Finanzas (valida el valor) → { ok, finance }
 // Protegido con requireAdmin. Nada secreto sale de aquí: ni claves ni tokens.
-import { requireAdmin, getAllowedEmails } from '../../lib/auth.mjs';
+import { requireAdmin, getAllowedEmails, getTeamAccess } from '../../lib/auth.mjs';
 import { LIMITS } from '../../lib/ratelimit.mjs';
 import { BooksError, getFinanceSettings, setFinanceSetting } from '../../lib/finance-books.mjs';
 
@@ -72,7 +72,8 @@ export default async function handler(req, res) {
       return res.status(200).json({
         ok: true,
         finance: await getFinanceSettings(),
-        team: getAllowedEmails(),
+        // Si la lectura de sesiones falla, la lista sale igual, sin fechas.
+        team: await getTeamAccess().catch(() => getAllowedEmails().map((email) => ({ email, last_access: null }))),
         me: session.email || null,
         limits: limitsView(),
       });

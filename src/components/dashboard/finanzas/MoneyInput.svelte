@@ -9,13 +9,14 @@
   let {
     label = 'Monto (USD)', value = $bindable(''), cents = $bindable(null), required = true,
     max = null, maxLabel = 'el saldo pendiente', showErrors = false, id = '',
+    allowZero = false,   // precio de entrada: $0 vale (meses gratis)
   } = $props();
 
   let touched = $state(false);
   const parsed = $derived(parseMoney(value));
   const problem = $derived.by(() => {
     if (!parsed.ok) return parsed.empty && !required ? '' : parsed.error;
-    if (parsed.cents <= 0) return 'El monto debe ser mayor que $0.';
+    if (parsed.cents < 0 || (parsed.cents === 0 && !allowZero)) return 'El monto debe ser mayor que $0.';
     if (max != null && parsed.cents > Number(max)) return `Supera ${maxLabel} (${formatUsd(max)}).`;
     return '';
   });

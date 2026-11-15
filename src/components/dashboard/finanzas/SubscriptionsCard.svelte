@@ -37,6 +37,12 @@
   const hasYearly = $derived(subs.some((s) => s.active && s.cycle === 'yearly'));
 
   async function changed() { await refreshShell(); onchanged?.(); }
+  // «Hasta» enseña el último día a precio de entrada; lo guardado es el primero a precio normal.
+  function dayBefore(v) {
+    const d = new Date(String(v).slice(0, 10) + 'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate() - 1);
+    return d.toISOString().slice(0, 10);
+  }
 
   async function toggle(sub) {
     const next = !sub.active;
@@ -92,13 +98,15 @@
                 <span class="sc-name">{s.name}</span>
                 <span class="sc-meta">
                   {#if s.category}<StatusChip tone="neutral" label={categoryLabel(s.category)} />{/if}
-                  {#if !s.active}<span>Pausada</span>
+                  {#if s.billing === 'variable'}<span class="sc-var">Cambia cada mes</span>{/if}
+                  {#if s.intro_until && s.active && String(s.intro_until).slice(0, 10) > new Date().toISOString().slice(0, 10)}<StatusChip tone="warning" label={`${Number(s.intro_amount_cents || 0) === 0 ? 'Gratis' : formatUsd(s.intro_amount_cents)} hasta ${fmtDay(dayBefore(s.intro_until))}`} />{/if}
+                  {#if !s.active}<span>{s.ended_at ? `De baja desde ${fmtDay(s.ended_at)}` : 'Pausada'}</span>
                   {:else if s.next_charge_at}<span>Próximo cargo {fmtDay(s.next_charge_at)}{s.started_at ? `; la pagas desde ${fmtDay(s.started_at)}` : ''}</span>
                   {:else}<span>Sin fecha de cargo</span>{/if}
                 </span>
               </div>
               <div class="sc-price">
-                <span class="sc-amount">{formatUsd(s.amount_cents)}</span>
+                <span class="sc-amount">{s.billing === 'variable' ? '≈ ' : ''}{formatUsd(s.amount_cents)}</span>
                 <span class="sc-cycle">{CYCLE_LABELS[s.cycle] || s.cycle}</span>
               </div>
               <div class="sc-acts">
@@ -130,9 +138,14 @@
   .sc-list { list-style: none; margin: 0; padding: 0; }
   .sc-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border-subtle); }
   .sc-row:first-child { border-top: 0; }
-  .sc-row.is-off .sc-main, .sc-row.is-off .sc-price, .sc-row.is-off :global(.brandlogo) { opacity: .55; }
+  /* Atenuada igual en escritorio y en móvil (allí .sc-main no pinta su propia caja). */
+  .sc-row.is-off .sc-name, .sc-row.is-off .sc-meta, .sc-row.is-off .sc-price, .sc-row.is-off :global(.brandlogo) { opacity: .55; }
+  /* «Cambia cada mes» es un aviso de cómo cobra, no una categoría: sin punto y con borde discontinuo. */
+  .sc-var { display: inline-flex; align-items: center; min-height: 22px; padding: 0 8px; border: 1px dashed var(--fg-faint);
+    border-radius: var(--radius-pill); font-size: var(--dash-caption); color: var(--fg-secondary); white-space: nowrap; }
   .sc-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
-  .sc-name { font-size: var(--dash-body); font-weight: 500; color: var(--fg-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* El nombre nunca se corta: en pantallas estrechas pasa a dos líneas. */
+  .sc-name { font-size: var(--dash-body); font-weight: 500; color: var(--fg-primary); overflow-wrap: anywhere; }
   .sc-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: var(--dash-caption); color: var(--fg-subtle); }
   .sc-price { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: 0 0 auto; }
   .sc-amount { font-size: var(--dash-small); color: var(--fg-primary); font-variant-numeric: tabular-nums; }
@@ -151,12 +164,15 @@
   @media (pointer: coarse) {
     .sc-toggle::after { content: ''; position: absolute; inset: -12px -6px; }
   }
-  /* Móvil: logo | datos | precio arriba y las acciones bajo el precio. */
+  /* Móvil: logo | nombre | precio arriba; debajo, las etiquetas a todo el ancho y las
+     acciones en su propia línea, para que nada se monte encima de los botones. */
   @media (max-width: 479px) {
-    .sc-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; column-gap: 12px; row-gap: 4px; align-items: start; }
-    .sc-row > :global(.brandlogo) { grid-row: 1 / 3; margin-top: 2px; }
-    .sc-main { grid-column: 2; grid-row: 1 / 3; }
+    .sc-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; column-gap: 12px; row-gap: 6px; align-items: start; }
+    .sc-row > :global(.brandlogo) { grid-column: 1; grid-row: 1; margin-top: 2px; }
+    .sc-main { display: contents; }
+    .sc-name { grid-column: 2; grid-row: 1; padding-top: 4px; }
     .sc-price { grid-column: 3; grid-row: 1; }
-    .sc-acts { grid-column: 3; grid-row: 2; justify-self: end; }
+    .sc-meta { grid-column: 2 / -1; grid-row: 2; }
+    .sc-acts { grid-column: 2 / -1; grid-row: 3; justify-self: end; }
   }
 </style>

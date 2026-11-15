@@ -199,7 +199,7 @@
           {@const tone = pct >= 100 ? 'success' : st.tone}
           <a class="pcard" href={cardHref(r)}>
             <div class="pcard__top">
-              <span class="pcard__mono" style={`background:${monoColor(r.client_name || r.name || r.project_code)}`} aria-hidden="true">{initials(r.client_name || r.name)}</span>
+              <span class="pcard__mono" style={`background:${monoColor(r.client_id, r.client_name || r.name || r.project_code)}`} aria-hidden="true">{initials(r.client_name || r.name)}</span>
               <div class="pcard__hd">
                 <span class="pcard__id">{r.service_type ? serviceLabel(r.service_type) : 'Proyecto'}</span>
                 <span class="pcard__name">{r.name || 'Proyecto sin nombre'}</span>

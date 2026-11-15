@@ -212,7 +212,7 @@
     {#each rows as r (r.project_id)}
       <a class="bcard" href={href('briefs', [r.project_id], route.query)}>
         <div class="bcard__top">
-          <span class="avatar" style="background:{avatarColor(r.business_name)}" aria-hidden="true">{initials(r.business_name)}</span>
+          <span class="avatar" style="background:{avatarColor(r.project_id, r.business_name)}" aria-hidden="true">{initials(r.business_name)}</span>
           <div class="bcard__id">
             <span class="bcard__name">{r.business_name || 'Sin nombre de negocio'}</span>
             <span class="bcard__sub">{r.owner_name || r.email || r.phone || 'Sin contacto'}</span>

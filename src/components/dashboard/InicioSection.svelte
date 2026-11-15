@@ -21,6 +21,7 @@
   import Icon from './ui/Icon.svelte';
   import { data, loadHome, loadLeads, loadProjects } from './lib/store.svelte.js';
   import { fmtDate, fmtTime, hourInHouston } from './lib/dates.js';
+  import { entityColor, initials } from './lib/colors.js';
   import { href } from './lib/router.svelte.js';
   import { num, money, moneyFits, delta, monthShort, hasActivity, axisScale, leadStates, cumulative, activityLabel } from './lib/inicio.js';
 
@@ -171,12 +172,6 @@
     cancelled: { label: 'Cancelado', tone: 'neutral' },   // OP-23, MOCK-12
   };
   function projStatus(s) { return PROJECT_STATUS[s] || { label: 'Sin estado', tone: 'neutral' }; }
-  function initials(s) {
-    const parts = (s || '?').trim().split(/[\s—-]+/).filter(Boolean);
-    if (!parts.length) return '?';
-    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-    return (parts[0][0] + parts[1][0]).toUpperCase();
-  }
 
   // ── Leads recientes ──────────────────────────────────────────
   // Origen en texto neutro (fase 3, H-07): el color queda para el estado.
@@ -460,7 +455,7 @@
                 <a class="prow" class:is-out={fit && pi >= projFit} aria-hidden={fit && pi >= projFit ? 'true' : undefined} tabindex={fit && pi >= projFit ? -1 : undefined} href={href('progreso', [p.project_code || p.id])}>
                   <span class="prow__main">
                     <span class="prow__name"><Icon name="folder" size={16} /><span class="ellip">{p.name}</span></span>
-                    <span class="prow__client"><span class="mono-av" aria-hidden="true">{initials(p.client_name)}</span><span class="ellip">{p.client_name || 'Sin cliente'}</span></span>
+                    <span class="prow__client"><span class="mono-av" style="background:{entityColor(p.client_id, p.client_name)}" aria-hidden="true">{initials(p.client_name)}</span><span class="ellip">{p.client_name || 'Sin cliente'}</span></span>
                   </span>
                   {#if p.status === 'active'}
                     <span class="prow__prog" role="progressbar" aria-label="Avance" aria-valuemin="0" aria-valuemax="100" aria-valuenow={pct}>
@@ -541,7 +536,7 @@
               {@const detail = leadDetail(lead)}
               <li>
                 <a class="lrow" class:is-out={fit && li >= leadFit} aria-hidden={fit && li >= leadFit ? 'true' : undefined} tabindex={fit && li >= leadFit ? -1 : undefined} href={href('leads', [lead.ref_id])}>
-                  <span class="mono-av lg" aria-hidden="true">{initials(lead.name || lead.email || lead.ref_id)}</span>
+                  <span class="mono-av lg" style="background:{entityColor(lead.ref_id, lead.name || lead.email)}" aria-hidden="true">{initials(lead.name || lead.email || lead.ref_id)}</span>
                   <span class="lrow__main">
                     <span class="lrow__name">{leadTitle(lead)}</span>
                     {#if detail}<span class="lrow__detail">{detail}</span>{/if}
@@ -694,7 +689,7 @@
   .prow__name { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--fg-primary); }
   .prow__name :global(.ui-icon) { flex: 0 0 auto; color: var(--fg-subtle); }
   .prow__client { display: flex; align-items: center; gap: 6px; min-width: 0; padding-left: 24px; color: var(--fg-subtle); font-size: var(--dash-caption); }
-  .prow__client .mono-av { width: 20px; height: 20px; font-size: 10px; }
+  .prow__client .mono-av { width: 22px; height: 22px; font-size: 10px; }
   .prow__prog { display: flex; align-items: center; gap: 8px; }
   .prow__st { display: flex; }
   .prow__st :global(.ui-chip) { padding: 1px 8px; font-size: 11px; }
@@ -719,8 +714,8 @@
   .lrow__src { font-size: 11px; color: var(--fg-secondary); }
   .dim { color: var(--fg-subtle); white-space: nowrap; font-family: var(--font-mono); font-size: 11px; font-variant-numeric: tabular-nums; }
 
-  /* Monograma neutro (fase 3: sin colores aleatorios que compitan). */
-  .mono-av { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex: 0 0 auto; border-radius: 999px; background: #333; border: 1px solid var(--border-strong); color: var(--fg-secondary); font-size: 9px; font-weight: 600; line-height: 1; }
+  /* Monograma con el color propio de cada cliente o lead (pedido del dueño). */
+  .mono-av { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex: 0 0 auto; border-radius: 999px; color: #fff; font-size: 10px; font-weight: 700; line-height: 1; }
   .mono-av.lg { width: 26px; height: 26px; font-size: 10px; }
 
   /* ── Leads por estado (píldoras de la referencia) ── */

@@ -377,7 +377,7 @@
             <div class="subs__row" title={`${s.name} · ${money(s.amount_cents)}/${s.cycle === 'yearly' ? 'año' : 'mes'}`}>
               <BrandLogo name={s.name} size={18} />
               <span class="subs__name">{s.name}</span>
-              <span class="subs__amt">{moneyShort(s.amount_cents)}{s.cycle === 'yearly' ? '/año' : ''}</span>
+              <span class="subs__amt">{s.billing === 'variable' ? '≈' : ''}{moneyShort(s.amount_cents)}{s.cycle === 'yearly' ? '/año' : ''}</span>
             </div>
           {/each}
         </div>

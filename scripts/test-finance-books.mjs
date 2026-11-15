@@ -639,6 +639,46 @@ await check('ajustes: sociedad con socios que suman 100; nada de valores raros',
   assert.deepEqual(c('finance.sales_tax_tx', { registered: 1, local_rate: 99 }), { registered: true, local_rate: null });
 });
 
+await check('monto del cargo: precio de entrada, gratis y monto que varía', async () => {
+  const base = { amount_cents: '1999', billing: 'fixed' };
+  assert.deepEqual(rules.subscriptionChargeAmount(base, '2026-07-19'), { cents: 1999, estimate: false, intro: false });
+  const intro = { ...base, intro_amount_cents: '199', intro_until: '2026-07-19' };
+  assert.equal(rules.subscriptionChargeAmount(intro, '2026-06-19').cents, 199);        // primer mes rebajado
+  assert.equal(rules.subscriptionChargeAmount(intro, '2026-07-19').cents, 1999);       // desde el fin, precio normal
+  const free = { ...base, intro_amount_cents: '0', intro_until: '2026-03-01' };
+  assert.equal(rules.subscriptionChargeAmount(free, '2026-02-01').cents, 0);           // mes gratis: sin cargo
+  const vari = { amount_cents: '2000', billing: 'variable' };
+  assert.deepEqual(rules.subscriptionChargeAmount(vari, '2026-11-16', '5330'), { cents: 5330, estimate: true, intro: false });
+  assert.equal(rules.subscriptionChargeAmount(vari, '2026-11-16', null).cents, 2000);  // sin historial: el monto guardado
+});
+await check('cron: la que varía sale «por confirmar» con el último monto real; mes gratis sin cargo', async () => {
+  reset((t) => {
+    if (/FROM subscriptions/.test(t)) return { rows: [
+      { id: '3', name: 'Vercel Pro', category: 'hosting', amount_cents: '2000', cycle: 'monthly', next_charge_at: '2026-11-16', started_at: '2026-04-16', ended_at: null, billing: 'variable' },
+      { id: '4', name: 'Google AI Pro', category: 'software', amount_cents: '1999', cycle: 'monthly', next_charge_at: '2026-11-19', started_at: '2026-10-19', ended_at: null, billing: 'fixed', intro_amount_cents: '0', intro_until: '2026-11-19' },
+    ] };
+    if (/MAX\(spent_at\)/.test(t)) return { rows: [{ id: '3', last: '2026-10-16' }] };
+    if (/DISTINCT ON \(subscription_id\)/.test(t)) return { rows: [{ id: '3', cents: '5330' }] };
+    if (/INSERT INTO company_expenses/.test(t)) return { rows: [{ id: '1' }] };
+    return { rows: [] };
+  });
+  await books.generateSubscriptionCharges({ today: '2026-11-20' });
+  const ins = log.filter((e) => /INSERT INTO company_expenses/.test(e.text)).map((e) => e.params);
+  // Vercel: noviembre por confirmar con 53,30; Google: octubre gratis (sin cargo), noviembre a precio normal.
+  assert.deepEqual(ins.map((p) => [p[3], p[2], p[8]]), [['2026-11-16', 5330, 'pending'], ['2026-11-19', 1999, 'ok']]);
+  assert.match(ins[0][0], /monto por confirmar/);
+});
+await check('el cargo real de una suscripción sustituye a su estimado y lo suprime', async () => {
+  reset(() => ({ rows: [{ id: '9' }] }));
+  await exp.createExpense({ label: 'Vercel', amount_cents: 5330, spent_at: '2026-11-16', subscription_id: '3' });
+  const del = log.find((e) => /DELETE FROM company_expenses e/.test(e.text));
+  assert.ok(del, 'borra el estimado');
+  assert.match(del.text, /e.review_status = 'pending'/);
+  assert.match(del.text, /BETWEEN \$2::date - 20 AND \$2::date \+ 20/);
+  assert.match(del.text, /INSERT INTO finance_suppressed_refs/);
+  assert.deepEqual(del.params, ['3', '2026-11-16', '9']);
+});
+
 if (fails.length) {
   console.error(`✗ ${fails.length} prueba(s) de los libros fallaron:\n - ` + fails.join('\n - '));
   process.exit(1);

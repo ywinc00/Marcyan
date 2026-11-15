@@ -92,13 +92,15 @@
                 <span class="sc-name">{s.name}</span>
                 <span class="sc-meta">
                   {#if s.category}<StatusChip tone="neutral" label={categoryLabel(s.category)} />{/if}
-                  {#if !s.active}<span>Pausada</span>
+                  {#if s.billing === 'variable'}<StatusChip tone="neutral" label="Cambia cada mes" />{/if}
+                  {#if s.intro_until && s.active && String(s.intro_until).slice(0, 10) > new Date().toISOString().slice(0, 10)}<StatusChip tone="warning" label={`Precio de entrada hasta ${fmtDay(s.intro_until)}`} />{/if}
+                  {#if !s.active}<span>{s.ended_at ? `De baja desde ${fmtDay(s.ended_at)}` : 'Pausada'}</span>
                   {:else if s.next_charge_at}<span>Próximo cargo {fmtDay(s.next_charge_at)}{s.started_at ? `; la pagas desde ${fmtDay(s.started_at)}` : ''}</span>
                   {:else}<span>Sin fecha de cargo</span>{/if}
                 </span>
               </div>
               <div class="sc-price">
-                <span class="sc-amount">{formatUsd(s.amount_cents)}</span>
+                <span class="sc-amount">{s.billing === 'variable' ? '≈ ' : ''}{formatUsd(s.amount_cents)}</span>
                 <span class="sc-cycle">{CYCLE_LABELS[s.cycle] || s.cycle}</span>
               </div>
               <div class="sc-acts">

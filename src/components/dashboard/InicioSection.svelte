@@ -21,6 +21,7 @@
   import Icon from './ui/Icon.svelte';
   import { data, loadHome, loadLeads, loadProjects } from './lib/store.svelte.js';
   import { fmtDate, fmtTime, hourInHouston } from './lib/dates.js';
+  import { entityColor } from './lib/colors.js';
   import { href } from './lib/router.svelte.js';
   import { num, money, moneyFits, delta, monthShort, hasActivity, axisScale, leadStates, cumulative, activityLabel } from './lib/inicio.js';
 
@@ -460,7 +461,7 @@
                 <a class="prow" class:is-out={fit && pi >= projFit} aria-hidden={fit && pi >= projFit ? 'true' : undefined} tabindex={fit && pi >= projFit ? -1 : undefined} href={href('progreso', [p.project_code || p.id])}>
                   <span class="prow__main">
                     <span class="prow__name"><Icon name="folder" size={16} /><span class="ellip">{p.name}</span></span>
-                    <span class="prow__client"><span class="mono-av" aria-hidden="true">{initials(p.client_name)}</span><span class="ellip">{p.client_name || 'Sin cliente'}</span></span>
+                    <span class="prow__client"><span class="mono-av" style="background:{entityColor(p.client_name)}" aria-hidden="true">{initials(p.client_name)}</span><span class="ellip">{p.client_name || 'Sin cliente'}</span></span>
                   </span>
                   {#if p.status === 'active'}
                     <span class="prow__prog" role="progressbar" aria-label="Avance" aria-valuemin="0" aria-valuemax="100" aria-valuenow={pct}>
@@ -541,7 +542,7 @@
               {@const detail = leadDetail(lead)}
               <li>
                 <a class="lrow" class:is-out={fit && li >= leadFit} aria-hidden={fit && li >= leadFit ? 'true' : undefined} tabindex={fit && li >= leadFit ? -1 : undefined} href={href('leads', [lead.ref_id])}>
-                  <span class="mono-av lg" aria-hidden="true">{initials(lead.name || lead.email || lead.ref_id)}</span>
+                  <span class="mono-av lg" style="background:{entityColor(leadTitle(lead) + lead.ref_id)}" aria-hidden="true">{initials(lead.name || lead.email || lead.ref_id)}</span>
                   <span class="lrow__main">
                     <span class="lrow__name">{leadTitle(lead)}</span>
                     {#if detail}<span class="lrow__detail">{detail}</span>{/if}
@@ -719,8 +720,8 @@
   .lrow__src { font-size: 11px; color: var(--fg-secondary); }
   .dim { color: var(--fg-subtle); white-space: nowrap; font-family: var(--font-mono); font-size: 11px; font-variant-numeric: tabular-nums; }
 
-  /* Monograma neutro (fase 3: sin colores aleatorios que compitan). */
-  .mono-av { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex: 0 0 auto; border-radius: 999px; background: #333; border: 1px solid var(--border-strong); color: var(--fg-secondary); font-size: 9px; font-weight: 600; line-height: 1; }
+  /* Monograma con el color propio de cada cliente o lead (pedido del dueño). */
+  .mono-av { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; flex: 0 0 auto; border-radius: 999px; color: #fff; font-size: 9px; font-weight: 700; line-height: 1; }
   .mono-av.lg { width: 26px; height: 26px; font-size: 10px; }
 
   /* ── Leads por estado (píldoras de la referencia) ── */

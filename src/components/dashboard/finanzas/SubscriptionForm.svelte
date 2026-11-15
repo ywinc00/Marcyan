@@ -12,7 +12,11 @@
   let { open = $bindable(false), subscription = null, onsaved } = $props();
 
   const editing = $derived(!!subscription);
-  let form = $state({ name: '', category: '', amount: '', cycle: 'monthly', next_charge_at: '', notes: '', active: true, started_at: '' });
+  const EMPTY = { name: '', category: '', amount: '', cycle: 'monthly', next_charge_at: '', notes: '', active: true, started_at: '',
+    billing: 'fixed', intro: false, intro_amount: '', intro_until: '', ended_at: '' };
+  let form = $state({ ...EMPTY });
+  let introCents = $state(null);
+  let shownEnd = '';
   let shownStart = $state('');
   let cents = $state(null);
   let saving = $state(false);
@@ -29,9 +33,13 @@
     const s = subscription;
     shownCharge = s ? dayISO(s.next_charge_at) : '';
     shownStart = s && s.started_at ? dayISO(s.started_at) : '';
+    shownEnd = s && s.ended_at ? dayISO(s.ended_at) : '';
     form = s
-      ? { name: s.name || '', category: s.category || '', amount: centsToInput(s.amount_cents), cycle: s.cycle || 'monthly', next_charge_at: dayISO(s.next_charge_at), notes: s.notes || '', active: !!s.active, started_at: s.started_at ? dayISO(s.started_at) : '' }
-      : { name: '', category: '', amount: '', cycle: 'monthly', next_charge_at: '', notes: '', active: true, started_at: '' };
+      ? { name: s.name || '', category: s.category || '', amount: centsToInput(s.amount_cents), cycle: s.cycle || 'monthly', next_charge_at: dayISO(s.next_charge_at), notes: s.notes || '', active: !!s.active, started_at: s.started_at ? dayISO(s.started_at) : '',
+          billing: s.billing === 'variable' ? 'variable' : 'fixed',
+          intro: !!s.intro_until, intro_amount: s.intro_until ? (centsToInput(s.intro_amount_cents || 0) || '0') : '', intro_until: s.intro_until ? dayISO(s.intro_until) : '',
+          ended_at: shownEnd }
+      : { ...EMPTY };
   });
 
   async function submit(e) {
@@ -39,11 +47,17 @@
     tried = true; formError = '';
     if (!form.name.trim()) { formError = 'Escribe el nombre del servicio.'; return; }
     if (cents == null) { formError = 'Revisa el monto.'; return; }
+    if (form.intro && (introCents == null || !form.intro_until)) { formError = 'El precio de entrada lleva monto (0 si fue gratis) y hasta cuándo.'; return; }
     saving = true;
     const body = {
       name: form.name.trim(), amount_cents: cents, cycle: form.cycle,
-      notes: form.notes.trim() || null, active: form.active,
+      notes: form.notes.trim() || null, active: form.active, billing: form.billing,
     };
+    // Precio de entrada (meses gratis o rebajados): monto y hasta cuándo, o nada.
+    if (form.intro) { body.intro_amount_cents = introCents; body.intro_until = form.intro_until; }
+    else if (editing && subscription.intro_until) { body.intro_amount_cents = null; body.intro_until = null; }
+    // Baja: la fecha en que dejó de pagarse (la del fin del periodo pagado).
+    if (!form.active && form.ended_at && form.ended_at !== shownEnd) body.ended_at = form.ended_at;
     if (!editing || form.next_charge_at !== shownCharge) body.next_charge_at = form.next_charge_at || null;
     // Alta: desde cuándo se paga. Los cargos desde esa fecha se apuntan solos como
     // gasto en los meses abiertos (los cerrados no se tocan).
@@ -94,10 +108,32 @@
         {/snippet}
       </Field>
     </div>
+    <Field label="Cómo cobra" hint={form.billing === 'variable' ? 'Cada mes el cargo sale «por confirmar» con el último monto, y la factura real lo sustituye.' : 'El mismo monto cada vez.'}>
+      {#snippet children(f)}
+        <select class="ui-input" id={f.id} aria-describedby={f.describedby} bind:value={form.billing}>
+          <option value="fixed">Siempre lo mismo</option>
+          <option value="variable">Cambia cada mes (por uso, asientos…)</option>
+        </select>
+      {/snippet}
+    </Field>
+    <label class="sf-check"><input type="checkbox" bind:checked={form.intro} /> Empezó con meses gratis o a precio rebajado</label>
+    {#if form.intro}
+      <div class="sf-grid">
+        <MoneyInput label="Precio de entrada" bind:value={form.intro_amount} bind:cents={introCents} showErrors={tried} allowZero />
+        <Field label="Hasta" hint="El primer cargo a precio normal.">
+          {#snippet children(f)}<input class="ui-input" id={f.id} type="date" aria-describedby={f.describedby} bind:value={form.intro_until} />{/snippet}
+        </Field>
+      </div>
+    {/if}
     <Field label="Notas" hint="Opcional.">
       {#snippet children(f)}<input class="ui-input" id={f.id} type="text" maxlength="1000" placeholder="Plan Pro" aria-describedby={f.describedby} bind:value={form.notes} />{/snippet}
     </Field>
     <label class="sf-check"><input type="checkbox" bind:checked={form.active} /> Activa (cuenta en el gasto mensual)</label>
+    {#if !form.active}
+      <Field label="Dada de baja el" hint="El último día pagado. Desde ahí no se apuntan más cargos; si la reactivas, empieza de nuevo.">
+        {#snippet children(f)}<input class="ui-input" id={f.id} type="date" aria-describedby={f.describedby} bind:value={form.ended_at} />{/snippet}
+      </Field>
+    {/if}
     {#if formError}<p class="sf-err" role="alert">{formError}</p>{/if}
   </form>
   {#snippet footer()}

@@ -37,6 +37,9 @@ export default async function handler(req, res) {
         notes: body.notes,
         started_at: body.started_at,
         account_id: body.account_id,
+        billing: body.billing,
+        intro_amount_cents: body.intro_amount_cents,
+        intro_until: body.intro_until,
       });
       return res.status(201).json({ ok: true, subscription });
     } catch (err) {

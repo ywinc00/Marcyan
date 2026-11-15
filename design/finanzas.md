@@ -3,7 +3,9 @@ Proyecto: Marcyan Web    Página/Vista: Orbit › Finanzas (libros listos para i
 Modo: REDISEÑO/IDENTIDAD dentro de la gramática Orbit (design/orbit.md, VALIDADO 2026-10-19)
 Plan: _cerebro/marcyan-web/encargos/2026-11-14-plan-panel-finanzas.md (fase 1)
 Bocetos: design/finanzas/bocetos.html (tres direcciones, baja fidelidad, cifras de ejemplo)
-Estado: PROPUESTO, el dueño elige dirección sobre los bocetos. Fecha: 2026-11-14
+Estado: VALIDADO por: el dueño, 2026-11-14 («la A como portada, la C como Impuestos»), con una
+        condición suya: se mantiene arriba el resumen de hoy (Cobrado del mes, Por cobrar, Vencido,
+        Gastos del mes, Neto), mejorado si se puede. Visual: OK sobre el render antes de mergear.
 ```
 
 ## Inventario de marca conservada
@@ -39,6 +41,9 @@ Orbit: título 26-28/600, título de tarjeta 15-17/600, cuerpo 14/400, caption 1
 mayúsculas solo en cabeceras de tabla, cifra destacada 26-30/650.
 
 ## 3. Intención por sección (pestañas)
+- **Resumen fijo arriba (condición del dueño)**: los cinco KPI de hoy, por encima de las pestañas,
+  en todas ellas. Mejoras: el neto ya resta comisiones y cuenta los cargos reales de suscripciones;
+  «Gastos (mes)» dice cuántos cargos automáticos lleva y que lo importado sin revisar no cuenta.
 - **Portada** (la que elija el dueño: A libro del año, B cierre, C declaración). Trabajo: «¿cómo va el
   año y qué tengo que hacer?». Teléfono: lo pendiente primero, luego los meses como lista, y la acción
   al alcance del pulgar.

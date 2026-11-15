@@ -27,6 +27,8 @@
   import NewClientDialog from './crm/NewClientDialog.svelte';
   import ExpensesCard from './finanzas/ExpensesCard.svelte';
   import SubscriptionsCard from './finanzas/SubscriptionsCard.svelte';
+  import YearBook from './finanzas/YearBook.svelte';
+  import TaxSheet from './finanzas/TaxSheet.svelte';
 
   import { api, errorMessage, isSessionError } from './lib/api.js';
   import { route, href, setQuery, navigate } from './lib/router.svelte.js';
@@ -41,6 +43,29 @@
 
   // ── Ruta ──────────────────────────────────────────────────────
   const detailRef = $derived(route.sub[0] === 'facturas' && route.sub[1] ? route.sub[1] : '');
+  // Pestañas (design/finanzas.md, OK del dueño 2026-11-14): Año es la portada;
+  // Impuestos es la hoja del contador. El resumen de arriba se queda en todas.
+  const TABS = [
+    { id: '', label: 'Año' },
+    { id: 'facturas', label: 'Facturas' },
+    { id: 'movimientos', label: 'Movimientos' },
+    { id: 'impuestos', label: 'Impuestos' },
+    { id: 'registros', label: 'Registros' },
+  ];
+  // Enlaces viejos (#/finanzas?estado=vencida) siguen llevando a Facturas, y los
+  // avisos del cierre (#/finanzas/cierre/AAAA-MM) abren ese mes en el Año.
+  const tab = $derived.by(() => {
+    const s = route.sub[0] || '';
+    if (s === 'cierre') return '';
+    if (TABS.some((t) => t.id === s)) return s;
+    if (!s && ['estado', 'q', 'pag', 'proyecto'].some((k) => route.query[k])) return 'facturas';
+    return '';
+  });
+  $effect(() => {
+    if (route.sub[0] === 'cierre' && /^\d{4}-\d{2}$/.test(route.sub[1] || '')) navigate('finanzas', [], { mes: route.sub[1] }, { replace: true });
+  });
+  let pendingMonth = $state('');
+  function goTab(id) { navigate('finanzas', id ? [id] : [], {}); }
   const filter = $derived(STATUS_FILTERS.find((f) => f.id === (route.query.estado || '')) || STATUS_FILTERS[0]);
   const search = $derived((route.query.q || '').slice(0, 200));
   const page = $derived(Math.max(1, parseInt(route.query.pag, 10) || 1));
@@ -49,7 +74,7 @@
   const projectFilter = $derived(/^\d{1,12}$/.test(route.query.proyecto || '') ? route.query.proyecto : '');
   // La lista vuelve con sus filtros (la ficha conserva la query del hash).
   const listQuery = $derived(Object.fromEntries(Object.entries(route.query).filter(([k]) => ['estado', 'q', 'pag', 'mes', 'cat', 'proyecto'].includes(k))));
-  const backHref = $derived(href('finanzas', [], listQuery));
+  const backHref = $derived(href('finanzas', ['facturas'], listQuery));
 
   // ── Resumen ───────────────────────────────────────────────────
   let summary = $state(null);
@@ -105,7 +130,7 @@
   }
 
   // Lista y resumen se recargan al entrar en la vista o al cambiar filtros.
-  $effect(() => { if (!detailRef) { filter; search; page; projectFilter; loadInvoices(); } });
+  $effect(() => { if (!detailRef && tab === 'facturas') { filter; search; page; projectFilter; loadInvoices(); } });
   $effect(() => { if (!detailRef) loadSummary(); });
   // El buscador refleja la URL (al llegar por enlace o con Atrás). Solo copia
   // si de verdad cambió: la URL guarda el texto recortado y, si se copiara
@@ -135,7 +160,7 @@
   function invoiceCreated(inv) {
     navigate('finanzas', ['facturas', inv.invoice_number], listQuery);
   }
-  async function afterChange() { await Promise.all([loadInvoices(), loadSummary()]); }
+  async function afterChange() { await Promise.all([tab === 'facturas' ? loadInvoices() : null, loadSummary()]); }
   function refreshAll() { afterChange(); refreshShell(); expensesCard?.load(); }
   let expensesCard = $state(null);
 
@@ -152,12 +177,17 @@
 
 <div class="fin">
 {#if detailRef}
-  <InvoiceDetail ref={detailRef} {backHref} onclose={() => navigate('finanzas', [], listQuery)} />
+  <InvoiceDetail ref={detailRef} {backHref} onclose={() => navigate('finanzas', ['facturas'], listQuery)} />
 {:else}
   <PageHeader title="Finanzas" subtitle="Lo que entra, lo que se debe y lo que sale.">
     {#snippet actions()}
       <button type="button" class="b" onclick={refreshAll} disabled={summaryLoading || invLoading}><Icon name="refresh" size={16} />Actualizar</button>
-      <button type="button" class="b b--primary" onclick={() => (invoiceFormOpen = true)}>Nueva factura</button>
+      {#if tab === '' && pendingMonth}
+        <button type="button" class="b" onclick={() => (invoiceFormOpen = true)}>Nueva factura</button>
+        <a class="b b--primary" href={href('finanzas', [], { mes: pendingMonth })}>Revisar {monthLong(pendingMonth).split(' ')[0]}</a>
+      {:else}
+        <button type="button" class="b b--primary" onclick={() => (invoiceFormOpen = true)}>Nueva factura</button>
+      {/if}
     {/snippet}
   </PageHeader>
 
@@ -171,7 +201,7 @@
           <span class:fin-up={collectedDelta >= 0} class:fin-down={collectedDelta < 0}>{collectedDelta >= 0 ? '+' : ''}{collectedDelta}%</span> vs el mismo tramo de {prevMonthName}
         {:else}Pagos recibidos este mes{/if}
       </Kpi>
-      <Kpi label="Por cobrar" art="invoice" tone={summary && summary.ar_total_cents > 0 ? 'accent' : ''} href={href('finanzas', [], { estado: 'abiertas' })}
+      <Kpi label="Por cobrar" art="invoice" tone={summary && summary.ar_total_cents > 0 ? 'accent' : ''} href={href('finanzas', ['facturas'], { estado: 'abiertas' })}
         value={summary ? fmtUsd0(summary.ar_total_cents) : '…'}>
         {#if summary && !summary.counts.open_invoices}Ninguna factura abierta{#if summary.draft_count}{` (${summary.draft_count} en borrador, aparte)`}{/if}
         {:else if summary}
@@ -179,19 +209,38 @@
         {:else}Saldo de las facturas abiertas{/if}
       </Kpi>
       <Kpi label="Vencido" art="alert" tone={summary && summary.overdue_cents > 0 ? 'error' : ''}
-        href={href('finanzas', [], { estado: 'vencida' })} value={summary ? fmtUsd0(summary.overdue_cents) : '…'}>
+        href={href('finanzas', ['facturas'], { estado: 'vencida' })} value={summary ? fmtUsd0(summary.overdue_cents) : '…'}>
         {#if summary && summary.overdue_count > 0}
           {summary.overdue_count} factura{summary.overdue_count === 1 ? '' : 's'} pasada{summary.overdue_count === 1 ? '' : 's'} de fecha con saldo
         {:else}Ninguna factura pasada de fecha{/if}
       </Kpi>
       <Kpi label="Gastos (mes)" art="card" value={summary ? fmtUsd0(summary.expenses_this_month_cents) : '…'}>
-        {#if summary}Con los cargos de las suscripciones, que se apuntan solos{:else}Gastos del mes{/if}
+        {#if summary}
+          {summary.subscription_charges_this_month ? `Con ${summary.subscription_charges_this_month} cargo${summary.subscription_charges_this_month === 1 ? '' : 's'} de suscripciones` : 'Gastos apuntados este mes'}{#if summary.expenses_pending_this_month}{`; ${summary.expenses_pending_this_month} importado${summary.expenses_pending_this_month === 1 ? '' : 's'} sin revisar aún no cuenta${summary.expenses_pending_this_month === 1 ? '' : 'n'}`}{/if}
+        {:else}Gastos del mes{/if}
       </Kpi>
       <Kpi label="Neto (mes)" art="chart-up" tone={summary && net !== 0 ? (net > 0 ? 'data' : 'error') : ''} value={summary ? fmtUsd0(net) : '…'}
         note="Cobrado menos comisiones y gastos del mes" />
     </KpiGrid>
   {/if}
 
+  <!-- ═══ Pestañas: en el teléfono, un selector con las mismas opciones ═══ -->
+  <nav class="fin-tabs" aria-label="Partes de Finanzas">
+    {#each TABS as t (t.id)}
+      <a class="fin-tab" href={href('finanzas', t.id ? [t.id] : [], {})} aria-current={tab === t.id ? 'page' : undefined}>{t.label}</a>
+    {/each}
+  </nav>
+  <label class="fin-tabsel">
+    <span class="sr-only">Parte de Finanzas</span>
+    <select class="ui-input" value={tab} onchange={(e) => goTab(e.currentTarget.value)}>
+      {#each TABS as t (t.id)}<option value={t.id}>{t.label}</option>{/each}
+    </select>
+  </label>
+
+  {#if tab === ''}
+  <div class="fin-block">
+    <YearBook bind:pendingMonth onchanged={loadSummary} />
+  </div>
   <div class="fin-block">
     {#if summary}
       <RevenueChart revenue={summary.revenue_by_month || []} delta={collectedDelta} prevLabel={prevMonthName} />
@@ -199,7 +248,9 @@
       <LoadingState loading={true} rows={1} height={346} label="Cargando el gráfico…" />
     {/if}
   </div>
-
+  {:else if tab === 'impuestos'}
+  <div class="fin-block"><TaxSheet /></div>
+  {:else if tab === 'facturas'}
   <!-- ═══ Facturas ═══ -->
   <div class="fin-block">
     <Card title="Facturas">
@@ -291,11 +342,15 @@
     </Card>
   </div>
 
-  <!-- ═══ Egresos ═══ -->
-  <div class="fin-egresos">
+  {:else if tab === 'movimientos'}
+  <div class="fin-block">
     <ExpensesCard bind:this={expensesCard} onchanged={loadSummary} />
+  </div>
+  {:else if tab === 'registros'}
+  <div class="fin-block">
     <SubscriptionsCard onchanged={loadSummary} />
   </div>
+  {/if}
 
   <InvoiceForm bind:open={invoiceFormOpen} onsaved={invoiceCreated} />
   <PaymentForm bind:open={payOpen} invoice={payInvoice} onsaved={afterChange} />
@@ -361,9 +416,19 @@
   .fin-pager__txt { font-size: var(--dash-small); color: var(--fg-subtle); }
   .fin-pager__btns { display: inline-flex; gap: 6px; }
 
-  .fin-egresos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; margin-bottom: var(--space-6); }
-
-  @media (max-width: 1099px) { .fin-egresos { grid-template-columns: 1fr; } }
+  /* Pestañas: subrayado blanco de 2 px en la activa (no naranja: H-07). */
+  .fin-tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--border); margin: 0 0 var(--space-5); }
+  .fin-tab { position: relative; padding: 10px 0 11px; color: var(--fg-subtle); text-decoration: none; font-size: var(--dash-body); }
+  .fin-tab:hover { color: var(--fg-primary); }
+  .fin-tab[aria-current='page'] { color: var(--fg-primary); }
+  .fin-tab[aria-current='page']::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--fg-primary); border-radius: 2px; }
+  .fin-tab:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; border-radius: 4px; }
+  .fin-tabsel { display: none; margin: 0 0 var(--space-4); }
+  @media (max-width: 719px) {
+    .fin-tabs { display: none; }
+    .fin-tabsel { display: block; }
+    .fin-tabsel .ui-input { min-height: 44px; }
+  }
   /* Móvil estrecho: las cifras de dinero necesitan el ancho entero (en dos
      columnas "$2,300" se cortaba en "$2,3…"). Solo en esta sección. */
   @media (max-width: 479px) {

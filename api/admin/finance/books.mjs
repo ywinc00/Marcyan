@@ -1,6 +1,7 @@
 // /api/admin/finance/books — libros de Finanzas (fase 1, migración 025)
 //   GET ?view=year&year=2026          → historial mes a mes del año + año a año
 //   GET ?view=schedule-c&year=2026    → resumen por línea del Schedule C
+//   GET ?view=line&year=2026&line=8   → movimientos de esa línea
 //   GET ?view=1099&year=2026          → contratistas y lista de 1099
 //   GET ?view=tax&year=2026           → hoja del trimestral y calendario
 //   GET ?view=close&month=2026-10     → checklist del cierre de ese mes
@@ -16,7 +17,7 @@ import { rowsToCsv, sendCsv } from '../../../lib/csv.mjs';
 import {
   BooksError, booksYear, booksYears, scheduleCSummary, contractors1099, estimatedTax,
   monthChecklist, closeMonth, reopenMonth, ledgerRows, getFinanceSettings, setFinanceSetting,
-  generateSubscriptionCharges,
+  generateSubscriptionCharges, scheduleCLine,
 } from '../../../lib/finance-books.mjs';
 
 const EXPORT_HEADERS = {
@@ -48,6 +49,7 @@ export default async function handler(req, res) {
       if (year === null) return res.status(400).json({ ok: false, error: 'Año no válido.' });
       if (view === 'year') return res.status(200).json({ ok: true, book: await booksYear(year), years: await booksYears() });
       if (view === 'schedule-c') return res.status(200).json({ ok: true, summary: await scheduleCSummary(year) });
+      if (view === 'line') return res.status(200).json({ ok: true, ...(await scheduleCLine(year, q.line)) });
       if (view === '1099') return res.status(200).json({ ok: true, list: await contractors1099(year) });
       if (view === 'tax') return res.status(200).json({ ok: true, tax: await estimatedTax(year) });
       if (view === 'close') return res.status(200).json({ ok: true, checklist: await monthChecklist(String(q.month || '')) });

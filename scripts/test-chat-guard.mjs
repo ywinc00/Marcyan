@@ -451,14 +451,14 @@ check('calc: válido → ok:true con mensual y anual = mensual*12', () => {
 
 // ── v7.2: PARIDAD de fórmulas (módulo == fórmula inline de ToolsHub) ──
 const toolsHubCalls = (cw, m, tk, cl) => Math.round(cw * 4.33 * (m / 100) * tk * (cl / 100));
-const toolsHubAppt = (aw, ns, av) => Math.round(aw * 4.33 * (ns / 100) * av * 0.4);
+const toolsHubAppt = (aw, ns, av) => Math.round(aw * 4.33 * (ns / 100) * av);
 check('paridad calls: golden 2273 (25/20/350/30)', () => {
   assert.equal(computeMissedCalls({ llamadas_semana: 25, pct_sin_contestar: 20, ticket: 350, tasa_cierre: 30 }).monthly, 2273);
   assert.equal(2273, toolsHubCalls(25, 20, 350, 30));
 });
-check('paridad appt: golden 675 (40/15/65)', () => {
-  assert.equal(computeNoShows({ citas_semana: 40, pct_no_show: 15, valor_cita: 65 }).monthly, 675);
-  assert.equal(675, toolsHubAppt(40, 15, 65));
+check('paridad appt: golden 1689 (40/15/65)', () => {
+  assert.equal(computeNoShows({ citas_semana: 40, pct_no_show: 15, valor_cita: 65 }).monthly, 1689);
+  assert.equal(1689, toolsHubAppt(40, 15, 65));
 });
 check('paridad calls: 2º set (10/50/400/30) == ToolsHub', () => {
   assert.equal(computeMissedCalls({ llamadas_semana: 10, pct_sin_contestar: 50, ticket: 400, tasa_cierre: 30 }).monthly, toolsHubCalls(10, 50, 400, 30));

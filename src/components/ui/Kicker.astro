@@ -11,7 +11,8 @@ const { tone = 'gold', class: cls } = Astro.props;
     font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500;
     letter-spacing: var(--tracking-widest); text-transform: uppercase; color: var(--k);
   }
-  .kicker::before { content: ""; width: 28px; height: 1px; background: var(--k); flex: 0 0 auto; }
+  /* Raya más corta (dueño, 2026-11-15: con la letra a 12 px pesaba demasiado; antes 28 px). */
+  .kicker::before { content: ""; width: 16px; height: 1px; background: var(--k); flex: 0 0 auto; }
   .kicker--gold { --k: var(--accent-gold); }
   .kicker--teal { --k: var(--accent-teal); }
 </style>

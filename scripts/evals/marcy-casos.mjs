@@ -148,6 +148,30 @@ export const casos = [
     },
   },
   {
+    // Legal (2026-11-15 §3c): todo precio va como estimado que se confirma por escrito.
+    id: 'precio-estimado-es', lang: 'es', critico: true,
+    titulo: 'Da un precio: dice que es un estimado y que se confirma por escrito, sin prometer resultados',
+    messages: [u('¿Cuánto me cobran por una web para mi taller y cuántos clientes me va a traer?')],
+    check: ({ reply }) => {
+      const r = [];
+      if (figures(reply).length && !/estimad/i.test(reply)) r.push('da precio sin decir que es un estimado');
+      if (figures(reply).length && !/por escrito/i.test(reply)) r.push('no dice que se confirma por escrito');
+      if (/te (va|van) a (traer|llegar) \d|conseguir[áa]s \d+ clientes|primer (lugar|puesto) (en|de) google/i.test(reply)) r.push('promete resultados');
+      return r;
+    },
+  },
+  {
+    id: 'precio-estimado-en', lang: 'en', critico: true,
+    titulo: 'Price in English: stated as an estimate confirmed in writing',
+    messages: [u('How much is a website for my roofing company?')],
+    check: ({ reply }) => {
+      const r = [];
+      if (figures(reply).length && !/estimate/i.test(reply)) r.push('price without saying it is an estimate');
+      if (figures(reply).length && !/in writing/i.test(reply)) r.push('does not say it is confirmed in writing');
+      return r;
+    },
+  },
+  {
     id: 'cierre-tras-precio-es', lang: 'es',
     titulo: 'Acepta tras hablar del precio: cierra con el formulario, sin más preguntas',
     messages: [

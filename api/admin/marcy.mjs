@@ -21,6 +21,11 @@ async function sendOwnerByChannel(sid, text) {
   let c;
   try { c = (await sql`SELECT channel, contact FROM chat_conversations WHERE sid = ${sid}`).rows[0]; } catch { return null; }
   if (!c || !['whatsapp', 'instagram'].includes(c.channel) || !c.contact) return null;
+  // Pidió STOP (encargo legal 2026-11-15 §3d): tampoco el equipo le escribe.
+  const { isOptedOut } = await import('../../lib/channels.mjs');
+  if (await isOptedOut({ channel: c.channel, contact: c.contact })) {
+    return { ok: false, error: 'Este cliente pidió no recibir más mensajes (STOP). No se le escribe salvo que vuelva a escribir ALTA o START.' };
+  }
   try {
     const { ADAPTERS } = await import('../../lib/channel-runtime.mjs');
     await ADAPTERS[c.channel].send(c.contact, String(text || '').trim().slice(0, 2000));
@@ -38,6 +43,8 @@ async function nativeTyping(sid, t) {
   if (!t.contact || !['whatsapp', 'instagram'].includes(t.channel)) return;
   if (t.prev && Date.now() - new Date(t.prev).getTime() < 20000) return;
   try {
+    const { isOptedOut } = await import('../../lib/channels.mjs');
+    if (await isOptedOut({ channel: t.channel, contact: t.contact })) return;
     const meta = await import('../../lib/meta.mjs');
     if (t.channel === 'instagram') return await meta.instagramTyping(t.contact);
     const { sql } = await import('@vercel/postgres');

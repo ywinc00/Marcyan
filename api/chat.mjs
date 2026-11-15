@@ -28,7 +28,7 @@
 //     límite de gasto mensual en la consola de Anthropic.
 // ════════════════════════════════════════════════════════════════
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL, QUOTE_TOOL, historyFigures, blockedFigures } from '../lib/chat-kb.mjs';
+import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, estimateNote, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL, QUOTE_TOOL, historyFigures, blockedFigures } from '../lib/chat-kb.mjs';
 import { quote } from '../lib/quote-rules.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 // SSRF + descarga endurecida (SIN Postgres) y motor determinista del diagnóstico.
@@ -762,6 +762,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
     const beforePrice = reply;
     reply = pricePostFilter(reply, lang, extraAllow);          // cifras fuera del allowlist (+ las computadas)
     const fallback = !text || reply !== beforePrice;
+    if (!fallback) reply = estimateNote(reply, lang, extraAllow); // todo precio, como estimado (legal §3c)
 
     // Coste y caché del turno (P2): una línea en el registro y su suma en la fila del día.
     const usage = sumUsage(finalResp === r1 ? [r1] : [r1, ...extraResps, finalResp]);

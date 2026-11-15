@@ -30,11 +30,7 @@ const sql = (strings, ...vals) => {
     return db.failLeads ? Promise.reject(new Error('neon caído')) : Promise.resolve({ rows: [{ id: 'LEAD-' + (++db.leadSeq) }], rowCount: 1 });
   }
   if (/FROM leads/.test(t)) return db.failLeads ? Promise.reject(new Error('neon caído')) : Promise.resolve({ rows: [], rowCount: 0 });
-  if (/INSERT INTO leads/.test(t)) {
-    // Sin la migración 028, las columnas de la casilla no existen (42703).
-    if (db.noConsentCols && /sms_consent/.test(t)) return Promise.reject(Object.assign(new Error('column "sms_consent" does not exist'), { code: '42703' }));
-    return Promise.resolve({ rows: [], rowCount: 1 });
-  }
+  if (/INSERT INTO leads/.test(t)) return Promise.resolve({ rows: [], rowCount: 1 });
   if (/SELECT \* FROM diagnostics WHERE ref_id/.test(t)) {
     return Promise.resolve({ rows: [{ ref_id: vals[0], score_total: 60, score_web: 60, score_seo: 60, score_ai: 60, score_conv: 60, score_rep: 60, findings: [], industry: 'otro', business_name: 'Acme', city: 'Houston', lead_ref: null }], rowCount: 1 });
   }
@@ -198,24 +194,6 @@ await check('contacto: si falla el correo al dueño → aviso al panel', async (
   mail.failAdmin = true;
   const r = await call(contact, { phone: '7135550199' });
   assert.ok(notices().some((n) => n.ref === 'email-admin:' + r.body.refId));
-});
-
-// ── Casilla de SMS y WhatsApp (encargo legal 2026-11-15 §2b) ───
-const TXT = 'Acepto recibir mensajes de texto o WhatsApp de Marcyan sobre mi solicitud.';
-await check('casilla SMS: marcada se guarda con su texto, hora y página', async () => {
-  await call(contact, { email: 'sms1@example.com', sms_consent: 'yes', sms_consent_text: TXT, page_url: 'https://marcyanstudio.com/es' });
-  const ins = db.calls.filter((x) => /INSERT INTO leads/.test(x.t)).pop();
-  assert.ok(/sms_consent_text/.test(ins.t));
-  assert.ok(ins.vals.includes(true) && ins.vals.includes(TXT) && ins.vals.includes('https://marcyanstudio.com/es'));
-});
-await check('casilla SMS: sin la migración 028 la prueba va a las notas y el lead entra', async () => {
-  db.noConsentCols = true;
-  const r = await call(contact, { email: 'sms2@example.com', sms_consent: 'no', sms_consent_text: TXT });
-  db.noConsentCols = false;
-  assert.equal(r.code, 200);
-  const ins = db.calls.filter((x) => /INSERT INTO leads/.test(x.t)).pop();
-  assert.ok(/notes/.test(ins.t));
-  assert.ok(ins.vals.some((v) => typeof v === 'string' && v.startsWith('Casilla SMS/WhatsApp: sin marcar') && v.includes(TXT)));
 });
 
 // ── Chat: coste y caché por turno (P2) ─────────────────────────

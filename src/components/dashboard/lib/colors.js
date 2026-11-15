@@ -4,7 +4,8 @@
 // naranja de la marca y todos pasan 4,5:1 con la inicial en blanco.
 // Una sola fuente para todas las vistas: el mismo lead o cliente sale igual en Inicio,
 // Leads, Clientes, Progreso y Briefs.
-export const ENTITY_PALETTE = ['#5b5bd6', '#15803d', '#db2777', '#0369a1', '#4d7c0f', '#7c3aed', '#0f766e', '#e11d48'];
+// Orden: índigo, verde, rosa, azul, carmín, verde azulado, violeta, oliva (los dos verdes, lo más lejos posible).
+export const ENTITY_PALETTE = ['#5b5bd6', '#15803d', '#db2777', '#0369a1', '#e11d48', '#0f766e', '#7c3aed', '#4d7c0f'];
 
 /**
  * Color de una entidad. Va por su número fijo (id, o el número final de su código,

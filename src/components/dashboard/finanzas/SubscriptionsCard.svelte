@@ -37,6 +37,12 @@
   const hasYearly = $derived(subs.some((s) => s.active && s.cycle === 'yearly'));
 
   async function changed() { await refreshShell(); onchanged?.(); }
+  // «Hasta» enseña el último día a precio de entrada; lo guardado es el primero a precio normal.
+  function dayBefore(v) {
+    const d = new Date(String(v).slice(0, 10) + 'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate() - 1);
+    return d.toISOString().slice(0, 10);
+  }
 
   async function toggle(sub) {
     const next = !sub.active;
@@ -93,7 +99,7 @@
                 <span class="sc-meta">
                   {#if s.category}<StatusChip tone="neutral" label={categoryLabel(s.category)} />{/if}
                   {#if s.billing === 'variable'}<span class="sc-var">Cambia cada mes</span>{/if}
-                  {#if s.intro_until && s.active && String(s.intro_until).slice(0, 10) > new Date().toISOString().slice(0, 10)}<StatusChip tone="warning" label={`${Number(s.intro_amount_cents || 0) === 0 ? 'Gratis' : formatUsd(s.intro_amount_cents)} hasta ${fmtDay(s.intro_until)}`} />{/if}
+                  {#if s.intro_until && s.active && String(s.intro_until).slice(0, 10) > new Date().toISOString().slice(0, 10)}<StatusChip tone="warning" label={`${Number(s.intro_amount_cents || 0) === 0 ? 'Gratis' : formatUsd(s.intro_amount_cents)} hasta ${fmtDay(dayBefore(s.intro_until))}`} />{/if}
                   {#if !s.active}<span>{s.ended_at ? `De baja desde ${fmtDay(s.ended_at)}` : 'Pausada'}</span>
                   {:else if s.next_charge_at}<span>Próximo cargo {fmtDay(s.next_charge_at)}{s.started_at ? `; la pagas desde ${fmtDay(s.started_at)}` : ''}</span>
                   {:else}<span>Sin fecha de cargo</span>{/if}

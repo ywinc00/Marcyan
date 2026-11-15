@@ -100,6 +100,9 @@
       <Field label="La pagas desde" hint="Cada cargo desde esa fecha cuenta como gasto del mes.">
         {#snippet children(f)}<input class="ui-input" id={f.id} type="date" aria-describedby={f.describedby} bind:value={form.started_at} />{/snippet}
       </Field>
+    </div>
+    <!-- Categoría y Cómo cobra siempre juntas, aunque se oculte «Próximo cargo». -->
+    <div class="sf-grid">
       <Field label="Categoría">
         {#snippet children(f)}
           <select class="ui-input" id={f.id} bind:value={form.category}>

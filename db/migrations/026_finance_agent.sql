@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS finance_agent_runs (
   note            TEXT
 );
 CREATE INDEX IF NOT EXISTS finance_agent_runs_started_idx ON finance_agent_runs (started_at DESC);
+-- Una sola pasada en marcha a la vez (cron y «Revisar ahora» no se pisan).
+CREATE UNIQUE INDEX IF NOT EXISTS finance_agent_runs_one_running ON finance_agent_runs ((TRUE)) WHERE status = 'running';
 
 -- ── Lo que el agente propone. Solo el dueño lo aplica o lo descarta.
 --    target_ref: a qué se refiere (mail:12, exp:40, inc:7, close:2026-10…). Una sola

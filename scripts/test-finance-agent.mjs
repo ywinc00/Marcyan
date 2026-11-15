@@ -155,9 +155,9 @@ const world = (o = {}) => (text, params) => {
   if (/FROM finance_agent_runs WHERE status = 'running'/.test(text)) return { rows: [] };
   if (/SUM\(cost_micro_usd\)/.test(text)) return { rows: [{ micro: o.spent || 0 }] };
   if (/COUNT\(\*\)::int AS n FROM finance_agent_runs/.test(text)) return { rows: [{ n: o.manualToday || 0 }] };
-  if (/INSERT INTO finance_agent_runs/.test(text)) return { rows: [{ id: 7 }] };
+  if (/INSERT INTO finance_agent_runs/.test(text)) return { rows: o.busy ? [] : [{ id: 7 }] };
   if (/FROM mail_items mi/.test(text)) return { rows: [{ id: 5, received_at: '2026-11-13T15:00:00Z', from_email: 'billing@vercel.com', subject: 'Your receipt from Vercel', summary: 'Recibo de Vercel por 20 USD' }] };
-  if (/FROM company_expenses e LEFT JOIN finance_accounts/.test(text)) return { rows: [{ id: 40, label: 'GOOGLE *WORKSPACE', vendor: null, category: null, amount_cents: 1400, spent_at: '2026-11-02', account_name: 'Tarjeta', subscription_matches: null }] };
+  if (/FROM company_expenses e LEFT JOIN finance_accounts/.test(text)) return { rows: [{ id: 40, label: 'GOOGLE *WORKSPACE', vendor: null, category: null, amount_cents: 1400, spent_at: '2026-11-02', account_name: 'Tarjeta', subscription_matches: [{ id: 90, subscription_id: 3, name: 'Google Workspace', date: '2026-11-01' }] }] };
   if (/FROM income_entries n/.test(text)) return { rows: [] };
   if (/FROM subscriptions/.test(text)) return { rows: [{ id: 3, name: 'Google Workspace', amount_cents: 1400, cycle: 'monthly', category: 'software' }] };
   if (/FROM finance_accounts WHERE/.test(text)) return { rows: [{ id: 1, name: 'Tarjeta', kind: 'card' }] };
@@ -247,12 +247,72 @@ await check('si la IA falla, la pasada queda como fallida y no rompe el cron', a
   const out = await A.runAgent({ trigger: 'cron', today: '2026-11-14', client: c });
   assert.equal(out.status, 'failed');
   assert.equal(sent(/UPDATE finance_agent_runs SET status/).at(-1).params[1], 'failed');
+  assert.match(notices.at(-1).title, /no pudo revisar/);
+});
+await check('una pasada en marcha: la segunda no arranca (índice único)', async () => {
+  reset(world({ busy: true }));
+  const { c, calls } = fakeClient([]);
+  assert.equal((await A.runAgent({ trigger: 'cron', today: '2026-11-14', client: c })).status, 'skipped');
+  await assert.rejects(A.runAgent({ trigger: 'manual', today: '2026-11-14', client: c }), /ya está revisando/);
+  assert.equal(calls.length, 0);
+  assert.equal(sent(/SET status = 'failed'.*WHERE status = 'running' AND started_at </).length, 2, 'limpia antes las pasadas colgadas');
+});
+await check('caduca según el estado real, no según lo que cabe en la situación', async () => {
+  reset(world({ seen: ['mail:5', 'exp:40'] }));
+  await A.runAgent({ trigger: 'cron', today: '2026-11-14', client: fakeClient([]).c });
+  const exp = sent(/UPDATE finance_agent_proposals p SET status = 'expired'/);
+  assert.equal(exp.length, 1);
+  assert.match(exp[0].text, /review_status = 'pending'/);
+  assert.match(exp[0].text, /e\.source_ref = p\.target_ref/);
+  assert.equal(exp[0].params.length, 0);
+});
+await check('pasada cortada (la IA no sigue): nada queda «visto» y la nota lo dice', async () => {
+  reset(world());
+  const { c } = fakeClient([msg([{ type: 'text', text: '' }], 'refusal')]);
+  const out = await A.runAgent({ trigger: 'cron', today: '2026-11-14', client: c });
+  assert.equal(out.status, 'done');
+  assert.equal(sent(/INSERT INTO finance_agent_seen/).length, 0);
+  assert.match(sent(/UPDATE finance_agent_runs SET status/).at(-1).params[7], /no quiso seguir/);
+});
+await check('el coste se va apuntando en cada paso (si Vercel corta, cuenta igual)', async () => {
+  reset(world());
+  const { c } = fakeClient([msg([{ type: 'tool_use', id: 'a', name: 'memory', input: { command: 'view', path: '/memories' } }]), msg([{ type: 'text', text: 'Nada que proponer.' }], 'end_turn')]);
+  await A.runAgent({ trigger: 'cron', today: '2026-11-14', client: c });
+  const steps = sent(/UPDATE finance_agent_runs SET input_tokens = \$2/);
+  assert.equal(steps.length, 2);
+  assert.equal(steps[1].params[3], 2 * 8000);
+});
+await check('la acción que se aplica la escribe el servidor con los datos reales', () => {
+  const cx = ctx();
+  cx.expenses.set('40', { id: 40, label: 'ADOBE *CC', amount_cents: 5999, spent_at: '2026-11-03', subscription_matches: [{ subscription_id: 3 }] });
+  cx.subscriptions.set('3', { id: 3, name: 'Adobe Creative Cloud' });
+  const d = R.validateProposal({ titulo: 'Categorizar Adobe como software', explicacion: 'x', tipo: 'descartar_movimiento', gasto_id: '40', motivo: 'duplicado' }, cx);
+  assert.match(d.payload.action, /^Quitar de los libros el gasto «ADOBE \*CC» del 3\/11 \(\$59\.99\): duplicado\. Se borra/);
+  const v = R.validateProposal({ ...base, tipo: 'vincular_suscripcion', gasto_id: '40', suscripcion_id: '3' }, cx);
+  assert.match(v.payload.action, /cargo de Adobe Creative Cloud/);
+  cx.expenses.get('40').subscription_matches = [];
+  assert.throws(() => R.validateProposal({ ...base, tipo: 'vincular_suscripcion', gasto_id: '40', suscripcion_id: '3' }, cx), /no coincide/);
+  assert.throws(() => R.validateProposal({ ...base, tipo: 'registrar_gasto', correo_id: '5', monto_usd: 5, fecha: '2026-02-30', categoria: 'hosting', concepto: 'x' }, cx), /tiene que existir/);
+});
+await check('coste con modelo de respaldo: cada intento a su precio', () => {
+  const m = { model: 'claude-opus-4-8', usage: { input_tokens: 10, output_tokens: 10, iterations: [
+    { model: 'claude-opus-5-5', input_tokens: 10000, output_tokens: 1000 }, { model: 'claude-opus-4-8', input_tokens: 10000, output_tokens: 2000 }] } };
+  assert.equal(R.messageCostMicroUsd(m), 60000 + 100000);
+});
+await check('redacción: fiscales, teléfonos y cuentas fuera; fechas y montos intactos', () => {
+  const t = R.redactText('SSN 123-45-6789, EIN 12-3456789, (713)555-1234, +52 55 1234 5678, cuenta 12345678, tarjeta 4111 1111 1111 1111. Periodo 2026-11-01 2026-11-30, total $1,234.56');
+  assert.ok(!/123-45-6789|12-3456789|555-1234|1234 5678|12345678|4111/.test(t), t);
+  assert.ok(t.includes('2026-11-01 2026-11-30') && t.includes('$1,234.56'), t);
+  assert.throws(() => R.checkMemoryText('llama al (713) 555-0199'), /datos personales/);
 });
 
 // ════════════════════════════════════════════════════════════════
 //  Aplicar y descartar
 // ════════════════════════════════════════════════════════════════
 const decided = (kind, payload) => (o = {}) => (text, params) => {
+  if (/SELECT id, kind, payload FROM finance_agent_proposals/.test(text)) return o.gone ? { rows: [] } : { rows: [{ id: 50, kind, payload }] };
+  if (/SELECT 1 FROM company_expenses WHERE source_ref = \$1/.test(text)) return { rows: o.resolved ? [{ x: 1 }] : [] };
+  if (/review_status = 'pending'/.test(text) && /^SELECT 1/.test(text)) return { rows: o.resolved ? [] : [{ x: 1 }] };
   if (/UPDATE finance_agent_proposals SET status = \$2/.test(text)) return o.gone ? { rows: [] } : { rows: [{ id: 50, kind, payload, target_ref: 'x' }] };
   if (/FROM finance_months/.test(text)) return { rows: o.closed ? [{ status: 'closed' }] : [] };
   if (/SELECT subject, received_at FROM mail_items/.test(text)) return { rows: [{ subject: 'Your receipt from Vercel', received_at: '2026-11-13T15:00:00Z' }] };
@@ -286,6 +346,13 @@ await check('aviso aplicado = «entendido»: no toca los libros', async () => {
   const out = await A.applyProposal('50', 'yo');
   assert.equal(out.kind, 'aviso');
   assert.equal(sent(/company_expenses|income_entries/).length, 0);
+});
+
+await check('aplicar algo que el dueño ya resolvió a mano → 409 y se retira', async () => {
+  reset(decided('categorizar', { expense_id: '40', category: 'software', business_pct: 100 })({ resolved: true }));
+  await assert.rejects(A.applyProposal('50', 'yo'), (e) => e.status === 409 && /a mano/.test(e.message));
+  assert.equal(sent(/SET status = 'expired'/).length, 1);
+  assert.equal(sent(/company_expenses SET|DELETE FROM company_expenses/).length, 0);
 });
 
 if (fails.length) {

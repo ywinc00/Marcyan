@@ -3,11 +3,12 @@
 //   POST { action: 'apply',  id } → aplica una propuesta (solo el dueño)
 //   POST { action: 'reject', id } → la descarta (no vuelve en 60 días)
 //   POST { action: 'run' }        → «Revisar ahora» (máx. 4 al día, dentro del tope del mes)
+//   POST { action: 'forget', path } → borra una nota de la memoria del agente
 // Protegido con requireAdmin. El agente solo propone: nada cambia sin este «apply».
 import { requireAdmin } from '../../../lib/auth.mjs';
 import { isBusinessError } from '../../../lib/finance-rules.mjs';
 import { setOidcToken } from '../../../lib/gmail.mjs';
-import { AgentError, agentState, applyProposal, rejectProposal, runAgent } from '../../../lib/finance-agent.mjs';
+import { AgentError, agentState, applyProposal, forgetMemory, rejectProposal, runAgent } from '../../../lib/finance-agent.mjs';
 
 export default async function handler(req, res) {
   const session = await requireAdmin(req, res);
@@ -19,6 +20,7 @@ export default async function handler(req, res) {
       const b = (typeof req.body === 'object' && req.body) ? req.body : {};
       if (b.action === 'apply') return res.status(200).json({ ...(await applyProposal(b.id, by)), state: await agentState() });
       if (b.action === 'reject') { await rejectProposal(b.id, by); return res.status(200).json({ ok: true, state: await agentState() }); }
+      if (b.action === 'forget') { await forgetMemory(b.path); return res.status(200).json({ ok: true, state: await agentState() }); }
       if (b.action === 'run') {
         setOidcToken(req.headers['x-vercel-oidc-token']);
         const run = await runAgent({ trigger: 'manual' });

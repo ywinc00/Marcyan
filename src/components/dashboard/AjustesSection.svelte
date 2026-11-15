@@ -97,6 +97,16 @@
       if (!isSessionError(e)) fieldError = { ...fieldError, run: errorMessage(e, 'No se pudo revisar.') };
     } finally { running = false; }
   }
+  let forgetting = $state('');
+  async function forget(m) {
+    forgetting = m.path; fieldError = { ...fieldError, run: '' };
+    try {
+      agent = (await api('/api/admin/finance/agent', { method: 'POST', body: { action: 'forget', path: m.path } })).state;
+      toast('Nota borrada');
+    } catch (e) {
+      if (!isSessionError(e)) fieldError = { ...fieldError, run: errorMessage(e, 'No se pudo borrar.') };
+    } finally { forgetting = ''; }
+  }
   const usd2 = (v) => formatUsd(Math.round(Number(v || 0) * 100));
   const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
   const RUN_WORDS = { nothing_new: 'Nada nuevo que revisar', skipped: 'No revisó', failed: 'Falló', running: 'Revisando' };
@@ -225,11 +235,24 @@
                     {#if agent.runs.length}
                       <ul class="aj-list aj-runs">
                         {#each agent.runs as r (r.id)}
-                          <li><span><b>{fmtDateTime(r.started_at)}</b>{r.trigger === 'manual' ? ', a mano' : ''}<br />{runLine(r)}</span><em>{usd2(r.cost_usd)}</em></li>
+                          <li><span><b>{fmtDateTime(r.started_at)}</b>{r.trigger === 'manual' ? ', a mano' : ''}<br />{runLine(r)}{#if r.status === 'done' && r.note}<span class="aj-note">{r.note}</span>{/if}</span><em>{usd2(r.cost_usd)}</em></li>
                         {/each}
                       </ul>
                     {:else}
                       <p class="aj-empty">Aún no ha revisado nada. La primera revisión es mañana temprano, o pulsa «Revisar ahora».</p>
+                    {/if}
+                  </div>
+                  <div class="aj-row aj-row--stack">
+                    <div class="aj-txt"><h3>Lo que ha aprendido</h3><p>Notas que guarda de lo que aplicas y descartas, para no preguntarte lo mismo. Si alguna no te cuadra, bórrala.</p></div>
+                    {#if agent.memory && agent.memory.length}
+                      <ul class="aj-list aj-mem">
+                        {#each agent.memory as m (m.path)}
+                          <li><span><b>{m.name}</b><span class="aj-note">{m.content}</span></span>
+                            <button type="button" class="b b--ghost b--mini" disabled={forgetting === m.path} onclick={() => forget(m)}>Borrar</button></li>
+                        {/each}
+                      </ul>
+                    {:else}
+                      <p class="aj-empty">Aún no ha guardado nada.</p>
                     {/if}
                   </div>
                   <p class="aj-foot">Usa la IA de Anthropic. Los correos le llegan sin direcciones ni teléfonos, y lo que dicen se trata como datos, nunca como órdenes. Para revisión de tu contador, no es consejo fiscal.</p>
@@ -340,6 +363,9 @@
   .aj-runs li { align-items: baseline; font-size: var(--dash-small); color: var(--fg-secondary); }
   .aj-runs b { font-weight: 500; color: var(--fg-primary); }
   .aj-runs em { font-style: normal; font-variant-numeric: tabular-nums; color: var(--fg-subtle); white-space: nowrap; }
+  .aj-note { display: block; margin-top: 2px; color: var(--fg-subtle); white-space: pre-line; overflow-wrap: anywhere; }
+  .aj-mem li { align-items: flex-start; font-size: var(--dash-small); }
+  .aj-mem b { font-weight: 500; color: var(--fg-primary); }
   .aj-empty { flex: 1 1 320px; margin: 0; color: var(--fg-subtle); font-size: var(--dash-small); }
   .aj-foot { margin: 0; padding: 12px 20px; border-top: 1px solid var(--border-subtle); color: var(--fg-subtle); font-size: var(--dash-small); }
   @container (max-width: 560px) {

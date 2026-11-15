@@ -6,7 +6,6 @@
   import { api, errorMessage, isSessionError } from '../lib/api.js';
   import { href } from '../lib/router.svelte.js';
   import { toast } from '../lib/toast.svelte.js';
-  import { formatUsd } from './fin.js';
 
   let { onchanged } = $props();
 
@@ -58,11 +57,14 @@
       {#each list as p (p.id)}
         {@const busy = busyId === p.id}
         <li class="ap-row">
-          <div class="ap-main">
-            <span class="ap-title">{p.title}</span>
-            {#if p.amount_cents}<span class="ap-amt">−{formatUsd(p.amount_cents)}</span>{/if}
-          </div>
-          {#if p.detail}<p class="ap-detail">{p.detail}</p>{/if}
+          <!-- Lo que hará «Aplicar» lo escribe el servidor con los datos reales; el
+               texto del agente va debajo, solo como el porqué. -->
+          <p class="ap-title">{p.kind === 'aviso' || !p.action ? p.title : p.action}</p>
+          {#if p.kind !== 'aviso' && p.action && (p.detail || p.title)}
+            <p class="ap-detail"><span class="ap-why">Por qué:</span> {p.detail || p.title}</p>
+          {:else if p.detail}
+            <p class="ap-detail">{p.detail}</p>
+          {/if}
           <div class="ap-acts">
             {#if p.kind === 'aviso'}
               <button type="button" class="b b--mini" disabled={busy} onclick={() => decide(p, 'apply')}>Entendido</button>
@@ -88,9 +90,8 @@
   .ap-list { list-style: none; margin: 0; padding: 0; }
   .ap-row { padding: 12px 20px; border-top: 1px solid var(--border-subtle); }
   .ap-row:first-child { border-top: 0; }
-  .ap-main { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-  .ap-title { color: var(--fg-primary); font-weight: 500; overflow-wrap: anywhere; }
-  .ap-amt { color: var(--fg-primary); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .ap-title { margin: 0; color: var(--fg-primary); font-weight: 500; overflow-wrap: anywhere; max-width: 75ch; font-variant-numeric: tabular-nums; }
+  .ap-why { color: var(--fg-subtle); }
   .ap-detail { margin: 4px 0 0; color: var(--fg-secondary); font-size: var(--dash-small); max-width: 75ch; }
   .ap-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
   .ap-link { color: var(--fg-secondary); font-size: var(--dash-small); text-underline-offset: 3px; padding: 6px 4px; }

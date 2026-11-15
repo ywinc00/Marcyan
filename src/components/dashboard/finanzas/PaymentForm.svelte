@@ -8,14 +8,19 @@
   import { api, errorMessage, isSessionError } from '../lib/api.js';
   import { toast } from '../lib/toast.svelte.js';
   import { todayISO, dayISO } from '../lib/dates.js';
-  import { centsToInput, formatUsd, PAYMENT_METHODS, PAYMENT_METHOD_LABELS } from './fin.js';
+  import { centsToInput, formatUsd, PAYMENT_METHODS, PAYMENT_METHOD_LABELS, parseMoney } from './fin.js';
+  import { loadAccounts } from './books.js';
 
   // invoice: { id, invoice_number, client_name, amount_cents, balance_cents, status }
   // payment: el pago a editar (null = nuevo)
   let { open = $bindable(false), invoice = null, payment = null, onsaved } = $props();
 
   const editing = $derived(!!payment);
-  let form = $state({ amount: '', method: 'zelle', paid_at: todayISO(), reference: '' });
+  let form = $state({ amount: '', method: 'zelle', paid_at: todayISO(), reference: '', account_id: '', fee: '' });
+  let accounts = $state([]);
+  // Cuenta propuesta según el método (Zelle y transferencia → banco, tarjeta → Stripe…).
+  const KIND_BY_METHOD = { zelle: 'bank', transfer: 'bank', card: 'stripe', stripe: 'stripe', paypal: 'paypal', cash: 'cash', revolut: 'revolut' };
+  const feeParsed = $derived(parseMoney(form.fee));
   let cents = $state(null);
   let saving = $state(false);
   let formError = $state('');
@@ -30,17 +35,29 @@
     if (!open) return;
     formError = ''; tried = false;
     form = payment
-      ? { amount: centsToInput(payment.amount_cents), method: payment.method || 'other', paid_at: dayISO(payment.paid_at), reference: payment.reference || '' }
-      : { amount: centsToInput(invoice ? invoice.balance_cents : 0), method: 'zelle', paid_at: todayISO(), reference: '' };
+      ? { amount: centsToInput(payment.amount_cents), method: payment.method || 'other', paid_at: dayISO(payment.paid_at), reference: payment.reference || '', account_id: payment.account_id ? String(payment.account_id) : '', fee: payment.fee_cents ? centsToInput(payment.fee_cents) : '' }
+      : { amount: centsToInput(invoice ? invoice.balance_cents : 0), method: 'zelle', paid_at: todayISO(), reference: '', account_id: '', fee: '' };
+    loadAccounts().then((a) => {
+      accounts = a.filter((x) => x.active !== false);
+      if (!form.account_id) suggestAccount();
+    }).catch(() => { accounts = []; });
   });
+  function suggestAccount() {
+    const kind = KIND_BY_METHOD[form.method];
+    const acc = kind && accounts.find((a) => a.kind === kind);
+    form.account_id = acc ? String(acc.id) : '';
+  }
 
   async function submit(e) {
     e?.preventDefault();
     tried = true; formError = '';
     if (cents == null) { formError = 'Revisa el monto.'; return; }
     if (!form.paid_at) { formError = 'Indica la fecha del pago.'; return; }
+    const fee = form.fee.trim() ? feeParsed.cents : 0;
+    if (form.fee.trim() && (!feeParsed.ok || fee == null || fee > cents)) { formError = 'Revisa la comisión: no puede ser mayor que el cobro.'; return; }
     saving = true;
-    const body = { amount_cents: cents, method: form.method, paid_at: form.paid_at, reference: form.reference.trim() || null };
+    const body = { amount_cents: cents, method: form.method, paid_at: form.paid_at, reference: form.reference.trim() || null,
+      account_id: form.account_id || null, fee_cents: fee };
     try {
       const j = editing
         ? await api('/api/admin/payments/' + payment.id, { method: 'PATCH', body })
@@ -67,13 +84,26 @@
     <div class="pay-grid">
       <Field label="Método">
         {#snippet children(f)}
-          <select class="ui-input" id={f.id} bind:value={form.method}>
+          <select class="ui-input" id={f.id} bind:value={form.method} onchange={() => { if (!payment) suggestAccount(); }}>
             {#each PAYMENT_METHODS as m}<option value={m}>{PAYMENT_METHOD_LABELS[m]}</option>{/each}
           </select>
         {/snippet}
       </Field>
       <Field label="Fecha del pago" required>
         {#snippet children(f)}<input class="ui-input" id={f.id} type="date" bind:value={form.paid_at} />{/snippet}
+      </Field>
+    </div>
+    <div class="pay-grid">
+      <Field label="Entró por" hint="Para cuadrar con el extracto.">
+        {#snippet children(f)}
+          <select class="ui-input" id={f.id} aria-describedby={f.describedby} bind:value={form.account_id}>
+            <option value="">Sin decir</option>
+            {#each accounts as a (a.id)}<option value={String(a.id)}>{a.name}</option>{/each}
+          </select>
+        {/snippet}
+      </Field>
+      <Field label="Comisión (USD)" hint="Lo que se quedó Stripe o PayPal. Opcional.">
+        {#snippet children(f)}<input class="ui-input" id={f.id} type="text" inputmode="decimal" placeholder="0.00" aria-describedby={f.describedby} bind:value={form.fee} />{/snippet}
       </Field>
     </div>
     <Field label="Referencia" hint="Número de confirmación o nota. Opcional.">

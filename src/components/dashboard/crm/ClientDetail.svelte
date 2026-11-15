@@ -26,7 +26,7 @@
   import { href, route, setSub, navigate } from '../lib/router.svelte.js';
   import { fmtDate, fmtDay } from '../lib/dates.js';
   import {
-    clientName, clientStatus, money, phoneHref, whatsappHref, deleteImpactText,
+    clientName, clientStatus, money, phoneHref, whatsappHref, deleteImpactText, keepsBooks,
     PROJECT_STATUS, INVOICE_STATUS, BRIEF_STATUS, leadStatus, leadSource,
   } from './crm.js';
 
@@ -149,7 +149,10 @@
     {#snippet badge()}<StatusChip tone={clientStatus(client.status).tone} label={clientStatus(client.status).label} />{/snippet}
     {#snippet actions()}
       {#if archived}
-        <button type="button" class="b b--danger" onclick={() => (confirmDelete = true)}>Borrar definitivamente</button>
+        <!-- Con facturas emitidas o cobros no se borra: los libros se guardan 7 años (encargo legal 15-nov). -->
+        {#if !keepsBooks(related?.impact)}
+          <button type="button" class="b b--danger" onclick={() => (confirmDelete = true)}>Borrar definitivamente</button>
+        {/if}
         <button type="button" class="b" disabled={archiving} onclick={() => setStatus('active')}>{archiving ? 'Un momento…' : 'Reactivar'}</button>
       {:else}
         <button type="button" class="b" onclick={() => (confirmArchive = true)}>Archivar</button>
@@ -163,7 +166,7 @@
   </PageHeader>
 
   {#if archived}
-    <p class="banner"><Icon name="alert" size={16} /> Cliente archivado: no sale en la lista de Clientes ni al elegir cliente en ninguna sección. Sus proyectos, facturas y pagos se conservan.</p>
+    <p class="banner"><Icon name="alert" size={16} /> Cliente archivado: no sale en la lista de Clientes ni al elegir cliente en ninguna sección. Sus proyectos, facturas y pagos se conservan.{keepsBooks(related?.impact) ? ' No se puede borrar: tiene facturas emitidas o cobros, y los libros se guardan 7 años.' : ''}</p>
   {/if}
 
   {#if related}

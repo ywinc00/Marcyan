@@ -159,12 +159,17 @@ export function whatsappHref(phone) {
 /** Plural sencillo: plural(2, 'proyecto', 'proyectos') → "2 proyectos". */
 export function plural(n, one, many) { return `${n} ${n === 1 ? one : many}`; }
 
+/** ¿Tiene facturas emitidas o cobros? Entonces no se borra: los libros se guardan 7 años. */
+export function keepsBooks(impact) {
+  return !!impact && (Number(impact.payments) > 0 || Number(impact.issued_invoices) > 0);
+}
+
 /** Frase de lo que arrastra un borrado definitivo de cliente (CRM-13). */
 export function deleteImpactText(impact) {
   if (!impact) return '';
   const parts = [];
   if (impact.projects) parts.push(plural(impact.projects, 'proyecto', 'proyectos') + (impact.milestones ? ` (con ${plural(impact.milestones, 'hito', 'hitos')})` : ''));
-  if (impact.invoices) parts.push(plural(impact.invoices, 'factura', 'facturas'));
+  if (impact.invoices) parts.push(plural(impact.invoices, 'borrador de factura', 'borradores de factura'));
   if (impact.payments) parts.push(plural(impact.payments, 'pago', 'pagos') + ` (${money(impact.payments_cents)} cobrados)`);
   if (!parts.length) return 'No tiene proyectos, facturas ni pagos: solo se borra su ficha.';
   const last = parts.pop();

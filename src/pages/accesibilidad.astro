@@ -1,0 +1,31 @@
+---
+// /accesibilidad — Declaración de accesibilidad (encargo legal 2026-11-15 §2d, texto de MSA Legales).
+// Espejo: /en/accessibility. Enlazada en el pie.
+import Layout from '../layouts/Layout.astro';
+import SiteNav from '../components/layout/SiteNav.astro';
+import SiteFooter from '../components/layout/SiteFooter.astro';
+import LegalDoc from '../components/sections/LegalDoc.astro';
+import { content, nap } from '../i18n/content';
+import { clusterNav } from '../i18n/clusters';
+
+// El CTA del nav lleva al FORMULARIO DE CONTACTO (captación), no al brief.
+const pageNav = { ...clusterNav, cta: { label: 'Propuesta gratis', href: '/es#contacto' } };
+---
+<Layout
+  title="Accesibilidad · Marcyan Studio"
+  description="Declaración de accesibilidad de Marcyan Studio: el sitio sigue las pautas WCAG 2.1 nivel AA. Si algo no te funciona, escríbenos y lo arreglamos."
+  lang="es"
+  path="/accesibilidad"
+  canonical="https://marcyanstudio.com/accesibilidad"
+
+>
+  <SiteNav nav={pageNav} lang="es" homeHref="/es" currentPath={Astro.url.pathname} />
+
+  <main id="main">
+    <LegalDoc title="Declaración de accesibilidad" updated="15 de noviembre de 2026">
+      <p>Queremos que cualquier persona pueda usar este sitio. Lo diseñamos siguiendo las pautas WCAG 2.1 nivel AA y lo revisamos en cada cambio. Si algo no te funciona, escríbenos a <a href={`mailto:${nap.email}`}>{nap.email}</a> y lo arreglamos.</p>
+    </LegalDoc>
+  </main>
+
+  <SiteFooter footer={content.es.footer} />
+</Layout>

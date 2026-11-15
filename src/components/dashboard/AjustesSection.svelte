@@ -274,9 +274,9 @@
         {:else if part.id === 'equipo'}
           <section class="aj-card" aria-label="Equipo">
             <div class="aj-row aj-row--stack">
-              <div class="aj-txt"><h3>Quién puede entrar</h3><p>Entra quien reciba el enlace de acceso en uno de estos correos. Por seguridad se cambia en Vercel, no desde aquí: dime a quién añadir o quitar.</p></div>
+              <div class="aj-txt"><h3>Quién puede entrar</h3><p>Entra quien reciba el enlace de acceso en uno de estos correos; con cada uno, su último acceso. Por seguridad se cambia en Vercel, no desde aquí: dime a quién añadir o quitar.</p></div>
               <ul class="aj-list">
-                {#each data.team as m (m)}<li>{m}{#if m === data.me}<span class="aj-tag">tú</span>{/if}</li>{/each}
+                {#each data.team as m (m.email)}<li><span>{m.email}{#if m.email === data.me}<span class="aj-tag">tú</span>{/if}</span><span class="aj-when">{m.last_access ? `Último acceso: ${fmtDateTime(m.last_access)}` : 'Aún no ha entrado'}</span></li>{/each}
               </ul>
             </div>
           </section>
@@ -357,6 +357,8 @@
   .aj-list--num b { font-variant-numeric: tabular-nums; font-weight: 600; }
   .aj-list--num span { color: var(--fg-secondary); }
   .aj-tag { margin-left: 8px; font-size: var(--dash-caption); color: var(--fg-subtle); }
+  .aj-when { flex: 0 0 auto; font-size: var(--dash-caption); color: var(--fg-subtle); }
+  @media (max-width: 479px) { .aj-list li:has(.aj-when) { flex-direction: column; gap: 2px; } }
   .aj-cap { min-width: 0 !important; width: 90px; }
   .aj-link { display: inline-block; margin-top: 6px; color: var(--fg-secondary); font-size: var(--dash-small); text-underline-offset: 3px; }
   .aj-link:hover { color: var(--fg-primary); }

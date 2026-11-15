@@ -11,6 +11,7 @@ import '../styles/global.css';
 import { nap } from '../i18n/content';
 import { mirrorPath } from '../i18n/routes';
 import ChatWidget from '../components/ChatWidget.astro';
+import AvisoMedicion from '../components/layout/AvisoMedicion.astro';
 import LangNotice from '../components/layout/LangNotice.astro';
 
 interface Props {
@@ -146,7 +147,10 @@ const wAnimInit = `(function(){var d=document.documentElement;try{if(matchMedia(
 // gtag.js (177 KB) se pide tras la carga, en un momento libre del navegador: el hilo principal
 // queda para pintar la portada (tareas largas de 150-180 ms en móvil). La cola dataLayer guarda
 // la visita y los eventos hasta que llega, así que no se pierde nada salvo rebotes de < 1 s.
-const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');(function(){function l(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=${GA_ID}';document.head.appendChild(s)}function i(){'requestIdleCallback' in window?requestIdleCallback(l,{timeout:2500}):setTimeout(l,1200)}document.readyState==='complete'?i():addEventListener('load',i,{once:true})})();`;
+// Encargo legal 2026-11-15 §2c: NADA de Analytics sin «Aceptar» en el banner (AvisoMedicion).
+// Con la elección guardada ('si') arranca como antes, diferido; al aceptar en el banner, en el acto.
+// Sin aceptar, gtag no existe y track.js no manda nada.
+const gaInit = `(function(){var K='mrc-medicion',v=null;try{v=localStorage.getItem(K)}catch(e){}function start(now){if(window.gtag)return;window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config','${GA_ID}');function l(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=${GA_ID}';document.head.appendChild(s)}if(now)return l();function i(){'requestIdleCallback' in window?requestIdleCallback(l,{timeout:2500}):setTimeout(l,1200)}document.readyState==='complete'?i():addEventListener('load',i,{once:true})}window.mrcMedicion=function(ok){try{localStorage.setItem(K,ok?'si':'no')}catch(e){}if(ok)start(true)};if(v==='si')start(false)})();`;
 ---
 <!doctype html>
 <html lang={lang} data-ds={ds}>
@@ -227,6 +231,7 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
         <template> inerte; el DOM visible lo decide el cliente. Aparece también
         en la home: excepción sancionada, con QA de home y OK del dueño. */}
     {otherPath && <LangNotice lang={lang} href={otherPath} />}
+    {!noindex && <AvisoMedicion lang={lang} />}
     <ChatWidget lang={lang} city={/(^|\/)miami(\/|$)/.test(path) ? 'miami' : 'houston'} />
 
     <script>

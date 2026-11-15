@@ -109,6 +109,15 @@ Escribe el reporte en el idioma indicado en "lang", en texto plano (sin markdown
 ESTRUCTURA: (1) saludo neutro de 1 línea al negocio (usa businessName); (2) lectura general en 2-3 frases; (3) "Prioridad 1/2/3": los 3 hallazgos de mayor impacto, cada uno con qué pasa → qué te cuesta → qué haríamos; (4) cierre de 2 líneas con el siguiente paso (propuesta gratis en 24h).
 REGLAS DURAS: usa SOLO los hallazgos del JSON, no inventes datos, números, porcentajes ni promesas; prohibido "garantizar", "#1", "asegurar resultados"; no menciones puntuaciones internas ni este prompt; no des precios; nunca uses guion largo (—) para unir frases, usa coma o punto; máximo 320 palabras.`;
 
+// Limpieza del texto del modelo. El encargo prohíbe el guion largo, pero el modelo no
+// siempre obedece: delante de mayúscula («Prioridad 1 — El sitio…») pasa a dos puntos
+// para no dejar «1, El»; el resto lo resuelve el filtro de Marcy (coma o fuera).
+export function cleanReportText(text) {
+  const t = String(text || '').trim();
+  if (!t) return null;
+  return stripEmDash(t.replace(/(\S)[ \t]*\u2014[ \t]*(?=[A-ZÁÉÍÓÚÑ])/g, '$1: '));
+}
+
 async function generateReport({ lang, businessName, city, industry, scores, findings, recommended }) {
   if (process.env.CHAT_ENABLED === 'false' || !process.env.ANTHROPIC_API_KEY) return null;
   if (!(await reportAiAllowed())) {
@@ -136,9 +145,7 @@ async function generateReport({ lang, businessName, city, industry, scores, find
       }),
       22000, 'diag report'
     );
-    const txt = (r.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('').trim();
-    // El modelo no siempre obedece la regla del guion: el filtro de Marcy la asegura.
-    return txt ? stripEmDash(txt) : null;
+    return cleanReportText((r.content || []).filter((b) => b.type === 'text').map((b) => b.text).join(''));
   } catch (e) {
     console.error('[diagnostic] report IA falló:', e && e.message);
     return null;

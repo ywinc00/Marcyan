@@ -9,6 +9,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { analyzeSite, findContactHref, mergeContactSignals, recommendService, fallbackReport } from '../lib/diagnostic-checks.mjs';
+import { cleanReportText } from '../api/diagnostic.mjs';
 
 let pass = 0;
 const fails = [];
@@ -264,6 +265,15 @@ check('informe sin IA sin guion largo (es/en)', () => {
     const rep = fallbackReport({ businessName: 'Negocio', lang, findings: r.findings, recommended });
     assert.ok(!rep.includes('\u2014'), lang);
   }
+});
+
+check('informe con IA: el texto del modelo sale sin guion largo y sin «1, El»', () => {
+  const raw = 'Hola Negocio \u2014 aquí va tu informe.\nPrioridad 1 \u2014 El sitio no usa conexión segura.\n\u2014 Cierre: horario Lun\u2013Vie.';
+  const out = cleanReportText(raw);
+  assert.ok(!out.includes('\u2014'), out);
+  assert.equal(out, 'Hola Negocio, aquí va tu informe.\nPrioridad 1: El sitio no usa conexión segura.\nCierre: horario Lun\u2013Vie.');
+  assert.equal(cleanReportText('Priority 1 \u2014 Your site has no HTTPS.'), 'Priority 1: Your site has no HTTPS.');
+  assert.equal(cleanReportText('   '), null);
 });
 
 if (fails.length) {

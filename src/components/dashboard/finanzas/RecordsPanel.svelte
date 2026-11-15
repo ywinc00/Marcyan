@@ -22,7 +22,7 @@
 
   const KIND_LABEL = { bank: 'Banco', stripe: 'Stripe', paypal: 'PayPal', revolut: 'Revolut', card: 'Tarjeta', cash: 'Efectivo', other: 'Otra' };
   const W9 = { missing: 'Falta W-9', on_file: 'W-9 guardado', not_required: 'No hace falta' };
-  const ENTITY = { individual: 'Persona', llc: 'LLC', partnership: 'Sociedad', corporation: 'Corporación', unknown: 'Sin saber' };
+  const ENTITY = { individual: 'Persona', llc: 'LLC', partnership: 'Sociedad', corporation: 'Corporación', unknown: 'Tipo sin indicar' };
   const INCOME_CAT = { servicios: 'De clientes, sin factura', otros: 'Otro ingreso del negocio', intereses: 'Intereses del banco' };
 
   // Qué enseña y qué pide cada tipo.
@@ -154,7 +154,7 @@
                   {#if r.active === false}<StatusChip tone="neutral" label="Sin usar" />{/if}
                   <button type="button" class="b b--ghost b--mini" onclick={() => patch(r, { active: r.active === false }, r.active === false ? 'Cuenta activa' : 'Cuenta sin usar')}>{r.active === false ? 'Volver a usar' : 'Dejar de usar'}</button>
                 {:else if kind === 'vendors'}
-                  <span class="rp-main">{r.name}<span class="rp-sub">{r.is_contractor ? 'Contratista' : 'Proveedor'} · {ENTITY[r.entity_type] || 'Sin saber'}{r.year_cents ? ` · ${fmtUsd0(r.year_cents)} este año` : ''}</span></span>
+                  <span class="rp-main">{r.name}<span class="rp-sub">{r.is_contractor ? 'Contratista' : 'Proveedor'} · {ENTITY[r.entity_type] || 'Tipo sin indicar'}{r.year_cents ? ` · ${fmtUsd0(r.year_cents)} este año` : ''}</span></span>
                   {#if r.is_contractor}
                     <label class="rp-sel"><span class="sr-only">W-9 de {r.name}</span>
                       <select class="ui-input" value={r.w9_status} onchange={(e) => patch(r, { w9_status: e.currentTarget.value }, 'W-9 actualizado')}>

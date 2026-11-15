@@ -70,6 +70,7 @@
     if (route.sub[0] === 'cierre' && /^\d{4}-\d{2}$/.test(route.sub[1] || '')) navigate('finanzas', [], { mes: route.sub[1] }, { replace: true });
   });
   let pendingMonth = $state('');
+  let taxPending = $state(0);
   function goTab(id) { navigate('finanzas', id ? [id] : [], {}); }
 
   // Registros: un apartado a la vez (?ver=), las suscripciones primero.
@@ -218,7 +219,14 @@
       <button type="button" class="b" onclick={refreshAll} disabled={summaryLoading || invLoading}><Icon name="refresh" size={16} />Actualizar</button>
       {#if tab === '' && pendingMonth}
         <button type="button" class="b" onclick={() => (invoiceFormOpen = true)}>Nueva factura</button>
-        <a class="b b--primary" href={href('finanzas', [], { mes: pendingMonth })}>Revisar {monthLong(pendingMonth).split(' ')[0]}</a>
+        <a class="b b--primary fin-desk" href={href('finanzas', [], { mes: pendingMonth })}>Revisar {monthLong(pendingMonth).split(' ')[0]}</a>
+      {:else if tab === 'impuestos'}
+        <button type="button" class="b" onclick={() => (invoiceFormOpen = true)}>Nueva factura</button>
+        {#if taxPending > 0}
+          <a class="b b--primary" href={href('finanzas', ['movimientos'], { ver: 'pendientes' })}>Revisar {taxPending} movimiento{taxPending === 1 ? '' : 's'}</a>
+        {:else}
+          <a class="b b--primary" href={`/api/admin/finance/books?view=export&year=${route.query.ano || new Date().getFullYear()}`} download><Icon name="download" size={16} />Para el contador</a>
+        {/if}
       {:else}
         <button type="button" class="b b--primary" onclick={() => (invoiceFormOpen = true)}>Nueva factura</button>
       {/if}
@@ -239,7 +247,7 @@
         value={summary ? fmtUsd0(summary.ar_total_cents) : '…'}>
         {#if summary && !summary.counts.open_invoices}Ninguna factura abierta{#if summary.draft_count}{` (${summary.draft_count} en borrador, aparte)`}{/if}
         {:else if summary}
-          Saldo de {summary.counts.open_invoices} factura{summary.counts.open_invoices === 1 ? '' : 's'} abierta{summary.counts.open_invoices === 1 ? '' : 's'}, sin borradores{#if summary.draft_count}{` (${summary.draft_count} aparte)`}{/if}
+          Saldo de {summary.counts.open_invoices} factura{summary.counts.open_invoices === 1 ? '' : 's'} abierta{summary.counts.open_invoices === 1 ? '' : 's'}{#if summary.draft_count}{`, sin contar ${summary.draft_count} borrador${summary.draft_count === 1 ? '' : 'es'}`}{:else}, sin borradores{/if}
         {:else}Saldo de las facturas abiertas{/if}
       </Kpi>
       <Kpi label="Vencido" art="alert" tone={summary && summary.overdue_cents > 0 ? 'error' : ''}
@@ -254,7 +262,7 @@
         {:else}Gastos del mes{/if}
       </Kpi>
       <Kpi label="Neto (mes)" art="chart-up" tone={summary && net !== 0 ? (net > 0 ? 'data' : 'error') : ''} value={summary ? fmtUsd0(net) : '…'}
-        note="Cobrado menos comisiones y gastos del mes" />
+        note="Lo que quedó este mes, igual que en el libro del año" />
     </KpiGrid>
   {/if}
 
@@ -283,7 +291,7 @@
     {/if}
   </div>
   {:else if tab === 'impuestos'}
-  <div class="fin-block"><TaxSheet /></div>
+  <div class="fin-block"><TaxSheet bind:pendingCount={taxPending} /></div>
   {:else if tab === 'facturas'}
   <!-- ═══ Facturas ═══ -->
   <div class="fin-block">
@@ -514,10 +522,19 @@
   }
   /* Móvil estrecho: las cifras de dinero necesitan el ancho entero (en dos
      columnas "$2,300" se cortaba en "$2,3…"). Solo en esta sección. */
+  /* Teléfono: el resumen en dos columnas (el primero a lo ancho) para que lo
+     pendiente se vea sin bajar tanto; sin la ilustración decorativa para que
+     la cifra entera quepa. Las cinco cifras y sus notas siguen a la vista. */
   @media (max-width: 479px) {
-    .fin :global(.ui-kpis[data-count="5"]) { grid-template-columns: 1fr; }
+    .fin :global(.ui-kpis[data-count="5"]) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .fin :global(.ui-kpis[data-count="5"] > :first-child) { grid-column: 1 / -1; }
+    .fin :global(.ui-kpis[data-count="5"] .kpi-art) { display: none; }
+    .fin :global(.ui-kpis[data-count="5"] .ui-kpi) { padding: 14px 14px; }
+    .fin :global(.ui-kpis[data-count="5"] .ui-kpi__num) { font-size: 26px; }
+    .fin :global(.ui-kpis[data-count="5"] .ui-kpi__row) { min-height: 36px; }
     .fin :global(.ui-kpis[data-count="3"]) { grid-template-columns: 1fr; }
   }
+  @media (max-width: 719px) { .fin-desk { display: none; } }
   @media (max-width: 719px) {
     .fin-table :global(.ui-table-wrap) { border-top: 0; }
     /* Tarjeta dentro de tarjeta: un nivel más de la rampa (H-06). */

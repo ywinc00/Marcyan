@@ -90,7 +90,7 @@
   const scope = $derived(month ? monthLong(month) : 'todos los meses');
 </script>
 
-<Card title="Gastos" caption="Todo lo que sale: gastos sueltos, cargos de suscripciones e importados ya aceptados">
+<Card title="Gastos" caption="Todo lo que sale">
   {#snippet actions()}
     <button type="button" class="b b--mini" onclick={openNew}>Nuevo gasto</button>
   {/snippet}

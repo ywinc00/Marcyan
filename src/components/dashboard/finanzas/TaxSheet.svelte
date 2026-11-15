@@ -14,6 +14,7 @@
   import { monthKey, fmtDay } from '../lib/dates.js';
   import { fmtUsd0, formatUsd, monthLong } from './fin.js';
 
+  let { pendingCount = $bindable(0) } = $props();
   const thisYear = Number(monthKey().slice(0, 4));
   const year = $derived(Number(/^\d{4}$/.test(route.query.ano || '') ? route.query.ano : thisYear));
   const openLine = $derived(route.query.linea || '');
@@ -56,13 +57,14 @@
     try { const r = await api(`/api/admin/finance/books?view=line&year=${year}&line=${encodeURIComponent(l)}`); if (openLine === l) lineRows = r; }
     catch (e) { if (!isSessionError(e)) lineError = errorMessage(e, 'No se pudieron cargar los movimientos de esta línea.'); }
   }
-  $effect(() => { if (openLine) loadLine(openLine); });
+  $effect(() => { if (openLine && !['1', '2'].includes(openLine)) loadLine(openLine); });
 
   const expenseLines = $derived(sc ? ORDER.filter((l) => sc.expenses_by_line[l]).map((l) => ({ line: l, cents: sc.expenses_by_line[l] })) : []);
   const gross = $derived(sc ? sc.line1_gross - sc.line2_returns : 0);
   const thisMonth = monthKey();
   const openMonths = $derived(book ? book.months.filter((m) => m.month < thisMonth && m.status !== 'closed') : []);
   const pendingImported = $derived(book && book.pending ? (book.pending.expenses || 0) + (book.pending.income || 0) : 0);
+  $effect(() => { pendingCount = pendingImported; });
   const closedThrough = $derived(tax && tax.books_closed_through ? monthLong(tax.books_closed_through).split(' ')[0] : '');
   const w9 = $derived(list1099 ? list1099.rows.filter((r) => r.needs_1099) : []);
   const w9Missing = $derived(w9.filter((r) => r.w9_status === 'missing'));
@@ -73,6 +75,8 @@
   const dayLong = (d) => new Date(d + 'T12:00:00').toLocaleDateString('es-US', { day: 'numeric', month: 'long', year: 'numeric' });
 
   function toggleLine(l) { setQuery({ linea: openLine === l ? '' : l }); }
+  // «Banco (Zelle y transferencias)» → «Banco» en las filas (el nombre entero vive en Registros).
+  const shortAcc = (n) => String(n || '').replace(/\s*\(.*\)\s*$/, '');
 </script>
 
 <div class="tx">
@@ -101,12 +105,13 @@
             {/each}
             {#if !sc.miles}
               <div class="tx-row"><span class="tx-ic tx-ic--info"><Icon name="car" size={16} /></span>
-                <span class="tx-txt">No hay millaje apuntado. Si usas el coche para ver clientes, se deduce.</span>
+                <span class="tx-txt">No hay millaje apuntado. Si usas el coche para ver clientes, puede deducirse.</span>
                 <a class="b b--mini" href={href('finanzas', ['registros'], { ver: 'millaje' })}>Apuntar</a></div>
             {/if}
           </section>
         {/if}
 
+        <div class="tx-layout">
         <!-- Schedule C -->
         <section class="tx-card" aria-labelledby="tx-sc">
           <header class="tx-head">
@@ -117,8 +122,20 @@
             <caption class="sr-only">Schedule C de {year} por líneas</caption>
             <thead><tr><th scope="col" class="tx-l">Línea</th><th scope="col">Parte I, ingresos</th><th scope="col" class="r">Total</th><th scope="col"><span class="sr-only">Abrir</span></th></tr></thead>
             <tbody>
-              <tr><td class="tx-l">1</td><td>Ingresos brutos</td><td class="r">{fmtUsd0(sc.line1_gross)}</td><td></td></tr>
-              <tr><td class="tx-l">2</td><td>Devoluciones a clientes</td><td class="r">{sc.line2_returns ? '−' + fmtUsd0(sc.line2_returns) : fmtUsd0(0)}</td><td></td></tr>
+              <tr class="tx-line" class:is-open={openLine === '1'}>
+                <td class="tx-l">1</td>
+                <td><button type="button" class="tx-btn" aria-expanded={openLine === '1'} onclick={() => toggleLine('1')}>Ingresos brutos</button></td>
+                <td class="r">{fmtUsd0(sc.line1_gross)}</td>
+                <td class="tx-chev" aria-hidden="true"><span class:is-rot={openLine === '1'}><Icon name="chevron" size={16} /></span></td>
+              </tr>
+              {#if openLine === '1'}<tr class="tx-detail"><td></td><td colspan="2"><p class="tx-small">Sale de los cobros de las facturas (antes de comisiones) y de los ingresos sin factura de clientes. <a href={href('finanzas', ['facturas'])}>Ver facturas</a> · <a href={href('finanzas', ['registros'], { ver: 'ingresos' })}>Ver ingresos sin factura</a></p></td><td></td></tr>{/if}
+              <tr class="tx-line" class:is-open={openLine === '2'}>
+                <td class="tx-l">2</td>
+                <td><button type="button" class="tx-btn" aria-expanded={openLine === '2'} onclick={() => toggleLine('2')}>Devoluciones a clientes</button></td>
+                <td class="r">{sc.line2_returns ? '−' + fmtUsd0(sc.line2_returns) : fmtUsd0(0)}</td>
+                <td class="tx-chev" aria-hidden="true"><span class:is-rot={openLine === '2'}><Icon name="chevron" size={16} /></span></td>
+              </tr>
+              {#if openLine === '2'}<tr class="tx-detail"><td></td><td colspan="2"><p class="tx-small">Dinero devuelto a clientes este año. <a href={href('finanzas', ['registros'], { ver: 'devoluciones' })}>Ver devoluciones</a></p></td><td></td></tr>{/if}
               <tr class="tx-sub"><td class="tx-l">7</td><td>Ingreso bruto</td><td class="r">{fmtUsd0(gross + sc.line6_other)}</td><td></td></tr>
             </tbody>
             <tbody>
@@ -132,7 +149,7 @@
                   <td class="tx-chev" aria-hidden="true"><span class:is-rot={isOpen}><Icon name="chevron" size={16} /></span></td>
                 </tr>
                 {#if isOpen}
-                  <tr class="tx-detail"><td></td><td colspan="3">
+                  <tr class="tx-detail"><td></td><td colspan="2">
                     {#if l.line === '27b' && sc.part_v}
                       <p class="tx-pv">{Object.entries(sc.part_v).map(([k, v]) => `${k} ${fmtUsd0(v)}`).join(' · ')}</p>
                     {/if}
@@ -147,13 +164,12 @@
                         {#each lineRows.rows.slice(0, 12) as e (e.id)}
                           <li>
                             <span class="tx-d">{fmtDay(e.spent_at)}</span>
-                            <span class="tx-n">{e.vendor || e.label}<span class="tx-small">{e.account_name || 'Sin cuenta'}{e.business_pct < 100 ? ` · ${e.business_pct} % de negocio` : ''}</span></span>
-                            <span class="tx-r">{e.receipt_status === 'attached' ? 'Con recibo' : e.receipt_status === 'not_required' ? 'No hace falta' : Number(e.amount_cents) >= 7500 ? 'Falta recibo' : ''}</span>
-                            <span class="r">{formatUsd(e.deductible_cents)}</span>
+                            <span class="tx-n">{e.vendor || e.label}<span class="tx-small">{[shortAcc(e.account_name) || 'Sin cuenta', e.business_pct < 100 ? `${e.business_pct} % de negocio` : '', e.receipt_status === 'attached' ? 'con recibo' : e.receipt_status === 'not_required' ? '' : Number(e.amount_cents) >= 7500 ? 'falta recibo' : ''].filter(Boolean).join(' · ')}</span></span>
+                            <span class="r">{fmtUsd0(e.deductible_cents)}</span>
                           </li>
                         {/each}
                       </ul>
-                      {#if lineRows.total > 12}<p class="tx-small">Y {lineRows.total - 12} más. <a href={href('finanzas', ['movimientos'], { ano: String(year) })}>Ver en Movimientos</a></p>{/if}
+                      <p class="tx-small">{lineRows.total > 12 ? `Y ${lineRows.total - 12} más. ` : ''}<a href={href('finanzas', ['movimientos'], {})}>Ver los {lineRows.total} en Movimientos</a></p>
                     {/if}
                   </td></tr>
                 {/if}
@@ -225,13 +241,20 @@
             <a class="b b--mini tx-dl" href={`/api/admin/finance/books?view=export&year=${year}`} download><Icon name="download" size={16} />Movimientos de {year} para el contador</a>
           </section>
         </div>
+        </div>
       {/if}
     </LoadingState>
   {/if}
 </div>
 
 <style>
-  .tx { container-type: inline-size; max-width: 980px; }
+  .tx { container-type: inline-size; }
+  .tx-layout { display: block; }
+  @container (min-width: 1100px) {
+    .tx-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+    .tx-layout > .tx-card { margin-bottom: 0; }
+    .tx-layout .tx-grid { grid-template-columns: 1fr; }
+  }
   .tx-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 16px; }
   .tx-pad { padding: 18px 20px; margin-bottom: 0; min-width: 0; }
   .tx-review { padding: 4px 0; }
@@ -265,7 +288,7 @@
   .tx-detail td { height: auto; padding: 4px 16px 14px; }
   .tx-pv { margin: 0 0 8px; color: var(--fg-secondary); font-size: var(--dash-small); }
   .tx-items { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-  .tx-items li { display: grid; grid-template-columns: 90px minmax(0, 1fr) auto 90px; gap: 12px; align-items: baseline; font-size: var(--dash-small); }
+  .tx-items li { display: grid; grid-template-columns: 90px minmax(0, 1fr) auto; gap: 12px; align-items: baseline; font-size: var(--dash-small); }
   .tx-d { color: var(--fg-subtle); }
   .tx-n { color: var(--fg-primary); min-width: 0; overflow-wrap: anywhere; }
   .tx-n .tx-small { display: block; }
@@ -291,8 +314,9 @@
   .neg { color: var(--color-error); }
   .num { font-variant-numeric: tabular-nums; }
   @container (max-width: 560px) {
-    .tx-l { width: 34px; }
-    .tx-t th, .tx-t td { padding: 0 8px; overflow-wrap: anywhere; }
+    .tx-l { width: 46px; white-space: nowrap; }
+    .tx-t th, .tx-t td { padding: 0 8px; }
+    .tx-t td:nth-child(2) { overflow-wrap: anywhere; }
     .tx-chev { width: 22px; }
     .tx-t thead th { padding: 10px 8px; }
     .tx-detail td { padding: 4px 8px 12px; }
@@ -300,7 +324,6 @@
     .tx-items .tx-d { grid-column: 1 / -1; }
     .tx-items .tx-n { order: 1; }
     .tx-items .r { order: 2; }
-    .tx-r { order: 3; grid-column: 1 / -1; }
     .tx-row { flex-wrap: wrap; }
   }
   @media (pointer: coarse) { .tx-row .b, .tx-dl { min-height: 44px; } }

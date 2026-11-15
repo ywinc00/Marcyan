@@ -28,7 +28,7 @@
   let schedNet = $state(null);
   let tax = $state(null);
   let w9Missing = $state([]);
-  let pendingCount = $state(null);    // cosas por arreglar del primer mes por cerrar
+  let pendingCount = $state(null);    // { blocking, warnings } del primer mes por cerrar
 
   async function load() {
     error = '';
@@ -66,7 +66,7 @@
     pendingCount = null;
     if (!m) return;
     api(`/api/admin/finance/books?view=close&month=${m}`)
-      .then((r) => { if (m === toClose) pendingCount = r.checklist.items.filter((i) => i.count > 0).length; })
+      .then((r) => { if (m === toClose) pendingCount = { blocking: r.checklist.items.filter((i) => i.blocking && i.count > 0).length, warnings: r.checklist.items.filter((i) => !i.blocking && i.count > 0).length }; })
       .catch(() => {});
   });
 
@@ -91,6 +91,11 @@
   });
 
   function toggle(m) { setQuery({ mes: openMonth === m ? '' : m }); }
+  function chipLabel(m) {
+    if (!pendingCount || m.month !== toClose) return 'Por cerrar';
+    if (pendingCount.blocking) return `Por cerrar: ${pendingCount.blocking} bloquea${pendingCount.blocking === 1 ? '' : 'n'}`;
+    return 'Listo para cerrar';
+  }
   function stateOf(m) {
     if (m.status === 'closed') return 'closed';
     if (m.month === thisMonth) return 'current';
@@ -119,6 +124,13 @@
     {/if}
   </div>
 
+  {#if toClose && year === thisYear && openMonth !== toClose}
+    <div class="yb-due">
+      <div><b>{monthLong(toClose).split(' ')[0].replace(/^./, (c) => c.toUpperCase())} está por cerrar</b>
+        {#if pendingCount}<span>{pendingCount.blocking ? `${pendingCount.blocking} cosa${pendingCount.blocking === 1 ? '' : 's'} lo bloquea${pendingCount.blocking === 1 ? '' : 'n'}` : 'Ya se puede cerrar'}{pendingCount.warnings ? `; ${pendingCount.warnings} aviso${pendingCount.warnings === 1 ? '' : 's'}` : ''}.</span>{/if}</div>
+      <button type="button" class="b b--primary" onclick={() => toggle(toClose)}>Revisar {monthLong(toClose).split(' ')[0]}</button>
+    </div>
+  {/if}
   {#if error}
     <ErrorState title="No se pudo cargar el año" message={error} onretry={load} />
   {:else}
@@ -159,7 +171,7 @@
                     {:else if st === 'current'}
                       <StatusChip tone="neutral" label="En curso" />
                     {:else}
-                      <StatusChip tone="warning" label={pendingCount && m.month === toClose ? `Por cerrar, ${pendingCount} ${pendingCount === 1 ? 'cosa' : 'cosas'}` : 'Por cerrar'} />
+                      <StatusChip tone="warning" label={chipLabel(m)} />
                     {/if}
                   </td>
                   <td class="yb-chev" aria-hidden="true"><span class:is-rot={isOpen}><Icon name="chevron" size={16} /></span></td>
@@ -223,11 +235,8 @@
             </section>
           {/if}
           <section class="yb-c" aria-label="Gastos del año por categoría">
-            <h3 class="yb-cap">Gastos de {year} por categoría</h3>
+            <h3 class="yb-cap">Dinero que salió en {year}, por categoría</h3>
             <ul class="yb-cats num">
-              {#if book.subscriptions && book.subscriptions.cents > 0}
-                <li><a href={href('finanzas', ['registros'], { ver: 'suscripciones' })}><span>Suscripciones <span class="sec">{book.subscriptions.n} servicio{book.subscriptions.n === 1 ? '' : 's'}</span></span><span>{fmtUsd0(book.subscriptions.cents)}</span></a></li>
-              {/if}
               {#each categories as c (c.id)}
                 <li><a href={href('finanzas', ['movimientos'], { cat: c.id, ano: String(year) })}><span>{c.label}</span><span>{fmtUsd0(c.cents)}</span></a></li>
               {/each}
@@ -235,7 +244,7 @@
                 <li class="sec">Aún no hay gastos en {year}.</li>
               {/if}
             </ul>
-            {#if book.subscriptions && book.subscriptions.cents > 0}<p class="yb-small">Las suscripciones también están dentro de su categoría.</p>{/if}
+            {#if book.subscriptions && book.subscriptions.cents > 0}<p class="yb-small">De todo esto, {fmtUsd0(book.subscriptions.cents)} son cargos de suscripciones. <a href={href('finanzas', ['registros'])}>Ver suscripciones</a>. Para impuestos cuenta la cifra de cada línea en Impuestos.</p>{/if}
           </section>
         </div>
       {/if}
@@ -287,6 +296,11 @@
   .yb-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; align-items: start; }
   .yb-mstate { display: block; margin-top: 2px; font-size: var(--dash-caption); color: var(--fg-subtle); }
   .yb-mstate.is-warn { color: var(--color-warning); }
+  .yb-due { display: none; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--bg-card); }
+  .yb-due b { font-weight: 600; display: block; }
+  .yb-due span { color: var(--fg-secondary); font-size: var(--dash-small); }
+  .yb-due .b { min-height: 44px; }
+  .yb-small a { color: var(--fg-primary); text-underline-offset: 3px; }
   .yb-diffline { display: none; margin: 0; padding: 12px 10px 0; font-size: var(--dash-small); color: var(--fg-secondary); }
   .yb-c { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; min-width: 0; }
   .yb-cap { margin: 0 0 10px; font: 500 var(--dash-caption)/1.2 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); }
@@ -309,6 +323,7 @@
     /* El estado pasa debajo del mes (texto, no solo icono) y la comparación con
        el año anterior, a una línea bajo la tabla: nada se pierde (E-62). */
     .yb-st, .yb-diff { display: none; }
+    .yb-due { display: flex; }
     .yb-diffline { display: block; }
     .yb-month { height: auto; min-height: 56px; padding-block: 8px; }
     .yb-wide { display: none; }

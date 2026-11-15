@@ -47,6 +47,16 @@ mock.module('../lib/auth.mjs', {
   },
 });
 
+// Almacén de archivos falso: get() devuelve los «bytes» que diga cada prueba.
+const blobs = { deleted: [], type: null };
+mock.module('@vercel/blob', {
+  namedExports: {
+    get: async () => ({ statusCode: 200, stream: { cancel: async () => {} }, blob: { contentType: 'image/png', size: 10 } }),
+    del: async (p) => { blobs.deleted.push(p); },
+  },
+});
+mock.module('file-type', { namedExports: { fileTypeFromStream: async () => blobs.type } });
+
 const tax = await import('../lib/finance-tax.mjs');
 const rules = await import('../lib/finance-rules.mjs');
 const books = await import('../lib/finance-books.mjs');
@@ -330,6 +340,166 @@ await check('CSV para el contador: dólares como números y fórmulas neutraliza
   assert.match(head, /^Fecha,Tipo,Cliente o proveedor,Concepto o factura,Importe \(USD\)/);
   assert.match(row, /,-90,0,hosting,27b,/);
   assert.match(row, /"'=HYPERLINK\(""x""\)"/);
+});
+
+// ════════════════════════════════════════════════════════════════
+//  Registros: cuentas, proveedores, devoluciones, ingresos, millaje
+// ════════════════════════════════════════════════════════════════
+const rec = await import('../lib/finance-records.mjs');
+await check('cuentas y proveedores: sin números de cuenta ni números fiscales', async () => {
+  reset(() => ({ rows: [{ id: '1' }] }));
+  await assert.rejects(rec.createAccount({ name: 'Chase 123456789', kind: 'bank' }), /números de cuenta/);
+  await assert.rejects(rec.createVendor({ name: 'Ana', notes: 'SSN 123-45-6789' }), /números fiscales/);
+  await assert.rejects(rec.createVendor({ name: 'Estudio', notes: 'EIN 12-3456789' }), /números fiscales/);
+  await rec.createVendor({ name: 'Ana López', is_contractor: true });
+  const ins = log.find((e) => /INSERT INTO finance_vendors/.test(e.text));
+  assert.equal(ins.params[3], 'missing'); // contratista sin W-9 hasta que se marque
+});
+await check('devoluciones: nunca más de lo cobrado y con la factura del cobro', async () => {
+  reset((t) => {
+    if (/FROM payments p WHERE p.id = \$1/.test(t)) return { rows: [{ amount_cents: '50000', invoice_id: '5', client_id: '3', refunded: '20000' }] };
+    if (/INSERT INTO refunds/.test(t)) return { rows: [{ id: '1' }] };
+    return { rows: [] };
+  });
+  await assert.rejects(rec.createRefund({ payment_id: '9', amount_cents: 30001, refunded_at: '2026-10-10' }), (e) => e.status === 409 && /\$300\.00/.test(e.message));
+  await rec.createRefund({ payment_id: '9', amount_cents: 30000, refunded_at: '2026-10-10' });
+  const ins = log.find((e) => /INSERT INTO refunds/.test(e.text));
+  assert.deepEqual(ins.params.slice(0, 5), ['9', '5', '3', 30000, '2026-10-10']);
+  reset();
+  await assert.rejects(rec.createRefund({ amount_cents: 100 }), /motivo/);
+});
+await check('millaje: sin motivo de negocio no se apunta', async () => {
+  reset(() => ({ rows: [{ id: '1', miles: '12.5' }] }));
+  await assert.rejects(rec.createMileage({ miles: 10 }), /motivo/);
+  await assert.rejects(rec.createMileage({ miles: 0, purpose: 'Cliente' }), /millas/);
+  const r = await rec.createMileage({ miles: '12,5', purpose: 'Reunión con cliente', trip_date: '2026-10-02' });
+  assert.equal(r.miles, 12.5);
+});
+
+// ════════════════════════════════════════════════════════════════
+//  Importar extractos
+// ════════════════════════════════════════════════════════════════
+const imr = await import('../lib/finance-import-rules.mjs');
+const imp = await import('../lib/finance-import.mjs');
+await check('CSV: comillas, comas dentro, punto y coma y BOM', () => {
+  assert.deepEqual(imr.parseCsv('﻿a,b\n"x, y","di ""hola"""\n'), [['a', 'b'], ['x, y', 'di "hola"']]);
+  assert.deepEqual(imr.parseCsv('a;b\r\n1;2'), [['a', 'b'], ['1', '2']]);
+});
+await check('fechas y montos de extractos reales', () => {
+  assert.equal(imr.parseDate('10/02/2026'), '2026-10-02');
+  assert.equal(imr.parseDate('02/10/2026', 'dmy'), '2026-10-02');
+  assert.equal(imr.parseDate('13/02/2026'), '2026-02-13');
+  assert.equal(imr.parseDate('2 Oct 2026'), '2026-10-02');
+  assert.equal(imr.parseDate('2026-10-02 14:33:00'), '2026-10-02');
+  assert.equal(imr.parseDate('02/30/2026'), null);
+  assert.equal(imr.parseSignedCents('(45.00)'), -4500);
+  assert.equal(imr.parseSignedCents('-1,234.56'), -123456);
+  assert.equal(imr.parseSignedCents('12.00 DR'), -1200);
+});
+await check('PayPal: reconoce el formato, salta pendientes y otras monedas, comisión en positivo', () => {
+  const csv = 'Date,Time,Name,Type,Status,Currency,Gross,Fee,Net,Transaction ID\n'
+    + '10/02/2026,10:00,"Acme, LLC",Payment,Completed,USD,"1,250.00",-36.55,"1,213.45",ABC\n'
+    + '10/03/2026,11:00,Figma,Subscription,Completed,USD,-15.00,0.00,-15.00,XYZ\n'
+    + '10/04/2026,11:00,Otro,Payment,Pending,USD,50.00,0,50,P1\n'
+    + '10/05/2026,11:00,Euro,Payment,Completed,EUR,50.00,0,50,P2';
+  const rows = imr.parseCsv(csv);
+  assert.equal(imr.detectPreset(rows[0]), 'paypal');
+  const out = imr.normalizeRows(rows.slice(1), imr.guessMapping(rows[0], 'paypal'));
+  assert.deepEqual(out.rows.map((r) => [r.amount_cents, r.fee_cents]), [[125000, 3655], [-1500, 0]]);
+  assert.deepEqual(out.skipped, { invalid: 0, status: 1, currency: 1, zero: 0 });
+});
+await check('banco con columnas de cargo y abono; signo invertido para tarjetas como Amex', () => {
+  const rows = imr.parseCsv('Date,Description,Debit,Credit\n10/01/2026,VERCEL INC,20.00,\n10/02/2026,ZELLE FROM ACME,,500.00');
+  const map = imr.guessMapping(rows[0], 'bank');
+  assert.deepEqual(imr.normalizeRows(rows.slice(1), map).rows.map((r) => r.amount_cents), [-2000, 50000]);
+  const amex = imr.parseCsv('Date,Description,Amount\n10/01/2026,FIGMA,15.00');
+  const m2 = { ...imr.guessMapping(amex[0], 'bank'), invert: true };
+  assert.equal(imr.normalizeRows(amex.slice(1), m2).rows[0].amount_cents, -1500);
+});
+await check('proveedor y categoría probables del concepto', () => {
+  assert.equal(imr.guessVendor('SQ *FIGMA.COM 4021 SAN FRANCISCO'), 'Figma');
+  assert.equal(imr.guessVendor('POS DEBIT OFFICE DEPOT #123'), 'Office Depot');
+  assert.equal(imr.guessCategory('VERCEL INC'), 'hosting');
+  assert.equal(imr.guessCategory('OPENAI *CHATGPT SUBSCR'), 'ia');
+  assert.equal(imr.guessCategory('PANADERIA LA ESPIGA'), null);
+});
+await check('claves de importación estables; dos filas idénticas son dos movimientos', () => {
+  const h = (s) => s.length.toString(16).padStart(24, '0');
+  const rows = [{ date: '2026-10-01', amount_cents: -500, description: 'Café', ref: '' }, { date: '2026-10-01', amount_cents: -500, description: 'café ', ref: '' }];
+  const k = imr.importKeys('3', rows, h);
+  assert.notEqual(k[0], k[1]);
+  assert.deepEqual(imr.importKeys('3', rows, h), k);
+  assert.match(k[0], /^imp:3:/);
+});
+await check('importar: pendiente de revisar, sin meses cerrados ni lo descartado; categoría aprendida', async () => {
+  reset((t, p) => {
+    if (/FROM finance_accounts WHERE id = \$1/.test(t)) return { rows: [{ id: '3', kind: 'bank' }] };
+    if (/FROM finance_months WHERE status = 'closed'/.test(t)) return { rows: [{ m: '2026-09' }] };
+    if (/FROM finance_suppressed_refs/.test(t)) return { rows: [{ source_ref: p[0][1] }] };
+    if (/DISTINCT ON \(lower\(vendor\)\)/.test(t)) return { rows: [{ v: 'figma', category: 'software' }] };
+    if (/INSERT INTO company_expenses/.test(t)) return { rows: [{ id: '1' }] };
+    if (/INSERT INTO income_entries/.test(t)) return { rows: [{ id: '2' }] };
+    return { rows: [] };
+  });
+  const out = await imp.importRows({ accountId: '3', filename: 'oct.csv', by: 'yo', rows: [
+    { date: '2026-10-01', amount_cents: -1500, description: 'SQ *FIGMA.COM', ref: '' },
+    { date: '2026-10-02', amount_cents: -999, description: 'Descartada antes', ref: '' },
+    { date: '2026-09-20', amount_cents: -700, description: 'Mes cerrado', ref: '' },
+    { date: '2026-10-03', amount_cents: 50000, fee_cents: 0, description: 'ZELLE FROM ACME', ref: '' },
+  ] });
+  assert.deepEqual(out, { total: 4, created_expenses: 1, created_income: 1, existing: 0, suppressed: 1, closed: 1 });
+  const ins = log.find((e) => /INSERT INTO company_expenses/.test(e.text));
+  assert.match(ins.text, /'import', t\.ref, 'pending'/);
+  assert.deepEqual(ins.params[2], ['software']);   // aprendida del último gasto de Figma
+  assert.deepEqual(ins.params[3], [1500]);         // el gasto se guarda en positivo
+  assert.ok(log.some((e) => /INSERT INTO finance_imports/.test(e.text)));
+  await assert.rejects(imp.importRows({ accountId: '3', rows: [{ date: '2026-10-01', amount_cents: 0, description: 'x' }] }), /fila 1/);
+  await assert.rejects(imp.importRows({ accountId: 'x', rows: [] }), /cuenta/);
+});
+await check('revisar: traspaso se descarta sin volver; cobro de factura toma cuenta y comisión', async () => {
+  reset((t) => {
+    if (/FROM income_entries WHERE id = \$1/.test(t)) return { rows: [{ id: '2', received_at: '2026-10-03', amount_cents: '50000', fee_cents: '0', account_id: '3', source_ref: 'imp:3:abc:1' }] };
+    if (/^UPDATE payments/.test(t)) return { rows: [{ id: '9' }] };
+    return { rows: [] };
+  });
+  await imp.resolveIncome('2', 'payment', { payment_id: '9' }, 'yo');
+  assert.ok(log.some((e) => /^UPDATE payments SET account_id = COALESCE\(account_id, \$1\)/.test(e.text)));
+  assert.ok(log.some((e) => /INSERT INTO finance_suppressed_refs/.test(e.text) && e.params[0] === 'imp:3:abc:1'));
+  assert.ok(log.some((e) => /DELETE FROM income_entries/.test(e.text)));
+  reset((t) => (/FROM company_expenses WHERE id = \$1/.test(t) ? { rows: [{ id: '1', spent_at: '2026-10-01', amount_cents: '1500', source_ref: 'imp:3:x:1' }] } : { rows: [] }));
+  await assert.rejects(imp.resolveExpense('1', 'accept', {}), /categoría/);
+  await imp.resolveExpense('1', 'ignore', {}, 'yo');
+  assert.ok(log.some((e) => /INSERT INTO finance_suppressed_refs/.test(e.text)));
+});
+
+// ════════════════════════════════════════════════════════════════
+//  Recibos
+// ════════════════════════════════════════════════════════════════
+const rc = await import('../lib/finance-receipts.mjs');
+const UUIDX = '123e4567-e89b-12d3-a456-426614174000';
+await check('recibos: ruta exacta, solo fotos o PDF, 15 MB como mucho', async () => {
+  assert.equal(rc.checkReceiptPath(`receipts/7/${UUIDX}.pdf`, '7', 'application/pdf'), true);
+  assert.equal(rc.checkReceiptPath(`receipts/8/${UUIDX}.pdf`, '7', 'application/pdf'), false);
+  assert.equal(rc.checkReceiptPath(`receipts/7/${UUIDX}.png`, '7', 'application/pdf'), false);
+  assert.equal(rc.checkReceiptPath(`receipts/7/../x.pdf`, '7', 'application/pdf'), false);
+  reset(() => ({ rows: [{ id: '7' }] }));
+  await assert.rejects(rc.receiptTokenOptions(`receipts/7/${UUIDX}.svg`, JSON.stringify({ expenseId: '7', contentType: 'image/svg+xml', size: 10 })), /foto/);
+  await assert.rejects(rc.receiptTokenOptions(`receipts/7/${UUIDX}.pdf`, JSON.stringify({ expenseId: '7', contentType: 'application/pdf', size: 16 * 1024 * 1024 })), /15 MB/);
+  const opt = await rc.receiptTokenOptions(`receipts/7/${UUIDX}.pdf`, JSON.stringify({ expenseId: '7', contentType: 'application/pdf', size: 2048 }));
+  assert.deepEqual([opt.allowedContentTypes, opt.maximumSizeInBytes, opt.addRandomSuffix, opt.allowOverwrite], [['application/pdf'], 2048, false, false]);
+});
+await check('recibos: el tipo real manda; un falso PDF se borra y no se enlaza', async () => {
+  reset((t) => (/SELECT id, receipt_path FROM company_expenses/.test(t) ? { rows: [{ id: '7', receipt_path: `receipts/7/old.png` }] } : { rows: [] }));
+  blobs.deleted.length = 0;
+  blobs.type = { mime: 'text/html', ext: 'html' };
+  await assert.rejects(rc.confirmReceipt('7', `receipts/7/${UUIDX}.pdf`), /no es una foto ni un PDF/);
+  assert.deepEqual(blobs.deleted, [`receipts/7/${UUIDX}.pdf`]);
+  assert.ok(!log.some((e) => /^UPDATE company_expenses/.test(e.text)));
+  blobs.deleted.length = 0;
+  blobs.type = { mime: 'application/pdf', ext: 'pdf' };
+  await rc.confirmReceipt('7', `receipts/7/${UUIDX}.pdf`);
+  assert.ok(log.some((e) => /receipt_status = 'attached'/.test(e.text)));
+  assert.deepEqual(blobs.deleted, ['receipts/7/old.png']); // el anterior se borra
 });
 
 if (fails.length) {

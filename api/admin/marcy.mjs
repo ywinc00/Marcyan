@@ -16,16 +16,26 @@ import { listConversations, getConversation, monthlySpend, monthFunnel } from '.
 import { setTakeover, recordOwnerMessage, markOwnerTyping, clearOwnerTyping } from '../../lib/takeover.mjs';
 
 // Manda por WhatsApp o Instagram lo que escribe el dueño. null = canal web (nada que mandar).
+// Pidió STOP (encargo legal 2026-11-15 §3d): tampoco el equipo le escribe. Se mira ANTES de
+// guardar el mensaje, para que no quede en el historial uno que no salió. Sin poder
+// consultarlo, no se envía. Devuelve el error o null.
+async function optOutBlock(sid) {
+  const { sql } = await import('@vercel/postgres');
+  let c;
+  try { c = (await sql`SELECT channel, contact FROM chat_conversations WHERE sid = ${sid}`).rows[0]; } catch { return null; }
+  if (!c || !['whatsapp', 'instagram'].includes(c.channel) || !c.contact) return null;
+  const { isOptedOut } = await import('../../lib/channels.mjs');
+  const out = await isOptedOut({ channel: c.channel, contact: c.contact });
+  if (out === true) return 'Este cliente pidió no recibir más mensajes (STOP). No se le escribe salvo que vuelva a escribir ALTA o START.';
+  if (out === null) return 'No pude comprobar si este cliente pidió STOP. Prueba de nuevo en un momento.';
+  return null;
+}
+
 async function sendOwnerByChannel(sid, text) {
   const { sql } = await import('@vercel/postgres');
   let c;
   try { c = (await sql`SELECT channel, contact FROM chat_conversations WHERE sid = ${sid}`).rows[0]; } catch { return null; }
   if (!c || !['whatsapp', 'instagram'].includes(c.channel) || !c.contact) return null;
-  // Pidió STOP (encargo legal 2026-11-15 §3d): tampoco el equipo le escribe.
-  const { isOptedOut } = await import('../../lib/channels.mjs');
-  if (await isOptedOut({ channel: c.channel, contact: c.contact })) {
-    return { ok: false, error: 'Este cliente pidió no recibir más mensajes (STOP). No se le escribe salvo que vuelva a escribir ALTA o START.' };
-  }
   try {
     const { ADAPTERS } = await import('../../lib/channel-runtime.mjs');
     await ADAPTERS[c.channel].send(c.contact, String(text || '').trim().slice(0, 2000));
@@ -44,7 +54,7 @@ async function nativeTyping(sid, t) {
   if (t.prev && Date.now() - new Date(t.prev).getTime() < 20000) return;
   try {
     const { isOptedOut } = await import('../../lib/channels.mjs');
-    if (await isOptedOut({ channel: t.channel, contact: t.contact })) return;
+    if ((await isOptedOut({ channel: t.channel, contact: t.contact })) !== false) return;
     const meta = await import('../../lib/meta.mjs');
     if (t.channel === 'instagram') return await meta.instagramTyping(t.contact);
     const { sql } = await import('@vercel/postgres');
@@ -72,6 +82,8 @@ export default async function handler(req, res) {
         return res.status(200).json({ ok: true });
       }
       if (b.action === 'enviar') {
+        const blocked = await optOutBlock(sid);
+        if (blocked) return res.status(409).json({ ok: false, error: blocked });
         const row = await recordOwnerMessage({ sid, text: b.text });
         if (!row) return res.status(409).json({ ok: false, error: 'Primero toma la conversación' });
         // WhatsApp e Instagram: el mensaje del dueño sale por el mismo canal (en la web lo recoge el widget).

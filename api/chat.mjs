@@ -679,6 +679,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
     // Cifras que ya salieron en la conversación (del cliente o de una herramienta en un
     // turno anterior): Marcy puede repetirlas sin que el filtro estricto las corte.
     let extraAllow = historyFigures(messages);
+    let lossFigures = [];   // cifras de calcular_perdida: pérdidas del cliente, no precios (estimateNote)
 
     // ¿Pidió una herramienta INTERNA (cómputo/revisión)? Ejecútala server-side y haz UNA
     // 2ª llamada (cap 1 iteración). El visitante no ve estas tools ni sus resultados.
@@ -691,6 +692,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
         ? await extraInternal.run(internal).catch(() => FAIL_RESULT)
         : await runInternalTool(internal, { lang, ip, sid });
       extraAllow = [...extraAllow, ...(out.extraAllow || [])];
+      if (internal.name === CALC_TOOL.name) lossFigures = out.extraAllow || [];
       // La API exige un tool_result por CADA tool_use del turno 1. Solo el interno
       // ejecutado lleva resultado real; cualquier OTRA tool del mismo turno (raro, contra
       // el prompt): si es de UI la honramos vía RESCATE abajo (ok:true = "mostrada"), si es
@@ -762,7 +764,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
     const beforePrice = reply;
     reply = pricePostFilter(reply, lang, extraAllow);          // cifras fuera del allowlist (+ las computadas)
     const fallback = !text || reply !== beforePrice;
-    if (!fallback) reply = estimateNote(reply, lang, extraAllow); // todo precio, como estimado (legal §3c)
+    if (!fallback) reply = estimateNote(reply, lang, lossFigures); // todo precio o plazo, como estimado (legal §3c)
 
     // Coste y caché del turno (P2): una línea en el registro y su suma en la fila del día.
     const usage = sumUsage(finalResp === r1 ? [r1] : [r1, ...extraResps, finalResp]);

@@ -263,6 +263,8 @@ ok('aviso de IA: se antepone solo si no lo dice ya', () => {
   assert.equal(withIntro('¿Qué negocio tienes?', 'es'), 'Hola, soy Marcy, la asistente con IA de Marcyan.\n\n¿Qué negocio tienes?');
   assert.equal(withIntro('Hola, soy Marcy, la asistente con IA de Marcyan. ¿En qué te ayudo?', 'es'), 'Hola, soy Marcy, la asistente con IA de Marcyan. ¿En qué te ayudo?');
   assert.match(withIntro('What business do you have?', 'en'), /^Hi, I'm Marcy, Marcyan's AI assistant\./);
+  // "asistente con IA" es un servicio que vendemos: hablar de él no es presentarse.
+  assert.ok(withIntro('Un asistente con IA para WhatsApp sale desde $500.', 'es').startsWith(CH_MSG.es.intro));
 });
 await aok('primer mensaje de Marcy en WhatsApp: con el aviso de IA', async () => {
   const s = fresh(); s.turns = [];
@@ -292,9 +294,10 @@ await aok('teléfono: saludo legal exacto y recados que avisan de la grabación'
   for (const k of ['recado', 'noContesta', 'fallo']) { assert.match(V_MSG.es[k], /se graba/, k); assert.match(V_MSG.en[k], /recorded/, k); }
 });
 ok('STOP: palabras de baja y de alta, solo si son el mensaje entero', () => {
-  for (const w of ['STOP', 'stop', ' Stop. ', 'BAJA', 'Baja!', 'parar', 'Cancelar', 'UNSUBSCRIBE', 'alto']) assert.equal(optKeyword(w), 'stop', w);
+  for (const w of ['STOP', 'stop', ' Stop. ', 'BAJA', 'Baja!', 'parar', 'UNSUBSCRIBE', 'Stop por favor', 'BAJA gracias', 'No me escriban más', 'dejen de escribirme', "don't text me anymore"]) assert.equal(optKeyword(w), 'stop', w);
   for (const w of ['START', 'Alta', 'unstop', 'reanudar']) assert.equal(optKeyword(w), 'start', w);
-  for (const w of ['no pares de mandarme info', 'stop the project', 'Hola', '', 'quiero darme de alta en el plan']) assert.equal(optKeyword(w), null, w);
+  // Respuestas normales en una venta o una cita: nunca dan de baja.
+  for (const w of ['Cancelar', 'Alto', 'Para', 'end', 'cancel', 'no pares de mandarme info', 'stop the project', 'Hola', '', 'quiero darme de alta en el plan']) assert.equal(optKeyword(w), null, w);
 });
 await aok('STOP por WhatsApp: no contesta, marca la bandeja y el lead, avisa', async () => {
   const s = fresh();
@@ -319,6 +322,20 @@ await aok('ALTA tras STOP: confirma y vuelve a atender', async () => {
   const s2 = fresh(); s2.opt = 'alta';
   assert.equal(await processInbound(ROW, deps(s2)), 'hecho');
   assert.equal(s2.calls.length, 1);
+});
+await aok('"Start" sin baja previa: sigue el camino normal y con el aviso de IA', async () => {
+  const s = fresh(); s.turns = [];
+  assert.equal(await processInbound({ ...ROW, text: 'Start' }, deps(s)), 'hecho');
+  assert.equal(s.calls.length, 1);
+  assert.ok(s.sent[0].startsWith(CH_MSG.es.intro));
+  assert.deepEqual(s.inbox, ['hecho']);
+});
+await aok('STOP que llega mientras Marcy piensa: la respuesta no sale', async () => {
+  const s = fresh();
+  const d = deps(s, { marcyTurn: async (a) => { s.calls.push(a); s.opt = 'baja'; return { reply: 'Sale desde $400.', action: null, tool: null, cortadas: [], fallback: false, costMicro: 1 }; } });
+  assert.equal(await processInbound(ROW, d), 'hecho');
+  assert.equal(s.sent.length, 0);
+  assert.match(s.recorded[0].reply, /No enviado/);
 });
 await aok('STOP no aplica al teléfono (se cuelga)', async () => {
   const s = fresh();

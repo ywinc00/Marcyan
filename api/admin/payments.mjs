@@ -37,6 +37,8 @@ export default async function handler(req, res) {
         paid_at: body.paid_at,
         reference: body.reference,
         stripe_payment_id: body.stripe_payment_id,
+        account_id: body.account_id,
+        fee_cents: body.fee_cents,
       });
       return res.status(201).json({ ok: true, ...result });
     } catch (err) {

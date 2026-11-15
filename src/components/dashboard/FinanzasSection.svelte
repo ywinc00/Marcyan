@@ -185,10 +185,10 @@
         {:else}Ninguna factura pasada de fecha{/if}
       </Kpi>
       <Kpi label="Gastos (mes)" art="card" value={summary ? fmtUsd0(summary.expenses_this_month_cents) : '…'}>
-        {#if summary}Gastos puntuales. Suscripciones aparte: {formatUsd(summary.subscriptions_monthly_cents)} al mes{:else}Gastos puntuales del mes{/if}
+        {#if summary}Con los cargos de las suscripciones, que se apuntan solos{:else}Gastos del mes{/if}
       </Kpi>
       <Kpi label="Neto (mes)" art="chart-up" tone={summary && net !== 0 ? (net > 0 ? 'data' : 'error') : ''} value={summary ? fmtUsd0(net) : '…'}
-        note="Cobrado menos gastos del mes y suscripciones (estimado mensual)" />
+        note="Cobrado menos comisiones y gastos del mes" />
     </KpiGrid>
   {/if}
 

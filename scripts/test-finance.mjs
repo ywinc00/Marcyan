@@ -177,7 +177,10 @@ await check('gráfico: el eje Y usa topes redondos (1, 2, 2.5 o 5 × 10^n por tr
 });
 await check('estado manual: solo Borrador, Enviada o Anulada; borrador sin pagos', () => {
   assert.equal(rules.manualStatusProblem('sent', 0), null);
-  assert.equal(rules.manualStatusProblem('void', 500), null);
+  // Anular con cobros sin devolver ya no se permite (fase 1 de libros): seguirían contando como ingreso.
+  assert.match(rules.manualStatusProblem('void', 500), /devolución/);
+  assert.equal(rules.manualStatusProblem('void', 500, 500), null);
+  assert.equal(rules.manualStatusProblem('void', 0), null);
   assert.ok(rules.manualStatusProblem('paid', 0));
   assert.ok(rules.manualStatusProblem('overdue', 0));
   assert.match(rules.manualStatusProblem('draft', 1), /borrador/);
@@ -203,10 +206,11 @@ await check('próximo cargo avanza solo según la periodicidad (FIN-10)', () => 
 await check('categorías fijas: normaliza sinónimos y desconocidas a "otro" (FIN-21)', () => {
   assert.equal(rules.normalizeCategory('Hosting'), 'hosting');
   assert.equal(rules.normalizeCategory('hospedaje'), 'hosting');
-  assert.equal(rules.normalizeCategory('Viajes'), 'otro');
+  assert.equal(rules.normalizeCategory('Viajes'), 'viajes'); // categoría propia desde la fase 1 (línea 24a)
+  assert.equal(rules.normalizeCategory('Cosas raras'), 'otro');
   assert.equal(rules.normalizeCategory(''), null);
   assert.equal(rules.categoryLabel('legal'), 'Legal y contable');
-  assert.equal(rules.categoryLabel('viajes'), 'Viajes');
+  assert.equal(rules.categoryLabel('viajes'), 'Viajes de trabajo');
 });
 await check('fechas y meses', () => {
   assert.equal(rules.isValidDay('2026-02-30'), false);
@@ -308,6 +312,7 @@ await check('editar un pago: el saldo se calcula SIN ese pago', async () => {
 });
 await check('borrar un pago recalcula su factura', async () => {
   reset((t) => {
+    if (/SELECT paid_at FROM payments WHERE id = \$1 FOR UPDATE/.test(t)) return { rows: [{ paid_at: '2026-10-10' }] };
     if (/DELETE FROM payments/.test(t)) return { rows: [{ invoice_id: '5' }] };
     if (/SELECT i.status, i.amount_cents/.test(t)) return { rows: [{ status: 'paid', amount_cents: '1000', paid_cents: '0' }] };
     return { rows: [] };
@@ -322,6 +327,7 @@ await check('editar factura: el monto no baja de lo cobrado y los estados calcul
   const db1 = (t) => {
     if (/FROM invoices WHERE id = \$1 FOR UPDATE/.test(t)) return { rows: [{ id: '5', client_id: '3', status: 'partial', amount_cents: '1000', project_id: null }] };
     if (/AS paid FROM payments/.test(t)) return { rows: [{ paid: '600' }] };
+    if (/FROM refunds WHERE invoice_id/.test(t)) return { rows: [{ c: '0' }] };
     return { rows: [] };
   };
   reset(db1);
@@ -334,10 +340,19 @@ await check('editar factura: el monto no baja de lo cobrado y los estados calcul
   await assert.rejects(fin.updateInvoice('5', { client_id: '9' }), /no se puede cambiar de cliente/);
   assert.ok(has(/^ROLLBACK$/));
 });
-await check('editar factura: anular con pagos se permite y guarda el estado', async () => {
+await check('editar factura: anular con cobros sin devolver → 409; con la devolución registrada se anula', async () => {
+  const sinDevolver = (t) => {
+    if (/FROM invoices WHERE id = \$1 FOR UPDATE/.test(t)) return { rows: [{ id: '5', client_id: '3', status: 'partial', amount_cents: '1000' }] };
+    if (/AS paid FROM payments/.test(t)) return { rows: [{ paid: '600' }] };
+    if (/FROM refunds WHERE invoice_id/.test(t)) return { rows: [{ c: '0' }] };
+    return { rows: [] };
+  };
+  reset(sinDevolver);
+  await assert.rejects(fin.updateInvoice('5', { status: 'void' }), (e) => e.status === 400 && /devolución/.test(e.message));
   reset((t) => {
     if (/FROM invoices WHERE id = \$1 FOR UPDATE/.test(t)) return { rows: [{ id: '5', client_id: '3', status: 'partial', amount_cents: '1000' }] };
     if (/AS paid FROM payments/.test(t)) return { rows: [{ paid: '600' }] };
+    if (/FROM refunds WHERE invoice_id/.test(t)) return { rows: [{ c: '600' }] };
     if (/SELECT i.status, i.amount_cents/.test(t)) return { rows: [{ status: 'void', amount_cents: '1000', paid_cents: '600' }] };
     if (/FROM \( SELECT i.id/.test(t)) return { rows: [{ id: '5', status: 'void' }] };
     return { rows: [] };
@@ -384,7 +399,7 @@ await check('estado derivado en SQL: vencida por fecha de Houston, borrador sin 
 });
 await check('FIN-11: Por cobrar y Vencido sin borradores; tramo comparable del mes anterior', async () => {
   reset((t) => {
-    if (/AS prev_same/.test(t)) return { rows: [{ cents: '42000', prev_same: '21000' }] };
+    if (/AS prev_same/.test(t)) return { rows: [{ cents: '42000', fees: '1200', prev_same: '21000' }] };
     if (/AS ar,/.test(t)) return { rows: [{ ar: '242000', open_n: 4, overdue: '105000', overdue_n: 2, draft: '12000', draft_n: 1, total_n: 10 }] };
     if (/FROM company_expenses/.test(t)) return { rows: [{ cents: '10399' }] };
     if (/FROM subscriptions/.test(t)) return { rows: [{ cents: '24339', n: 7 }] };
@@ -397,7 +412,9 @@ await check('FIN-11: Por cobrar y Vencido sin borradores; tramo comparable del m
   assert.equal(s.ar_total_cents, 242000);
   assert.equal(s.draft_total_cents, 12000);
   assert.equal(s.collected_prev_same_period_cents, 21000);
-  assert.equal(s.net_this_month_cents, 42000 - 10399 - 24339);
+  // Los cargos de suscripciones ya son gastos reales: el estimado no se resta (contaba doble).
+  assert.equal(s.net_this_month_cents, 42000 - 1200 - 10399);
+  assert.equal(s.subscriptions_monthly_cents, 24339);
   assert.equal(s.counts.open_invoices, 4);
   assert.equal(s.subscriptions_active, 7);
 });
@@ -424,10 +441,12 @@ await check('gastos: monto > 0, categoría normalizada y fecha de Houston por de
   assert.equal(ins.params[3], houstonDate());
 });
 await check('gastos: editar (PATCH) con SET parametrizado y validación', async () => {
-  reset(() => ({ rows: [{ id: '4', label: 'Nuevo' }] }));
+  reset((t) => (/FROM finance_months/.test(t) ? { rows: [] } : { rows: [{ id: '4', label: 'Nuevo', spent_at: '2026-10-10' }] }));
   const r = await exp.updateExpense('4', { label: 'Nuevo', amount_cents: 1500, category: 'otro', hack: 'x' });
   assert.equal(r.label, 'Nuevo');
-  assert.match(log[0].text, /UPDATE company_expenses SET label = \$1, category = \$2, amount_cents = \$3 WHERE id = \$4/);
+  const upd = log.find((e) => /^UPDATE company_expenses/.test(e.text));
+  assert.match(upd.text, /UPDATE company_expenses SET label = \$1, category = \$2, amount_cents = \$3, updated_at = NOW\(\) WHERE id = \$4/);
+  assert.ok(!/hack/.test(upd.text));
   await assert.rejects(exp.updateExpense('4', { amount_cents: -5 }), /mayor que \$0/);
   assert.equal(await exp.updateExpense('abc', { label: 'x' }), null);
 });
@@ -499,7 +518,7 @@ await check('/payments/:id: 404 si no existe; ID inválido → 400', async () =>
   assert.equal(r2.statusCode, 400);
 });
 await check('PATCH /expenses/:id con monto inválido → 400 legible', async () => {
-  reset();
+  reset((t) => (/FROM company_expenses WHERE id = \$1 LIMIT 1/.test(t) ? { rows: [{ id: '4', spent_at: '2026-10-10' }] } : { rows: [] }));
   const res = fakeRes();
   await expenseIdH({ method: 'PATCH', query: { id: '4' }, body: { amount_cents: 0 } }, res);
   assert.equal(res.statusCode, 400);

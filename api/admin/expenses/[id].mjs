@@ -1,6 +1,8 @@
 // /api/admin/expenses/:id   (id = company_expenses.id BIGINT → string)
 //   GET    → { ok, expense }
-//   PATCH  → { label?, category?, amount_cents?, spent_at?, vendor?, notes? }
+//   PATCH  → { label?, category?, amount_cents?, spent_at?, vendor?, notes?,
+//              account_id?, vendor_id?, business_pct?, receipt_status?, review_status? }
+//            Un mes cerrado no se edita (409 con el motivo).
 //            edita el gasto {ok, expense} (FIN-10)
 //   DELETE → elimina el gasto {ok, deleted}
 // Protegido con requireAdmin.
@@ -42,11 +44,12 @@ export default async function handler(req, res) {
 
   if (req.method === 'DELETE') {
     try {
-      const ok = await deleteExpense(id);
+      const ok = await deleteExpense(id, session.email || null);
       if (!ok) return res.status(404).json({ ok: false, error: 'Gasto no encontrado' });
       console.log(`[admin/expenses/:id DELETE] gasto ${id} eliminado por ${session.email}`);
       return res.status(200).json({ ok: true, deleted: id });
     } catch (err) {
+      if (isBusinessError(err)) return res.status(err.status).json({ ok: false, error: err.message });
       console.error('[admin/expenses/:id DELETE] error:', err);
       return res.status(500).json({ ok: false, error: 'Error al eliminar gasto' });
     }

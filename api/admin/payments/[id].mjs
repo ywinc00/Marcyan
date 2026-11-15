@@ -9,7 +9,7 @@ import { requireAdmin } from '../../../lib/auth.mjs';
 import { getPayment, updatePayment, deletePayment } from '../../../lib/finance.mjs';
 import { isBusinessError } from '../../../lib/finance-rules.mjs';
 
-const EDITABLE = ['amount_cents', 'method', 'paid_at', 'reference'];
+const EDITABLE = ['amount_cents', 'method', 'paid_at', 'reference', 'account_id', 'fee_cents'];
 
 export default async function handler(req, res) {
   const session = await requireAdmin(req, res);
@@ -53,6 +53,7 @@ export default async function handler(req, res) {
       console.log(`[admin/payments/:id DELETE] pago ${id} eliminado por ${session.email}`);
       return res.status(200).json({ ok: true, ...out });
     } catch (err) {
+      if (isBusinessError(err)) return res.status(err.status).json({ ok: false, error: err.message });
       console.error('[admin/payments/:id DELETE] error:', err);
       return res.status(500).json({ ok: false, error: 'Error al borrar el pago' });
     }

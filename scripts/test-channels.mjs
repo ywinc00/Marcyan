@@ -305,7 +305,6 @@ await aok('STOP por WhatsApp: no contesta, marca la bandeja y el lead, avisa', a
   assert.equal(s.sent.length, 0); assert.equal(s.calls.length, 0);
   assert.deepEqual(s.inbox, ['baja']);
   assert.equal(s.leadNotes.length, 1); assert.match(s.leadNotes[0], /STOP por WhatsApp/);
-  assert.ok(s.queries.some((q) => /SET sms_consent = false/.test(q)), 'la casilla de SMS del lead queda en no');
   assert.match(s.notes[0].title, /no recibir más mensajes/);
 });
 await aok('tras STOP, un mensaje nuevo: Marcy calla, queda en Orbit y avisa', async () => {

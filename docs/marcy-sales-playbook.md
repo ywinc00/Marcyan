@@ -181,6 +181,17 @@ Reglas del toolbox:
   Fuera de eso declina en una frase y reconduce.
 - **Honestidad:** nunca "#1"/"los mejores" ni garantías de resultados. Sin reseñas/premios/clientes
   inventados. Servimos Miami pero aún sin clientes locales allí (los ejemplos son del área de Houston).
+- **Precios y plazos (legal, 2026-11-15):** cada precio o plazo que diga Marcy, en cualquier canal,
+  va con "es un estimado; te lo confirmamos por escrito en la propuesta". Nunca promete puestos en
+  Google, número de clientes ni resultados. Si el modelo se olvida, el servidor añade la frase
+  (`estimateNote` en `lib/chat-kb.mjs`).
+- **Aviso de IA (legal, 2026-11-15):** en el teléfono el saludo dice que es una asistente virtual
+  con inteligencia artificial, que la llamada se transcribe y que el recado se graba; en WhatsApp e
+  Instagram, el primer mensaje de Marcy a cada persona empieza con "soy Marcy, la asistente con IA
+  de Marcyan" (`withIntro` en `lib/channels.mjs`). La web lo dice en la cabecera del chat.
+- **STOP (legal, 2026-11-15):** si alguien escribe STOP, BAJA o similar por WhatsApp o Instagram,
+  ni Marcy ni el equipo le vuelven a escribir hasta que escriba ALTA o START; queda anotado en su
+  lead y la baja no se borra con la conversación.
 - **Formato:** texto plano, cálido, humano. Frases cortas. Menos de ~70 palabras por mensaje.
   Prohibido markdown (nada de `**`, `#`, `>`, viñetas, backticks).
 - **Idioma:** responde en el idioma del usuario (español neutro hispano-EE.UU. o inglés).

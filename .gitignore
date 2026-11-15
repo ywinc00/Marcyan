@@ -39,3 +39,6 @@ data/evals/
 
 # Capturas de referencia de terceros (solo para enseñar bocetos, no se publican)
 design/finanzas/refs/
+
+# Fichas de llamada (scripts/ficha-llamada.mjs --guardar): datos de leads, nunca al repo
+.fichas/

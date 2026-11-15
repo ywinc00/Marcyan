@@ -1,0 +1,134 @@
+---
+// Calendario de la tarjeta «Mensual» en Precios (pedido del dueño, 2026-11-14): pareja
+// de la tarjeta de pago de «Pago por proyecto». Un calendario de mesa suelto, sin recuadro,
+// que al pasar el ratón pasa la hoja del mes, como el de workos.com/pricing.
+// Mecanismo medido en la referencia (muestreo cada ~35 ms en Chrome, 2026-11-14):
+// - dos hojas iguales apiladas y dos anillas; todo gira sobre el borde de arriba con
+//   perspectiva de 300 px; zona de ratón de 102 × 93 alrededor;
+// - ~180 ms de espera (si el ratón sale antes, no pasa); la hoja de arriba da la vuelta entera hacia atrás por encima de las
+//   anillas en ~950 ms y se apaga cuando pasa por detrás (hacia los 550 ms);
+// - la hoja de abajo arranca inclinada ~18° hacia delante y algo apagada, y se asienta
+//   en ~650 ms;
+// - el calendario entero se mece hacia atrás hasta ~18,5° con el empuje de la hoja y vuelve
+//   con un rebote pequeño (-0,4°) en ~1,9 s;
+// - al salir no hay vuelta atrás: la hoja nueva es igual que la que se fue, así que el
+//   reposo se recupera sin que se note.
+// Aquí con el oro de la marca, cuadros de días en tinta (legibles sobre oro) y sombra
+// neutra, sin halo dorado (pieza G-10). Decorativo: aria-hidden. Con ratón, al pasar
+// (F-07); en táctil, cada toque pasa una hoja; con movimiento reducido, quieto (F-02).
+const dias = [1, 2, 2, 3, 2, 3, 2, 2, 2, 2, 1, 2];
+---
+<span class="cal" aria-hidden="true">
+  <span class="cal__wrap">
+    <span class="cal__hoja cal__hoja--abajo">
+      {dias.map((d) => <i class={`cal__dia cal__dia--${d}`}></i>)}
+    </span>
+    <span class="cal__hoja cal__hoja--arriba">
+      {dias.map((d) => <i class={`cal__dia cal__dia--${d}`}></i>)}
+    </span>
+    <span class="cal__anilla cal__anilla--1"></span>
+    <span class="cal__anilla cal__anilla--2"></span>
+  </span>
+  <span class="cal__target"></span>
+</span>
+
+<style>
+  .cal {
+    position: relative; display: inline-block; inline-size: 38px; block-size: 29px;
+    perspective: 300px;
+  }
+  /* Zona de ratón de 102 × 93 en la referencia, centrada en el calendario. */
+  .cal__target { position: absolute; inset: -32px -32px; }
+
+  .cal__wrap { position: absolute; inset: 0; display: block; transform-origin: 50% 0; }
+
+  .cal__hoja {
+    position: absolute; inset: 0; display: grid;
+    grid-template-columns: repeat(4, 4px); grid-auto-rows: 4px; gap: 3px 4px;
+    align-content: start; padding: 6px 0 0 5px; box-sizing: border-box;
+    border-radius: 3px;
+    /* Oro de la marca en papel: claro arriba, más hondo abajo, con filo de luz. */
+    background: linear-gradient(180deg, #e2cfa4 0%, var(--accent-gold, #c8a96e) 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -1px 0 rgba(0, 0, 0, .14);
+  }
+  .cal__hoja { transform-origin: 50% 0; }
+  .cal__hoja--abajo { z-index: 1; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -1px 0 rgba(0, 0, 0, .14), 0 5px 12px -5px rgba(0, 0, 0, .7); }
+  /* Como en la referencia, una sola cara visible por detrás: se apaga antes de verse del revés. */
+  .cal__hoja--arriba { z-index: 2; }
+
+  /* Días en tinta sobre oro, tres tonos como la referencia: el más oscuro marca los días con cita. */
+  .cal__dia { display: block; inline-size: 4px; block-size: 4px; border-radius: .5px; }
+  .cal__dia--1 { background: rgba(12, 11, 9, .3); }
+  .cal__dia--2 { background: rgba(12, 11, 9, .4); }
+  .cal__dia--3 { background: rgba(12, 11, 9, .78); }
+
+  /* Anillas de metal claro que asoman por arriba. */
+  .cal__anilla {
+    position: absolute; top: -3px; z-index: 3; inline-size: 3px; block-size: 7px; border-radius: 100px;
+    background: linear-gradient(135deg, #e9e4d8 25%, #fffaf0 38%, #b3a98f);
+    box-shadow: 0 .5px .5px rgba(0, 0, 0, .6);
+  }
+  .cal__anilla--1 { left: 8px; }
+  .cal__anilla--2 { left: 27px; }
+
+  /* Pasar la hoja: tres movimientos con los tiempos medidos. Lo lanza el script con una
+     clase que dura lo que el paso, así la hoja termina aunque el ratón salga a mitad. */
+  .cal.is-pasando .cal__hoja--arriba { animation: cal-hoja 950ms linear both; }
+  .cal.is-pasando .cal__hoja--abajo { animation: cal-asienta 650ms cubic-bezier(.2, .6, .3, 1) both; }
+  .cal.is-pasando .cal__wrap { animation: cal-mece 1900ms linear both; }
+
+  @keyframes cal-hoja {
+    /* Ángulos muestreados en la referencia, en fracción del tiempo. */
+    0% { transform: rotateX(0); opacity: 1; }
+    10% { transform: rotateX(16deg); }
+    25% { transform: rotateX(52deg); }
+    39% { transform: rotateX(115deg); }
+    40% { opacity: 1; }
+    47% { opacity: 0; }
+    53% { transform: rotateX(242deg); }
+    68% { transform: rotateX(324deg); }
+    83% { transform: rotateX(353deg); }
+    100% { transform: rotateX(360deg); opacity: 0; }
+  }
+  @keyframes cal-asienta {
+    0% { transform: rotateX(-12deg); opacity: .8; }
+    100% { transform: rotateX(0); opacity: 1; }
+  }
+  @keyframes cal-mece {
+    0%, 5% { transform: rotateX(0); }
+    12% { transform: rotateX(.85deg); }
+    19% { transform: rotateX(3.3deg); }
+    27% { transform: rotateX(7.5deg); }
+    34% { transform: rotateX(16.4deg); }
+    41% { transform: rotateX(18.5deg); }
+    49% { transform: rotateX(9.4deg); }
+    56% { transform: rotateX(4.6deg); }
+    63% { transform: rotateX(2deg); }
+    70% { transform: rotateX(.5deg); }
+    78% { transform: rotateX(-.2deg); }
+    85% { transform: rotateX(-.37deg); }
+    93% { transform: rotateX(-.06deg); }
+    100% { transform: rotateX(0); }
+  }
+
+  /* Movimiento reducido (F-02): el calendario no se mueve. */
+  @media (prefers-reduced-motion: reduce) {
+    .cal .cal__hoja, .cal .cal__wrap { animation: none !important; }
+  }
+</style>
+
+<script>
+  // Con ratón, al entrar (tras ~180 ms, como la referencia); en táctil, cada toque. El paso
+  // entero dura ~1,9 s y no se corta si el ratón sale a mitad.
+  for (const c of document.querySelectorAll<HTMLElement>('.cal')) {
+    let fin = 0, espera = 0;
+    const pasar = () => {
+      if (c.classList.contains('is-pasando')) return;
+      c.classList.add('is-pasando');
+      fin = window.setTimeout(() => c.classList.remove('is-pasando'), 2000);
+    };
+    c.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') espera = window.setTimeout(pasar, 180); });
+    c.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') clearTimeout(espera); });
+    c.addEventListener('pointerup', (e) => { if (e.pointerType === 'touch') pasar(); });
+  }
+</script>

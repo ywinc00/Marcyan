@@ -279,9 +279,11 @@ await check('resumen Schedule C: bruto, devoluciones, comisiones a la línea 10 
   const s = await books.scheduleCSummary(2026);
   assert.equal(s.line1_gross, 1000000);
   assert.equal(s.line2_returns, 50000);
-  assert.equal(s.line6_other, 1200);
+  assert.equal(s.line6_other, 0);                    // los intereses no van al Schedule C
+  assert.equal(s.interest_schedule_b, 1200);          // van al Schedule B
+  assert.ok(s.notes.some((n) => /Schedule B/.test(n)));
   assert.deepEqual(s.expenses_by_line, { 8: 20000, '24b': 5000, '27b': 5000, 10: 3000 });
-  assert.equal(s.net_profit, 1000000 - 50000 + 1200 - 33000);
+  assert.equal(s.net_profit, 1000000 - 50000 - 33000);
   assert.equal(s.disclaimer, tax.TAX_DISCLAIMER);
 });
 await check('1099: solo banco, transferencia o efectivo cuentan; aviso cerca del umbral', async () => {
@@ -459,6 +461,7 @@ await check('importar: pendiente de revisar, sin meses cerrados ni lo descartado
 await check('revisar: traspaso se descarta sin volver; cobro de factura toma cuenta y comisión', async () => {
   reset((t) => {
     if (/FROM income_entries WHERE id = \$1/.test(t)) return { rows: [{ id: '2', received_at: '2026-10-03', amount_cents: '50000', fee_cents: '0', account_id: '3', source_ref: 'imp:3:abc:1' }] };
+    if (/SELECT paid_at FROM payments WHERE id = \$1/.test(t)) return { rows: [{ paid_at: '2026-10-02' }] };
     if (/^UPDATE payments/.test(t)) return { rows: [{ id: '9' }] };
     return { rows: [] };
   });
@@ -500,6 +503,124 @@ await check('recibos: el tipo real manda; un falso PDF se borra y no se enlaza',
   await rc.confirmReceipt('7', `receipts/7/${UUIDX}.pdf`);
   assert.ok(log.some((e) => /receipt_status = 'attached'/.test(e.text)));
   assert.deepEqual(blobs.deleted, ['receipts/7/old.png']); // el anterior se borra
+});
+
+// ════════════════════════════════════════════════════════════════
+//  Fallos que encontró la revisión adversarial (2026-11-14): que no vuelvan
+// ════════════════════════════════════════════════════════════════
+const fin = await import('../lib/finance.mjs');
+await check('SQL: editar factura y suscripción llevan $ en cada parámetro', async () => {
+  reset((t) => {
+    if (/FROM invoices WHERE id = \$1 FOR UPDATE/.test(t)) return { rows: [{ id: '5', client_id: '3', status: 'sent', amount_cents: '1000' }] };
+    if (/AS paid FROM payments/.test(t)) return { rows: [{ paid: '0' }] };
+    return { rows: [] };
+  });
+  await fin.updateInvoice('5', { description: 'Anticipo', status: 'void' });
+  const upd = log.find((e) => /^UPDATE invoices SET description/.test(e.text));
+  assert.match(upd.text, /^UPDATE invoices SET description = \$1, status = \$2 WHERE id = \$3$/);
+  let state = { id: '7', name: 'Figma', cycle: 'monthly', active: true, started_at: '2026-01-05', ended_at: null, next_charge_at: '2026-01-05' };
+  reset((t, p) => (/^UPDATE subscriptions/.test(t) ? { rows: [state] } : /FROM subscriptions WHERE id = \$1/.test(t) ? { rows: [state] } : { rows: [] }));
+  await exp.updateSubscription('7', { name: 'Figma Pro' });
+  const us = log.find((e) => /^UPDATE subscriptions/.test(e.text));
+  assert.match(us.text, /^UPDATE subscriptions SET name = \$1 WHERE id = \$2 RETURNING/);
+});
+await check('suscripción: cambiar el día de cobro o el ciclo vale desde hoy; la baja se valida antes de escribir', async () => {
+  const { houstonDate } = await import('../lib/dates.mjs');
+  let state = { id: '7', name: 'Figma', cycle: 'monthly', active: true, started_at: '2026-01-05', ended_at: null, next_charge_at: '2099-01-05' };
+  reset((t, p) => {
+    if (/^UPDATE subscriptions/.test(t)) {
+      const cols = t.slice(t.indexOf('SET') + 4, t.indexOf(' WHERE')).split(', ').map((s) => s.split(' = ')[0]);
+      cols.forEach((c, i) => { state = { ...state, [c]: p[i] }; });
+      return { rows: [state] };
+    }
+    if (/FROM subscriptions WHERE id = \$1/.test(t)) return { rows: [state] };
+    return { rows: [] };
+  });
+  await exp.updateSubscription('7', { next_charge_at: '2099-01-20' });
+  assert.equal(state.started_at, houstonDate());
+  log.length = 0;
+  await assert.rejects(exp.updateSubscription('7', { ended_at: '2020-01-01' }), /baja no puede ser anterior/);
+  assert.ok(!log.some((e) => /^UPDATE subscriptions/.test(e.text)), 'no escribe nada si la baja es inválida');
+});
+await check('suscripción pausada antes de la migración: reactivar abre alta nueva aunque no tenga baja', async () => {
+  const { houstonDate } = await import('../lib/dates.mjs');
+  let state = { id: '8', name: 'Neon', cycle: 'monthly', active: false, started_at: '2026-01-10', ended_at: null, next_charge_at: '2026-01-10' };
+  reset((t, p) => {
+    if (/^UPDATE subscriptions/.test(t)) {
+      const cols = t.slice(t.indexOf('SET') + 4, t.indexOf(' WHERE')).split(', ').map((s) => s.split(' = ')[0]);
+      cols.forEach((c, i) => { state = { ...state, [c]: p[i] }; });
+      return { rows: [state] };
+    }
+    if (/FROM subscriptions WHERE id = \$1/.test(t)) return { rows: [state] };
+    return { rows: [] };
+  });
+  await exp.updateSubscription('8', { active: true });
+  assert.equal(state.started_at, houstonDate());
+});
+await check('cron: nunca otro cargo en el periodo del último registrado (aunque cambie el día)', async () => {
+  assert.equal(books.afterPeriod('2026-10-20', '2026-10-05', 'monthly'), false);
+  assert.equal(books.afterPeriod('2026-11-05', '2026-10-05', 'monthly'), true);
+  assert.equal(books.afterPeriod('2026-12-01', '2026-03-01', 'yearly'), false);
+  reset((t) => {
+    if (/FROM subscriptions/.test(t)) return { rows: [{ id: '7', name: 'Figma', category: 'software', amount_cents: '1500', cycle: 'monthly', next_charge_at: '2026-10-20', started_at: '2026-09-01', ended_at: null }] };
+    if (/MAX\(spent_at\)/.test(t)) return { rows: [{ id: '7', last: '2026-10-05' }] };
+    if (/INSERT INTO company_expenses/.test(t)) return { rows: [{ id: '1' }] };
+    return { rows: [] };
+  });
+  await books.generateSubscriptionCharges({ today: '2026-11-25' });
+  const ins = log.filter((e) => /INSERT INTO company_expenses/.test(e.text)).map((e) => e.params[3]);
+  assert.deepEqual(ins, ['2026-11-20']);   // ni sept ni oct (ya cobrados), solo noviembre
+});
+await check('cierre: una factura anulada y devuelta entera no bloquea el mes', async () => {
+  reset(() => ({ rows: [{ n: 0 }] }));
+  await books.monthChecklist('2026-03');
+  const q = log.find((e) => /i.status = 'void'/.test(e.text));
+  assert.match(q.text, /FROM refunds WHERE invoice_id = i.id\), 0\) > 0/);
+});
+await check('panel: lo importado sin revisar no cuenta en los gastos del mes', async () => {
+  reset(() => ({ rows: [{ cents: '0', n: 0 }] }));
+  await exp.financeExtras();
+  assert.match(log[0].text, /WHERE review_status = 'ok'/);
+});
+await check('un cobro con devoluciones no se borra', async () => {
+  reset((t) => {
+    if (/SELECT paid_at FROM payments WHERE id = \$1 FOR UPDATE/.test(t)) return { rows: [{ paid_at: '2026-10-10' }] };
+    if (/COUNT\(\*\)::int AS n FROM refunds/.test(t)) return { rows: [{ n: 1 }] };
+    return { rows: [] };
+  });
+  await assert.rejects(fin.deletePayment('77'), (e) => e.status === 409 && /devolución/.test(e.message));
+  assert.ok(!log.some((e) => /^DELETE FROM payments/.test(e.text)));
+});
+await check('trimestral: los intereses pagan renta pero no cuota de autónomo', () => {
+  const a = tax.quarterlyEstimate({ year: 2026, ytdNet: 60000, monthsElapsed: 6, today: '2026-07-01' });
+  const b = tax.quarterlyEstimate({ year: 2026, ytdNet: 60000, ytdOtherIncome: 1000, monthsElapsed: 6, today: '2026-07-01' });
+  near(b.seTax, a.seTax);
+  near(b.incomeTax - a.incomeTax, 2000 * 0.22);   // 1.000 en 6 meses = 2.000 al año, tramo del 22 %
+});
+await check('fechas reales del driver (objetos Date) en duplicados', () => {
+  const pairs = tax.findDuplicates([
+    { id: 1, vendor: 'Acme', amount_cents: 5000, spent_at: new Date('2026-11-06T00:00:00Z') },
+    { id: 2, vendor: 'Acme', amount_cents: 5000, spent_at: new Date('2026-11-07T00:00:00Z') },
+  ]);
+  assert.deepEqual(pairs, [['1', '2']]);
+});
+await check('Stripe y Revolut: la hora UTC pasa a la fecha de Houston', () => {
+  assert.equal(imr.utcToHouston('2026-04-01 02:30:00'), '2026-03-31');
+  assert.equal(imr.utcToHouston('2026-04-01T18:00:00Z'), '2026-04-01');
+  const rows = imr.parseCsv('id,Created date (UTC),Amount,Fee,Description,Status,Currency\nch_1,2026-04-01 02:30:00,100.00,3.20,Acme,Paid,usd');
+  const out = imr.normalizeRows(rows.slice(1), imr.guessMapping(rows[0], 'stripe'));
+  assert.equal(out.rows[0].date, '2026-03-31');
+});
+await check('asignar un cargo importado a su suscripción suprime el automático aunque aún no exista', async () => {
+  reset((t, p) => {
+    if (/FROM company_expenses WHERE id = \$1/.test(t)) return { rows: [{ id: '1', spent_at: '2026-10-16', amount_cents: '1500', source_ref: 'imp:3:x:1' }] };
+    if (/FROM subscriptions WHERE id = \$1/.test(t)) return { rows: [{ id: '7', name: 'Figma', category: 'software', cycle: 'monthly', next_charge_at: '2026-10-20', started_at: '2026-09-01', ended_at: null }] };
+    if (/WHERE source_ref = \$1/.test(t)) return { rows: [] };          // el automático del 20 aún no existe
+    if (/^UPDATE company_expenses/.test(t)) return { rows: [{ id: '1' }] };
+    return { rows: [] };
+  });
+  await imp.resolveExpense('1', 'subscription', { subscription_id: '7' }, 'yo');
+  assert.ok(log.some((e) => /INSERT INTO finance_suppressed_refs/.test(e.text) && e.params[0] === 'sub:7:2026-10-20'));
 });
 
 if (fails.length) {

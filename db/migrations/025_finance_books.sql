@@ -39,7 +39,7 @@ INSERT INTO finance_accounts (name, kind) VALUES
 ON CONFLICT (name) DO NOTHING;
 
 -- ── Proveedores y contratistas (para la lista de 1099). Nunca se guarda el
---    número fiscal: solo si el W-9 está y, si se sube, su archivo privado.
+--    número fiscal ni el archivo del W-9 (lleva el SSN o EIN): solo si lo tenemos.
 CREATE TABLE IF NOT EXISTS finance_vendors (
   id            BIGSERIAL PRIMARY KEY,
   name          TEXT NOT NULL,
@@ -48,7 +48,6 @@ CREATE TABLE IF NOT EXISTS finance_vendors (
                 CHECK (entity_type IN ('individual', 'llc', 'partnership', 'corporation', 'unknown')),
   w9_status     TEXT NOT NULL DEFAULT 'missing'
                 CHECK (w9_status IN ('missing', 'on_file', 'not_required')),
-  w9_path       TEXT,
   email         TEXT,
   notes         TEXT,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -79,9 +78,11 @@ CREATE INDEX IF NOT EXISTS idx_company_expenses_vendor       ON company_expenses
 ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS started_at DATE;
 ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS ended_at   DATE;
 ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS account_id BIGINT REFERENCES finance_accounts(id) ON DELETE SET NULL;
-UPDATE subscriptions SET started_at = created_at::date WHERE started_at IS NULL;
---    Las que ya estaban en pausa no generan cargos hasta que se les ponga su baja
---    (no sabemos cuándo se pausaron: mejor no inventar gastos).
+--    Alta = el día que se aplica esta migración: así el cron no genera de golpe años de
+--    cargos (ni del año ya declarado ni los que el dueño ya apuntó a mano). El panel le
+--    pide revisar el alta real de cada una; los cargos pasados se crean en meses abiertos.
+--    Las que ya estaban en pausa no generan cargos hasta que se reactiven.
+UPDATE subscriptions SET started_at = CURRENT_DATE WHERE started_at IS NULL;
 
 -- ── Movimientos automáticos que el dueño borró: el cron y las importaciones no
 --    los vuelven a crear (cargo de suscripción que no se cobró, fila repetida…).

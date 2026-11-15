@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finanzas · tres direcciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&display=swap" rel="stylesheet">
+<style>
+/* Tokens reales de Orbit (src/styles/dashboard.css). Nada nuevo. */
+:root{
+  --bg-base:#0e0e11;--bg-2:#0b0b0e;--bg-card:#16161a;--bg-elevated:#1b1b20;--surface-3:#23232a;
+  --border:rgba(255,255,255,.07);--border-subtle:rgba(255,255,255,.045);--border-strong:rgba(255,255,255,.11);
+  --fg-primary:#f4f4f5;--fg-secondary:#a1a1aa;--fg-subtle:#8b8b95;--fg-faint:#6b6b74;--fg-inverse:#0e0e11;
+  --accent:#f97316;--accent-hover:#fb923c;--accent-dim:rgba(249,115,22,.16);--accent-line:rgba(249,115,22,.32);
+  --teal:#34d399;--teal-dim:rgba(52,211,153,.14);
+  --ok:#22c55e;--warn:#f5b338;--err:#ef4444;--info:#60a5fa;
+  --r-sm:6px;--r-md:9px;--r-lg:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#08080a;color:var(--fg-primary);font:400 14px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding:40px 32px 80px}
+.num{font-variant-numeric:tabular-nums}
+h1.page{font-size:22px;font-weight:600;letter-spacing:-.02em;margin-bottom:6px}
+p.lead{color:var(--fg-secondary);max-width:860px;margin-bottom:36px}
+.dir{margin-bottom:72px}
+.dir-head{display:flex;gap:16px;align-items:baseline;margin-bottom:14px;flex-wrap:wrap}
+.dir-tag{font:600 12px/1 Inter;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent-line);border-radius:999px;padding:6px 10px}
+.dir-title{font-size:20px;font-weight:600;letter-spacing:-.02em}
+.dir-why{color:var(--fg-secondary);max-width:980px;margin-bottom:16px}
+.dir-why b{color:var(--fg-primary);font-weight:600}
+.row{display:flex;gap:28px;align-items:flex-start}
+/* ── Marco de escritorio (barra lateral de Orbit simplificada) ── */
+.app{width:1280px;flex:none;background:var(--bg-base);border:1px solid var(--border-strong);border-radius:12px;overflow:hidden;display:grid;grid-template-columns:212px 1fr;min-height:780px}
+.side{background:var(--bg-2);border-right:1px solid var(--border);padding:18px 12px;display:flex;flex-direction:column;gap:2px}
+.brand{display:flex;gap:9px;align-items:center;font-weight:600;padding:4px 8px 18px}
+.brand i{width:22px;height:22px;border-radius:7px;background:conic-gradient(from 200deg,#f97316,#fb923c,#ea580c,#f97316)}
+.nav{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-md);color:var(--fg-secondary);font-size:13.5px}
+.nav svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.nav.on{background:var(--bg-elevated);color:var(--fg-primary);box-shadow:inset 2px 0 0 var(--accent)}
+.main{padding:24px 28px;min-width:0}
+.top{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.top h2{font-size:26px;font-weight:600;letter-spacing:-.025em}
+.sp{flex:1}
+.btn{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:8px 14px;border-radius:var(--r-md);font:600 13px/1 Inter;border:1px solid var(--border);background:var(--bg-elevated);color:var(--fg-primary);white-space:nowrap}
+.btn.pri{background:var(--accent);color:var(--fg-inverse);border-color:transparent}
+.btn.pri[disabled]{opacity:.45}
+.btn.sm{min-height:30px;padding:6px 10px;font-size:12.5px}
+.btn.ghost{background:transparent}
+.btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6}
+.seg{display:inline-flex;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-md);padding:3px;gap:2px}
+.seg span{padding:6px 11px;border-radius:7px;font-size:13px;color:var(--fg-secondary)}
+.seg span.on{background:var(--surface-3);color:var(--fg-primary)}
+.tabs{display:flex;gap:22px;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tabs span{padding:10px 0 11px;font-size:13.5px;color:var(--fg-subtle);position:relative}
+.tabs span.on{color:var(--fg-primary)}
+.tabs span.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--fg-primary);border-radius:2px}
+.tabs b{font-weight:600;color:var(--warn);font-size:12px;margin-left:6px}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg)}
+.cap{font:500 11.5px/1.2 Inter;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-subtle)}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 9px;font:500 12px/1.4 Inter;white-space:nowrap}
+.chip.ok{background:rgba(34,197,94,.14);color:#4ade80}
+.chip.warn{background:rgba(245,179,56,.14);color:var(--warn)}
+.chip.err{background:rgba(239,68,68,.14);color:#f87171}
+.chip.mute{background:var(--surface-3);color:var(--fg-secondary)}
+.chip.info{background:rgba(96,165,250,.14);color:var(--info)}
+.ic{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.pos{color:var(--teal)} .neg{color:#f87171} .mut{color:var(--fg-subtle)} .sec{color:var(--fg-secondary)}
+table{border-collapse:collapse;width:100%}
+th{font:500 11.5px/1.2 Inter;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-subtle);text-align:left;padding:12px 16px;border-bottom:1px solid var(--border)}
+td{padding:0 16px;height:46px;border-bottom:1px solid var(--border-subtle)}
+th.r,td.r{text-align:right}
+tr.tot td{font-weight:600;border-bottom:0;border-top:1px solid var(--border-strong)}
+tr.sel td{background:var(--bg-elevated)}
+.note{font-size:12.5px;color:var(--fg-subtle)}
+.disc{font-size:12.5px;color:var(--fg-subtle);display:flex;gap:8px;align-items:center}
+/* ── Marco de teléfono ── */
+.phone{width:390px;flex:none;background:var(--bg-base);border:1px solid var(--border-strong);border-radius:28px;overflow:hidden;min-height:780px}
+.ph-top{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--bg-2)}
+.ph-top .t{font-weight:600}
+.ph-body{padding:16px}
+.dv{position:relative;height:8px}.dv::before{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:var(--border-strong)}.dv i{position:absolute;top:1px;height:6px;border-radius:3px}.dv i.p{left:50%;background:var(--teal);opacity:.7}.dv i.n{right:50%;background:#f87171;opacity:.75}
+.idx{padding:7px 10px;border-radius:var(--r-md);color:var(--fg-secondary)}.idx.on{background:var(--surface-3);color:var(--fg-primary)}
+.mini-label{font:500 11.5px/1 Inter;color:var(--fg-subtle);text-transform:uppercase;letter-spacing:.06em;margin:22px 0 10px}
+</style>
+</head>
+<body>
+<h1 class="page">Finanzas: tres direcciones para elegir</h1>
+<p class="lead">Bocetos de baja fidelidad con los colores, letra y piezas reales de Orbit. Las cifras son de ejemplo. Las tres tienen lo mismo dentro (historial mes a mes y año a año, cierre de mes, revisión de lo importado, hoja para el contador y registros); cambia la idea que manda al abrir Finanzas y cómo se trabaja cada semana.</p>
+
+<!-- ═════════════════════════ A ═════════════════════════ -->
+<section class="dir" id="A">
+  <div class="dir-head"><span class="dir-tag">Dirección A</span><span class="dir-title">El libro del año</span></div>
+  <p class="dir-why"><b>La idea:</b> el año es un libro de 12 filas, una por mes, con lo que entró, lo que salió, lo que quedó y si el mes está cerrado. Responde de golpe a «mes a mes y año a año». A la derecha, lo que pide atención y el próximo plazo fiscal. Tomado de ShareWillow (el año como tabla de meses con total y un panel lateral de resumen) y de las hojas de cálculo de finanzas (Equals). <b>Lo que no se toma:</b> su color crema ni sus tablas sin estados.</p>
+  <div class="row">
+    <div class="app">
+      <aside class="side">
+        <div class="brand"><i></i>Orbit</div>
+        <div class="nav"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5V20H4z"/></svg>Inicio</div>
+        <div class="nav"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg>Leads</div>
+        <div class="nav"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 9h8M8 13h5"/></svg>Clientes</div>
+        <div class="nav on"><svg viewBox="0 0 24 24"><path d="M4 18V9M10 18V5M16 18v-7M21 18H3"/></svg>Finanzas</div>
+        <div class="nav"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></svg>Progreso</div>
+      </aside>
+      <div class="main">
+        <div class="top"><h2>Finanzas</h2><span class="seg"><span class="on">2026</span><span>2025</span></span><span class="sp"></span>
+          <span class="btn ghost"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Para el contador</span>
+          <span class="btn pri"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Registrar</span></div>
+        <div class="tabs"><span class="on">Resumen</span><span>Movimientos<b>14</b></span><span>Cierre</span><span>Impuestos</span><span>Registros</span></div>
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:20px">
+          <div class="card" style="overflow:hidden">
+            <table class="num">
+              <thead><tr><th>Mes</th><th class="r">Entró</th><th class="r">Salió</th><th class="r">Quedó</th><th style="width:150px"></th><th>Estado</th></tr></thead>
+              <tbody>
+                <tr><td>Enero</td><td class="r">$6,400</td><td class="r sec">$1,212</td><td class="r pos">$5,188</td><td><div class="dv"><i class="p" style="width:39%"></i></div></td><td><span class="chip ok">Cerrado</span></td></tr>
+                <tr><td>Febrero</td><td class="r">$4,150</td><td class="r sec">$1,980</td><td class="r pos">$2,170</td><td><div class="dv"><i class="p" style="width:16.5%"></i></div></td><td><span class="chip ok">Cerrado</span></td></tr>
+                <tr><td>Marzo</td><td class="r">$2,900</td><td class="r sec">$3,310</td><td class="r neg">−$410</td><td><div class="dv"><i class="n" style="width:3.5%"></i></div></td><td><span class="chip ok">Cerrado</span></td></tr>
+                <tr><td>Abril</td><td class="r">$7,800</td><td class="r sec">$1,640</td><td class="r pos">$6,160</td><td><div class="dv"><i class="p" style="width:46.5%"></i></div></td><td><span class="chip ok">Cerrado</span></td></tr>
+                <tr><td>Mayo</td><td class="r">$5,200</td><td class="r sec">$1,705</td><td class="r pos">$3,495</td><td><div class="dv"><i class="p" style="width:26.5%"></i></div></td><td><span class="chip ok">Cerrado</span></td></tr>
+                <tr><td>Junio</td><td class="r">$6,650</td><td class="r sec">$2,120</td><td class="r pos">$4,530</td><td><div class="dv"><i class="p" style="width:34%"></i></div></td><td><span class="chip ok">Cerrado</span></td></tr>
+                <tr><td>Julio</td><td class="r">$3,900</td><td class="r sec">$1,560</td><td class="r pos">$2,340</td><td><div class="dv"><i class="p" style="width:17.5%"></i></div></td><td><span class="chip ok">Cerrado</span></td></tr>
+                <tr><td>Agosto</td><td class="r">$8,100</td><td class="r sec">$2,450</td><td class="r pos">$5,650</td><td><div class="dv"><i class="p" style="width:42.5%"></i></div></td><td><span class="chip ok">Cerrado</span></td></tr>
+                <tr><td>Septiembre</td><td class="r">$5,750</td><td class="r sec">$1,890</td><td class="r pos">$3,860</td><td><div class="dv"><i class="p" style="width:29%"></i></div></td><td><span class="chip ok">Cerrado</span></td></tr>
+                <tr class="sel"><td>Octubre</td><td class="r">$6,300</td><td class="r sec">$2,010</td><td class="r pos">$4,290</td><td><div class="dv"><i class="p" style="width:32.5%"></i></div></td><td><span class="chip warn">Por cerrar · 4 pendientes</span></td></tr>
+                <tr><td>Noviembre</td><td class="r">$2,500</td><td class="r sec">$890</td><td class="r pos">$1,610</td><td><div class="dv"><i class="p" style="width:12%;opacity:.45"></i></div></td><td><span class="chip mute">En curso</span></td></tr>
+                <tr><td class="mut">Diciembre</td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr class="tot"><td>2026</td><td class="r">$59,650</td><td class="r">$20,767</td><td class="r pos">$38,883</td><td></td><td class="note">9 meses cerrados</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="card" style="padding:18px 20px">
+              <div class="cap">Necesita tu atención</div>
+              <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px">
+                <div style="display:flex;gap:10px"><svg class="ic" style="color:var(--warn)" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg><div>Cierra octubre<div class="note">4 cosas por revisar antes</div></div></div>
+                <div style="display:flex;gap:10px"><svg class="ic" style="color:var(--fg-secondary)" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg><div>14 movimientos importados<div class="note">del banco y de Stripe, sin clasificar</div></div></div>
+                <div style="display:flex;gap:10px"><svg class="ic" style="color:var(--fg-secondary)" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 9h6M9 13h6"/></svg><div>Falta el W-9 de 1 contratista<div class="note">ya pasa de $2,000 este año</div></div></div>
+              </div>
+            </div>
+            <div class="card" style="padding:18px 20px">
+              <div class="cap">Próximo plazo fiscal</div>
+              <div class="num" style="font-size:28px;font-weight:650;letter-spacing:-.02em;margin-top:10px">$3,940</div>
+              <div class="sec">Pago trimestral 4 · vence el 15 de enero</div>
+              <div class="note" style="margin-top:10px">Con los libros cerrados hasta septiembre. Para revisión de tu contador, no es consejo fiscal.</div>
+            </div>
+            <div class="card" style="padding:18px 20px">
+              <div class="cap">Gastos del año por línea fiscal</div>
+              <div style="display:flex;flex-direction:column;gap:9px;margin-top:14px;font-size:13px" class="num">
+                <div style="display:flex;justify-content:space-between"><span>Software y hosting</span><span class="sec">$7,420</span></div><div style="height:4px;background:var(--surface-3);border-radius:2px"><div style="width:100%;height:4px;background:var(--fg-secondary);border-radius:2px"></div></div>
+                <div style="display:flex;justify-content:space-between"><span>Contratistas</span><span class="sec">$5,600</span></div><div style="height:4px;background:var(--surface-3);border-radius:2px"><div style="width:75%;height:4px;background:var(--fg-secondary);border-radius:2px"></div></div>
+                <div style="display:flex;justify-content:space-between"><span>Publicidad</span><span class="sec">$3,100</span></div><div style="height:4px;background:var(--surface-3);border-radius:2px"><div style="width:42%;height:4px;background:var(--fg-secondary);border-radius:2px"></div></div>
+                <div style="display:flex;justify-content:space-between"><span>IA</span><span class="sec">$2,050</span></div><div style="height:4px;background:var(--surface-3);border-radius:2px"><div style="width:28%;height:4px;background:var(--fg-secondary);border-radius:2px"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone">
+      <div class="ph-top"><span class="t">Finanzas</span><span class="sp"></span><span class="seg"><span class="on">2026</span><span>2025</span></span></div>
+      <div class="ph-body">
+        <div class="card" style="padding:14px 16px;display:flex;gap:10px;align-items:center"><svg class="ic" style="color:var(--warn)" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg><div style="flex:1">Cierra octubre<div class="note">4 cosas por revisar</div></div><span class="btn sm">Ver</span></div>
+        <div class="mini-label">Mes a mes</div>
+        <div class="card num" style="overflow:hidden">
+          <div style="display:flex;padding:12px 14px;border-bottom:1px solid var(--border-subtle)"><span style="flex:1">Noviembre</span><span class="pos" style="margin-right:10px">$1,610</span><span class="chip mute">En curso</span></div>
+          <div style="display:flex;padding:12px 14px;border-bottom:1px solid var(--border-subtle);background:var(--bg-elevated)"><span style="flex:1">Octubre</span><span class="pos" style="margin-right:10px">$4,290</span><span class="chip warn">Por cerrar</span></div>
+          <div style="display:flex;padding:12px 14px;border-bottom:1px solid var(--border-subtle)"><span style="flex:1">Septiembre</span><span class="pos" style="margin-right:10px">$3,860</span><span class="chip ok">Cerrado</span></div>
+          <div style="display:flex;padding:12px 14px;border-bottom:1px solid var(--border-subtle)"><span style="flex:1">Agosto</span><span class="pos" style="margin-right:10px">$5,650</span><span class="chip ok">Cerrado</span></div>
+          <div style="display:flex;padding:12px 14px;border-bottom:1px solid var(--border-subtle)"><span style="flex:1">Julio</span><span class="pos" style="margin-right:10px">$2,340</span><span class="chip ok">Cerrado</span></div>
+          <div style="display:flex;padding:12px 14px;font-weight:600"><span style="flex:1">2026 hasta hoy</span><span class="pos">$38,883</span></div>
+        </div>
+        <div class="note" style="margin-top:8px">Toca un mes para ver qué entró y qué salió.</div>
+        <div class="mini-label">Próximo plazo</div>
+        <div class="card" style="padding:14px 16px"><div class="num" style="font-size:22px;font-weight:650">$3,940</div><div class="sec">Trimestral 4 · 15 de enero</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════ B ═════════════════════════ -->
+<section class="dir" id="B">
+  <div class="dir-head"><span class="dir-tag">Dirección B</span><span class="dir-title">El cierre como una revisión que pasa o no pasa</span></div>
+  <p class="dir-why"><b>La idea:</b> al abrir Finanzas lo primero es el mes que toca cerrar, contado como una lista de comprobaciones que pasan o fallan, cada una con su arreglo en la misma fila. Se cierra cuando todo pasa. Tomado de las ejecuciones de GitHub (cada paso con su estado y su detalle desplegable) y de la revisión de movimientos de Mercury (la fila abre un panel con categoría y recibo). <b>Lo que no se toma:</b> su aspecto de consola ni sus azules.</p>
+  <div class="row">
+    <div class="app">
+      <aside class="side">
+        <div class="brand"><i></i>Orbit</div>
+        <div class="nav"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5V20H4z"/></svg>Inicio</div>
+        <div class="nav"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg>Leads</div>
+        <div class="nav"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 9h8M8 13h5"/></svg>Clientes</div>
+        <div class="nav on"><svg viewBox="0 0 24 24"><path d="M4 18V9M10 18V5M16 18v-7M21 18H3"/></svg>Finanzas</div>
+        <div class="nav"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></svg>Progreso</div>
+      </aside>
+      <div class="main">
+        <div class="top"><h2>Finanzas</h2><span class="sp"></span><span class="btn"><svg viewBox="0 0 24 24"><path d="M12 20V9M7 14l5-5 5 5M5 4h14"/></svg>Importar extracto</span><span class="btn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Registrar</span></div>
+        <div class="tabs"><span class="on">Cierre</span><span>Año</span><span>Movimientos</span><span>Impuestos</span><span>Registros</span></div>
+        <!-- tira de meses -->
+        <div class="num" style="display:grid;grid-template-columns:repeat(12,1fr);gap:6px;margin-bottom:18px">
+          <div class="card" style="padding:8px 10px"><div class="note">Ene</div><div style="font-weight:600">$5.2k</div><div style="height:3px;background:var(--ok);border-radius:2px;margin-top:6px"></div></div>
+          <div class="card" style="padding:8px 10px"><div class="note">Feb</div><div style="font-weight:600">$2.2k</div><div style="height:3px;background:var(--ok);border-radius:2px;margin-top:6px"></div></div>
+          <div class="card" style="padding:8px 10px"><div class="note">Mar</div><div style="font-weight:600" class="neg">−$0.4k</div><div style="height:3px;background:var(--ok);border-radius:2px;margin-top:6px"></div></div>
+          <div class="card" style="padding:8px 10px"><div class="note">Abr</div><div style="font-weight:600">$6.2k</div><div style="height:3px;background:var(--ok);border-radius:2px;margin-top:6px"></div></div>
+          <div class="card" style="padding:8px 10px"><div class="note">May</div><div style="font-weight:600">$3.5k</div><div style="height:3px;background:var(--ok);border-radius:2px;margin-top:6px"></div></div>
+          <div class="card" style="padding:8px 10px"><div class="note">Jun</div><div style="font-weight:600">$4.5k</div><div style="height:3px;background:var(--ok);border-radius:2px;margin-top:6px"></div></div>
+          <div class="card" style="padding:8px 10px"><div class="note">Jul</div><div style="font-weight:600">$2.3k</div><div style="height:3px;background:var(--ok);border-radius:2px;margin-top:6px"></div></div>
+          <div class="card" style="padding:8px 10px"><div class="note">Ago</div><div style="font-weight:600">$5.7k</div><div style="height:3px;background:var(--ok);border-radius:2px;margin-top:6px"></div></div>
+          <div class="card" style="padding:8px 10px"><div class="note">Sep</div><div style="font-weight:600">$3.9k</div><div style="height:3px;background:var(--ok);border-radius:2px;margin-top:6px"></div></div>
+          <div class="card" style="padding:8px 10px;border-color:var(--border-strong);background:var(--bg-elevated)"><div class="note" style="color:var(--fg-primary)">Oct</div><div style="font-weight:600">$4.3k</div><div style="height:3px;background:var(--warn);border-radius:2px;margin-top:6px"></div></div>
+          <div class="card" style="padding:8px 10px"><div class="note">Nov</div><div style="font-weight:600">$1.6k</div><div style="height:3px;background:var(--surface-3);border-radius:2px;margin-top:6px"></div></div>
+          <div class="card" style="padding:8px 10px;opacity:.5"><div class="note">Dic</div><div style="font-weight:600">&nbsp;</div><div style="height:3px;background:var(--surface-3);border-radius:2px;margin-top:6px"></div></div>
+        </div>
+        <div class="card" style="overflow:hidden">
+          <div style="display:flex;align-items:center;gap:14px;padding:18px 20px;border-bottom:1px solid var(--border)">
+            <div><div style="font-size:17px;font-weight:600">Cierre de octubre</div><div class="note">3 de 6 comprobaciones pasan. Cuando todo pase, el mes queda bloqueado y cuenta para los impuestos.</div></div>
+            <span class="sp"></span><span class="btn pri" disabled>Cerrar octubre</span>
+          </div>
+          <!-- paso desplegado -->
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border-subtle);display:flex;gap:12px;align-items:center;background:var(--bg-elevated)">
+            <svg class="ic" style="color:#f87171" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg>
+            <div style="flex:1"><b style="font-weight:600">9 movimientos importados sin revisar</b> <span class="note">· bloquea el cierre</span></div><span class="chip err">9</span>
+            <svg class="ic mut" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <div style="padding:6px 20px 14px 50px;border-bottom:1px solid var(--border-subtle);background:var(--bg-elevated)">
+            <table class="num" style="font-size:13px">
+              <tr><td style="height:52px;padding-left:0">Oct 3<div class="note">Banco</div></td><td>ZELLE FROM ACME LLC</td><td class="r pos">+$1,250</td><td><span class="chip info">Es el cobro de INV-012</span></td><td class="r" style="padding-right:0"><span class="btn sm">Confirmar</span></td></tr>
+              <tr><td style="height:52px;padding-left:0">Oct 5<div class="note">Tarjeta</div></td><td>SQ *FIGMA.COM</td><td class="r">−$15</td><td><span class="chip mute">Software · como siempre</span></td><td class="r" style="padding-right:0"><span class="btn sm">Aceptar</span></td></tr>
+              <tr><td style="height:52px;padding-left:0">Oct 9<div class="note">Banco</div></td><td>STRIPE TRANSFER</td><td class="r pos">+$2,880</td><td><span class="chip info">Traspaso desde Stripe, no es ingreso</span></td><td class="r" style="padding-right:0"><span class="btn sm">Confirmar</span></td></tr>
+              <tr><td style="height:52px;padding-left:0;border-bottom:0" class="note" colspan="5">Y 6 más · <span style="color:var(--fg-primary)">Revisar todos</span></td></tr>
+            </table>
+          </div>
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border-subtle);display:flex;gap:12px;align-items:center">
+            <svg class="ic" style="color:var(--warn)" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg>
+            <div style="flex:1">3 gastos de $75 o más sin recibo <span class="note">· el contador los pedirá</span></div><span class="btn sm">Subir recibos</span>
+          </div>
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border-subtle);display:flex;gap:12px;align-items:center">
+            <svg class="ic" style="color:var(--warn)" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg>
+            <div style="flex:1">1 gasto puesto a mano que ya registra la suscripción de Vercel <span class="note">· contaría doble</span></div><span class="btn sm">Elegir uno</span>
+          </div>
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border-subtle);display:flex;gap:12px;align-items:center" class="sec">
+            <svg class="ic" style="color:var(--ok)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg><div style="flex:1">Extractos de octubre importados: banco, Stripe y tarjeta</div></div>
+          <div style="padding:14px 20px;border-bottom:1px solid var(--border-subtle);display:flex;gap:12px;align-items:center" class="sec">
+            <svg class="ic" style="color:var(--ok)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg><div style="flex:1">Ninguna factura anulada con cobros</div></div>
+          <div style="padding:14px 20px;display:flex;gap:12px;align-items:center" class="sec">
+            <svg class="ic" style="color:var(--ok)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg><div style="flex:1">Todos los cobros con su cuenta</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="phone">
+      <div class="ph-top"><span class="t">Finanzas</span><span class="sp"></span><span class="note">Cierre</span></div>
+      <div class="ph-body">
+        <div style="font-size:17px;font-weight:600">Cierre de octubre</div>
+        <div class="note" style="margin-bottom:14px">3 de 6 comprobaciones pasan</div>
+        <div class="card" style="overflow:hidden">
+          <div style="padding:14px;display:flex;gap:10px;border-bottom:1px solid var(--border-subtle)"><svg class="ic" style="color:#f87171" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg><div style="flex:1">9 movimientos sin revisar</div><span class="chip err">9</span></div>
+          <div style="padding:12px 14px;border-bottom:1px solid var(--border-subtle);background:var(--bg-elevated)" class="num"><div style="display:flex"><span style="flex:1">ZELLE FROM ACME LLC</span><span class="pos">+$1,250</span></div><div class="note" style="margin:4px 0 10px">Oct 3 · Banco</div><div style="display:flex;gap:8px;flex-wrap:wrap"><span class="chip info">Cobro de INV-012</span><span class="sp"></span><span class="btn sm">Confirmar</span></div></div>
+          <div style="padding:14px;display:flex;gap:10px;border-bottom:1px solid var(--border-subtle)"><svg class="ic" style="color:var(--warn)" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg><div style="flex:1">3 gastos sin recibo</div></div>
+          <div style="padding:14px;display:flex;gap:10px;border-bottom:1px solid var(--border-subtle)"><svg class="ic" style="color:var(--warn)" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg><div style="flex:1">1 gasto que contaría doble</div></div>
+          <div style="padding:14px;display:flex;gap:10px" class="sec"><svg class="ic" style="color:var(--ok)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg><div style="flex:1">3 comprobaciones pasan</div></div>
+        </div>
+        <div style="position:relative;margin-top:22px"><span class="btn pri" disabled style="width:100%;justify-content:center;min-height:44px">Cerrar octubre</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════ C ═════════════════════════ -->
+<section class="dir" id="C">
+  <div class="dir-head"><span class="dir-tag">Dirección C</span><span class="dir-title">La declaración que se va rellenando sola</span></div>
+  <p class="dir-why"><b>La idea:</b> Finanzas tiene la forma del formulario que se entrega a final de año: cada línea del Schedule C con su total al día, y cada línea se abre para ver sus movimientos. A un lado, el índice de partes; al otro, la revisión con lo que falla, lo que avisa y lo que conviene. Tomado de la declaración de Wealthsimple (un solo documento con índice lateral y una revisión de errores, avisos y sugerencias) y de las tablas de líneas numeradas de los formularios. <b>Lo que no se toma:</b> su fondo blanco ni su largo de página entera.</p>
+  <div class="row">
+    <div class="app">
+      <aside class="side">
+        <div class="brand"><i></i>Orbit</div>
+        <div class="nav"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5V20H4z"/></svg>Inicio</div>
+        <div class="nav"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></svg>Leads</div>
+        <div class="nav"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 9h8M8 13h5"/></svg>Clientes</div>
+        <div class="nav on"><svg viewBox="0 0 24 24"><path d="M4 18V9M10 18V5M16 18v-7M21 18H3"/></svg>Finanzas</div>
+        <div class="nav"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></svg>Progreso</div>
+      </aside>
+      <div class="main">
+        <div class="top"><h2>Finanzas</h2><span class="seg"><span class="on">2026</span><span>2025</span></span><span class="sp"></span><span class="btn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Registrar</span><span class="btn pri"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Paquete para el contador</span></div>
+        <div class="tabs"><span class="on">Declaración</span><span>Año</span><span>Movimientos<b>14</b></span><span>Cierre</span><span>Registros</span></div>
+        <div style="display:grid;grid-template-columns:170px 1fr 270px;gap:20px">
+          <nav style="display:flex;flex-direction:column;gap:2px;font-size:13px;position:sticky;top:0">
+            <span class="cap" style="margin-bottom:8px">Schedule C</span>
+            <span class="idx on">Parte I · Ingresos</span>
+            <span class="idx">Parte II · Gastos</span>
+            <span class="idx">Parte IV · Vehículo</span>
+            <span class="idx">Parte V · Otros</span>
+            <span class="cap" style="margin:16px 0 8px">Además</span>
+            <span class="idx">1099 de contratistas</span>
+            <span class="idx">Pagos trimestrales</span>
+            <span class="idx">Plazos</span>
+          </nav>
+          <div class="card" style="overflow:hidden">
+            <div style="padding:16px 20px;border-bottom:1px solid var(--border)"><div style="font-size:16px;font-weight:600">Schedule C de 2026, al día</div><div class="disc" style="margin-top:4px">Meses cerrados de enero a septiembre; octubre y noviembre aún pueden cambiar. Para revisión de tu contador, no es consejo fiscal.</div></div>
+            <table class="num" style="font-size:13.5px">
+              <tr><th style="width:56px">Línea</th><th>Concepto</th><th class="r">Total</th><th style="width:30px"></th></tr>
+              <tr><td class="mut">1</td><td>Ingresos brutos</td><td class="r">$59,650</td><td class="mut">›</td></tr>
+              <tr><td class="mut">2</td><td>Devoluciones a clientes</td><td class="r">−$600</td><td class="mut">›</td></tr>
+              <tr><td class="mut">6</td><td>Otros ingresos (intereses)</td><td class="r">$42</td><td class="mut">›</td></tr>
+              <tr style="background:var(--bg-elevated)"><td class="mut">8</td><td>Publicidad</td><td class="r">$3,100</td><td class="mut">⌄</td></tr>
+              <tr style="background:var(--bg-elevated)"><td></td><td colspan="3" style="padding:4px 16px 12px">
+                <div class="note" style="display:grid;grid-template-columns:70px 1fr 90px;gap:4px 12px;font-size:12.5px">
+                  <span>Oct 12</span><span style="color:var(--fg-secondary)">Meta Ads · campaña Houston</span><span style="text-align:right;color:var(--fg-secondary)">$420</span>
+                  <span>Sep 30</span><span style="color:var(--fg-secondary)">Google Ads</span><span style="text-align:right;color:var(--fg-secondary)">$380</span>
+                  <span></span><span>Y 11 más</span><span></span>
+                </div></td></tr>
+              <tr><td class="mut">10</td><td>Comisiones de cobro (Stripe, PayPal)</td><td class="r">$1,210</td><td class="mut">›</td></tr>
+              <tr><td class="mut">11</td><td>Contratistas</td><td class="r">$5,600</td><td class="mut">›</td></tr>
+              <tr><td class="mut">17</td><td>Legal y contable</td><td class="r">$850</td><td class="mut">›</td></tr>
+              <tr><td class="mut">24b</td><td>Comidas de negocio (50 %)</td><td class="r">$215</td><td class="mut">›</td></tr>
+              <tr><td class="mut">27b</td><td>Otros gastos (Parte V)</td><td class="r">$9,790</td><td class="mut">›</td></tr>
+              <tr class="tot"><td class="mut">31</td><td>Beneficio neto</td><td class="r pos">$38,327</td><td></td></tr>
+            </table>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="card" style="padding:16px 18px">
+              <div class="cap">Revisión</div>
+              <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px;font-size:13px">
+                <div style="display:flex;gap:9px"><svg class="ic" style="color:#f87171" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg><div>Octubre sin cerrar<div class="note">sus cifras aún pueden cambiar</div></div></div>
+                <div style="display:flex;gap:9px"><svg class="ic" style="color:var(--warn)" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg><div>Falta el W-9 de Ana López<div class="note">le toca 1099-NEC (pasa de $2,000)</div></div></div>
+                <div style="display:flex;gap:9px"><svg class="ic" style="color:var(--info)" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></svg><div>Sin millaje apuntado<div class="note">si usas el coche para clientes, se deduce</div></div></div>
+              </div>
+            </div>
+            <div class="card" style="padding:16px 18px">
+              <div class="cap">Pago trimestral 4</div>
+              <div class="num" style="font-size:26px;font-weight:650;margin-top:8px">$3,940</div>
+              <div class="sec" style="font-size:13px">vence el 15 de enero de 2027</div>
+              <div class="note" style="margin-top:8px">Supuestos: una persona, declaración individual, deducción estándar. <span style="color:var(--fg-primary)">Ver todos</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone">
+      <div class="ph-top"><span class="t">Declaración 2026</span><span class="sp"></span><span class="note">al día</span></div>
+      <div class="ph-body">
+        <div style="display:flex;gap:6px;overflow:hidden;margin-bottom:14px"><span class="chip mute" style="background:var(--surface-3);color:var(--fg-primary)">Ingresos</span><span class="chip mute">Gastos</span><span class="chip mute">Vehículo</span><span class="chip mute">1099</span></div>
+        <div class="card num" style="overflow:hidden;font-size:13.5px">
+          <div style="display:flex;padding:12px 14px;border-bottom:1px solid var(--border-subtle)"><span class="mut" style="width:38px">1</span><span style="flex:1">Ingresos brutos</span><span>$59,650</span></div>
+          <div style="display:flex;padding:12px 14px;border-bottom:1px solid var(--border-subtle)"><span class="mut" style="width:38px">2</span><span style="flex:1">Devoluciones</span><span>−$600</span></div>
+          <div style="display:flex;padding:12px 14px;border-bottom:1px solid var(--border-subtle)"><span class="mut" style="width:38px">8</span><span style="flex:1">Publicidad</span><span>$3,100</span></div>
+          <div style="display:flex;padding:12px 14px;border-bottom:1px solid var(--border-subtle)"><span class="mut" style="width:38px">11</span><span style="flex:1">Contratistas</span><span>$5,600</span></div>
+          <div style="display:flex;padding:12px 14px;border-bottom:1px solid var(--border-subtle)"><span class="mut" style="width:38px">27b</span><span style="flex:1">Otros gastos</span><span>$9,790</span></div>
+          <div style="display:flex;padding:12px 14px;font-weight:600"><span class="mut" style="width:38px">31</span><span style="flex:1">Beneficio neto</span><span class="pos">$38,327</span></div>
+        </div>
+        <div class="mini-label">Revisión</div>
+        <div class="card" style="padding:12px 14px;font-size:13px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:9px"><svg class="ic" style="color:#f87171" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg>Octubre sin cerrar</div>
+          <div style="display:flex;gap:9px"><svg class="ic" style="color:var(--warn)" viewBox="0 0 24 24"><path d="M12 4 3 20h18z"/><path d="M12 10v4M12 17h.01"/></svg>Falta 1 W-9</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="dir">
+  <div class="dir-head"><span class="dir-tag" style="color:var(--teal);border-color:rgba(52,211,153,.3)">Recomendación</span><span class="dir-title">A como portada, con el cierre de B y la declaración de C en sus pestañas</span></div>
+  <p class="dir-why">El libro del año es lo que hoy falta y lo que se mira más a menudo. El cierre de B es la mejor forma de trabajar cada mes, y la declaración de C es lo que se lleva al contador en enero. Las tres caben en las pestañas sin pantallas nuevas fuera de Finanzas. Si eliges otra como portada, las otras dos pasan igual a sus pestañas.</p>
+</section>
+</body>
+</html>

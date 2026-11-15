@@ -21,7 +21,7 @@ import { herramientasCopy } from '../../i18n/w/herramientas';
 import Icon from '../ui/Icon.astro';
 import Button from '../ui/Button.astro';
 import IconoObjeto from '../w/IconoObjeto.astro';
-import { computeMissedCalls, computeNoShows, WEEKS_PER_MONTH, NOSHOW_RECOVERY } from '../../../lib/tools-formulas.mjs';
+import { computeMissedCalls, computeNoShows, WEEKS_PER_MONTH } from '../../../lib/tools-formulas.mjs';
 import './range.css';
 
 interface Props { lang: 'es' | 'en' }
@@ -48,7 +48,7 @@ const callsSliders = [
   { role: 'close',     label: tt.inClose,     min: 10, max: 80,  step: 1, val: 30, fmt: 'pct' },
 ];
 // Calc 2 — citas perdidas: noShowsMes = apptWeek·4.33·(noShow/100);
-//          recuperableUSD = noShowsMes·apptValue·0.4 (40% recuperable con recordatorios).
+//          perdidaUSD = noShowsMes·apptValue (sin factor de recuperación: no hay fuente).
 const apptSliders = [
   { role: 'apptWeek',  label: tt.inApptWeek,  min: 10, max: 200, step: 1, val: 40, fmt: 'int' },
   { role: 'noShow',    label: tt.inNoShow,    min: 5, max: 40,  step: 1, val: 15, fmt: 'pct' },
@@ -59,7 +59,7 @@ const initCalls = computeMissedCalls({ llamadas_semana: 25, pct_sin_contestar: 2
 const initAppt = computeNoShows({ citas_semana: 40, pct_no_show: 15, valor_cita: 65 }).monthly;
 // Desglose inicial (mismas cuentas que el script de abajo).
 const c1 = 25 * WEEKS_PER_MONTH, c2 = c1 * 0.2, c3 = c2 * 0.3;
-const a1 = 40 * WEEKS_PER_MONTH, a2 = a1 * 0.15, a3 = a2 * NOSHOW_RECOVERY;
+const a1 = 40 * WEEKS_PER_MONTH, a2 = a1 * 0.15;
 
 const cards = [
   {
@@ -69,7 +69,7 @@ const cards = [
   },
   {
     type: 'appt', id: ids.appt, title: tt.calcApptTitle, sub: tt.calcApptSub, sliders: apptSliders,
-    outLbl: tt.outAppt, init: initAppt, copy: w.appt, bd: [n0.format(a1), n0.format(a2), n1.format(a3), nf.format(65)],
+    outLbl: tt.outAppt, init: initAppt, copy: w.appt, bd: [n0.format(a1), n1.format(a2), nf.format(65)],
     icon: 'calendar', elevated: false,
   },
 ];
@@ -133,7 +133,7 @@ const cards = [
               {c.copy.rows.map((r, k) => (
                 <div class="tc__bdrow">
                   <dt>{r}</dt>
-                  <dd>{k < 3 ? '≈ ' : '× '}<span data-bd={k + 1}>{c.bd[k]}</span></dd>
+                  <dd>{k < c.copy.rows.length - 1 ? '≈ ' : '× '}<span data-bd={k + 1}>{c.bd[k]}</span></dd>
                 </div>
               ))}
               <div class="tc__bdrow tc__bdrow--total">
@@ -289,7 +289,7 @@ const cards = [
 
 <script>
   import { track } from '../../lib/track.js';
-  import { computeMissedCalls, computeNoShows, WEEKS_PER_MONTH, NOSHOW_RECOVERY } from '../../../lib/tools-formulas.mjs';
+  import { computeMissedCalls, computeNoShows, WEEKS_PER_MONTH } from '../../../lib/tools-formulas.mjs';
 
   const lang = document.documentElement.lang === 'en' ? 'en' : 'es';
   const loc = lang === 'en' ? 'en-US' : 'es-US';
@@ -323,8 +323,8 @@ const cards = [
         const a = get('callsWeek') * WEEKS_PER_MONTH, b = a * get('missed') / 100, c = b * get('close') / 100;
         bd(1, n0.format(a)); bd(2, n0.format(b)); bd(3, n1.format(c)); bd(4, nf.format(get('ticket')));
       } else {
-        const a = get('apptWeek') * WEEKS_PER_MONTH, b = a * get('noShow') / 100, c = b * NOSHOW_RECOVERY;
-        bd(1, n0.format(a)); bd(2, n0.format(b)); bd(3, n1.format(c)); bd(4, nf.format(get('apptValue')));
+        const a = get('apptWeek') * WEEKS_PER_MONTH, b = a * get('noShow') / 100;
+        bd(1, n0.format(a)); bd(2, n1.format(b)); bd(3, nf.format(get('apptValue')));
       }
       bd('total', nf.format(compute()));
     }
@@ -383,8 +383,8 @@ const cards = [
           : 'Acabo de usar la calculadora de llamadas perdidas: recibo unas ' + get('callsWeek') + ' llamadas por semana, se me escapa el ' + get('missed') + '%, mi ticket promedio es $' + get('ticket') + ' y cierro el ' + get('close') + '%. Me sale que podría estar perdiendo ' + v + ' al mes. ¿Qué me conviene hacer?';
       } else {
         msg = en
-          ? 'I just used the no-show calculator: about ' + get('apptWeek') + ' appointments a week, ' + get('noShow') + '% no-shows, and each appointment is worth $' + get('apptValue') + '. It says I could recover ' + v + ' a month. What should I do about it?'
-          : 'Acabo de usar la calculadora de citas perdidas: tengo unas ' + get('apptWeek') + ' citas por semana, el ' + get('noShow') + '% no llega, y cada cita vale $' + get('apptValue') + '. Me sale que podría recuperar ' + v + ' al mes. ¿Qué me conviene hacer?';
+          ? 'I just used the no-show calculator: about ' + get('apptWeek') + ' appointments a week, ' + get('noShow') + '% no-shows, and each appointment is worth $' + get('apptValue') + '. It says I am losing about ' + v + ' a month to no-shows. What should I do about it?'
+          : 'Acabo de usar la calculadora de citas perdidas: tengo unas ' + get('apptWeek') + ' citas por semana, el ' + get('noShow') + '% no llega, y cada cita vale $' + get('apptValue') + '. Me sale que pierdo unos ' + v + ' al mes en citas que no llegan. ¿Qué me conviene hacer?';
       }
       track('calc_marcy_opened', { type });
       window.dispatchEvent(new CustomEvent('mrc:ask', { detail: { text: msg } }));

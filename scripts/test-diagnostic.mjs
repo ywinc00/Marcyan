@@ -7,7 +7,9 @@
 //  reseñas cuando el dato no se declaró ('ns').
 // ════════════════════════════════════════════════════════════════
 import assert from 'node:assert/strict';
-import { analyzeSite, findContactHref, mergeContactSignals, recommendService } from '../lib/diagnostic-checks.mjs';
+import { readFileSync } from 'node:fs';
+import { analyzeSite, findContactHref, mergeContactSignals, recommendService, fallbackReport } from '../lib/diagnostic-checks.mjs';
+import { cleanReportText } from '../api/diagnostic.mjs';
 
 let pass = 0;
 const fails = [];
@@ -246,6 +248,33 @@ check('S3: telephone+address DENTRO del ld+json sigue aprobando', () => {
     assert.equal(await reportAiAllowed({ store, now: now + 86400 * 1000 }), true, 'al día siguiente vuelve');
   });
 }
+
+// ── Regla de copy: sin guion largo en lo que ve el cliente (2026-11-15) ──
+check('hallazgos sin guion largo (es/en, qué pasa y qué cuesta)', () => {
+  const src = readFileSync(new URL('../lib/diagnostic-checks.mjs', import.meta.url), 'utf8');
+  const block = src.slice(src.indexOf('const FINDINGS = {'), src.indexOf('\n};', src.indexOf('const FINDINGS = {')));
+  assert.ok(block.length > 1000, 'no encontré el bloque de hallazgos');
+  const bad = block.split(/\r?\n/).filter((l) => l.includes('\u2014'));
+  assert.deepEqual(bad, []);
+});
+check('informe sin IA sin guion largo (es/en)', () => {
+  const r = analyzeSite({ html: '<html><body><p>x</p></body></html>', https: false, hasSite: true, city: 'Houston', reviewsBucket: '0' });
+  assert.ok(r.findings.length >= 3);
+  const recommended = recommendService({ scores: r.scores });
+  for (const lang of ['es', 'en']) {
+    const rep = fallbackReport({ businessName: 'Negocio', lang, findings: r.findings, recommended });
+    assert.ok(!rep.includes('\u2014'), lang);
+  }
+});
+
+check('informe con IA: el texto del modelo sale sin guion largo y sin «1, El»', () => {
+  const raw = 'Hola Negocio \u2014 aquí va tu informe.\nPrioridad 1 \u2014 El sitio no usa conexión segura.\n\u2014 Cierre: horario Lun\u2013Vie.';
+  const out = cleanReportText(raw);
+  assert.ok(!out.includes('\u2014'), out);
+  assert.equal(out, 'Hola Negocio, aquí va tu informe.\nPrioridad 1: El sitio no usa conexión segura.\nCierre: horario Lun\u2013Vie.');
+  assert.equal(cleanReportText('Priority 1 \u2014 Your site has no HTTPS.'), 'Priority 1: Your site has no HTTPS.');
+  assert.equal(cleanReportText('   '), null);
+});
 
 if (fails.length) {
   console.error(`✗ ${fails.length} prueba(s) del diagnóstico fallaron:\n - ` + fails.join('\n - '));

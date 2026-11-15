@@ -18,7 +18,7 @@ export interface ToolsCopy {
   /** Última fila del desglose (el mismo total que la tarjeta). */
   totalRow: string;
   calls: { rows: [string, string, string, string]; note: string; band: Band };
-  appt: { rows: [string, string, string, string]; note: string; band: Band };
+  appt: { rows: [string, string, string]; note: string; band: Band };
   bandCta: string;
   bandMarcy: string;
   cierre: { titleHtml: string; proof: string };
@@ -39,8 +39,8 @@ export const herramientasCopy: Record<ToolsLang, ToolsCopy> = {
       },
     },
     appt: {
-      rows: ['Citas al mes', 'Citas que no llegan', 'Recuperables con recordatorios', 'Valor por cita'],
-      note: 'Supuesto del cálculo: con recordatorios se recuperan 4 de cada 10 citas perdidas.',
+      rows: ['Citas al mes', 'Citas que no llegan', 'Valor por cita'],
+      note: 'Supuesto del cálculo: 4.33 semanas por mes.',
       band: {
         title: '¿Quieres que Marcy agende por ti?',
         text: 'Agenda citas a cualquier hora, sin que tengas que contestar el teléfono.',
@@ -67,8 +67,8 @@ export const herramientasCopy: Record<ToolsLang, ToolsCopy> = {
       },
     },
     appt: {
-      rows: ['Appointments a month', 'No-shows', 'Recoverable with reminders', 'Value per appointment'],
-      note: 'Assumes reminders win back 4 in 10 missed appointments.',
+      rows: ['Appointments a month', 'No-shows', 'Value per appointment'],
+      note: 'Assumes 4.33 weeks per month.',
       band: {
         title: 'Want Marcy to book for you?',
         text: "She books appointments around the clock, so you don't have to pick up.",

@@ -181,7 +181,7 @@
 <label class="search">
   <span class="search__icon" aria-hidden="true"><Icon name="search" size={16} /></span>
   <span class="sr-only">Buscar briefs</span>
-  <input class="ui-input search__input" type="search" placeholder="Buscar negocio, persona o MRC"
+  <input class="ui-input search__input" type="search" placeholder="Buscar briefs" title="Busca por negocio, persona o número MRC"
     value={searchText} oninput={onSearchInput}
     onfocus={() => (searchFocused = true)} onblur={() => (searchFocused = false)} />
 </label>

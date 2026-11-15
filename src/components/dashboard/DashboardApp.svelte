@@ -646,6 +646,7 @@
 
   /* ── Suscripciones (barra lateral y menú móvil) ── */
   .side-subs { display: flex; flex-direction: column; gap: 2px; }
+  .side-subs :global(.subs__name) { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.25; }
   .subs__amt { margin-left: auto; flex: 0 0 auto; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); font-variant-numeric: tabular-nums; }
   .subs__all { display: block; margin: 4px 10px 0; font-size: var(--dash-caption); color: var(--fg-subtle); text-decoration: none; }
   .subs__all:hover { color: var(--fg-primary); }

@@ -470,6 +470,7 @@
   .note__text { margin: 2px 0 0; font-size: var(--dash-small); color: var(--fg-secondary); line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
 
   .note__foot { display: flex; align-items: center; flex-wrap: wrap; gap: 4px var(--space-4); margin-top: 8px; }
+  @media (max-width: 399px) { .note__foot { column-gap: 12px; } }
   .note__open { display: inline-flex; align-items: center; gap: 2px; min-height: 28px; font-size: var(--dash-small); font-weight: 500; color: var(--fg-primary); text-decoration: none; border-radius: var(--radius-sm, 6px); }
   .note__open:hover { color: var(--fg-secondary); }
   .note__act { min-height: 28px; padding: 0; background: transparent; border: 0; cursor: pointer; font: inherit; font-size: var(--dash-small); color: var(--fg-secondary); border-radius: var(--radius-sm, 6px); }

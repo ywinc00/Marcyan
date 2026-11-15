@@ -487,6 +487,9 @@ select.inp,
 .ui-kpi.has-art .ui-kpi__note { max-width: calc(100% - 74px); }
 .ui-kpi__note .is-data, .ui-kpi__note .is-up { color: var(--delta-up); font-weight: 500; }
 .ui-kpi__note .is-down { color: var(--delta-down); font-weight: 500; }
+/* La variación («↑ +15.1 %», «−$3,800») es un bloque: nunca se parte (E-62). */
+.ui-kpi__note .is-up, .ui-kpi__note .is-down, .ui-kpi__note .is-data, .ui-kpi__note .nw,
+.ui-kpi__note .fin-up, .ui-kpi__note .fin-down { white-space: nowrap; }
 .ui-kpi__note.is-error { color: var(--delta-down); }
 .ui-kpi__art {
   position: absolute; z-index: 0; right: 0; bottom: -16px;

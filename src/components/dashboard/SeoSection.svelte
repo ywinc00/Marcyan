@@ -351,7 +351,7 @@
           {#if proj && proj.domain}<span>{proj.domain}</span>{/if}
           {#if sumG}<span title="Search Console publica con 2 o 3 días de retraso">Search Console: {windowTxt}</span>{/if}
           {#if sumA}<span title="Analytics, sin el día de hoy">Analytics: {dayShort(sumA.current.start)} al {dayShort(sumA.current.end)}</span>{/if}
-          <span>Cambios frente a los {days} días anteriores</span>
+          <span>Cambios vs. {days} días antes</span>
           {#if proj && proj.active === false}<span>Pausado: fuera de la sincronización automática</span>{:else if syncState && syncState.at}<span title="Se sincroniza solo cada madrugada">Actualizado {whenTxt(syncState.at)}</span>{/if}
         </p>
       </div>
@@ -570,7 +570,7 @@
   .seo-tab[aria-current='page']::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--fg-primary); border-radius: 2px; }
   .seo-tabs__meta { margin: 0 0 9px; display: flex; flex-wrap: wrap; gap: 4px 10px; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); }
   .seo-tabs__meta span { overflow-wrap: anywhere; }
-  .seo-tabs__meta span + span::before { content: '·'; margin-right: 10px; color: var(--fg-faint); }
+  .seo-tabs__meta span:not(:last-child)::after { content: '·'; margin-left: 10px; color: var(--fg-faint); }
 
   .seo-stack { display: flex; flex-direction: column; gap: 14px; transition: opacity var(--duration-fast); }
   .seo-stack > :global(.ui-kpis) { margin: 0; }

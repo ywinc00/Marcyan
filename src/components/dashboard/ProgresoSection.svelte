@@ -167,7 +167,7 @@
       <div class="pl-search">
         <Icon name="search" size={16} />
         <label class="sr-only" for="prj-search">Buscar proyectos</label>
-        <input id="prj-search" class="ui-input" type="search" placeholder="Buscar proyecto, cliente o MRC"
+        <input id="prj-search" class="ui-input" type="search" placeholder="Buscar proyectos" title="Busca por proyecto, cliente o número MRC"
                value={searchText} oninput={onSearch} />
       </div>
     </div>
@@ -291,6 +291,8 @@
     font-size: var(--dash-card-title); font-weight: 600; color: var(--fg-primary); line-height: 1.3; letter-spacing: -0.01em;
     display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
+  /* Teléfono: hasta tres líneas, el nombre entero se lee (E-62). */
+  @media (max-width: 479px) { .pcard__name { -webkit-line-clamp: 4; line-clamp: 4; } }
   .pcard__sub { display: flex; align-items: center; gap: 6px; font-size: var(--dash-small); color: var(--fg-subtle); min-width: 0; }
   .pcard__client { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pcard__dot { color: var(--fg-subtle); }

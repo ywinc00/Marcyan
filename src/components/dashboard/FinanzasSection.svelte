@@ -242,14 +242,14 @@
     <KpiGrid count={5} label="Resumen del mes">
       <Kpi label="Cobrado (mes)" art="coins" tone={summary && summary.collected_this_month_cents > 0 ? 'data' : ''} value={summary ? fmtUsd0(summary.collected_this_month_cents) : '…'}>
         {#if summary && collectedDelta !== null}
-          <span class:fin-up={collectedDelta >= 0} class:fin-down={collectedDelta < 0}>{collectedDelta >= 0 ? '+' : ''}{collectedDelta} %</span> vs. mismo tramo de {prevMonthName}
+          <span class:fin-up={collectedDelta >= 0} class:fin-down={collectedDelta < 0}>{collectedDelta >= 0 ? '+' : ''}{collectedDelta} %</span> <span title="Frente al mismo tramo de {prevMonthName}">vs. {prevMonthName.slice(0, 3)}</span>
         {:else}Pagos recibidos este mes{/if}
       </Kpi>
       <Kpi label="Por cobrar" art="invoice" tone={summary && summary.ar_total_cents > 0 ? 'accent' : ''} href={href('finanzas', ['facturas'], { estado: 'abiertas' })}
         value={summary ? fmtUsd0(summary.ar_total_cents) : '…'}>
-        {#if summary && !summary.counts.open_invoices}Ninguna factura abierta{#if summary.draft_count}{` · ${summary.draft_count} en borrador`}{/if}
+        {#if summary && !summary.counts.open_invoices}Ninguna factura abierta{#if summary.draft_count}{`, ${summary.draft_count} en borrador`}{/if}
         {:else if summary}
-          {summary.counts.open_invoices} factura{summary.counts.open_invoices === 1 ? '' : 's'} abierta{summary.counts.open_invoices === 1 ? '' : 's'}{#if summary.draft_count}{` · ${summary.draft_count} borrador${summary.draft_count === 1 ? '' : 'es'} aparte`}{/if}
+          {summary.counts.open_invoices} factura{summary.counts.open_invoices === 1 ? '' : 's'} abierta{summary.counts.open_invoices === 1 ? '' : 's'}{#if summary.draft_count}{`, ${summary.draft_count} borrador${summary.draft_count === 1 ? '' : 'es'} aparte`}{/if}
         {:else}Saldo de las facturas abiertas{/if}
       </Kpi>
       <Kpi label="Vencido" art="alert" tone={summary && summary.overdue_cents > 0 ? 'error' : ''}
@@ -260,7 +260,7 @@
       </Kpi>
       <Kpi label="Gastos (mes)" art="card" value={summary ? fmtUsd0(summary.expenses_this_month_cents) : '…'}>
         {#if summary}
-          {summary.subscription_charges_this_month ? `${summary.subscription_charges_this_month} cargo${summary.subscription_charges_this_month === 1 ? '' : 's'} de suscripciones` : 'Apuntados este mes'}{#if summary.expenses_pending_this_month}{` · ${summary.expenses_pending_this_month} sin revisar, aún no cuenta${summary.expenses_pending_this_month === 1 ? '' : 'n'}`}{/if}
+          {summary.subscription_charges_this_month ? `${summary.subscription_charges_this_month} cargo${summary.subscription_charges_this_month === 1 ? '' : 's'} de suscripciones` : 'Apuntados este mes'}{#if summary.expenses_pending_this_month}{`, ${summary.expenses_pending_this_month} sin revisar aún`}{/if}
         {:else}Gastos del mes{/if}
       </Kpi>
       <Kpi label="Neto (mes)" art="chart-up" tone={summary && net !== 0 ? (net > 0 ? 'data' : 'error') : ''} value={summary ? fmtUsd0(net) : '…'}
@@ -450,8 +450,8 @@
   .fin :global(select.ui-input:disabled) { cursor: not-allowed; opacity: .7; }
 
   .fin-block { margin-bottom: var(--space-5); }
-  .fin-up { color: var(--accent-teal); font-weight: 600; }
-  .fin-down { color: var(--color-error); font-weight: 600; }
+  .fin-up { color: var(--delta-up); font-weight: 500; }
+  .fin-down { color: var(--delta-down); font-weight: 500; }
 
   /* Filtros en pastillas con su recuento (E-06). El activo NO es naranja
      (H-07): un nivel más de superficie, borde fuerte y texto primario. */

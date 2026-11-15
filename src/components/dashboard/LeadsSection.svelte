@@ -52,7 +52,7 @@
   // En pantallas estrechas el texto de ayuda del buscador se cortaba: allí va uno corto.
   let narrow = $state(false);
   $effect(() => {
-    const mq = window.matchMedia('(max-width: 719px)');
+    const mq = window.matchMedia('(max-width: 1279px)');
     narrow = mq.matches;
     const on = (e) => { narrow = e.matches; };
     mq.addEventListener('change', on);

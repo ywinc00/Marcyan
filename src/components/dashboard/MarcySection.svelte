@@ -509,7 +509,7 @@
   .item__m > :first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .item { min-width: 0; }
   .item__when { white-space: nowrap; }
-  .fail-txt { color: var(--color-warning, #f5b338); }
+  .fail-txt { color: var(--fg-secondary); }
 
   .thread { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
   .thread__head { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: 1px solid var(--border-subtle); }
@@ -531,7 +531,7 @@
   .toolcard { align-self: flex-end; display: inline-flex; gap: 6px; align-items: center; padding: 5px 10px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-elevated); color: var(--fg-secondary); font-size: var(--dash-caption); }
   .ev { align-self: flex-end; font-size: var(--dash-caption); color: var(--fg-subtle); }
   .ev--warn { color: var(--color-warning, #f5b338); }
-  .ev--live { align-self: center; color: var(--accent-teal); }
+  .ev--live { align-self: center; color: var(--fg-subtle); }
   .failbox { align-self: stretch; padding: 9px 12px; border: 1px solid rgba(245, 179, 56, .45); border-radius: 10px; background: rgba(245, 179, 56, .06); color: var(--color-warning, #f5b338); font-size: var(--dash-small); }
   .failbox--rail { display: flex; flex-direction: column; gap: 2px; }
   .failbox--rail span { color: var(--fg-secondary); font-size: var(--dash-caption); }

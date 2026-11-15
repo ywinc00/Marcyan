@@ -316,7 +316,7 @@
   <KpiGrid count={4} label="Resumen">
     <Kpi label="Leads recibidos" value={leadsThisMonth ?? '—'} art="inbox" href={href('leads')}>
       {#if leadsThisMonth === null}Sin dato de este mes
-      {:else}{#if leadsDelta && leadsDelta.dir !== 'same'}<span class="nw" class:is-up={leadsDelta.dir === 'up'} class:is-down={leadsDelta.dir === 'down'}>{leadsDelta.text}</span> vs. {prevLabel}
+      {:else}{#if leadsDelta && leadsDelta.dir !== 'same'}<span class="nw" class:is-up={leadsDelta.dir === 'up'} class:is-down={leadsDelta.dir === 'down'}>{leadsDelta.text}</span> vs. {prevLabel}
         {:else if leadsDelta && leadsThisMonth > 0}igual que en {prevLabel}
         {:else}este mes{/if}
       {/if}
@@ -328,7 +328,7 @@
     <div class="kpi-box" bind:this={revenueBox}>
     <Kpi label="Cobrado este mes" value={revenueShort} art="coins" href={href('finanzas')}>
       {#if revenue === null}Finanzas no respondió
-      {:else}{#if revenueRounded}<span class="exact">{revenueExact}</span><span class="sep">·</span><wbr>{/if}{#if revenueDelta && revenueDelta.dir !== 'same'}<span class="nw" class:is-up={revenueDelta.dir === 'up'} class:is-down={revenueDelta.dir === 'down'}>{revenueDelta.text}</span> vs. {prevLabel}
+      {:else}{#if revenueRounded}<span class="exact">{revenueExact}</span><span class="sep">·</span><wbr>{/if}{#if revenueDelta && revenueDelta.dir !== 'same'}<span class="nw" class:is-up={revenueDelta.dir === 'up'} class:is-down={revenueDelta.dir === 'down'}>{revenueDelta.text}</span> vs. {prevLabel}
       {:else if revenue === 0}Sin cobros este mes
       {:else}igual que en {prevLabel}{/if}{/if}
     </Kpi>

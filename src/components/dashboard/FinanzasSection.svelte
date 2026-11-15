@@ -249,7 +249,7 @@
         value={summary ? fmtUsd0(summary.ar_total_cents) : '…'}>
         {#if summary && !summary.counts.open_invoices}Ninguna factura abierta{#if summary.draft_count}{`, ${summary.draft_count} en borrador`}{/if}
         {:else if summary}
-          {summary.counts.open_invoices} factura{summary.counts.open_invoices === 1 ? '' : 's'} abierta{summary.counts.open_invoices === 1 ? '' : 's'}{#if summary.draft_count}{`, ${summary.draft_count} borrador${summary.draft_count === 1 ? '' : 'es'} aparte`}{/if}
+          {summary.counts.open_invoices} abierta{summary.counts.open_invoices === 1 ? '' : 's'}{#if summary.draft_count}{`, ${summary.draft_count} borrador${summary.draft_count === 1 ? '' : 'es'}`}{/if}
         {:else}Saldo de las facturas abiertas{/if}
       </Kpi>
       <Kpi label="Vencido" art="alert" tone={summary && summary.overdue_cents > 0 ? 'error' : ''}

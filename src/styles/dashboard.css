@@ -503,6 +503,9 @@ select.inp,
   .ui-kpi.has-art .ui-kpi__note { max-width: calc(100% - 64px); }
   .ui-kpi.has-art.is-strip .ui-kpi__note { max-width: none; margin-bottom: 34px; }
   .ui-kpi__art { width: 62px; bottom: -12px; }
+  /* Teléfono: la nota va SIEMPRE justo bajo la cifra (con franja o sin ella), así
+     las tarjetas vecinas se leen a la misma altura. */
+  .ui-kpi__note { margin-top: 0; }
 }
 @media (max-width: 719px) {
   .ui-kpi { padding: 13px 14px 12px; min-height: 96px; }

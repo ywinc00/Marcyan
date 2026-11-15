@@ -24,7 +24,8 @@
       const txt = el ? el.textContent.trim() : '';
       const len = txt.length;
       const blocks = el ? [...el.querySelectorAll('.is-up, .is-down, .is-data, .nw, .fin-up, .fin-down')].map((b) => b.textContent.trim()) : [];
-      const longest = [...txt.split(/\s+/), ...blocks].reduce((m, w) => Math.max(m, w.length), 0);
+      // Se parte solo por espacios normales: el espacio duro («1 sin leer») une palabras.
+      const longest = [...txt.split(/[ \t\n]+/), ...blocks].reduce((m, w) => Math.max(m, w.length), 0);
       const perLine = Math.max(1, Math.floor((cw - 64) / 7.3));
       // Franja si la nota pasa de dos líneas o si una sola palabra no cabe junto al objeto.
       const next = len > perLine * 2 || longest > perLine;

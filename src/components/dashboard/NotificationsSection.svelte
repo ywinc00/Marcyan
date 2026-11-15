@@ -271,7 +271,7 @@
   const kpiNote = (t) => {
     if (!loaded) return 'Sin datos';
     const c = counts.by_type[t] || { total: 0, unread: 0 };
-    return c.unread ? `${c.unread} sin leer` : (c.total ? 'Todo leído' : 'Ninguno en la bandeja');
+    return c.unread ? `${c.unread} sin leer` : (c.total ? 'Todo leído' : 'Ninguno en la bandeja');
   };
 </script>
 
@@ -383,7 +383,7 @@
                 {#if !n.archived_at}
                   <button type="button" class="note__act" disabled={isBusy} onclick={() => toggleRead(n)}
                           aria-label={`${n.read_at ? 'Marcar como no leído' : 'Marcar como leído'}: ${cleanTitle(n.title)}`}>
-                    {n.read_at ? 'Marcar como no leído' : 'Marcar como leído'}
+                    {n.read_at ? 'Marcar no leído' : 'Marcar leído'}
                   </button>
                 {/if}
                 {#if archiveAvailable}

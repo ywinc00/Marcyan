@@ -269,7 +269,7 @@
       {#each steps as s, i (s.label)}
         <button type="button" class="step" aria-pressed={i === 0 ? !q.paso && !q.f && !q.motivo : q.paso === s.id} onclick={() => pickStep(s.id)}>
           <span class="step__label">{s.label}</span>
-          <span class="step__n">{s.n}{#if s.drop}<em>−{s.drop}</em>{/if}</span>
+          <span class="step__n">{s.n}{#if s.drop}<em title="Se quedaron en este paso">↓ {s.drop}</em>{/if}</span>
           <span class="step__bar"><i style="width:{s.pct}%"></i></span>
         </button>
       {/each}
@@ -320,7 +320,7 @@
                   <span class="item__r1"><b class="item__t">{title(r)}</b><StatusChip tone={om.tone} label={om.label} /></span>
                   <span class="item__q">{r.last_reply || ''}</span>
                   <span class="item__m">
-                    <span class:fail-txt={!!r.fallo}>{#if r.fallo}{motivoLabel(r.fallo.motivo)} · mensaje {r.fallo.turno}{:else if r.lead_ref}{r.lead_ref}{:else}{meta(r)}{/if}</span>
+                    <span class:fail-txt={!!r.fallo}>{#if r.fallo}{motivoLabel(r.fallo.motivo)} · mensaje {r.fallo.turno}{:else if r.lead_ref}Dejó sus datos{:else}{meta(r)}{/if}</span>
                     <span class="item__when">{rel(r.last_at)}</span>
                   </span>
                 </button>
@@ -411,7 +411,7 @@
             <dt>Mensajes</dt><dd>{conv.turnos.length}</dd>
             <dt>Último</dt><dd>{rel(conv.last_at)}</dd>
             <dt>Coste</dt><dd>{usd(conv.cost_micro_usd, 3)}</dd>
-            {#if conv.lead_ref}<dt>Registro</dt><dd>{#if leadHref(conv.lead_ref)}<a href={leadHref(conv.lead_ref)}>{conv.lead_ref}</a>{:else}{conv.lead_ref}{/if}</dd>{/if}
+            {#if conv.lead_ref}<dt>Registro</dt><dd>{#if leadHref(conv.lead_ref)}<a href={leadHref(conv.lead_ref)}>Ver el lead</a>{:else}Lead guardado{/if}</dd>{/if}
           </dl>
         </div>
         <div class="rail__del">
@@ -425,7 +425,7 @@
     <ConfirmDialog bind:open={delOpen} title="Borrar conversación" confirmLabel="Borrar para siempre" busy={delBusy} onconfirm={borrar}
       message={`Se borrarán los ${conv.turnos.length} mensajes de esta conversación${conv.contact ? ' con ' + (conv.contact_name || conv.contact) : ''}. No se puede deshacer.`}>
       {#if conv.lead_ref && /^LEAD-/i.test(conv.lead_ref)}
-        <label class="del-check"><input type="checkbox" bind:checked={delLead} disabled={delBusy} /> Borrar también {conv.lead_ref} y sus citas</label>
+        <label class="del-check"><input type="checkbox" bind:checked={delLead} disabled={delBusy} /> Borrar también su lead y sus citas</label>
       {/if}
     </ConfirmDialog>
   {/if}
@@ -452,12 +452,12 @@
   .step:last-child { border-right: 0; }
   .step:hover { background: var(--bg-elevated); }
   .step:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; }
-  .step[aria-pressed='true'] { background: var(--bg-elevated); box-shadow: inset 0 -2px 0 var(--accent-gold); }
+  .step[aria-pressed='true'] { background: var(--bg-elevated); box-shadow: inset 0 -2px 0 var(--fg-primary); }
   .step__label { font-size: var(--dash-small); color: var(--fg-secondary); }
   .step__n { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
-  .step__n em { font-style: normal; font-size: var(--dash-caption); font-weight: 600; color: var(--color-warning, #f5b338); margin-left: 6px; }
+  .step__n em { font-style: normal; font-family: var(--font-mono); font-size: var(--dash-mono); font-weight: 400; color: var(--fg-subtle); margin-left: 8px; letter-spacing: 0; }
   .step__bar { height: 4px; border-radius: 4px; background: var(--bg-elevated); overflow: hidden; margin-top: auto; }
-  .step__bar i { display: block; height: 100%; background: var(--accent-teal); border-radius: 4px; }
+  .step__bar i { display: block; height: 100%; background: var(--fg-secondary); border-radius: 4px; }
   .step--side { background: rgba(96, 165, 250, .04); }
   .why { padding: 14px 18px 10px; }
   .why ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }

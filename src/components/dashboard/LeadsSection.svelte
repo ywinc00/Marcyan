@@ -174,9 +174,9 @@
   <LoadingState loading={loading && !loaded} skeleton={kpiSkel} label="Cargando las cifras de leads">
   {#if stats}
     <KpiGrid count={3} label="Resumen de leads">
-      <Kpi label="Este mes" value={stats.this_month ?? 0} note={`${stats.prev_month ?? 0} el mes pasado`} />
-      <Kpi label="Por atender" value={stats.new ?? 0} tone={stats.new ? 'accent' : ''} href={href('leads', [], { estado: 'nuevo' })} note="Nuevos sin contactar todavía" />
-      <Kpi label="Convertidos" value={stats.converted ?? 0} note={`${conversion} % de ${stats.total} leads`} />
+      <Kpi label="Este mes" value={stats.this_month ?? 0} art="inbox" note={`vs. ${stats.prev_month ?? 0} el mes anterior`} />
+      <Kpi label="Por atender" value={stats.new ?? 0} art="bell" tone={stats.new ? 'accent' : ''} href={href('leads', [], { estado: 'nuevo' })} note="Nuevos sin contactar todavía" />
+      <Kpi label="Convertidos" value={stats.converted ?? 0} art="check" note={`${conversion} % de ${stats.total} leads`} />
     </KpiGrid>
   {/if}
   </LoadingState>

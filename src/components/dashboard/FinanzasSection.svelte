@@ -528,12 +528,11 @@
   /* Móvil estrecho: las cifras de dinero necesitan el ancho entero (en dos
      columnas "$2,300" se cortaba en "$2,3…"). Solo en esta sección. */
   /* Teléfono: el resumen en dos columnas (el primero a lo ancho) para que lo
-     pendiente se vea sin bajar tanto; sin la ilustración decorativa para que
-     la cifra entera quepa. Las cinco cifras y sus notas siguen a la vista. */
+     pendiente se vea sin bajar tanto. El objeto se queda (un solo sistema en todo el
+     panel): la cifra ya no comparte fila con él y cabe entera. */
   @media (max-width: 479px) {
     .fin :global(.ui-kpis[data-count="5"]) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
     .fin :global(.ui-kpis[data-count="5"] > :first-child) { grid-column: 1 / -1; }
-    .fin :global(.ui-kpis[data-count="5"] .kpi-art) { display: none; }
     .fin :global(.ui-kpis[data-count="5"] .ui-kpi) { padding: 14px 14px; }
     .fin :global(.ui-kpis[data-count="5"] .ui-kpi__num) { font-size: 26px; }
     .fin :global(.ui-kpis[data-count="5"] .ui-kpi__row) { min-height: 36px; }

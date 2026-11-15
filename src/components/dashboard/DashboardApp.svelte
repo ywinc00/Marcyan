@@ -107,6 +107,8 @@
   const monthlyRunRate = $derived(data.subs
     .filter((s) => s.active)
     .reduce((sum, s) => { const c = Number(s.amount_cents) || 0; return sum + (s.cycle === 'yearly' ? Math.round(c / 12) : c); }, 0));
+  // Barra lateral: dólares redondos ($120/año), el detalle exacto queda en el título y en Finanzas.
+  function moneyShort(cents) { return '$' + Math.round((Number(cents) || 0) / 100).toLocaleString('en-US'); }
   function money(cents) {
     return '$' + ((Number(cents) || 0) / 100).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   }
@@ -340,7 +342,7 @@
   <!-- Fase 3: la marca del panel como en la lámina original (ficha con el
        icono de Orbit + nombre en blanco), sin el naranja en cursiva. -->
   <span class="brand" class:brand--lg={large}>
-    <span class="brand__tile" aria-hidden="true"><img src="/dashboard/orbit-icon.svg" alt="" width="22" height="22" /></span>
+    <span class="brand__tile" aria-hidden="true"><svg viewBox="0 0 512 512" width="26" height="26"><defs><radialGradient id="brandCore" cx="38%" cy="34%" r="70%"><stop offset="0" stop-color="#fdba74"/><stop offset=".55" stop-color="#f97316"/><stop offset="1" stop-color="#9a3412"/></radialGradient><clipPath id="brandFront"><rect x="0" y="256" width="512" height="256" transform="rotate(-24 256 256)"/></clipPath></defs><g transform="rotate(-24 256 256)"><ellipse cx="256" cy="256" rx="196" ry="74" fill="none" stroke="#f97316" stroke-width="30" opacity=".55"/></g><circle cx="256" cy="256" r="98" fill="url(#brandCore)"/><g clip-path="url(#brandFront)"><g transform="rotate(-24 256 256)"><ellipse cx="256" cy="256" rx="196" ry="74" fill="none" stroke="#f97316" stroke-width="30"/></g></g><circle cx="424" cy="224" r="30" fill="#f4f4f5" stroke="#262626" stroke-width="8"/></svg></span>
     <span class="wordmark">Orbit</span>
   </span>
 {/snippet}
@@ -363,7 +365,7 @@
   <div class="side-subs">
     <!-- El gasto mensual sube a la cabecera del bloque (antes era una tarjeta
          aparte con la cifra en naranja). -->
-    <span class="nav__cap nav__cap--row"><span>Suscripciones</span>{#if activeSubs.length}<span class="nav__cap-num">{money(monthlyRunRate)}/mes</span>{/if}</span>
+    <span class="nav__cap nav__cap--row"><span>Suscripciones</span>{#if activeSubs.length}<span class="nav__cap-num">{moneyShort(monthlyRunRate)}/mes</span>{/if}</span>
     {#if data.subsError && !data.subs.length}
       <p class="subs__hint subs__hint--err">No se pudieron cargar. <button class="inline-btn" onclick={refreshShell}>Reintentar</button></p>
     {:else if !data.subsLoaded}
@@ -375,7 +377,7 @@
             <div class="subs__row" title={`${s.name} · ${money(s.amount_cents)}/${s.cycle === 'yearly' ? 'año' : 'mes'}`}>
               <BrandLogo name={s.name} size={18} />
               <span class="subs__name">{s.name}</span>
-              <span class="subs__amt">{money(s.amount_cents)}{s.cycle === 'yearly' ? '/año' : ''}</span>
+              <span class="subs__amt">{moneyShort(s.amount_cents)}{s.cycle === 'yearly' ? '/año' : ''}</span>
             </div>
           {/each}
         </div>
@@ -578,7 +580,7 @@
   .brand { display: flex; align-items: center; gap: 12px; }
   .brand--lg { justify-content: center; margin-bottom: var(--space-2); }
   .brand__tile { width: 34px; height: 34px; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; background: #262626; border: 1px solid var(--border); }
-  .brand__tile img { display: block; width: 22px; height: 22px; border-radius: 5px; }
+  .brand__tile svg { display: block; }
   .brand--lg .brand__tile { width: 40px; height: 40px; }
   .wordmark { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.01em; font-size: 17px; color: var(--fg-primary); }
   .brand--lg .wordmark { font-size: 20px; }
@@ -628,9 +630,13 @@
   .nav__count { margin-left: auto; min-width: 22px; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold); font-size: var(--dash-caption); font-weight: 600; line-height: 1.5; text-align: center; font-variant-numeric: tabular-nums; }
   /* Portátil de poco alto: la barra lateral se aprieta antes de desplazarse. */
   @media (max-height: 820px) {
-    .sidebar { gap: 14px; padding-top: 14px; }
-    .nav { padding-top: 12px; }
-    .nav__item { min-height: 36px; padding: 6px 10px; }
+    .sidebar { gap: 12px; padding-top: 14px; padding-bottom: 10px; scrollbar-width: none; }
+    .sidebar::-webkit-scrollbar { display: none; }
+    .nav { padding-top: 10px; gap: 0; }
+    .nav__cap { padding-bottom: 6px; }
+    .nav__item { min-height: 33px; padding: 5px 10px; }
+    .subs__row { padding-top: 5px; padding-bottom: 5px; }
+    .sidebar__foot { padding-top: 8px; }
   }
   .nav__item.active { background: var(--surface-3); color: var(--fg-primary); font-weight: 500; }
   .nav__item.active :global(.ui-icon) { color: var(--fg-primary); }

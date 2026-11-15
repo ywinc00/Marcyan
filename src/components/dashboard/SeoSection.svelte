@@ -195,7 +195,7 @@
 
   // KPIs
   // Nota corta (cabe en una línea de la cifra): el rango ya se ve arriba, en las pastillas.
-  const prevTxt = 'vs. antes';
+  const prevTxt = $derived(`vs. ${days} días previos`);
   const dClicks = $derived(sumG ? delta(sumG.current.clicks, sumG.previous && sumG.previous.clicks) : null);
   const dImpr = $derived(sumG ? delta(sumG.current.impressions, sumG.previous && sumG.previous.impressions) : null);
   const dPos = $derived(sumG ? delta(sumG.current.position, sumG.previous && sumG.previous.position, { lowerIsBetter: true }) : null);
@@ -232,9 +232,7 @@
   let metric = $state('clicks');       // qué pinta el gráfico del Resumen: un solo gráfico, un solo color
   let fit = $state(false);
   onMount(() => {
-    // SEO lleva barra de proyecto y pestañas encima: a pantalla solo desde 820 de alto;
-    // por debajo fluye (las cifras, el gráfico y la indexación siguen en la primera vista).
-    const mq = window.matchMedia('(min-width: 1100px) and (min-height: 820px)');
+    const mq = window.matchMedia('(min-width: 1100px) and (min-height: 700px)');
     const sync = () => (fit = mq.matches);
     sync();
     mq.addEventListener?.('change', sync);
@@ -243,7 +241,18 @@
   const fitOn = $derived(fit && ver === 'resumen' && Boolean(detail) && (hasGsc || hasGa4));
   // Mejores búsquedas: tantas filas como quepan (34 px + 6 de separación), cinco si la página fluye.
   let qH = $state(0);
-  const qRows = $derived(fitOn && qH ? Math.max(1, Math.min(10, Math.floor((qH + 6) / 40))) : 5);
+  const qMax = $derived(queries.length ? Math.max(...queries.map((q) => Number(q.clicks) || 0)) : 0);
+  // Portátil de poco alto (menos de 820): gráfico, indexación y búsquedas en tres columnas.
+  let short = $state(false);
+  onMount(() => {
+    const mq = window.matchMedia('(max-height: 819px)');
+    const sync = () => (short = mq.matches);
+    sync();
+    mq.addEventListener?.('change', sync);
+    return () => mq.removeEventListener?.('change', sync);
+  });
+  // Filas de 32 px (40 en tres columnas, a dos líneas) más 6 de separación.
+  const qRows = $derived(fitOn && qH ? Math.max(1, Math.min(10, Math.floor((qH + 6) / (short ? 46 : 38)))) : 5);
   const qCols = [
     { key: 'query', label: 'Búsqueda', primary: true },
     { key: 'clicks', label: 'Clics', align: 'end' },
@@ -253,7 +262,7 @@
   ];
 </script>
 
-<div class="seo" class:is-fit={fitOn}>
+<div class="seo" class:is-fit={fitOn} class:is-short={fitOn && short}>
 <PageHeader title="SEO">
   {#snippet actions()}
     <button type="button" class="b seo-health seo-health--{health.tone}" onclick={() => (statusOpen = true)} aria-haspopup="dialog">
@@ -267,7 +276,7 @@
   {#if isOff}
     {offTxt}
   {:else if d}
-    <span class={d.dir === 'flat' ? '' : d.better ? 'is-up' : 'is-down'}>{d.dir === 'up' ? '↑' : d.dir === 'down' ? '↓' : '→'} {d.txt}</span> <span title="frente a los {days} días anteriores">{prevTxt}</span>
+    <span class={d.dir === 'flat' ? '' : d.better ? 'is-up' : 'is-down'}>{d.dir === 'up' ? '↑' : d.dir === 'down' ? '↓' : '→'} {d.txt}</span> <span class="kn-prev">{prevTxt}</span>
   {:else}
     {okTxt}
   {/if}
@@ -317,10 +326,10 @@
       </div>
       {#if selected}
         <div class="seo-bar__acts">
-          <button type="button" class="b" onclick={() => syncNow()} disabled={Boolean(syncingId) || !configured || !(selected.gsc_site_url || selected.ga4_property_id)}>
-            <span class:seo-spin={syncing}><Icon name="refresh" size={16} /></span>{syncing ? 'Actualizando…' : 'Actualizar ahora'}
+          <button type="button" class="b" onclick={() => syncNow()} disabled={Boolean(syncingId) || !configured || !(selected.gsc_site_url || selected.ga4_property_id)} title="Actualizar ahora">
+            <span class:seo-spin={syncing}><Icon name="refresh" size={16} /></span><span class="seo-bar__txt">{syncing ? 'Actualizando…' : 'Actualizar ahora'}</span>
           </button>
-          <button type="button" class="b" onclick={openEdit}><Icon name="edit" size={16} />Editar</button>
+          <button type="button" class="b" onclick={openEdit} aria-label="Editar proyecto"><Icon name="edit" size={16} /><span class="seo-bar__txt" aria-hidden="true">Editar</span></button>
           <button type="button" class="ui-icon-btn seo-del" onclick={() => (delOpen = true)} aria-label="Eliminar proyecto" title="Eliminar proyecto"><Icon name="trash" size={18} /></button>
         </div>
       {/if}
@@ -454,7 +463,6 @@
                   {/if}
                   <SeoIndexation mode="summary" onpages={() => pickVer('paginas')} indexation={detail.metrics.indexation} {hasGsc} state={syncState && syncState.sources ? syncState.sources.indexation : null}
                     {syncing} gscFailed={Boolean(gscErr)} onsync={() => syncNow()} onedit={openEdit} onstatus={() => (statusOpen = true)} />
-                </div>
 
                 {#if topQ || gscDaily.length}
                   <Card tag="article" title="Mejores búsquedas">
@@ -464,16 +472,18 @@
                     {/snippet}
                     {#if queries.length}
                       <div class="qs">
-                        <div class="qs__cols" aria-hidden="true"><span>Búsqueda</span><span>Clics</span><span>Impresiones</span><span>CTR</span><span>Posición</span></div>
+                        <div class="qs__cols" aria-hidden="true"><span>Búsqueda</span><span class="qs__x"></span><span>Clics</span><span class="qs__x">Impresiones</span><span class="qs__x">CTR</span><span>Posición</span></div>
                         <div class="qs__box" bind:clientHeight={qH}>
                           <ol class="qs__rows">
                             {#each queries.slice(0, qRows) as q (q.rank)}
                               <li class="qs__row">
                                 <span class="q"><span class="q__rank">{q.rank}</span><span class="q__text ellip">{q.query || '—'}</span></span>
-                                <span class="num num--hi"><span class="qs__lbl">Clics </span>{nfmt(q.clicks)}</span>
-                                <span class="num"><span class="qs__lbl">Impr. </span>{nfmt(q.impressions)}</span>
-                                <span class="num num--dim"><span class="qs__lbl">CTR </span>{pct(q.ctr)}</span>
-                                <span class="num num--dim"><span class="qs__lbl">Pos. </span>{pos(q.position)}</span>
+                                <!-- barra de clics frente a la búsqueda con más clics -->
+                                <span class="qs__bar" aria-hidden="true"><i style="width:{qMax ? Math.max(2, (Number(q.clicks) || 0) / qMax * 100) : 0}%"></i></span>
+                                <span class="num num--hi"><span class="qs__lbl">Clics</span>{nfmt(q.clicks)}</span>
+                                <span class="num qs__x"><span class="qs__lbl">Impr.</span>{nfmt(q.impressions)}</span>
+                                <span class="num num--dim qs__x"><span class="qs__lbl">CTR</span>{pct(q.ctr)}</span>
+                                <span class="num num--dim"><span class="qs__lbl">Pos.</span>{pos(q.position)}</span>
                               </li>
                             {/each}
                           </ol>
@@ -485,6 +495,7 @@
                     {/if}
                   </Card>
                 {/if}
+                </div>
               {/if}
               {/if}
             </div>
@@ -517,8 +528,21 @@
   .seo > :global(.ui-page-head) { margin: 6px 0 14px; }
   .seo.is-fit { height: calc(100dvh - var(--chrome-y, 76px)); min-height: 0; }
   .seo.is-fit .seo-stack { flex: 1 1 auto; min-height: 0; }
-  .seo.is-fit .seo-row--a { flex: 1.35 1 0; min-height: 0; }
-  .seo.is-fit .seo-stack > :global(.ui-card:last-child) { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+  /* Rejilla del Resumen: gráfico e indexación arriba, búsquedas abajo; en portátil
+     de poco alto, las tres en una fila (E-77: cabe en 1366×768). */
+  .seo-row--a { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .seo-row--a > :global(:nth-child(3)) { grid-column: 1 / -1; }
+  .seo.is-fit .seo-row--a { flex: 1 1 auto; min-height: 0; grid-template-rows: minmax(0, 1.2fr) minmax(0, 1fr); }
+  /* Nota de la cifra en dos líneas fijas: el cambio arriba, el periodo debajo. */
+  .kn-prev { display: block; }
+  .seo.is-short .seo-row--a { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 1.15fr); grid-template-rows: minmax(0, 1fr); }
+  .seo.is-short .seo-row--a > :global(:nth-child(3)) { grid-column: auto; }
+  .seo.is-short .qs__cols, .seo.is-short .qs__row { grid-template-columns: minmax(0, 1fr) 48px 52px; }
+  .seo.is-short .qs__bar, .seo.is-short .qs__x { display: none; }
+  /* Tres columnas: la búsqueda baja a dos líneas en vez de cortarse. */
+  .seo.is-short .qs__row { min-height: 40px; padding-top: 4px; padding-bottom: 4px; }
+  .seo.is-short .q__text { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; font-size: var(--dash-caption); line-height: 1.3; }
+  .seo.is-short > :global(.ui-page-head) { margin-bottom: 10px; }
 
   .seo-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
   .seo-bar__pick { flex: 1 1 260px; max-width: 380px; min-width: 0; }
@@ -571,15 +595,17 @@
 
   /* Mejores búsquedas: filas compactas como «Recent Projects» de la referencia. */
   .qs { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
-  .qs__cols, .qs__row { display: grid; grid-template-columns: minmax(0, 1fr) 72px 96px 64px 72px; gap: 12px; align-items: center; }
+  .qs__cols, .qs__row { display: grid; grid-template-columns: minmax(150px, 1.3fr) minmax(0, 1fr) 56px 92px 60px 64px; gap: 14px; align-items: center; }
   .qs__cols { padding: 0 12px 8px; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); }
-  .qs__cols > :not(:first-child) { text-align: right; }
+  .qs__cols > :nth-child(n+3) { text-align: right; }
+  .qs__bar { display: block; height: 4px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); overflow: hidden; }
+  .qs__bar i { display: block; height: 100%; border-radius: 999px; background: #6a6a6a; }
   .qs__box { flex: 1 1 auto; min-height: 0; overflow: hidden; }
   .qs__rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-  .qs__row { min-height: 34px; padding: 0 12px; background: #242424; border: 1px solid var(--border-subtle); border-radius: 8px; font-size: var(--dash-small); }
+  .qs__row { min-height: 32px; padding: 0 12px; background: #242424; border: 1px solid var(--border-subtle); border-radius: 8px; font-size: var(--dash-small); }
   .qs__row > .num { text-align: right; }
   /* Rótulo de cada cifra: oculto a la vista en escritorio (lo dicen las columnas), visible en el teléfono. */
-  .qs__lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .qs__lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin-right: 5px; }
   .ellip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 
   .q { display: inline-flex; align-items: center; gap: 10px; min-width: 0; max-width: 100%; }
@@ -596,11 +622,17 @@
     .seo-q :global(.ui-table td.is-primary) { grid-column: 1 / -1; }
     .seo-q :global(.ui-table td:not(.is-primary):not(.is-action)) { grid-column: auto; }
     .seo-bar__pick { flex-basis: 100%; max-width: none; }
-    .seo-bar__acts { margin-left: 0; flex-wrap: wrap; }
+    .seo-bar__acts { margin-left: auto; flex-wrap: nowrap; gap: 6px; }
+    .seo-bar__acts .b { width: var(--tap-min, 44px); padding: 0; }
+    .seo-bar__txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .seo-range__b { padding: 6px 9px; font-size: var(--dash-caption); }
+    .seo-tabs__meta { gap: 2px 12px; font-size: 11px; }
     /* Resumen: la búsqueda arriba y sus cuatro cifras debajo, con su rótulo. */
     .qs__cols { display: none; }
     .qs__row { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 4px; padding: 8px 12px; }
     .qs__row > .q { grid-column: 1 / -1; }
+    .qs__bar { display: none; }
+    .qs__lbl { display: block; margin: 0 0 1px; }
     .qs__row > .num { text-align: left; }
     .qs__lbl { position: static; width: auto; height: auto; overflow: visible; clip: auto; color: var(--fg-faint); }
   }

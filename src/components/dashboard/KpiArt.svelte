@@ -49,32 +49,34 @@
 {#snippet slab(x, y, w, h, r, d = 4, face = 'face')}
   <rect x={x + d * 0.45} y={y + d} width={w} height={h} rx={r} fill={g('side')} />
   <rect x={x} y={y} width={w} height={h} rx={r} fill={g(face)} stroke={g('rim')} stroke-width="1" />
+  <!-- filo de luz del canto superior, como los objetos de la lámina -->
+  <path d="M{x + r} {y + 0.7}H{x + w - r}" stroke="#fff" stroke-opacity=".55" stroke-width="1" stroke-linecap="round" />
 {/snippet}
 
 <svg class="kpi-art" width={size} height={Math.round(size * H / W)} viewBox="0 0 {W} {H}" aria-hidden="true" focusable="false">
   <defs>
     <linearGradient id="{uid}-face" x1="0" y1="0" x2=".55" y2="1">
-      <stop offset="0" stop-color="#565656" />
-      <stop offset=".5" stop-color="#323232" />
+      <stop offset="0" stop-color="#727272" />
+      <stop offset=".42" stop-color="#3e3e3e" />
       <stop offset="1" stop-color="#262626" />
     </linearGradient>
     <linearGradient id="{uid}-face2" x1="0" y1="0" x2=".55" y2="1">
-      <stop offset="0" stop-color="#3c3c3c" />
-      <stop offset="1" stop-color="#202020" />
+      <stop offset="0" stop-color="#525252" />
+      <stop offset="1" stop-color="#222" />
     </linearGradient>
     <linearGradient id="{uid}-paper" x1="0" y1="0" x2=".5" y2="1">
-      <stop offset="0" stop-color="#646464" />
-      <stop offset=".45" stop-color="#3a3a3a" />
-      <stop offset="1" stop-color="#2a2a2a" />
+      <stop offset="0" stop-color="#8c8c8c" />
+      <stop offset=".4" stop-color="#474747" />
+      <stop offset="1" stop-color="#2c2c2c" />
     </linearGradient>
     <linearGradient id="{uid}-side" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#1c1c1c" />
       <stop offset="1" stop-color="#101010" />
     </linearGradient>
     <linearGradient id="{uid}-rim" x1="0" y1="0" x2=".4" y2="1">
-      <stop offset="0" stop-color="#fff" stop-opacity=".26" />
-      <stop offset=".45" stop-color="#fff" stop-opacity=".07" />
-      <stop offset="1" stop-color="#fff" stop-opacity=".02" />
+      <stop offset="0" stop-color="#fff" stop-opacity=".6" />
+      <stop offset=".45" stop-color="#fff" stop-opacity=".12" />
+      <stop offset="1" stop-color="#fff" stop-opacity=".03" />
     </linearGradient>
     <radialGradient id="{uid}-shadow" cx=".5" cy=".5" r=".5">
       <stop offset="0" stop-color="#000" stop-opacity=".55" />
@@ -84,6 +86,9 @@
 
   <!-- sombra de contacto -->
   <ellipse cx="66" cy="80" rx="46" ry="11" fill={g('shadow')} />
+  <!-- copia fantasma detrás (la lámina repite el objeto, tenue y desplazado) -->
+  <use href="#{uid}-obj" transform="translate(-20 -12)" opacity=".13" />
+  <g id="{uid}-obj">
 
   {#if resolved === 'docs'}
     <!-- Dos hojas inclinadas con renglones (referencia: «Active Contracts»). -->
@@ -139,12 +144,16 @@
       <circle cx="62" cy="45" r="2.2" fill="#d0d0d0" />
     </g>
   {:else if resolved === 'coins'}
-    <!-- Pila de monedas: cilindros (canto + cara elíptica). -->
-    {#each [[58, 66], [62, 54], [57, 42]] as [cx, cy], i (i)}
-      <path d="M{cx - 26} {cy}v7a26 9 0 0 0 52 0v-7" fill={g('side')} />
-      <ellipse {cx} {cy} rx="26" ry="9" fill={g('face')} stroke={g('rim')} />
-      {#if i === 2}<ellipse {cx} {cy} rx="17" ry="5.4" fill="none" stroke="#141414" stroke-width="1.5" /><ellipse {cx} cy={cy + 0.9} rx="17" ry="5.4" fill="none" stroke="#fff" stroke-opacity=".1" stroke-width="1" />{/if}
-    {/each}
+    <!-- Billetes apilados con el símbolo grabado (cobrado, valor). -->
+    <g transform="rotate(-14 62 48)">
+      <g transform="rotate(9 70 40)">{@render slab(32, 14, 76, 44, 6, 3, 'face2')}</g>
+      {@render slab(20, 28, 78, 46, 6, 4, 'paper')}
+      <g class="eng">
+        <circle cx="59" cy="51" r="10" />
+        <path d="M59 44.5v13M62.4 47.2h-4.6a2.2 2.2 0 0 0 0 4.4h2.4a2.2 2.2 0 0 1 0 4.4h-4.8" class="eng--glyph" />
+        <path d="M27 36h9M82 66h9" />
+      </g>
+    </g>
   {:else if resolved === 'card'}
     <!-- Tarjeta de pago inclinada: chip y número grabados. -->
     <g transform="rotate(-16 62 48)">
@@ -171,12 +180,14 @@
       {/if}
     </g>
   {/if}
+  </g>
 </svg>
 
 <style>
   .kpi-art { display: block; flex: 0 0 auto; overflow: visible; }
-  .eng { fill: none; stroke: #b9b9b9; stroke-opacity: .7; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .eng--glyph { stroke: #dcdcdc; stroke-opacity: .92; stroke-width: 2.4; }
-  .eng--strong { stroke-opacity: .95; }
-  .glyph { color: #d8d8d8; }
+  /* Grabados en blanco nítido, como las líneas de los objetos de la lámina. */
+  .eng { fill: none; stroke: #f2f2f2; stroke-opacity: .85; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .eng--glyph { stroke: #fafafa; stroke-opacity: .96; stroke-width: 2.2; }
+  .eng--strong { stroke-opacity: 1; }
+  .glyph { color: #f4f4f4; }
 </style>

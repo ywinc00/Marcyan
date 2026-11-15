@@ -84,7 +84,7 @@
     'sin-soporte': 'Este navegador no admite avisos.',
     'ios-instalar': 'En iPhone, instala Orbit primero: Compartir y luego "Añadir a pantalla de inicio". Ábrelo desde ahí y activa los avisos.',
     bloqueado: 'Los avisos están bloqueados para este sitio. Permítelos en los ajustes del navegador y vuelve aquí.',
-    'sin-llave': 'Falta la llave de avisos en Vercel.',
+    'sin-llave': 'Los avisos al teléfono aún no están activados en el servidor.',
     'sin-base': 'Falta preparar la base de datos de los avisos.',
   };
 </script>

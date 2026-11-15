@@ -259,7 +259,7 @@
     cursor: pointer; transition: border-color var(--duration-fast), background-color var(--duration-fast), color var(--duration-fast);
   }
   .pill:hover { border-color: var(--border-strong); color: var(--fg-primary); }
-  .pill[aria-pressed="true"] { background: var(--accent-gold-dim); border-color: var(--accent-gold-line); color: var(--fg-primary); }
+  .pill[aria-pressed="true"] { background: var(--surface-3); border-color: var(--border-strong); color: var(--fg-primary); }
   /* Hueco del recuento mientras llegan las cifras: la fila no cambia de ancho (E-09). */
   .pill__hueco { display: inline-block; width: 22px; height: 14px; vertical-align: middle; }
   .pill__n { min-width: 18px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--bg-elevated); color: var(--fg-secondary); font-size: var(--dash-caption); text-align: center; font-variant-numeric: tabular-nums; }

@@ -132,9 +132,9 @@
   <LoadingState loading={loading && !loaded} skeleton={kpiSkel} label="Cargando las cifras de clientes">
   {#if summary}
     <KpiGrid count={3} label="Resumen de clientes">
-      <Kpi label="Clientes activos" value={summary.active} note={summary.inactive ? `${plural(summary.inactive, 'inactivo', 'inactivos')} aparte` : 'Ninguno inactivo'} />
-      <Kpi label="Con proyecto en curso" value={summary.with_active_projects} tone="data" href={href('progreso', [], { estado: 'activo' })} note="Ver el avance en Progreso" />
-      <Kpi label="Saldo por cobrar" value={money(summary.balance_cents)} note="Facturas emitidas sin pagar, sin borradores" />
+      <Kpi label="Clientes activos" value={summary.active} art="users" note={summary.inactive ? `${plural(summary.inactive, 'inactivo', 'inactivos')} aparte` : 'Ninguno inactivo'} />
+      <Kpi label="Con proyecto en curso" value={summary.with_active_projects} art="folder" href={href('progreso', [], { estado: 'activo' })} note="Ver el avance en Progreso" />
+      <Kpi label="Saldo por cobrar" value={money(summary.balance_cents)} art="invoice" note="Facturas emitidas sin pagar, sin borradores" />
     </KpiGrid>
   {/if}
   </LoadingState>
@@ -182,7 +182,7 @@
                 <span class="mono-av" style="background:{monoColor(clientName(c))}" aria-hidden="true">{initials(clientName(c))}</span>
                 <span class="c-text">
                   <span class="c-name">{clientName(c)}</span>
-                  <span class="c-sub">{[c.business_name && c.owner_name ? c.owner_name : '', c.client_code].filter(Boolean).join(' · ')}</span>
+                  <span class="c-sub">{c.business_name && c.owner_name ? c.owner_name : ''}</span>
                 </span>
               </a>
             {:else if col.key === 'contact'}

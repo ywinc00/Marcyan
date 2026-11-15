@@ -70,7 +70,7 @@
           <circle cx={cx(i)} cy="28" r="15" fill="none" stroke={done || cur ? c : 'var(--border-strong)'} stroke-opacity=".55" stroke-width="1.5" />
         {/if}
         <circle cx={cx(i)} cy="28" r="11"
-                fill={done ? c : cur ? 'color-mix(in srgb, var(--color-info) 18%, var(--bg-card))' : 'var(--bg-elevated)'}
+                fill={done ? c : cur ? 'color-mix(in srgb, var(--fg-secondary) 18%, var(--bg-card))' : 'var(--bg-elevated)'}
                 stroke={done || cur ? c : 'var(--border-strong)'} stroke-width="2" />
         {#if done}
           <path d="M{cx(i) - 4.5} 28 l3 3 l6 -6.5" fill="none" stroke="var(--fg-inverse)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />

@@ -477,31 +477,22 @@ select.inp,
   line-height: 1.05; letter-spacing: -0.02em; color: var(--fg-primary);
   font-variant-numeric: tabular-nums;
 }
-.ui-kpi.has-art .ui-kpi__num { max-width: calc(100% - min(36cqw, 100px)); }
 .ui-kpi__note {
   position: relative; z-index: 1; margin: auto 0 0; padding-top: 10px;
   font-family: var(--font-mono); font-size: var(--dash-mono); letter-spacing: -0.01em;
   color: var(--fg-subtle); line-height: 1.45;
 }
-.ui-kpi.has-art .ui-kpi__note { max-width: calc(100% - min(30cqw, 84px)); }
+/* La nota deja libre la mitad visible del objeto; la cifra va arriba y usa todo el ancho. */
+.ui-kpi.has-art .ui-kpi__note { max-width: calc(100% - clamp(26px, 20cqw, 56px)); }
 .ui-kpi__note .is-data, .ui-kpi__note .is-up { color: var(--delta-up); font-weight: 500; }
 .ui-kpi__note .is-down { color: var(--delta-down); font-weight: 500; }
 .ui-kpi__note.is-error { color: var(--delta-down); }
 .ui-kpi__art {
-  position: absolute; z-index: 0; right: 2px; bottom: -24px;
-  width: clamp(84px, 46cqw, 138px); opacity: .95; pointer-events: none;
+  position: absolute; z-index: 0; right: 0; bottom: -16px;
+  width: clamp(64px, 46cqw, 120px); opacity: .95; pointer-events: none;
   transition: opacity var(--duration-fast);
 }
 .ui-kpi__art svg { width: 100%; height: auto; }
-/* Tarjeta estrecha (dos por fila en el teléfono): la nota usa todo el ancho y
-   el objeto queda detrás, más pequeño y tenue, sin partir la comparación. */
-@container (max-width: 236px) {
-  /* Tarjeta estrecha (cinco por fila, o dos en el teléfono): el objeto sube a la
-     altura de la cifra, entero y más pequeño, y la nota usa todo el ancho. */
-  .ui-kpi.has-art .ui-kpi__note { max-width: none; }
-  .ui-kpi.has-art .ui-kpi__num { max-width: calc(100% - 66px); }
-  .ui-kpi__art { width: 62px; top: 22px; bottom: auto; right: 4px; opacity: .9; }
-}
 @media (max-width: 719px) {
   .ui-kpi { padding: 13px 14px 12px; min-height: 96px; }
   .ui-kpi__num { font-size: 24px; }
@@ -521,24 +512,28 @@ select.inp,
 .ui-card__actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); flex: 0 1 auto; min-width: 0; }
 
 /* ── Chip de estado (color + texto, nunca solo color) ── */
+/* Fase 3, ronda 2: ficha NEUTRA con un punto de color delante (forma + color +
+   palabra). Mapa del panel, sin azul (la lámina no lo tiene): por atender o
+   activo = naranja, hecho o positivo = verde, aviso = ámbar, error = rojo,
+   resto (en curso, pausa, archivado) = gris. */
 .ui-chip {
-  --chip: var(--fg-secondary);
+  --chip: var(--fg-faint);
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 3px 10px; border-radius: var(--radius-pill);
+  padding: 2px 9px 2px 8px; border-radius: var(--radius-pill);
   font-size: var(--dash-caption); font-weight: 500; line-height: 1.45; white-space: nowrap;
-  color: var(--chip);
-  background: color-mix(in srgb, var(--chip) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--chip) 20%, transparent);
+  color: var(--fg-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
 }
-.ui-chip--neutral { --chip: var(--fg-secondary); background: var(--bg-elevated); border-color: var(--border); }
-/* El naranja de un chip compite con el botón principal: «en curso» y demás
-   estados de trabajo van en blanco roto sobre el elevado (H-07). */
-.ui-chip--accent  { --chip: #fdba74; }
-.ui-chip--data    { --chip: var(--accent-teal); }
-.ui-chip--success { --chip: var(--color-success); }
+.ui-chip::before { content: ''; flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%; background: var(--chip); }
+.ui-chip--neutral { --chip: var(--fg-faint); }
+.ui-chip--accent,
+.ui-chip--info    { --chip: var(--accent-gold); color: var(--fg-primary); }
+.ui-chip--data,
+.ui-chip--success { --chip: var(--delta-up); }
 .ui-chip--warning { --chip: var(--color-warning); }
-.ui-chip--error   { --chip: var(--color-error); }
-.ui-chip--info    { --chip: var(--color-info); }
+.ui-chip--error   { --chip: var(--delta-down); color: var(--fg-primary); }
+@media (forced-colors: active) { .ui-chip::before { background: CanvasText; } }
 
 /* ── Vacío (E-08) ── */
 .ui-empty {

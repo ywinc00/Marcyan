@@ -201,7 +201,7 @@
             <div class="pcard__top">
               <span class="pcard__mono" style={`background:${monoColor(r.client_name || r.name || r.project_code)}`} aria-hidden="true">{initials(r.client_name || r.name)}</span>
               <div class="pcard__hd">
-                <span class="pcard__id">{r.project_code || ('PRJ-' + r.id)}{#if r.service_type}<span class="pcard__svc">{' · ' + serviceLabel(r.service_type)}</span>{/if}</span>
+                <span class="pcard__id">{r.service_type ? serviceLabel(r.service_type) : 'Proyecto'}</span>
                 <span class="pcard__name">{r.name || 'Proyecto sin nombre'}</span>
               </div>
               <StatusChip tone={st.tone} label={st.label} />
@@ -301,7 +301,7 @@
   .pcard__pct { font-size: var(--dash-caption); font-weight: 600; width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
   .pcard__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 10px; border-top: 1px solid var(--border-subtle); }
   .pcard__hit { font-size: var(--dash-small); color: var(--fg-secondary); }
-  .pcard__amt { font-size: var(--dash-small); font-weight: 600; color: var(--accent-teal); font-variant-numeric: tabular-nums; }
+  .pcard__amt { font-family: var(--font-mono); font-size: var(--dash-mono); font-weight: 500; color: var(--fg-primary); font-variant-numeric: tabular-nums; }
 
   /* Móvil: en media columna la cifra de dinero no cabe junto a la ilustración;
      se oculta solo esa ilustración (la cifra manda). */

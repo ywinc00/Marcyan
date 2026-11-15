@@ -98,7 +98,7 @@
         <div class="ix__body">
           <p class="ix__ratio"><span class="ix__num">{nfmt(indexed)}</span> <span class="ix__of">de {nfmt(total)}</span></p>
           <p class="ix__cap">URLs del sitemap indexadas</p>
-          {#if unchecked > 0}{#if summary}<p class="ix__cap">{nfmt(unchecked)} por revisar</p>{:else}<p class="ix__cap">Revisadas {nfmt(checkedN)} de {nfmt(total)}. Las {nfmt(unchecked)} restantes se revisan en las próximas actualizaciones.</p>{/if}{/if}
+          {#if unchecked > 0}{#if summary}<p class="ix__cap">{nfmt(unchecked)} por revisar</p>{:else}<p class="ix__cap">Revisadas {nfmt(checkedN)} de {nfmt(total)}. {unchecked === 1 ? 'La que falta se revisa' : `Las ${nfmt(unchecked)} que faltan se revisan`} en las próximas actualizaciones.</p>{/if}{/if}
           {#if !summary}<div class="ix__bar" role="img" aria-label="{nfmt(indexed)} de {nfmt(total)} URLs indexadas">
             <div class="ix__fill" style="width:{Math.round(ratio * 100)}%"></div>
           </div>{/if}
@@ -146,7 +146,7 @@
   .ix--sum .ix__body { flex: 1 1 auto; gap: 4px; }
   .ix--sum .ix__donut { width: 72px; height: 72px; }
   /* Motivos en el resumen: filas planas (sin caja) para que la tarjeta quepa. */
-  .ix__issues--sum { grid-template-columns: 1fr; gap: 0; }
+  .ix__issues.ix__issues--sum { grid-template-columns: 1fr; gap: 0; }
   .ix__issues--sum .ix__issue { padding: 3px 0; background: none; border: 0; border-radius: 0; border-bottom: 1px solid var(--border-subtle); }
   .ix__issues--sum .ix__issue:last-child { border-bottom: 0; }
   .ix { display: flex; align-items: center; gap: var(--space-5); flex-wrap: wrap; }

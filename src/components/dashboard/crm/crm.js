@@ -8,10 +8,10 @@
 // ── Leads ────────────────────────────────────────────────────
 // Tonos distintos por estado (CRM-14): Contactado y Convertido ya no comparten color.
 export const LEAD_STATUSES = [
-  // Fase 3 · mapa de estados: nuevo = azul (por atender), contactado = ámbar
-  // (esperando al cliente), convertido = verde. El naranja queda para la acción.
+  // Fase 3 · mapa de estados (chip neutro con punto): nuevo = naranja (por atender),
+  // contactado = gris (esperando al cliente), convertido = verde.
   { id: 'new',       slug: 'nuevo',      label: 'Nuevo',      plural: 'Nuevos',      tone: 'info'    },
-  { id: 'contacted', slug: 'contactado', label: 'Contactado', plural: 'Contactados', tone: 'warning' },
+  { id: 'contacted', slug: 'contactado', label: 'Contactado', plural: 'Contactados', tone: 'neutral' },
   { id: 'converted', slug: 'convertido', label: 'Convertido', plural: 'Convertidos', tone: 'success' },
   { id: 'archived',  slug: 'archivado',  label: 'Archivado',  plural: 'Archivados',  tone: 'neutral' },
   // Prueba y spam no cuentan en las estadísticas ni salen en "Todos".

@@ -25,7 +25,8 @@ export const M_STATUSES = [
 
 // Colores reales de cada tono (para SVG, donde no llegan las clases).
 export const TONE_COLOR = {
-  info: 'var(--color-info)',
+  // Fase 3: el avance en curso va en gris claro (el azul competía, sin estar en la lámina).
+  info: 'var(--fg-secondary)',
   warning: 'var(--color-warning)',
   success: 'var(--color-success)',
   neutral: 'var(--fg-subtle)',

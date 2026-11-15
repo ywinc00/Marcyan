@@ -122,6 +122,28 @@
   const sparkPoints = $derived(cumulative(activity));
   const sparkTotal = $derived(sparkPoints.length ? sparkPoints[sparkPoints.length - 1] : 0);
   const SPARK_W = 560, SPARK_H = 120;
+  // Curva monótona (Fritsch y Carlson): suave entre meses sin inventar subidas ni bajadas.
+  function monotonePath(p) {
+    const n = p.length;
+    if (n < 3) return p.map((q, i) => (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' ');
+    const d = [], m = [];
+    for (let i = 0; i < n - 1; i++) d.push((p[i + 1][1] - p[i][1]) / (p[i + 1][0] - p[i][0]));
+    m[0] = d[0]; m[n - 1] = d[n - 2];
+    for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+    for (let i = 0; i < n - 1; i++) {
+      if (d[i] === 0) { m[i] = 0; m[i + 1] = 0; continue; }
+      const a = m[i] / d[i], b = m[i + 1] / d[i], h = a * a + b * b;
+      if (h > 9) { const t = 3 / Math.sqrt(h); m[i] = t * a * d[i]; m[i + 1] = t * b * d[i]; }
+    }
+    let out = 'M' + p[0][0].toFixed(1) + ' ' + p[0][1].toFixed(1);
+    for (let i = 0; i < n - 1; i++) {
+      const dx = (p[i + 1][0] - p[i][0]) / 3;
+      out += ' C' + (p[i][0] + dx).toFixed(1) + ' ' + (p[i][1] + m[i] * dx).toFixed(1) + ' '
+        + (p[i + 1][0] - dx).toFixed(1) + ' ' + (p[i + 1][1] - m[i + 1] * dx).toFixed(1) + ' '
+        + p[i + 1][0].toFixed(1) + ' ' + p[i + 1][1].toFixed(1);
+    }
+    return out;
+  }
   const sparkPath = $derived.by(() => {
     const n = sparkPoints.length;
     if (!anyActivity || n === 0) return { line: '', area: '', dot: null };
@@ -133,10 +155,10 @@
     }
     const step = SPARK_W / (n - 1);
     const xy = sparkPoints.map((v, i) => [i * step, yS(v)]);
-    const line = xy.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+    const line = monotonePath(xy);
     const area = 'M0 ' + SPARK_H + ' ' + line.replace(/^M/, 'L') + ' L' + SPARK_W + ' ' + SPARK_H + ' Z';
     const last = xy[xy.length - 1];
-    return { line, area, dot: { x: last[0], y: last[1] } };
+    return { line, area, dot: { x: last[0], y: last[1] }, pts: xy };
   });
 
   // ── Proyectos recientes ──────────────────────────────────────
@@ -216,7 +238,7 @@
     mq.addEventListener?.('change', sync);
     return () => mq.removeEventListener?.('change', sync);
   });
-  const PROJ_ROW = 40, LEAD_ROW = 48;
+  const PROJ_ROW = 48, LEAD_ROW = 48;
   let projH = $state(0), leadH = $state(0);
   const projRows = $derived(fit && projH ? Math.max(1, Math.min(8, Math.floor((projH + 6) / PROJ_ROW))) : 5);
   const leadRows = $derived(fit && leadH ? Math.max(1, Math.min(8, Math.floor((leadH + 6) / LEAD_ROW))) : 5);
@@ -298,6 +320,9 @@
             <p class="m-delta">igual que en {monthShort(activity[activeBar - 1]?.month)}</p>
           {/if}
         </div>
+        {#if anyActivity}
+          <p class="m-legend" aria-hidden="true"><span><i class="lg lg--leads"></i>leads</span><span><i class="lg lg--briefs"></i>briefs</span></p>
+        {/if}
       </header>
 
       {#if !anyActivity}
@@ -340,6 +365,10 @@
               {#if t > 0}<text x={VW - 2} y={gy + 4} text-anchor="end" class="chart__axis">{t}</text>{/if}
             {/each}
             <line x1="0" y1={BASE} x2={PW - 6} y2={BASE} class="chart__base" />
+            <!-- Guía discontinua del mes resaltado, de lado a lado y DETRÁS de las barras. -->
+            {#if activeBar >= 0 && (num(activity[activeBar]?.total) || 0) > 0}
+              <line x1="0" y1={yOf(num(activity[activeBar].total))} x2={PW - 6} y2={yOf(num(activity[activeBar].total))} class="chart__guide" />
+            {/if}
 
             {#each activity as a, i (a.month)}
               {@const v = num(a.total) || 0}
@@ -350,10 +379,18 @@
               {@const r = Math.min(8, bh / 2, bw / 2)}
               {@const isActive = i === activeBar}
               {#if v > 0}
-                <path d="M{bx} {BASE}V{by + r}Q{bx} {by} {bx + r} {by}H{bx + bw - r}Q{bx + bw} {by} {bx + bw} {by + r}V{BASE}Z"
-                  fill={isActive ? 'url(#barActive)' : 'url(#barIdle)'} class="chart__bar" class:is-active={isActive} />
+                {@const shape = `M${bx} ${BASE}V${by + r}Q${bx} ${by} ${bx + r} ${by}H${bx + bw - r}Q${bx + bw} ${by} ${bx + bw} ${by + r}V${BASE}Z`}
+                {@const bH = bh * Math.min(1, Math.max(0, (num(a.briefs) || 0) / v))}
+                <clipPath id="ini-bar-{i}"><path d={shape} /></clipPath>
+                <path d={shape} fill={isActive ? 'url(#barActive)' : 'url(#barIdle)'} class="chart__bar" class:is-active={isActive} />
+                {#if bH > 0.5}
+                  <!-- briefs: la parte de arriba, un tono más clara; un filete la separa de los leads -->
+                  <g clip-path="url(#ini-bar-{i})">
+                    <rect x={bx} y={by} width={bw} height={bH} class="chart__seg" class:is-active={isActive} />
+                    {#if bH < bh - 0.5}<line x1={bx} x2={bx + bw} y1={by + bH} y2={by + bH} class="chart__cut" />{/if}
+                  </g>
+                {/if}
                 {#if isActive}
-                  <line x1={bx + bw + 4} y1={by} x2={PW - 6} y2={by} class="chart__guide" />
                   <circle cx={bx} cy={by} r="4" class="chart__dot" />
                 {/if}
               {/if}
@@ -383,7 +420,7 @@
       {:else if !data.projectsLoaded}
         <LoadingState loading={true} rows={5} height={34} gap={6} label="Cargando proyectos" />
       {:else if recentProjects.length}
-        <div class="tcols tcols--p" aria-hidden="true"><span>Proyecto</span><span>Cliente</span><span>Avance</span></div>
+        <div class="tcols tcols--p" aria-hidden="true"><span>Proyecto y cliente</span><span>Avance</span></div>
         <div class="rows-box" bind:clientHeight={projH}>
           <ul class="rows">
             {#each recentProjects.slice(0, projRows) as p (p.id)}
@@ -391,8 +428,10 @@
               {@const pct = num(p.progress) || 0}
               <li>
                 <a class="prow" href={href('progreso', [p.project_code || p.id])}>
-                  <span class="prow__name"><Icon name="folder" size={16} /><span class="ellip">{p.name}</span></span>
-                  <span class="prow__client"><span class="mono-av" aria-hidden="true">{initials(p.client_name)}</span><span class="ellip">{p.client_name || 'Sin cliente'}</span></span>
+                  <span class="prow__main">
+                    <span class="prow__name"><Icon name="folder" size={16} /><span class="ellip">{p.name}</span></span>
+                    <span class="prow__client"><span class="mono-av" aria-hidden="true">{initials(p.client_name)}</span><span class="ellip">{p.client_name || 'Sin cliente'}</span></span>
+                  </span>
                   {#if p.status === 'active'}
                     <span class="prow__prog" role="progressbar" aria-label="Avance" aria-valuemin="0" aria-valuemax="100" aria-valuenow={pct}>
                       <span class="prog"><span class="prog__bar" style="width:{pct}%"></span></span><span class="prog__n">{pct}%</span>
@@ -514,6 +553,9 @@
               <path d={sparkPath.area} fill="url(#sparkFill)" />
               <path d={sparkPath.line} fill="none" style="stroke:var(--accent-gold)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
             </svg>
+            {#each (sparkPath.pts || []).slice(0, -1) as q, i (i)}
+              <span class="spark-pt" style="left:{q[0] / SPARK_W * 100}%;top:{q[1] / SPARK_H * 100}%"></span>
+            {/each}
             {#if sparkPath.dot}
               <span class="spark-dot" style="left:{sparkPath.dot.x / SPARK_W * 100}%;top:{sparkPath.dot.y / SPARK_H * 100}%"></span>
             {/if}
@@ -572,7 +614,16 @@
 
   /* ── Gráfico de barras (como «Revenue» de la referencia) ── */
   .plot { position: relative; height: 210px; }
-  .ini.is-fit .plot { flex: 1 1 auto; height: auto; min-height: 120px; }
+  /* A pantalla, el gráfico llena su tarjeta hasta un tope (en pantallas muy altas no crece de más). */
+  .ini.is-fit .plot { flex: 1 1 auto; height: auto; min-height: 120px; max-height: 270px; margin-top: auto; }
+  .m-legend { margin: 2px 0 0; display: flex; gap: 14px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-subtle); }
+  .m-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .lg { display: inline-block; width: 9px; height: 9px; border-radius: 3px; }
+  .lg--leads { background: #3a3a3a; border: 1px solid rgba(255, 255, 255, 0.12); }
+  .lg--briefs { background: #585858; border: 1px solid rgba(255, 255, 255, 0.16); }
+  .chart__seg { fill: rgba(255, 255, 255, 0.1); }
+  .chart__seg.is-active { fill: rgba(255, 255, 255, 0.24); }
+  .chart__cut { stroke: rgba(0, 0, 0, 0.45); stroke-width: 1; }
   .chart { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; touch-action: pan-y; }
   .chart__lbl { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 12px; }
   .chart__lbl.is-active { fill: var(--fg-primary); }
@@ -594,20 +645,22 @@
   .l-more:hover { color: var(--fg-primary); border-color: var(--border-strong); background: var(--bg-elevated); }
   .list-body { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   .tcols { display: grid; gap: 12px; padding: 0 12px 8px; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); }
-  .tcols--p, .prow { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr) 88px; }
+  .tcols--p, .prow { grid-template-columns: minmax(0, 1fr) 104px; }
   .rows-box { flex: 1 1 auto; min-height: 0; overflow: hidden; }
   .rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 
   .prow {
-    display: grid; align-items: center; gap: 12px; min-height: 34px; padding: 0 12px;
+    display: grid; align-items: center; gap: 12px; min-height: 42px; padding: 3px 12px;
     background: #242424; border: 1px solid var(--border-subtle); border-radius: 8px;
     color: inherit; text-decoration: none; font-size: var(--dash-small);
     transition: background-color var(--duration-fast), border-color var(--duration-fast);
   }
   .prow:hover { background: var(--bg-elevated); border-color: var(--border); }
+  .prow__main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .prow__name { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--fg-primary); }
   .prow__name :global(.ui-icon) { flex: 0 0 auto; color: var(--fg-subtle); }
-  .prow__client { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--fg-secondary); font-size: var(--dash-caption); }
+  .prow__client { display: flex; align-items: center; gap: 6px; min-width: 0; padding-left: 24px; color: var(--fg-subtle); font-size: var(--dash-caption); }
+  .prow__client .mono-av { width: 16px; height: 16px; font-size: 8px; }
   .prow__prog { display: flex; align-items: center; gap: 8px; }
   .prow__st { display: flex; }
   .prow__st :global(.ui-chip) { padding: 1px 8px; font-size: 11px; }
@@ -639,10 +692,10 @@
   .states { list-style: none; margin: 4px 0 12px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
   .ini.is-fit .states { flex: 1 1 auto; justify-content: space-evenly; margin: 0 0 10px; }
   .st { display: grid; grid-template-columns: 1fr 34px; align-items: center; gap: 12px; text-decoration: none; color: inherit; border-radius: 999px; }
-  .st__track { position: relative; display: block; height: 26px; border-radius: 999px; background: rgba(255, 255, 255, 0.025); }
+  .st__track { position: relative; display: block; height: 26px; border-radius: 999px; }
   .st__fill {
     position: absolute; inset: 0 auto 0 0; display: flex; align-items: center; justify-content: flex-end;
-    width: max(var(--pct), calc(var(--lbl) + 30px)); max-width: 100%; padding: 0 12px;
+    width: max(var(--pct), calc(var(--lbl) + 64px)); max-width: 100%; padding: 0 12px;
     border-radius: 999px; background: linear-gradient(90deg, rgba(255,255,255,0.02), #3b3b3b);
     border: 1px solid rgba(255, 255, 255, 0.09); transition: width .4s var(--ease), border-color var(--duration-fast);
   }
@@ -664,6 +717,11 @@
   .ini.is-fit .spark-wrap { flex: 1 1 auto; height: auto; min-height: 70px; }
   .spark { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
   .spark__grid { stroke: var(--chart-grid); stroke-width: 1; }
+  .spark-pt {
+    position: absolute; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--bg-card); border: 1.5px solid color-mix(in srgb, var(--accent-gold) 70%, transparent);
+    transform: translate(-50%, -50%); pointer-events: none;
+  }
   .spark-dot {
     position: absolute; width: 10px; height: 10px; border-radius: 50%;
     background: var(--accent-gold); border: 2.5px solid var(--bg-card);
@@ -682,11 +740,7 @@
     .row--b > :global(*) { grid-column: 1 / -1; }
     .m-amount { font-size: 22px; }
     /* En el teléfono el cliente baja bajo el nombre (no se esconde, E-62). */
-    .tcols--p { display: none; }
-    .prow { grid-template-columns: minmax(0, 1fr) 84px; row-gap: 2px; padding: 7px 12px; }
-    .prow__name { grid-column: 1; grid-row: 1; }
-    .prow__client { grid-column: 1; grid-row: 2; }
-    .prow__prog, .prow__st { grid-column: 2; grid-row: 1 / span 2; }
+    .tcols--p, .prow { grid-template-columns: minmax(0, 1fr) 88px; }
   }
   @media (pointer: coarse) {
     .prow, .lrow { min-height: 44px; }

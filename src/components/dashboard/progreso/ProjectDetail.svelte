@@ -191,7 +191,7 @@
   }
   .pd-code { color: var(--fg-primary); font-weight: 600; font-variant-numeric: tabular-nums; }
   .pd-dot { color: var(--fg-subtle); }
-  .pd-money { color: var(--accent-teal); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .pd-money { color: var(--fg-primary); font-weight: 600; font-variant-numeric: tabular-nums; }
 
   .pd-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: var(--space-5); align-items: start; }
   .pd-main, .pd-aside { display: flex; flex-direction: column; gap: var(--space-5); min-width: 0; }

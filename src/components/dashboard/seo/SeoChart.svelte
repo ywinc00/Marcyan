@@ -38,7 +38,24 @@
 
   const n = $derived(series.length);
   const values = $derived(series.map((p) => p.v).filter((v) => v != null));
-  const scale = $derived(niceScale(values.length ? Math.max(...values) : 0));
+  // Escala con aire arriba: la línea no toca el techo (si la cima cae justo en una
+  // marca, se prueba con 3, 4 o 5 tramos y se queda la que deja la cima por debajo).
+  function roomyScale(m) {
+    if (!(m > 0)) return niceScale(0);
+    const target = m * 1.06;
+    let best = null;
+    for (const parts of [4, 5, 3]) {
+      const raw = target / parts;
+      const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+      let step = [1, 2, 2.5, 5, 10].map((k) => k * mag).find((v) => v >= raw) || 10 * mag;
+      if (step < 1) step = 1;
+      step = Math.ceil(step);
+      const max = step * parts;
+      if (!best || max < best.max) best = { max, ticks: Array.from({ length: parts + 1 }, (_, i) => i * step) };
+    }
+    return best;
+  }
+  const scale = $derived(roomyScale(values.length ? Math.max(...values) : 0));
   // A6-R6: el margen izquierdo se mide con el rótulo más largo del eje
   // (mono de 11 px ≈ 6,7 px por carácter + 8 de separación + 4 de aire), con
   // el mínimo de siempre (40) para no mover los gráficos de números cortos.
@@ -206,7 +223,7 @@
   .sc__guide { stroke: var(--border-strong); stroke-dasharray: 3 4; stroke-width: 1; }
   .sc__pending { fill: var(--bg-elevated); opacity: .55; }
   .sc-legend { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; font-size: var(--dash-caption); color: var(--fg-subtle); }
-  .sc-legend__sw { width: 12px; height: 10px; border-radius: 2px; background: var(--bg-elevated); border: 1px solid var(--border); flex: 0 0 auto; }
+  .sc-legend__sw { width: 14px; height: 6px; border-radius: 3px; background: repeating-linear-gradient(135deg, #4a4a4a 0 2px, transparent 2px 4px); flex: 0 0 auto; }
   /* El tooltip base (.chart-tip) vive en dashboard.css; aquí solo se acota
      a la caja: en los bordes se alinea hacia dentro y arriba baja bajo el punto. */
   .sc-tip { line-height: 1.25; }

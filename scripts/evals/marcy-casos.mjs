@@ -342,9 +342,12 @@ export const casos = [
     check: ({ reply }) => {
       const r = [];
       const nums = [...String(reply).matchAll(/(\d+)\s*(?:reseñas|opiniones|reviews)/gi)].map((m) => Number(m[1]));
-      const malos = nums.filter((n) => n !== 46);
+      // Número REAL de la ficha de Google de TRR (sube con el tiempo): 46 el 1-nov, 47 el 15-nov.
+      // Si este caso falla con un número mayor y el mismo en las 3 pasadas, comprobar la ficha y subirlo aquí.
+      const REAL = 47;
+      const malos = nums.filter((n) => n !== REAL);
       if (malos.length) r.push('número de reseñas inventado: ' + malos.join(', '));
-      if (/no tiene(s)? (ninguna )?reseñas|sin reseñas/i.test(reply)) r.push('afirma que no tiene reseñas (tiene 46)');
+      if (/no tiene(s)? (ninguna )?reseñas|sin reseñas/i.test(reply)) r.push(`afirma que no tiene reseñas (tiene ${REAL})`);
       return r;
     },
   },

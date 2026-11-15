@@ -10,7 +10,7 @@ import { readFileSync } from 'node:fs';
 import { sumUsage, turnCostMicroUsd, cacheHitRate, summarize, usageLogLine, recordUsage, PRICES_USD_PER_MTOK } from '../lib/chat-usage.mjs';
 import { ALLOWED_MODELS as MODELS_FOR_PRICES } from '../api/chat.mjs';
 import { fichaForChat } from '../lib/diagnostic-rubric.mjs';
-import { brandPostFilter, pricePostFilter, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES, stripEmDash, SYSTEM_PROMPT, QUOTE_TOOL, historyFigures, PRICES, CONTACT_TOOL, blockedFigures } from '../lib/chat-kb.mjs';
+import { brandPostFilter, pricePostFilter, estimateNote, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES, stripEmDash, SYSTEM_PROMPT, QUOTE_TOOL, historyFigures, PRICES, CONTACT_TOOL, blockedFigures } from '../lib/chat-kb.mjs';
 import { quote, SERVICES, SERVICE_KEYS } from '../lib/quote-rules.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 import { ssrfGuard, isBlockedIp } from '../lib/site-fetch.mjs';
@@ -131,6 +131,28 @@ check('cita: la hora pedida viaja a la cajita solo si es un código válido', ()
   assert.equal(bad.action.extras.at, undefined);
   const otro = parseToolResponse([{ type: 'tool_use', name: 'solicitar_datos_contacto', input: { destino: 'contacto', mensaje: 'x', hora: '2026-11-09T21:00:00.000Z' } }], 'es');
   assert.equal(otro.action.extras.at, undefined);
+});
+check('legal: todo precio va como estimado (red de seguridad)', () => {
+  assert.equal(estimateNote('Una landing sale desde $400.', 'es'), 'Una landing sale desde $400. Es un estimado; te lo confirmamos por escrito en la propuesta.');
+  assert.equal(estimateNote('Sale desde $400. ¿Te encaja?', 'es'), 'Sale desde $400. Es un estimado; te lo confirmamos por escrito en la propuesta. ¿Te encaja?');
+  assert.equal(estimateNote('It starts at $400. Does that work?', 'en'), "It starts at $400. It's an estimate; we'll confirm it in writing in the proposal. Does that work?");
+  assert.equal(estimateNote('Sale en $400, un estimado que se confirma por escrito.', 'es'), 'Sale en $400, un estimado que se confirma por escrito.');
+  assert.equal(estimateNote('Pierdes unos $2,400 al mes.', 'es', ['2400']), 'Pierdes unos $2,400 al mes.');
+  assert.equal(estimateNote('Cuéntame de tu negocio.', 'es'), 'Cuéntame de tu negocio.');
+  // Cifras de cotizar o repetidas del historial también son precios nuestros.
+  assert.match(estimateNote('Te sale en $1,450 de pago único.', 'es', []), /Es un estimado; te lo confirmamos por escrito en la propuesta\.$/);
+  // Plazo de entrega: también; las horas de respuesta no.
+  assert.match(estimateNote('La landing está lista en 7 días.', 'es'), /Es un estimado/);
+  assert.equal(estimateNote('Te respondemos en menos de 1 hora hábil.', 'es'), 'Te respondemos en menos de 1 hora hábil.');
+  // "aproximadamente" no basta: tiene que decir que se confirma por escrito.
+  assert.match(estimateNote('Queda en unas 3 semanas, aproximadamente, desde $990.', 'es'), /por escrito en la propuesta\.$/);
+  // Pérdida del cliente repetida del historial: no es un precio nuestro.
+  assert.equal(estimateNote('Pierdes unos $2,400 al mes. ¿Te pasa seguido?', 'es'), 'Pierdes unos $2,400 al mes. ¿Te pasa seguido?');
+  // El punto de un dominio no es fin de frase.
+  assert.equal(estimateNote('It starts at $400 at marcyanstudio.com. Want me to set it up?', 'en'), "It starts at $400 at marcyanstudio.com. It's an estimate; we'll confirm it in writing in the proposal. Want me to set it up?");
+  assert.match(SYSTEM_PROMPT, /que escriba STOP/);
+  assert.match(SYSTEM_PROMPT, /es un estimado y que te lo confirmamos por escrito en la propuesta/);
+  assert.match(SYSTEM_PROMPT, /Nunca prometas puestos en Google/);
 });
 check('texto + tool destino proyecto', () => {
   const r = parseToolResponse([TX('Te armo la propuesta.'), TU('proyecto')], 'es');

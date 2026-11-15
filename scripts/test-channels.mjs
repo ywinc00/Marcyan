@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import {
   sidFor, e164, detectLang, historyFromTurns, buildMessages, renderAction, joinReply, pageUrl,
   slotsToolResult, channelContext, processInbound, textBooking, CH_MSG, houstonDate, dateContext,
+  withIntro, optKeyword, isOptedOut,
 } from '../lib/channels.mjs';
 import { validMetaSignature, verifyChallenge, parseWhatsApp, parseInstagram, chunkText } from '../lib/meta.mjs';
 import { twilioSignature, validTwilio, speakable, greetTwiml, replyTwiml, dialTwiml, recordTwiml, waitTwiml, inTransferHours, wantsEnglish, callCostMicro } from '../lib/voice.mjs';
@@ -162,7 +163,9 @@ function fakeSql(state) {
   return async (strings, ...vals) => {
     const q = strings.join('?');
     state.queries.push(q);
-    if (/SELECT created_at, user_text, reply FROM chat_turns/.test(q)) return { rows: state.turns.slice() };
+    if (/SELECT created_at, user_text, reply, action_type FROM chat_turns/.test(q)) return { rows: state.turns.slice() };
+    if (/FROM channel_inbox WHERE channel = \? AND contact = \?/.test(q)) return { rows: state.opt ? [{ status: state.opt }] : [] };
+    if (/UPDATE leads SET notes/.test(q)) { state.leadNotes.push(vals[0]); return { rows: [] }; }
     if (/SELECT lang FROM chat_conversations/.test(q)) return { rows: state.lang ? [{ lang: state.lang }] : [] };
     if (/UPDATE channel_inbox/.test(q)) { state.inbox.push(vals[0]); return { rows: [] }; }
     return { rows: [] };
@@ -182,7 +185,8 @@ function deps(state, over = {}) {
     ...over,
   };
 }
-const fresh = () => ({ queries: [], turns: [], inbox: [], waiting: [], recorded: [], notes: [], leads: [], appts: [], sent: [], calls: [], lang: null });
+const PRIOR = [{ created_at: new Date().toISOString(), user_text: 'hola', reply: 'Hola, soy Marcy, la asistente con IA de Marcyan. ¿En qué te ayudo?', action_type: null }];
+const fresh = () => ({ queries: [], turns: PRIOR.slice(), inbox: [], waiting: [], recorded: [], notes: [], leads: [], appts: [], sent: [], calls: [], leadNotes: [], lang: null });
 const ROW = { channel: 'whatsapp', sid: 'wa-17135550000', contact: '+17135550000', contactName: 'Ana', text: 'Hola, quiero una web', kind: 'text', inboxId: 7, attempts: 0 };
 
 await aok('contesta y registra con su canal', async () => {
@@ -253,6 +257,96 @@ await aok('texto de tarjeta no sale por el canal', async () => {
   s2.turn = { reply: 'Aquí tienes las formas de escribirnos directo. 👇', toolOnly: true, action: { type: 'channels' }, tool: null, cortadas: [], fallback: false, costMicro: 0 };
   await processInbound(ROW, deps(s2));
   assert.ok(!s2.sent[0].includes('👇')); assert.match(s2.sent[0], /713-823-9144/);
+});
+// ── Legal 2026-11-15: aviso de IA en el primer mensaje y STOP ──
+ok('aviso de IA: se antepone solo si no lo dice ya', () => {
+  assert.equal(withIntro('¿Qué negocio tienes?', 'es'), 'Hola, soy Marcy, la asistente con IA de Marcyan.\n\n¿Qué negocio tienes?');
+  assert.equal(withIntro('Hola, soy Marcy, la asistente con IA de Marcyan. ¿En qué te ayudo?', 'es'), 'Hola, soy Marcy, la asistente con IA de Marcyan. ¿En qué te ayudo?');
+  assert.match(withIntro('What business do you have?', 'en'), /^Hi, I'm Marcy, Marcyan's AI assistant\./);
+  // "asistente con IA" es un servicio que vendemos: hablar de él no es presentarse.
+  assert.ok(withIntro('Un asistente con IA para WhatsApp sale desde $500.', 'es').startsWith(CH_MSG.es.intro));
+});
+await aok('primer mensaje de Marcy en WhatsApp: con el aviso de IA', async () => {
+  const s = fresh(); s.turns = [];
+  await processInbound(ROW, deps(s));
+  assert.equal(s.sent[0], `${CH_MSG.es.intro}\n\nHola, ¿qué negocio tienes?`);
+  assert.match(s.calls[0].extraContext, /primera vez/);
+});
+await aok('primer mensaje aunque antes escribiera el dueño desde la app', async () => {
+  const s = fresh(); s.turns = [{ created_at: new Date().toISOString(), user_text: '', reply: 'Hola, soy Yan', action_type: 'dueno' }];
+  await processInbound(ROW, deps(s));
+  assert.ok(s.sent[0].startsWith(CH_MSG.es.intro));
+});
+await aok('primer mensaje que es un audio: también con el aviso', async () => {
+  const s = fresh(); s.turns = [];
+  await processInbound({ ...ROW, kind: 'audio', text: '' }, deps(s));
+  assert.ok(s.sent[0].startsWith(CH_MSG.es.intro));
+});
+await aok('el teléfono no lleva el aviso escrito (lo dice el saludo)', async () => {
+  const s = fresh(); s.turns = [];
+  await processInbound({ ...ROW, channel: 'telefono', sid: 'tel-CA1' }, deps(s));
+  assert.equal(s.sent[0], 'Hola, ¿qué negocio tienes?');
+});
+await aok('teléfono: saludo legal exacto y recados que avisan de la grabación', async () => {
+  const { V_MSG } = await import('../lib/voice.mjs');
+  assert.equal(V_MSG.es.hola, 'Hola, gracias por llamar a Marcyan. Soy Marcy, la asistente virtual con inteligencia artificial. Esta llamada se transcribe para atenderte mejor y, si dejas un recado, se graba. Si prefieres hablar con una persona, dilo. ¿En qué te ayudo? If you prefer English, just say English.');
+  assert.equal(V_MSG.en.hola, "Hi, thanks for calling Marcyan. I'm Marcy, the virtual assistant powered by artificial intelligence. This call is transcribed to help you better and, if you leave a message, it is recorded. If you'd rather talk to a person, just say so. How can I help?");
+  for (const k of ['recado', 'noContesta', 'fallo']) { assert.match(V_MSG.es[k], /se graba/, k); assert.match(V_MSG.en[k], /recorded/, k); }
+});
+ok('STOP: palabras de baja y de alta, solo si son el mensaje entero', () => {
+  for (const w of ['STOP', 'stop', ' Stop. ', 'BAJA', 'Baja!', 'parar', 'UNSUBSCRIBE', 'Stop por favor', 'BAJA gracias', 'No me escriban más', 'dejen de escribirme', "don't text me anymore"]) assert.equal(optKeyword(w), 'stop', w);
+  for (const w of ['START', 'Alta', 'unstop', 'reanudar']) assert.equal(optKeyword(w), 'start', w);
+  // Respuestas normales en una venta o una cita: nunca dan de baja.
+  for (const w of ['Cancelar', 'Alto', 'Para', 'end', 'cancel', 'no pares de mandarme info', 'stop the project', 'Hola', '', 'quiero darme de alta en el plan']) assert.equal(optKeyword(w), null, w);
+});
+await aok('STOP por WhatsApp: no contesta, marca la bandeja y el lead, avisa', async () => {
+  const s = fresh();
+  assert.equal(await processInbound({ ...ROW, text: 'STOP' }, deps(s)), 'baja');
+  assert.equal(s.sent.length, 0); assert.equal(s.calls.length, 0);
+  assert.deepEqual(s.inbox, ['baja']);
+  assert.equal(s.leadNotes.length, 1); assert.match(s.leadNotes[0], /STOP por WhatsApp/);
+  assert.ok(s.queries.some((q) => /SET sms_consent = false/.test(q)), 'la casilla de SMS del lead queda en no');
+  assert.match(s.notes[0].title, /no recibir más mensajes/);
+});
+await aok('tras STOP, un mensaje nuevo: Marcy calla, queda en Orbit y avisa', async () => {
+  const s = fresh(); s.opt = 'baja';
+  assert.equal(await processInbound(ROW, deps(s)), 'hecho');
+  assert.equal(s.sent.length, 0); assert.equal(s.calls.length, 0);
+  assert.deepEqual(s.waiting, ['Hola, quiero una web']);
+  assert.match(s.notes[0].title, /pidió STOP/);
+});
+await aok('ALTA tras STOP: confirma y vuelve a atender', async () => {
+  const s = fresh(); s.opt = 'baja';
+  assert.equal(await processInbound({ ...ROW, text: 'ALTA' }, deps(s)), 'alta');
+  assert.deepEqual(s.sent, [CH_MSG.es.alta]);
+  assert.deepEqual(s.inbox, ['alta']);
+  const s2 = fresh(); s2.opt = 'alta';
+  assert.equal(await processInbound(ROW, deps(s2)), 'hecho');
+  assert.equal(s2.calls.length, 1);
+});
+await aok('"Start" sin baja previa: sigue el camino normal y con el aviso de IA', async () => {
+  const s = fresh(); s.turns = [];
+  assert.equal(await processInbound({ ...ROW, text: 'Start' }, deps(s)), 'hecho');
+  assert.equal(s.calls.length, 1);
+  assert.ok(s.sent[0].startsWith(CH_MSG.es.intro));
+  assert.deepEqual(s.inbox, ['hecho']);
+});
+await aok('STOP que llega mientras Marcy piensa: la respuesta no sale', async () => {
+  const s = fresh();
+  const d = deps(s, { marcyTurn: async (a) => { s.calls.push(a); s.opt = 'baja'; return { reply: 'Sale desde $400.', action: null, tool: null, cortadas: [], fallback: false, costMicro: 1 }; } });
+  assert.equal(await processInbound(ROW, d), 'hecho');
+  assert.equal(s.sent.length, 0);
+  assert.match(s.recorded[0].reply, /No enviado/);
+});
+await aok('STOP no aplica al teléfono (se cuelga)', async () => {
+  const s = fresh();
+  await processInbound({ ...ROW, channel: 'telefono', sid: 'tel-CA1', text: 'stop' }, deps(s));
+  assert.equal(s.calls.length, 1);
+});
+await aok('isOptedOut: la última palabra manda', async () => {
+  assert.equal(await isOptedOut({ channel: 'whatsapp', contact: '+1' }, { sqlImpl: fakeSql({ ...fresh(), opt: 'baja' }) }), true);
+  assert.equal(await isOptedOut({ channel: 'whatsapp', contact: '+1' }, { sqlImpl: fakeSql({ ...fresh(), opt: 'alta' }) }), false);
+  assert.equal(await isOptedOut({ channel: 'telefono', contact: '+1' }, { sqlImpl: fakeSql({ ...fresh(), opt: 'baja' }) }), false);
 });
 await aok('reservar llamada: lead antes que la cita y contacto del servidor', async () => {
   const s = fresh();

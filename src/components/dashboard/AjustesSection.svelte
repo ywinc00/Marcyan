@@ -279,6 +279,10 @@
                 {#each data.team as m (m.email)}<li><span>{m.email}{#if m.email === data.me}<span class="aj-tag">tú</span>{/if}</span><span class="aj-when">{m.last_access ? `Último acceso: ${fmtDateTime(m.last_access)}` : 'Aún no ha entrado'}</span></li>{/each}
               </ul>
             </div>
+            <!-- Usuario orbit_lectura de la base (ficha de llamada, docs/orbit/ficha-llamada.md). -->
+            <div class="aj-row aj-row--stack">
+              <div class="aj-txt"><h3>Acceso de solo lectura</h3><p>Desde el ordenador del dueño, para preparar llamadas: lee leads, conversaciones con Marcy, citas, briefs y proyectos. Nunca ve Finanzas ni puede cambiar nada.</p></div>
+            </div>
           </section>
         {:else if part.id === 'topes'}
           <section class="aj-card" aria-label="Topes de Marcy">

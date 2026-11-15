@@ -98,12 +98,13 @@ export default async function handler(req, res) {
         });
       }
       const impact = await clientDeleteImpact(id);
-      // Los cobros son parte de los libros (meses cerrados incluidos): no se borran en cascada.
-      if (Number(impact.payments) > 0) {
+      // Facturas emitidas y cobros son parte de los libros, que se guardan 7 años (encargo
+      // legal 15-nov): borrar el cliente se los llevaría en cascada. Se archiva en su lugar.
+      if (Number(impact.payments) > 0 || Number(impact.issued_invoices) > 0) {
         return res.status(409).json({
           ok: false,
-          error: 'Este cliente tiene cobros registrados y forman parte de los libros. Archívalo en lugar de borrarlo.',
-          reason: 'has_payments',
+          error: 'Este cliente tiene facturas emitidas o cobros, y forman parte de los libros, que se guardan 7 años. Archívalo en lugar de borrarlo.',
+          reason: Number(impact.payments) > 0 ? 'has_payments' : 'has_invoices',
           impact,
         });
       }

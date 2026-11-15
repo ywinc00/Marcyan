@@ -41,6 +41,7 @@ mock.module('../lib/auth.mjs', {
     requireAdmin: async () => ({ email: 'prueba@marcyan.test' }),
     safeEqual: (a, b) => a === b,
     getAllowedEmails: () => ['prueba@marcyan.test'],
+    getTeamAccess: async () => [{ email: 'prueba@marcyan.test', last_access: null }],
   },
 });
 

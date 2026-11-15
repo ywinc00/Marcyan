@@ -45,6 +45,7 @@ mock.module('../lib/auth.mjs', {
     requireAdmin: async () => ({ email: 'prueba@marcyan.test' }),
     safeEqual: (a, b) => a === b,
     getAllowedEmails: () => ['prueba@marcyan.test'],
+    getTeamAccess: async () => [{ email: 'prueba@marcyan.test', last_access: null }],
   },
 });
 
@@ -677,6 +678,40 @@ await check('el cargo real de una suscripción sustituye a su estimado y lo supr
   assert.match(del.text, /BETWEEN \$2::date - 20 AND \$2::date \+ 20/);
   assert.match(del.text, /INSERT INTO finance_suppressed_refs/);
   assert.deepEqual(del.params, ['3', '2026-11-16', '9']);
+});
+
+// ── Encargo legal de Orbit (15-nov): los libros se guardan 7 años ──
+const clientsApi = (await import('../api/admin/clients/[id].mjs')).default;
+await check('cliente con facturas emitidas: no se borra (409) y no se lanza ningún DELETE', async () => {
+  reset((t) => {
+    if (/SELECT \* FROM clients WHERE id/.test(t)) return { rows: [{ id: '5', client_code: 'CLI-005', business_name: 'Sabor Boricua', status: 'archived' }] };
+    if (/issued_invoices/.test(t)) return { rows: [{ projects: 1, milestones: 0, invoices: 2, issued_invoices: 1, payments: 0, payments_cents: 0 }] };
+    return { rows: [] };
+  });
+  const res = fakeRes();
+  await clientsApi({ method: 'DELETE', query: { id: '5', confirm: 'Sabor Boricua' }, body: {}, headers: {} }, res);
+  assert.equal(res.statusCode, 409);
+  assert.equal(res.body.reason, 'has_invoices');
+  assert.match(res.body.error, /7 años/);
+  assert.ok(!log.some((e) => /DELETE FROM clients/.test(e.text)), 'no borra');
+});
+await check('cliente solo con borradores: sí se borra', async () => {
+  reset((t) => {
+    if (/SELECT \* FROM clients WHERE id/.test(t)) return { rows: [{ id: '6', client_code: 'CLI-006', business_name: 'Prueba', status: 'archived' }] };
+    if (/issued_invoices/.test(t)) return { rows: [{ projects: 0, milestones: 0, invoices: 1, issued_invoices: 0, payments: 0, payments_cents: 0 }] };
+    if (/DELETE FROM clients/.test(t)) return { rows: [{ id: '6' }] };
+    return { rows: [] };
+  });
+  const res = fakeRes();
+  await clientsApi({ method: 'DELETE', query: { id: '6', confirm: 'Prueba' }, body: {}, headers: {} }, res);
+  assert.equal(res.statusCode, 200);
+});
+await check('ajustes: el equipo sale con el último acceso de cada correo', async () => {
+  reset(() => ({ rows: [] }));
+  const res = fakeRes();
+  await settingsApi.default({ method: 'GET', query: {}, headers: {} }, res);
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(res.body.team, [{ email: 'prueba@marcyan.test', last_access: null }]);
 });
 
 if (fails.length) {

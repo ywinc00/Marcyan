@@ -473,7 +473,8 @@
   .step:disabled, .why button:disabled { cursor: default; }
   .step:disabled:hover, .why button:disabled:hover { background: transparent; }
   .why__bar { height: 6px; border-radius: 4px; background: var(--bg-elevated); overflow: hidden; }
-  .why__bar i { display: block; height: 100%; background: var(--color-warning, #f5b338); border-radius: 4px; }
+  /* Fase 3: barras de proporción en gris claro (como la referencia); el ámbar competía con el naranja. */
+  .why__bar i { display: block; height: 100%; background: var(--fg-secondary); border-radius: 4px; }
 
   /* ── Consola de tres columnas ── */
   .console { scroll-margin-top: 72px; display: grid; grid-template-columns: 320px minmax(0, 1fr) 280px; height: min(74vh, 760px); min-height: 520px; overflow: hidden; }

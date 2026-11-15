@@ -232,7 +232,9 @@
   let metric = $state('clicks');       // qué pinta el gráfico del Resumen: un solo gráfico, un solo color
   let fit = $state(false);
   onMount(() => {
-    const mq = window.matchMedia('(min-width: 1100px) and (min-height: 700px)');
+    // SEO lleva barra de proyecto y pestañas encima: a pantalla solo desde 820 de alto;
+    // por debajo fluye (las cifras, el gráfico y la indexación siguen en la primera vista).
+    const mq = window.matchMedia('(min-width: 1100px) and (min-height: 820px)');
     const sync = () => (fit = mq.matches);
     sync();
     mq.addEventListener?.('change', sync);

@@ -22,9 +22,16 @@
 
   // El lienzo mide lo mismo que su caja (1 unidad = 1 px): los rótulos se
   // leen a 11 px también en el teléfono, en vez de encogerse con el SVG.
-  let boxW = $state(560), plotH = $state(0);
+  let boxW = $state(560), plotH = $state(0), plotEl = $state();
+  // El alto solo se mide cuando el gráfico llena su tarjeta (un observador menos en el resto).
+  $effect(() => {
+    if (!fill || !plotEl || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver((es) => { const h = Math.round(es[0].contentRect.height); if (h !== plotH) plotH = h; });
+    ro.observe(plotEl);
+    return () => ro.disconnect();
+  });
   const VBW = $derived(Math.max(260, Math.round(boxW || 560)));
-  const VBH = $derived(fill && plotH ? Math.max(120, Math.round(plotH)) : (VBW < 480 ? 180 : 210));
+  const VBH = $derived(fill && plotH ? Math.max(90, Math.round(plotH)) : (VBW < 480 ? 180 : 210));
   const PAD_R = 8, PAD_T = 14, PAD_B = 26;
   const uid = 'sc' + Math.random().toString(36).slice(2, 8);
   const color = $derived(tone === 'data' ? 'var(--accent-teal)' : 'var(--accent-gold)');
@@ -126,7 +133,7 @@
 </script>
 
 <div class="sc-box" class:is-fill={fill} bind:clientWidth={boxW}>
-  <div class="sc-plot" bind:clientHeight={plotH}>
+  <div class="sc-plot" bind:this={plotEl}>
   {#if tip}
     <span class="chart-tip sc-tip sc-tip--{tip.align}" class:sc-tip--below={tip.below} style="left:{tip.left}%;top:{tip.top}%">
       {#if hovered.v == null}
@@ -189,7 +196,7 @@
   .sc-box { position: relative; }
   .sc-plot { position: relative; }
   .sc-box.is-fill { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
-  .sc-box.is-fill .sc-plot { flex: 1 1 auto; min-height: 120px; }
+  .sc-box.is-fill .sc-plot { flex: 1 1 auto; min-height: 90px; }
   .sc-box.is-fill .sc { position: absolute; inset: 0; height: 100%; }
   .sc { width: 100%; height: auto; display: block; touch-action: pan-y; cursor: crosshair; border-radius: var(--radius-sm); }
   .sc:focus { outline: none; }

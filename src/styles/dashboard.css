@@ -514,11 +514,11 @@ select.inp,
   padding: 18px;
 }
 .ui-card--flush { padding: 0; overflow: hidden; }
-.ui-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+.ui-card__head { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px var(--space-3); margin-bottom: var(--space-4); }
 .ui-card__titles { min-width: 0; }
 .ui-card__caption { margin: 0 0 6px; font-family: var(--font-mono); font-size: var(--dash-mono); font-weight: 400; color: var(--fg-subtle); }
 .ui-card__title { margin: 0; font-size: var(--dash-body); font-weight: 500; color: var(--fg-primary); letter-spacing: -0.005em; }
-.ui-card__actions { display: flex; align-items: center; gap: var(--space-2); flex: 0 0 auto; }
+.ui-card__actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); flex: 0 1 auto; min-width: 0; }
 
 /* ── Chip de estado (color + texto, nunca solo color) ── */
 .ui-chip {

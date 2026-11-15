@@ -102,10 +102,10 @@
           {#if !summary}<div class="ix__bar" role="img" aria-label="{nfmt(indexed)} de {nfmt(total)} URLs indexadas">
             <div class="ix__fill" style="width:{Math.round(ratio * 100)}%"></div>
           </div>{/if}
-          <div class="ix__legend">
+          {#if !summary}<div class="ix__legend">
             <span><span class="dot dot--on"></span>Indexadas {nfmt(indexed)}</span>
             <span><span class="dot"></span>Sin indexar {nfmt(indexation.not_indexed)}</span>
-          </div>
+          </div>{/if}
         </div>
       </div>
     {/if}
@@ -144,10 +144,10 @@
   .ix-more:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
   .ix--sum { gap: var(--space-4); flex-wrap: nowrap; align-items: center; }
   .ix--sum .ix__body { flex: 1 1 auto; gap: 4px; }
-  .ix--sum .ix__donut { width: 80px; height: 80px; }
+  .ix--sum .ix__donut { width: 72px; height: 72px; }
   /* Motivos en el resumen: filas planas (sin caja) para que la tarjeta quepa. */
   .ix__issues--sum { grid-template-columns: 1fr; gap: 0; }
-  .ix__issues--sum .ix__issue { padding: 5px 0; background: none; border: 0; border-radius: 0; border-bottom: 1px solid var(--border-subtle); }
+  .ix__issues--sum .ix__issue { padding: 3px 0; background: none; border: 0; border-radius: 0; border-bottom: 1px solid var(--border-subtle); }
   .ix__issues--sum .ix__issue:last-child { border-bottom: 0; }
   .ix { display: flex; align-items: center; gap: var(--space-5); flex-wrap: wrap; }
   .ix__donut { width: 96px; height: 96px; flex: 0 0 auto; display: block; }

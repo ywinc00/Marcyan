@@ -9,6 +9,7 @@
 // la tarjeta grande W-CORE-15. La FAQ (única FAQPage) la monta la página con la piel v3.
 // Lógica, data-*, llamadas y eventos: intactos.
 import { GOS } from '../../i18n/growth-os';
+import { content } from '../../i18n/content';
 import Icon from '../ui/Icon.astro';
 import BtnStates from '../ui/BtnStates.astro';
 import ScoreRing from './ScoreRing.astro';
@@ -21,6 +22,8 @@ interface Props { lang: 'es' | 'en' }
 const { lang } = Astro.props;
 const t = GOS[lang].page;
 const e = GOS[lang].errors;
+// Aviso de privacidad bajo el botón (encargo legal 2026-11-15 §2a): el mismo texto que el contacto.
+const priv = content[lang].contact.form.privacy;
 const contactHref = lang === 'en' ? '/en#contacto' : '/es#contacto';
 const scoreLabel = lang === 'en' ? 'Score' : 'Puntaje';
 const ctaTitle = lang === 'en' ? 'Prefer to talk now?' : '¿Prefieres hablar ahora?';
@@ -182,6 +185,7 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
             <button type="submit" class="dgw__btn dgw__btn--gold dgw__btn--wide bstate" data-claim-btn>
               <BtnStates sending={t.claimBtnSending} done={t.claimBtn}>{t.claimBtn}</BtnStates>
             </button>
+            <p class="dgw__legal">{priv.pre}<a href={priv.href}>{priv.link}</a>{priv.post}</p>
           </form>
         </div>
       </div>
@@ -287,6 +291,9 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
   .dgw__btn:focus-visible { outline: 2px solid var(--accent-gold-line); outline-offset: 2px; }
 
   .dgw__err { margin: var(--space-4) 0 0; color: #d98b8b; font-size: var(--text-sm); }
+  .dgw__legal { margin: var(--space-3) 0 0; font-size: var(--text-sm); line-height: 1.5; color: var(--fg-secondary); text-align: center; }
+  .dgw__legal a { color: var(--fg-primary); text-decoration: underline; text-underline-offset: 2px; }
+  .dgw__legal a:hover { color: var(--accent-gold); }
 
   /* Resultado */
   .dgw__rhead { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); align-items: baseline;

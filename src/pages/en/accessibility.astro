@@ -1,0 +1,31 @@
+---
+// /en/accessibility — Accessibility statement (legal task 2026-11-15 §2d, text from MSA Legales).
+// Mirror of /accesibilidad. Linked from the footer.
+import Layout from '../../layouts/Layout.astro';
+import SiteNav from '../../components/layout/SiteNav.astro';
+import SiteFooter from '../../components/layout/SiteFooter.astro';
+import LegalDoc from '../../components/sections/LegalDoc.astro';
+import { content, nap } from '../../i18n/content';
+import { clusterNavEn } from '../../i18n/clusters';
+
+// The nav CTA points to the CONTACT FORM (lead capture), not the brief.
+const pageNav = { ...clusterNavEn, cta: { label: 'Get my free proposal', href: '/en#contacto' } };
+---
+<Layout
+  title="Accessibility · Marcyan Studio"
+  description="Marcyan Studio accessibility statement: this site follows the WCAG 2.1 level AA guidelines. If something does not work for you, write to us and we will fix it."
+  lang="en"
+  path="/en/accessibility"
+  canonical="https://marcyanstudio.com/en/accessibility"
+  hasEn={true}
+>
+  <SiteNav nav={pageNav} lang="en" homeHref="/en" hasEn={true} currentPath={Astro.url.pathname} />
+
+  <main id="main">
+    <LegalDoc title="Accessibility statement" updated="November 15, 2026" updatedLabel="Last updated">
+      <p>We want anyone to be able to use this site. We design it following the WCAG 2.1 level AA guidelines and review it with every change. If something does not work for you, write to us at <a href={`mailto:${nap.email}`}>{nap.email}</a> and we will fix it.</p>
+    </LegalDoc>
+  </main>
+
+  <SiteFooter footer={content.en.footer} lang="en" />
+</Layout>

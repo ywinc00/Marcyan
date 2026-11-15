@@ -6,7 +6,16 @@
   import { untrack } from 'svelte';
   import { api } from '../lib/api.js';
   import { toastError } from '../lib/toast.svelte.js';
-  import { fmtDateTime, rel } from '../lib/dates.js';
+  import { fmtDateTime, fmtDate, rel } from '../lib/dates.js';
+  // «Recibido hace 3 días» / «Recibido el 07 nov 2026»: una sola forma de leerlo.
+  function recibido(v) {
+    const r = rel(v);
+    if (!r) return '';
+    if (r === 'ahora' || /^\d+[mh]$/.test(r)) return 'Recibido hoy';
+    const d = r.match(/^(\d+)d$/);
+    if (d) return d[1] === '1' ? 'Recibido ayer' : `Recibido hace ${d[1]} días`;
+    return 'Recibido el ' + fmtDate(v);
+  }
   import { route, setQuery, href } from '../lib/router.svelte.js';
   import PageHeader from '../ui/PageHeader.svelte';
   import KpiGrid from '../ui/KpiGrid.svelte';
@@ -218,7 +227,7 @@
         </div>
         <div class="bcard__foot">
           <span class="mono">{r.project_id}</span>
-          <span class="mono soft" title={fmtDateTime(r.created_at)}>Recibido {rel(r.created_at)}</span>
+          <span class="mono soft" title={fmtDateTime(r.created_at)}>{recibido(r.created_at)}</span>
         </div>
       </a>
     {/each}

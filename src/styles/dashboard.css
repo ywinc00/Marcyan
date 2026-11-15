@@ -483,16 +483,23 @@ select.inp,
   color: var(--fg-subtle); line-height: 1.45;
 }
 /* La nota deja libre la mitad visible del objeto; la cifra va arriba y usa todo el ancho. */
-.ui-kpi.has-art .ui-kpi__note { max-width: calc(100% - clamp(40px, 30cqw, 70px)); }
+/* El texto acaba 12 px antes del objeto (88 px, su silueta empieza a 13 px de su borde). */
+.ui-kpi.has-art .ui-kpi__note { max-width: calc(100% - 68px); }
 .ui-kpi__note .is-data, .ui-kpi__note .is-up { color: var(--delta-up); font-weight: 500; }
 .ui-kpi__note .is-down { color: var(--delta-down); font-weight: 500; }
 .ui-kpi__note.is-error { color: var(--delta-down); }
 .ui-kpi__art {
   position: absolute; z-index: 0; right: 0; bottom: -16px;
-  width: clamp(64px, 38cqw, 120px); opacity: .95; pointer-events: none;
+  width: 88px; opacity: .95; pointer-events: none;
   transition: opacity var(--duration-fast);
 }
 .ui-kpi__art svg { width: 100%; height: auto; }
+/* Tarjeta estrecha (dos por fila en el teléfono): la nota usa todo el ancho y el
+   objeto, más pequeño, tiene su propia franja debajo; nunca se pisan. */
+@container (max-width: 159px) {
+  .ui-kpi.has-art .ui-kpi__note { max-width: none; margin-bottom: 38px; }
+  .ui-kpi__art { width: 62px; bottom: -12px; }
+}
 @media (max-width: 719px) {
   .ui-kpi { padding: 13px 14px 12px; min-height: 96px; }
   .ui-kpi__num { font-size: 24px; }
@@ -643,7 +650,9 @@ select.inp,
 .ui-confirm__msg { margin: 0; font-size: var(--dash-body); color: var(--fg-secondary); line-height: 1.55; }
 
 /* ── Tabla de datos → tarjetas por debajo de 720 px ── */
-.ui-table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+/* Si la tabla no cabe (tableta, portátil estrecho), se desplaza DENTRO de su tarjeta con
+   la barra visible; nunca se corta la última columna (E-62). */
+.ui-table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow-x: auto; overflow-y: hidden; }
 .ui-table { width: 100%; border-collapse: collapse; font-size: var(--dash-body); }
 .ui-table th {
   text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); white-space: nowrap;

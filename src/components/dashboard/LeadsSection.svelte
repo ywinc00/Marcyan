@@ -281,7 +281,7 @@
   .c-cell:hover .c-name { text-decoration: underline; text-underline-offset: 3px; }
   .c-text { min-width: 0; display: flex; flex-direction: column; }
   .c-name { color: var(--fg-primary); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .c-sub { font-size: var(--dash-caption); color: var(--fg-subtle); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 300px; }
+  .c-sub { font-size: var(--dash-caption); color: var(--fg-subtle); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: clamp(120px, 14vw, 300px); }
   .mono-av { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; flex: 0 0 auto; border-radius: var(--radius-pill); color: #fff; font-family: var(--font-display); font-size: 11px; font-weight: 700; line-height: 1; }
   .mono-av--anon { background: var(--bg-elevated); color: var(--fg-secondary); border: 1px solid var(--border-strong); }
   .dim { color: var(--fg-subtle); white-space: nowrap; font-size: var(--dash-small); font-variant-numeric: tabular-nums; }
@@ -289,7 +289,7 @@
 
   /* Interés y mensaje SIEMPRE por separado (CRM-01): el interés en una línea
      de apoyo y el mensaje debajo; el texto completo está en la ficha. */
-  .msg { display: flex; flex-direction: column; gap: 2px; max-width: 360px; min-width: 0; }
+  .msg { display: flex; flex-direction: column; gap: 2px; max-width: clamp(140px, 18vw, 360px); min-width: 0; }
   .msg__interest { font-size: var(--dash-caption); color: var(--fg-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .msg__text { color: var(--fg-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .msg__interest:only-child { font-size: var(--dash-body); color: var(--fg-secondary); }

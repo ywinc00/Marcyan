@@ -441,6 +441,11 @@
   .seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); }
   .seg button { min-height: 32px; padding: 5px 12px; border: 0; border-radius: 7px; background: transparent; color: var(--fg-secondary); font: inherit; font-size: var(--dash-small); font-weight: 500; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
   .seg button:hover { color: var(--fg-primary); }
+  /* Teléfono estrecho: las cuatro pestañas reparten el ancho en vez de salirse (E-62). */
+  @media (max-width: 399px) {
+    .seg { display: flex; width: 100%; }
+    .seg button { flex: 1 1 auto; justify-content: center; padding: 5px 6px; }
+  }
   .seg button[aria-selected='true'] { background: var(--surface-3); color: var(--fg-primary); }
   .seg button:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
   .seg__live { min-width: 18px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--accent-teal-dim); color: var(--accent-teal); font-size: var(--dash-caption); font-weight: 600; }

@@ -40,7 +40,8 @@
     "calendar": "<g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M16 2v4M8 2v4m5-2h-2C7.229 4 5.343 4 4.172 5.172S3 8.229 3 12v2c0 3.771 0 5.657 1.172 6.828S7.229 22 11 22h2c3.771 0 5.657 0 6.828-1.172S21 17.771 21 14v-2c0-3.771 0-5.657-1.172-6.828S16.771 4 13 4M3 10h18\"/><path d=\"M12.126 14H12m.125 4H12m-4.376-4H7.5m.125 4H7.5m9.125-4H16.5m-4.25 0a.25.25 0 1 1-.5 0a.25.25 0 0 1 .5 0m0 4a.25.25 0 1 1-.5 0a.25.25 0 0 1 .5 0m-4.5-4a.25.25 0 1 1-.5 0a.25.25 0 0 1 .5 0m0 4a.25.25 0 1 1-.5 0a.25.25 0 0 1 .5 0m9-4a.25.25 0 1 1-.5 0a.25.25 0 0 1 .5 0\"/></g>",
     "search": "<path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m17 17l4 4m-2-10a8 8 0 1 0-16 0a8 8 0 0 0 16 0\"/>",
   };
-  const OWN = ['inbox', 'docs', 'invoice', 'folder', 'check', 'clock', 'coins', 'card', 'chart-up'];
+  const OWN = ['inbox', 'docs', 'invoice', 'folder', 'check', 'clock', 'coins', 'card', 'chart-up',
+    'cursor', 'eye', 'medal', 'users', 'bell', 'alert', 'warning', 'pause', 'rocket'];
   const resolved = $derived(OWN.includes(kind) || GLYPHS[kind] ? kind : 'tile');
   const W = 120, H = 90;
 </script>
@@ -51,6 +52,12 @@
   <rect x={x} y={y} width={w} height={h} rx={r} fill={g(face)} stroke={g('rim')} stroke-width="1" />
   <!-- filo de luz del canto superior, como los objetos de la lámina -->
   <path d="M{x + r} {y + 0.7}H{x + w - r}" stroke="#fff" stroke-opacity=".55" stroke-width="1" stroke-linecap="round" />
+{/snippet}
+
+<!-- Forma libre con el mismo acabado: canto desplazado + cara con degradado + filo. -->
+{#snippet shape(d, dd = 4, face = 'face')}
+  <path {d} transform="translate({dd * 0.45} {dd})" fill={g('side')} />
+  <path {d} fill={g(face)} stroke={g('rim')} stroke-width="1" stroke-linejoin="round" />
 {/snippet}
 
 <svg class="kpi-art" width={size} height={Math.round(size * H / W)} viewBox="0 0 {W} {H}" aria-hidden="true" focusable="false">
@@ -87,7 +94,7 @@
   <!-- sombra de contacto -->
   <ellipse cx="66" cy="80" rx="46" ry="11" fill={g('shadow')} />
   <!-- copia fantasma detrás (la lámina repite el objeto, tenue y desplazado) -->
-  <use href="#{uid}-obj" transform="translate(-20 -12)" opacity=".13" />
+  <use href="#{uid}-obj" transform="translate(14 -12)" opacity=".13" />
   <g id="{uid}-obj">
 
   {#if resolved === 'docs'}
@@ -169,6 +176,70 @@
       {@render slab(48, 34, 20, 44, 5, 5, 'face')}
       {@render slab(74, 16, 20, 62, 5, 5, 'face')}
       <path class="eng eng--glyph" d="M28 40l18-12 12 6 24-18M76 16h6v6" />
+    </g>
+  {:else if resolved === 'cursor'}
+    <!-- Puntero que hace clic (clics). -->
+    <g transform="rotate(-8 60 46)">
+      {@render shape('M40 10 L40 66 Q40 70 43.5 67.5 L54 57 L62.5 75.5 Q64 78 66.5 77 L72 74.5 Q74.5 73.3 73.3 70.8 L64.8 52.6 L79 52.4 Q83 52.2 80 49.4 L44 8.6 Q40 5.8 40 10 Z', 5)}
+      <g class="eng"><path d="M28 18l-7-5M25 30h-8M33 8l-3-7" /></g>
+    </g>
+  {:else if resolved === 'eye'}
+    <!-- Página de resultados de búsqueda (impresiones: salir en Google). -->
+    <g transform="rotate(-10 62 46)">
+      {@render slab(16, 12, 92, 64, 8, 5, 'face')}
+      <g class="eng">
+        <rect x="26" y="22" width="62" height="11" rx="5.5" />
+        <circle cx="80" cy="27.5" r="2.6" />
+        <path d="M26 45h46" class="eng--glyph" />
+        <path d="M26 53h34M26 63h44" />
+      </g>
+    </g>
+  {:else if resolved === 'medal'}
+    <!-- Podio con el 1 grabado (posición media en Google). -->
+    <g transform="rotate(-6 62 48)">
+      {@render slab(16, 42, 30, 36, 6, 4, 'face2')}
+      {@render slab(76, 52, 30, 26, 6, 4, 'face2')}
+      {@render slab(44, 22, 34, 56, 6, 5, 'face')}
+      <g class="eng"><path d="M57 36l5-4v18" class="eng--glyph" /><path d="M24 52h14M84 62h14" /></g>
+    </g>
+  {:else if resolved === 'users'}
+    <!-- Dos personas (sesiones, clientes). -->
+    <g transform="rotate(-6 62 46)">
+      {@render shape('M60 76 V62 Q60 46 78 46 H82 Q100 46 100 62 V76 Z', 4, 'face2')}
+      <circle cx="82.5" cy="31" r="11" transform="translate(1.8 4)" fill={g('side')} />
+      <circle cx="82.5" cy="31" r="11" fill={g('face2')} stroke={g('rim')} />
+      {@render shape('M22 78 V64 Q22 46 42 46 H50 Q70 46 70 64 V78 Z', 5)}
+      <circle cx="46" cy="30" r="13" transform="translate(2.2 5)" fill={g('side')} />
+      <circle cx="46" cy="30" r="13" fill={g('face')} stroke={g('rim')} />
+    </g>
+  {:else if resolved === 'bell'}
+    <!-- Campana (por atender, sin leer). -->
+    <g transform="rotate(-10 62 46)">
+      {@render shape('M62 10 C46 10 38 22 38 38 V52 L30 62 Q28 66 33 66 H91 Q96 66 94 62 L86 52 V38 C86 22 78 10 62 10 Z', 5)}
+      <circle cx="62" cy="72" r="6" transform="translate(2 4)" fill={g('side')} />
+      <circle cx="62" cy="72" r="6" fill={g('face2')} stroke={g('rim')} />
+      <g class="eng"><path d="M48 30c2-6 6-9 12-10" /><path d="M40 58h44" /></g>
+    </g>
+  {:else if resolved === 'alert' || resolved === 'warning'}
+    <!-- Señal de aviso con el signo grabado (vencido). -->
+    <g transform="rotate(-6 62 46)">
+      {@render shape('M57 14 Q62 6 67 14 L102 70 Q106 78 97 78 H27 Q18 78 22 70 Z', 5)}
+      <g class="eng"><path d="M62 34v20" class="eng--glyph" /><path d="M62 64v.5" class="eng--glyph" /></g>
+    </g>
+  {:else if resolved === 'pause'}
+    <!-- Dos barras de pausa (en pausa). -->
+    <g transform="rotate(-8 62 46)">
+      {@render slab(34, 14, 22, 62, 7, 5, 'face')}
+      {@render slab(66, 14, 22, 62, 7, 5, 'face')}
+    </g>
+  {:else if resolved === 'rocket'}
+    <!-- Cohete (proyectos en marcha). -->
+    <g transform="rotate(28 62 46)">
+      {@render shape('M48 50 L34 66 Q32 70 36 69 L50 64 Z', 3, 'face2')}
+      {@render shape('M76 50 L90 66 Q92 70 88 69 L74 64 Z', 3, 'face2')}
+      {@render shape('M62 6 C78 18 82 38 77 64 H47 C42 38 46 18 62 6 Z', 5)}
+      <circle cx="62" cy="34" r="8" fill="#2a2a2a" stroke="#fafafa" stroke-opacity=".9" stroke-width="1.8" />
+      <g class="eng"><path d="M55 72v8M62 72v12M69 72v8" /></g>
     </g>
   {:else}
     <!-- Ficha con el dibujo del panel grabado (y otra detrás, como la referencia). -->

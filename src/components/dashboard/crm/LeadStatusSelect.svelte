@@ -89,13 +89,13 @@
     --st: var(--fg-secondary);
     appearance: none; -webkit-appearance: none;
     /* Fase 3: ficha neutra con el punto del estado delante (como el chip de estado). */
-    min-height: 30px; min-width: 116px; padding: 5px 30px 5px 24px;
+    min-height: 30px; min-width: 0; max-width: 100%; padding: 5px 26px 5px 22px;
     border-radius: var(--radius-pill);
     color: var(--fg-primary);
     background-color: var(--bg-elevated);
     border: 1px solid var(--border-strong);
     background-image: radial-gradient(circle at 13px 50%, var(--st) 3px, transparent 3.6px), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b8b95' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
-    background-repeat: no-repeat; background-position: 0 0, right 11px center;
+    background-repeat: no-repeat; background-position: -1px 0, right 9px center;
     font-family: var(--font-body); font-size: var(--dash-caption); font-weight: 500;
     cursor: pointer; transition: filter var(--duration-fast), opacity var(--duration-fast);
   }

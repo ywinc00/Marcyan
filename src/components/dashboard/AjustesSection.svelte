@@ -350,7 +350,7 @@
   .aj-inline .ui-input { min-width: 0; width: auto; }
   .aj-save { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .aj-err { color: var(--color-error); font-size: var(--dash-small); }
-  .aj-switch { display: inline-flex; align-items: center; gap: 8px; color: var(--fg-secondary); cursor: pointer; }
+  .aj-switch { display: inline-flex; align-items: center; gap: 8px; font-size: var(--dash-small); color: var(--fg-secondary); cursor: pointer; }
   .aj-switch input { width: 18px; height: 18px; accent-color: var(--accent-teal); }
   .aj-list { list-style: none; margin: 0; padding: 0; flex: 1 1 320px; display: grid; gap: 8px; }
   .aj-list li { display: flex; justify-content: space-between; gap: 12px; color: var(--fg-primary); overflow-wrap: anywhere; }

@@ -241,7 +241,22 @@
   const PROJ_ROW = 48, LEAD_ROW = 48;
   let projH = $state(0), leadH = $state(0);
   const projRows = $derived(fit && projH ? Math.max(1, Math.min(8, Math.floor((projH + 6) / PROJ_ROW))) : 5);
-  const leadRows = $derived(fit && leadH ? Math.max(1, Math.min(8, Math.floor((leadH + 6) / LEAD_ROW))) : 5);
+  // Leads: el detalle puede ir en dos líneas, así que las filas que caben se MIDEN
+  // (se pintan hasta 8 y se esconden las que no entran enteras).
+  let leadUl = $state();
+  let leadFit = $state(8);
+  $effect(() => {
+    const ul = leadUl, on = fit;
+    void leadH; void leads.length;
+    if (!ul || !on) return;
+    const id = requestAnimationFrame(() => {
+      const box = ul.parentElement ? ul.parentElement.clientHeight : 0;
+      let n = 0;
+      for (const li of ul.children) { if (li.offsetTop + li.offsetHeight <= box + 0.5) n++; else break; }
+      leadFit = Math.max(1, n);
+    });
+    return () => cancelAnimationFrame(id);
+  });
 
   // Comparación del mes resaltado con el anterior (pieza C-06: la cifra dice de dónde sale).
   const barDelta = $derived(activeBar > 0 ? delta(num(activity[activeBar]?.total) || 0, num(activity[activeBar - 1]?.total) || 0) : null);
@@ -321,7 +336,7 @@
           {/if}
         </div>
         {#if anyActivity}
-          <p class="m-legend" aria-hidden="true"><span><i class="lg lg--leads"></i>leads</span><span><i class="lg lg--briefs"></i>briefs</span></p>
+          <p class="m-legend" aria-hidden="true"><span class="lg-bar"><i class="lg-bar__b"></i><i class="lg-bar__l"></i></span><span>briefs arriba, leads abajo</span></p>
         {/if}
       </header>
 
@@ -505,12 +520,12 @@
         <LoadingState loading={true} rows={4} height={42} gap={6} label="Cargando leads" />
       {:else if leads.length}
         <div class="rows-box" bind:clientHeight={leadH}>
-          <ul class="rows">
-            {#each leads.slice(0, leadRows) as lead (lead.ref_id)}
+          <ul class="rows" bind:this={leadUl}>
+            {#each leads.slice(0, fit ? 8 : 5) as lead, li (lead.ref_id)}
               {@const src = sourceMeta(lead.source)}
               {@const detail = leadDetail(lead)}
               <li>
-                <a class="lrow" href={href('leads', [lead.ref_id])}>
+                <a class="lrow" class:is-out={fit && li >= leadFit} aria-hidden={fit && li >= leadFit ? 'true' : undefined} tabindex={fit && li >= leadFit ? -1 : undefined} href={href('leads', [lead.ref_id])}>
                   <span class="mono-av lg" aria-hidden="true">{initials(lead.name || lead.email || lead.ref_id)}</span>
                   <span class="lrow__main">
                     <span class="lrow__name">{leadTitle(lead)}</span>
@@ -592,13 +607,13 @@
 
   /* En la pantalla de un portátil o mayor, Inicio cabe entero (E-77): alto de la
      ventana menos la carcasa; la fila del gráfico se lleva algo más que la de abajo. */
-  .ini.is-fit { height: calc(100dvh - var(--chrome-y, 76px)); min-height: 0; }
+  .ini.is-fit { height: min(calc(100dvh - var(--chrome-y, 76px)), 1000px); min-height: 0; }
   .ini.is-fit .row { min-height: 0; }
   .ini.is-fit .row--a { flex: 1.22 1 0; }
   .ini.is-fit .row--b { flex: 1 1 0; }
 
   /* ── Cabecera de métrica (rótulo mono + cifra) ── */
-  .m-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin-bottom: 10px; }
+  .m-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 6px var(--space-3); margin-bottom: 10px; }
   .m-lbl { margin: 0 0 6px; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); }
   .m-amount { margin: 0; font-family: var(--font-display); font-size: 24px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.05; color: var(--fg-primary); font-variant-numeric: tabular-nums; }
   .m-amount .muted { font-family: var(--font-mono); font-size: var(--dash-mono); font-weight: 400; letter-spacing: 0; color: var(--fg-subtle); }
@@ -615,9 +630,13 @@
   /* ── Gráfico de barras (como «Revenue» de la referencia) ── */
   .plot { position: relative; height: 210px; }
   /* A pantalla, el gráfico llena su tarjeta hasta un tope (en pantallas muy altas no crece de más). */
-  .ini.is-fit .plot { flex: 1 1 auto; height: auto; min-height: 120px; max-height: 270px; margin-top: auto; }
+  .ini.is-fit .plot { flex: 1 1 auto; height: auto; min-height: 120px; max-height: 300px; margin-top: auto; }
   .m-legend { margin: 2px 0 0; display: flex; gap: 14px; font-family: var(--font-mono); font-size: 11px; color: var(--fg-subtle); }
   .m-legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .lg-bar { flex-direction: column; gap: 0 !important; width: 9px; height: 16px; border-radius: 3px 3px 0 0; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.12); }
+  .lg-bar i { display: block; width: 100%; }
+  .lg-bar__b { height: 40%; background: #5a5a5a; }
+  .lg-bar__l { height: 60%; background: #383838; }
   .lg { display: inline-block; width: 9px; height: 9px; border-radius: 3px; }
   .lg--leads { background: #3a3a3a; border: 1px solid rgba(255, 255, 255, 0.12); }
   .lg--briefs { background: #585858; border: 1px solid rgba(255, 255, 255, 0.16); }
@@ -646,7 +665,7 @@
   .list-body { display: flex; flex-direction: column; flex: 1; min-height: 0; }
   .tcols { display: grid; gap: 12px; padding: 0 12px 8px; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); }
   .tcols--p, .prow { grid-template-columns: minmax(0, 1fr) 104px; }
-  .rows-box { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+  .rows-box { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; }
   .rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 
   .prow {
@@ -660,7 +679,7 @@
   .prow__name { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--fg-primary); }
   .prow__name :global(.ui-icon) { flex: 0 0 auto; color: var(--fg-subtle); }
   .prow__client { display: flex; align-items: center; gap: 6px; min-width: 0; padding-left: 24px; color: var(--fg-subtle); font-size: var(--dash-caption); }
-  .prow__client .mono-av { width: 16px; height: 16px; font-size: 8px; }
+  .prow__client .mono-av { width: 20px; height: 20px; font-size: 10px; }
   .prow__prog { display: flex; align-items: center; gap: 8px; }
   .prow__st { display: flex; }
   .prow__st :global(.ui-chip) { padding: 1px 8px; font-size: 11px; }
@@ -678,7 +697,9 @@
   .lrow:hover { background: var(--bg-elevated); border-color: var(--border); }
   .lrow__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
   .lrow__name { color: var(--fg-primary); font-size: var(--dash-small); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .lrow__detail { font-size: var(--dash-caption); color: var(--fg-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* El negocio y la ciudad bajan a una segunda línea antes que cortarse (E-62). */
+  .lrow__detail { font-size: var(--dash-caption); color: var(--fg-subtle); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.35; }
+  .lrow.is-out { visibility: hidden; }
   .lrow__meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: 0 0 auto; }
   .lrow__src { font-size: 11px; color: var(--fg-secondary); }
   .dim { color: var(--fg-subtle); white-space: nowrap; font-family: var(--font-mono); font-size: 11px; font-variant-numeric: tabular-nums; }
@@ -740,7 +761,11 @@
     .row--b > :global(*) { grid-column: 1 / -1; }
     .m-amount { font-size: 22px; }
     /* En el teléfono el cliente baja bajo el nombre (no se esconde, E-62). */
-    .tcols--p, .prow { grid-template-columns: minmax(0, 1fr) 88px; }
+    .tcols--p { display: none; }
+    .prow { grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 8px 12px; }
+    .prow .ellip { white-space: normal; }
+    .prow__client { padding-left: 24px; }
+    .prow__prog, .prow__st { padding-left: 24px; }
   }
   @media (pointer: coarse) {
     .prow, .lrow { min-height: 44px; }

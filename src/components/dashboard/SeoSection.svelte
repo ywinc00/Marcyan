@@ -195,7 +195,7 @@
 
   // KPIs
   // Nota corta (cabe en una línea de la cifra): el rango ya se ve arriba, en las pastillas.
-  const prevTxt = $derived(`vs. ${days} días antes`);
+
   const dClicks = $derived(sumG ? delta(sumG.current.clicks, sumG.previous && sumG.previous.clicks) : null);
   const dImpr = $derived(sumG ? delta(sumG.current.impressions, sumG.previous && sumG.previous.impressions) : null);
   const dPos = $derived(sumG ? delta(sumG.current.position, sumG.previous && sumG.previous.position, { lowerIsBetter: true }) : null);
@@ -276,7 +276,7 @@
   {#if isOff}
     {offTxt}
   {:else if d}
-    <span class={d.dir === 'flat' ? '' : d.better ? 'is-up' : 'is-down'}>{d.dir === 'up' ? '↑' : d.dir === 'down' ? '↓' : '→'} {d.txt}</span> <span class="kn-prev">{prevTxt}</span>
+    <span class={d.dir === 'flat' ? '' : d.better ? 'is-up' : 'is-down'}>{d.dir === 'up' ? '↑' : d.dir === 'down' ? '↓' : '→'} {d.txt}</span>
   {:else}
     {okTxt}
   {/if}
@@ -351,6 +351,7 @@
           {#if proj && proj.domain}<span>{proj.domain}</span>{/if}
           {#if sumG}<span title="Search Console publica con 2 o 3 días de retraso">Search Console: {windowTxt}</span>{/if}
           {#if sumA}<span title="Analytics, sin el día de hoy">Analytics: {dayShort(sumA.current.start)} al {dayShort(sumA.current.end)}</span>{/if}
+          <span>Cambios frente a los {days} días anteriores</span>
           {#if proj && proj.active === false}<span>Pausado: fuera de la sincronización automática</span>{:else if syncState && syncState.at}<span title="Se sincroniza solo cada madrugada">Actualizado {whenTxt(syncState.at)}</span>{/if}
         </p>
       </div>
@@ -526,7 +527,7 @@
   /* ── Página (fase 3): en un portátil o mayor, el Resumen cabe en la pantalla (E-77) ── */
   .seo { display: flex; flex-direction: column; }
   .seo > :global(.ui-page-head) { margin: 6px 0 14px; }
-  .seo.is-fit { height: calc(100dvh - var(--chrome-y, 76px)); min-height: 0; }
+  .seo.is-fit { height: min(calc(100dvh - var(--chrome-y, 76px)), 1040px); min-height: 0; }
   .seo.is-fit .seo-stack { flex: 1 1 auto; min-height: 0; }
   /* Rejilla del Resumen: gráfico e indexación arriba, búsquedas abajo; en portátil
      de poco alto, las tres en una fila (E-77: cabe en 1366×768). */
@@ -534,7 +535,6 @@
   .seo-row--a > :global(:nth-child(3)) { grid-column: 1 / -1; }
   .seo.is-fit .seo-row--a { flex: 1 1 auto; min-height: 0; grid-template-rows: minmax(0, 1.2fr) minmax(0, 1fr); }
   /* Nota de la cifra en dos líneas fijas: el cambio arriba, el periodo debajo. */
-  .kn-prev { display: block; }
   .seo.is-short .seo-row--a { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(0, 1.15fr); grid-template-rows: minmax(0, 1fr); }
   .seo.is-short .seo-row--a > :global(:nth-child(3)) { grid-column: auto; }
   .seo.is-short .qs__cols, .seo.is-short .qs__row { grid-template-columns: minmax(0, 1fr) 48px 52px; }
@@ -622,9 +622,10 @@
     .seo-q :global(.ui-table td.is-primary) { grid-column: 1 / -1; }
     .seo-q :global(.ui-table td:not(.is-primary):not(.is-action)) { grid-column: auto; }
     .seo-bar__pick { flex-basis: 100%; max-width: none; }
-    .seo-bar__acts { margin-left: auto; flex-wrap: nowrap; gap: 6px; }
-    .seo-bar__acts .b { width: var(--tap-min, 44px); padding: 0; }
-    .seo-bar__txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    /* Teléfono: el rango en su fila y las acciones del proyecto debajo, con su nombre. */
+    .seo-range { flex: 1 1 100%; justify-content: space-between; }
+    .seo-range__b { flex: 1 1 0; justify-content: center; }
+    .seo-bar__acts { flex: 1 1 100%; margin-left: 0; flex-wrap: nowrap; gap: 8px; }
     .seo-range__b { padding: 6px 9px; font-size: var(--dash-caption); }
     .seo-tabs__meta { gap: 2px 12px; font-size: 11px; }
     /* Resumen: la búsqueda arriba y sus cuatro cifras debajo, con su rótulo. */

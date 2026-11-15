@@ -291,8 +291,11 @@
   .neg { color: var(--color-error); }
   .num { font-variant-numeric: tabular-nums; }
   @container (max-width: 560px) {
-    .tx-l { width: 40px; }
-    .tx-t th, .tx-t td { padding: 0 10px; }
+    .tx-l { width: 34px; }
+    .tx-t th, .tx-t td { padding: 0 8px; overflow-wrap: anywhere; }
+    .tx-chev { width: 22px; }
+    .tx-t thead th { padding: 10px 8px; }
+    .tx-detail td { padding: 4px 8px 12px; }
     .tx-items li { grid-template-columns: minmax(0, 1fr) auto; }
     .tx-items .tx-d { grid-column: 1 / -1; }
     .tx-items .tx-n { order: 1; }

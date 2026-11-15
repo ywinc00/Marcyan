@@ -7,6 +7,10 @@
 // ─────────────────────────────────────────────────────────────
 // Las 3 fuentes, solo con los subconjuntos que usa el sitio (styles/fonts.css: mismos woff2 de Fontsource).
 import '../styles/fonts.css';
+// Precarga de las dos letras que pintan la primera pantalla (titular y texto), subconjunto latino: el
+// titular ya no aparece un instante con la letra de reserva. Mismo archivo (y misma URL) que fonts.css.
+import fontDisplayUrl from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
+import fontBodyUrl from '@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2?url';
 import '../styles/global.css';
 import { nap } from '../i18n/content';
 import { mirrorPath } from '../i18n/routes';
@@ -154,6 +158,8 @@ const gaInit = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     {ds === 'v3' && <script is:inline set:html={wAnimInit} />}
+    <link rel="preload" href={fontDisplayUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={fontBodyUrl} as="font" type="font/woff2" crossorigin />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canon} />

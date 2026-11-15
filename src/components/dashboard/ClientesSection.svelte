@@ -222,6 +222,7 @@
   .c-cell:hover .c-name { text-decoration: underline; text-underline-offset: 3px; }
   .c-text { min-width: 0; display: flex; flex-direction: column; }
   .c-name { color: var(--fg-primary); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (max-width: 719px) { .c-name { white-space: normal; } }
   .c-sub { font-size: var(--dash-caption); color: var(--fg-subtle); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .mono-av { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; flex: 0 0 auto; border-radius: var(--radius-pill); color: #fff; font-family: var(--font-display); font-size: 11px; font-weight: 700; line-height: 1; }
   .contact { display: flex; flex-direction: column; min-width: 0; }

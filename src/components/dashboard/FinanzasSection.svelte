@@ -242,29 +242,29 @@
     <KpiGrid count={5} label="Resumen del mes">
       <Kpi label="Cobrado (mes)" art="coins" tone={summary && summary.collected_this_month_cents > 0 ? 'data' : ''} value={summary ? fmtUsd0(summary.collected_this_month_cents) : '…'}>
         {#if summary && collectedDelta !== null}
-          <span class:fin-up={collectedDelta >= 0} class:fin-down={collectedDelta < 0}>{collectedDelta >= 0 ? '+' : ''}{collectedDelta}%</span> vs el mismo tramo de {prevMonthName}
+          <span class:fin-up={collectedDelta >= 0} class:fin-down={collectedDelta < 0}>{collectedDelta >= 0 ? '+' : ''}{collectedDelta} %</span> vs. mismo tramo de {prevMonthName}
         {:else}Pagos recibidos este mes{/if}
       </Kpi>
       <Kpi label="Por cobrar" art="invoice" tone={summary && summary.ar_total_cents > 0 ? 'accent' : ''} href={href('finanzas', ['facturas'], { estado: 'abiertas' })}
         value={summary ? fmtUsd0(summary.ar_total_cents) : '…'}>
-        {#if summary && !summary.counts.open_invoices}Ninguna factura abierta{#if summary.draft_count}{` (${summary.draft_count} en borrador, aparte)`}{/if}
+        {#if summary && !summary.counts.open_invoices}Ninguna factura abierta{#if summary.draft_count}{` · ${summary.draft_count} en borrador`}{/if}
         {:else if summary}
-          Saldo de {summary.counts.open_invoices} factura{summary.counts.open_invoices === 1 ? '' : 's'} abierta{summary.counts.open_invoices === 1 ? '' : 's'}{#if summary.draft_count}{`, sin contar ${summary.draft_count} borrador${summary.draft_count === 1 ? '' : 'es'}`}{:else}, sin borradores{/if}
+          {summary.counts.open_invoices} factura{summary.counts.open_invoices === 1 ? '' : 's'} abierta{summary.counts.open_invoices === 1 ? '' : 's'}{#if summary.draft_count}{` · ${summary.draft_count} borrador${summary.draft_count === 1 ? '' : 'es'} aparte`}{/if}
         {:else}Saldo de las facturas abiertas{/if}
       </Kpi>
       <Kpi label="Vencido" art="alert" tone={summary && summary.overdue_cents > 0 ? 'error' : ''}
         href={href('finanzas', ['facturas'], { estado: 'vencida' })} value={summary ? fmtUsd0(summary.overdue_cents) : '…'}>
         {#if summary && summary.overdue_count > 0}
-          {summary.overdue_count} factura{summary.overdue_count === 1 ? '' : 's'} pasada{summary.overdue_count === 1 ? '' : 's'} de fecha con saldo
-        {:else}Ninguna factura pasada de fecha{/if}
+          {summary.overdue_count} factura{summary.overdue_count === 1 ? '' : 's'} vencida{summary.overdue_count === 1 ? '' : 's'}
+        {:else}Nada vencido{/if}
       </Kpi>
       <Kpi label="Gastos (mes)" art="card" value={summary ? fmtUsd0(summary.expenses_this_month_cents) : '…'}>
         {#if summary}
-          {summary.subscription_charges_this_month ? `Con ${summary.subscription_charges_this_month} cargo${summary.subscription_charges_this_month === 1 ? '' : 's'} de suscripciones` : 'Gastos apuntados este mes'}{#if summary.expenses_pending_this_month}{`; ${summary.expenses_pending_this_month} importado${summary.expenses_pending_this_month === 1 ? '' : 's'} sin revisar aún no cuenta${summary.expenses_pending_this_month === 1 ? '' : 'n'}`}{/if}
+          {summary.subscription_charges_this_month ? `${summary.subscription_charges_this_month} cargo${summary.subscription_charges_this_month === 1 ? '' : 's'} de suscripciones` : 'Apuntados este mes'}{#if summary.expenses_pending_this_month}{` · ${summary.expenses_pending_this_month} sin revisar, aún no cuenta${summary.expenses_pending_this_month === 1 ? '' : 'n'}`}{/if}
         {:else}Gastos del mes{/if}
       </Kpi>
       <Kpi label="Neto (mes)" art="chart-up" tone={summary && net !== 0 ? (net > 0 ? 'data' : 'error') : ''} value={summary ? fmtUsd0(net) : '…'}
-        note="Lo que quedó este mes, igual que en el libro del año" />
+        note="Lo que quedó este mes" />
     </KpiGrid>
   {/if}
 

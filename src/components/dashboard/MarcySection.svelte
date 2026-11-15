@@ -433,7 +433,7 @@
 
 <style>
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); }
-  .cap { margin: 0 0 8px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); }
+  .cap { margin: 0 0 8px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle); }
   .muted { color: var(--fg-subtle); }
   .small { font-size: var(--dash-caption); line-height: 1.5; }
 
@@ -469,7 +469,12 @@
   .why button { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 90px 26px; align-items: center; gap: 10px; padding: 6px 8px; margin: 0 -8px; border: 0; border-radius: var(--radius-sm); background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
   .why button:hover, .why button[aria-pressed='true'] { background: var(--bg-elevated); }
   .why button:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 1px; }
-  .why__t { font-size: var(--dash-small); color: var(--fg-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .why__t { font-size: var(--dash-small); color: var(--fg-secondary); overflow: hidden; line-height: 1.3; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; }
+  /* Teléfono: el motivo baja a dos líneas en vez de cortarse (E-62). */
+  @media (max-width: 479px) {
+    .why button { grid-template-columns: minmax(0, 1fr) 64px 22px; }
+    .why__t { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.3; }
+  }
   .why b { text-align: right; font-variant-numeric: tabular-nums; }
   /* Huecos de la primera carga: misma línea que el número y el motivo reales. */
   .sk-n { display: inline-block; width: 52px; height: .9em; vertical-align: middle; }

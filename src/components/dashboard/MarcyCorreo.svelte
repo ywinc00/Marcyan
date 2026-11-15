@@ -146,7 +146,7 @@
 
 <style>
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); }
-  .cap { margin: 0 0 6px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); }
+  .cap { margin: 0 0 6px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle); }
   .muted { color: var(--fg-subtle); font-size: var(--dash-small); margin: 0; }
   .mail__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 12px 16px; border-bottom: 1px solid var(--border-subtle); }
   .pills { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -159,7 +159,7 @@
   .meta { margin: 0 0 0 auto; font-size: var(--dash-caption); color: var(--fg-subtle); }
   .mail__body { display: grid; grid-template-columns: minmax(0, 1fr) 320px; min-height: 420px; }
   .list { min-width: 0; padding: 4px 0 12px; }
-  .day { margin: 0; padding: 14px 16px 6px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); }
+  .day { margin: 0; padding: 14px 16px 6px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle); }
   ul { list-style: none; margin: 0; padding: 0; }
   .row { width: 100%; display: grid; grid-template-columns: 10px 150px minmax(0, 1fr) 210px 64px; align-items: center; gap: 12px; padding: 10px 16px; border: 0; border-left: 2px solid transparent; border-top: 1px solid var(--border-subtle); background: transparent; color: var(--fg-secondary); font: inherit; font-size: var(--dash-small); text-align: left; cursor: pointer; }
   li:first-child .row { border-top: 0; }

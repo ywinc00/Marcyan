@@ -189,7 +189,8 @@
   function leadTitle(l) { return l.name || l.email || l.phone || 'Sin nombre'; }
   // Segunda línea: el negocio y la ciudad; si no hay, el contacto que no sea ya el título.
   function leadDetail(l) {
-    const biz = [l.business_name, l.city].filter(Boolean).join(', ');
+    const city = (l.city || '').replace(/,\s*[A-Z]{2}$/, '');
+    const biz = [l.business_name, city].filter(Boolean).join(' · ');
     if (biz) return biz;
     const t = leadTitle(l);
     return [l.email, l.phone].find((v) => v && v !== t) || '';
@@ -238,9 +239,23 @@
     mq.addEventListener?.('change', sync);
     return () => mq.removeEventListener?.('change', sync);
   });
-  const PROJ_ROW = 48, LEAD_ROW = 48;
   let projH = $state(0), leadH = $state(0);
-  const projRows = $derived(fit && projH ? Math.max(1, Math.min(8, Math.floor((projH + 6) / PROJ_ROW))) : 5);
+  // Proyectos: igual que los leads, se pintan hasta 8 y se MIDEN las filas que caben
+  // enteras (una fila cortada por la tarjeta no se enseña; ronda 3 de la crítica).
+  let projUl = $state();
+  let projFit = $state(8);
+  $effect(() => {
+    const ul = projUl, on = fit;
+    void projH; void recentProjects.length;
+    if (!ul || !on) return;
+    const id = requestAnimationFrame(() => {
+      const box = ul.parentElement ? ul.parentElement.clientHeight : 0;
+      let n = 0;
+      for (const li of ul.children) { if (li.offsetTop + li.offsetHeight <= box + 0.5) n++; else break; }
+      projFit = Math.max(1, n);
+    });
+    return () => cancelAnimationFrame(id);
+  });
   // Leads: el detalle puede ir en dos líneas, así que las filas que caben se MIDEN
   // (se pintan hasta 8 y se esconden las que no entran enteras).
   let leadUl = $state();
@@ -437,12 +452,12 @@
       {:else if recentProjects.length}
         <div class="tcols tcols--p" aria-hidden="true"><span>Proyecto y cliente</span><span>Avance</span></div>
         <div class="rows-box" bind:clientHeight={projH}>
-          <ul class="rows">
-            {#each recentProjects.slice(0, projRows) as p (p.id)}
+          <ul class="rows" bind:this={projUl}>
+            {#each recentProjects.slice(0, fit ? 8 : 5) as p, pi (p.id)}
               {@const st = projStatus(p.status)}
               {@const pct = num(p.progress) || 0}
               <li>
-                <a class="prow" href={href('progreso', [p.project_code || p.id])}>
+                <a class="prow" class:is-out={fit && pi >= projFit} aria-hidden={fit && pi >= projFit ? 'true' : undefined} tabindex={fit && pi >= projFit ? -1 : undefined} href={href('progreso', [p.project_code || p.id])}>
                   <span class="prow__main">
                     <span class="prow__name"><Icon name="folder" size={16} /><span class="ellip">{p.name}</span></span>
                     <span class="prow__client"><span class="mono-av" aria-hidden="true">{initials(p.client_name)}</span><span class="ellip">{p.client_name || 'Sin cliente'}</span></span>
@@ -699,7 +714,7 @@
   .lrow__name { color: var(--fg-primary); font-size: var(--dash-small); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* El negocio y la ciudad bajan a una segunda línea antes que cortarse (E-62). */
   .lrow__detail { font-size: var(--dash-caption); color: var(--fg-subtle); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.35; }
-  .lrow.is-out { visibility: hidden; }
+  .lrow.is-out, .prow.is-out { visibility: hidden; }
   .lrow__meta { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: 0 0 auto; }
   .lrow__src { font-size: 11px; color: var(--fg-secondary); }
   .dim { color: var(--fg-subtle); white-space: nowrap; font-family: var(--font-mono); font-size: 11px; font-variant-numeric: tabular-nums; }

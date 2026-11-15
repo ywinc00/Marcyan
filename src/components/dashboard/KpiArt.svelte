@@ -211,14 +211,21 @@
       {@render shape('M22 78 V64 Q22 46 42 46 H50 Q70 46 70 64 V78 Z', 5)}
       <circle cx="46" cy="30" r="13" transform="translate(2.2 5)" fill={g('side')} />
       <circle cx="46" cy="30" r="13" fill={g('face')} stroke={g('rim')} />
+      <g class="eng">
+        <path d="M37 25a10 10 0 0 1 8-6" class="eng--glyph" />
+        <path d="M38 50l8 7 8-7" />
+        <path d="M76 28a8 8 0 0 1 6-5" />
+        <path d="M73 49l7 6 7-6" />
+      </g>
     </g>
   {:else if resolved === 'bell'}
     <!-- Campana (por atender, sin leer). -->
-    <g transform="rotate(-10 62 46)">
-      {@render shape('M62 10 C46 10 38 22 38 38 V52 L30 62 Q28 66 33 66 H91 Q96 66 94 62 L86 52 V38 C86 22 78 10 62 10 Z', 5)}
-      <circle cx="62" cy="72" r="6" transform="translate(2 4)" fill={g('side')} />
-      <circle cx="62" cy="72" r="6" fill={g('face2')} stroke={g('rim')} />
-      <g class="eng"><path d="M48 30c2-6 6-9 12-10" /><path d="M40 58h44" /></g>
+    <g transform="translate(0 -8) rotate(-10 62 46)">
+      <circle cx="62" cy="9" r="4" fill={g('face2')} stroke={g('rim')} />
+      {@render shape('M62 12 C46 12 38 24 38 40 V52 L30 62 Q28 66 33 66 H91 Q96 66 94 62 L86 52 V40 C86 24 78 12 62 12 Z', 5)}
+      <circle cx="62" cy="71" r="6.5" transform="translate(2 3)" fill={g('side')} />
+      <circle cx="62" cy="71" r="6.5" fill={g('face')} stroke={g('rim')} />
+      <g class="eng"><path d="M47 34c2-7 7-11 13-12" class="eng--glyph" /><path d="M36 58h52" /><path d="M58 70.5h8" /></g>
     </g>
   {:else if resolved === 'alert' || resolved === 'warning'}
     <!-- Señal de aviso con el signo grabado (vencido). -->

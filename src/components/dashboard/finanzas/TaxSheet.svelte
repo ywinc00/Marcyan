@@ -270,10 +270,10 @@
   .tx-head p { margin: 4px 0 0; color: var(--fg-subtle); font-size: var(--dash-small); }
   .tx-t { width: 100%; border-collapse: collapse; }
   .tx-t th, .tx-t td { height: 48px; padding: 0 16px; border-bottom: 1px solid var(--border-subtle); text-align: left; font-weight: 400; }
-  .tx-t thead th { height: auto; padding: 12px 16px; font: 500 var(--dash-caption)/1.2 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); border-bottom: 1px solid var(--border); }
+  .tx-t thead th { height: auto; padding: 12px 16px; font: 500 var(--dash-caption)/1.2 var(--font-body); letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle); border-bottom: 1px solid var(--border); }
   .tx-t .r { text-align: right; white-space: nowrap; }
   .tx-l { width: 64px; color: var(--fg-subtle); }
-  .tx-part { font: 500 var(--dash-caption)/1.2 var(--font-body) !important; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle) !important; height: 40px !important; }
+  .tx-part { font: 500 var(--dash-caption)/1.2 var(--font-body) !important; letter-spacing: 0; text-transform: none; font-family: var(--font-mono) !important; color: var(--fg-subtle) !important; height: 40px !important; }
   .tx-sub td { font-weight: 600; color: var(--fg-primary); }
   .tx-sub .tx-l { font-weight: 400; color: var(--fg-subtle); }
   .tx-tot td { font-weight: 600; border-top: 1px solid var(--border-strong); border-bottom: 0; }
@@ -298,7 +298,7 @@
   .tx-notes { padding: 12px 16px; border-top: 1px solid var(--border-subtle); color: var(--fg-subtle); font-size: var(--dash-small); }
   .tx-notes p { margin: 0 0 4px; }
   .tx-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-  .tx-cap { margin: 0 0 10px; font: 500 var(--dash-caption)/1.2 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); }
+  .tx-cap { margin: 0 0 10px; font: 500 var(--dash-caption)/1.2 var(--font-body); letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle); }
   .tx-big { margin: 0; font-size: 28px; font-weight: 650; letter-spacing: -.02em; }
   .tx-pad p { margin: 4px 0 0; }
   .tx-ass { margin-top: 10px; font-size: var(--dash-small); color: var(--fg-secondary); }

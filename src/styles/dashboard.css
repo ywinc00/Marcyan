@@ -484,7 +484,7 @@ select.inp,
 }
 /* La nota deja libre la mitad visible del objeto; la cifra va arriba y usa todo el ancho. */
 /* El texto acaba 12 px antes del objeto (88 px, su silueta empieza a 13 px de su borde). */
-.ui-kpi.has-art .ui-kpi__note { max-width: calc(100% - 68px); }
+.ui-kpi.has-art .ui-kpi__note { max-width: calc(100% - 74px); }
 .ui-kpi__note .is-data, .ui-kpi__note .is-up { color: var(--delta-up); font-weight: 500; }
 .ui-kpi__note .is-down { color: var(--delta-down); font-weight: 500; }
 .ui-kpi__note.is-error { color: var(--delta-down); }
@@ -497,7 +497,8 @@ select.inp,
 /* Tarjeta estrecha (dos por fila en el teléfono): la nota usa todo el ancho y el
    objeto, más pequeño, tiene su propia franja debajo; nunca se pisan. */
 @container (max-width: 159px) {
-  .ui-kpi.has-art .ui-kpi__note { max-width: none; margin-bottom: 38px; }
+  .ui-kpi.has-art .ui-kpi__note { max-width: calc(100% - 64px); }
+  .ui-kpi.has-art.is-strip .ui-kpi__note { max-width: none; margin-bottom: 34px; }
   .ui-kpi__art { width: 62px; bottom: -12px; }
 }
 @media (max-width: 719px) {
@@ -685,7 +686,7 @@ select.inp,
   }
   .ui-table td:not(.is-primary):not(.is-action)::before {
     content: attr(data-label); flex: 0 0 auto;
-    font-size: var(--dash-caption); font-weight: 500; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle);
+    font-size: var(--dash-caption); font-weight: 500; letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle);
   }
   .ui-table td.is-wide { flex-direction: column; align-items: stretch; gap: 6px; }
 }

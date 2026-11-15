@@ -235,6 +235,8 @@
                 <span class="c-text">
                   <span class="c-name">{lead.name || 'Sin nombre'}</span>
                   <span class="c-sub">{[lead.business_name, lead.email || lead.phone].filter(Boolean).join(' · ') || lead.ref_id}</span>
+                  <!-- Entre 720 y 1099 px la columna Origen se pliega aquí, bajo el contacto. -->
+                  <span class="c-src">{leadSource(lead.source).label}</span>
                 </span>
               </a>
             {:else if col.key === 'source'}
@@ -294,11 +296,25 @@
   .msg__text { color: var(--fg-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .msg__interest:only-child { font-size: var(--dash-body); color: var(--fg-secondary); }
 
+  .c-src { display: none; margin-top: 2px; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); }
+  /* Tableta y portátil estrecho: sin la columna Origen (va bajo el contacto), la
+     tabla cabe entera y el estado se ve sin desplazarla (ronda 3 de la crítica). */
+  @media (min-width: 720px) and (max-width: 1099px) {
+    .list :global(.ui-table th:nth-child(2)), .list :global(.ui-table td:nth-child(2)) { display: none; }
+    .c-src { display: block; }
+  }
+  /* Teléfono estrecho: el selector de estado baja a su fila, bajo el nombre, que así
+     usa todo el ancho de la tarjeta. */
+  @media (max-width: 479px) {
+    .list :global(.ui-table td.is-primary) { grid-column: 1 / -1; }
+    .list :global(.ui-table td.is-action) { grid-column: 1 / -1; grid-row: 2; padding: 0 0 12px; margin: 0 0 4px; justify-content: flex-start; border-bottom: 1px solid var(--border-subtle); }
+    .list :global(.ui-table td.is-primary) { border-bottom: 0; padding-bottom: 8px; margin-bottom: 0; }
+  }
   @media (max-width: 719px) {
     .origin { flex: 1 1 100%; }
     .msg { max-width: none; }
     .msg__interest { white-space: normal; overflow-wrap: anywhere; }
     .msg__text { white-space: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; }
-    .c-sub { max-width: none; }
+    .c-sub { max-width: none; white-space: normal; overflow-wrap: anywhere; }
   }
 </style>

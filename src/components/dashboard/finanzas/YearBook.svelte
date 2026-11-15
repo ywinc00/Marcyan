@@ -265,7 +265,7 @@
   .yb-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
   .yb-t { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
   .yb-t th, .yb-t td { padding: 0 16px; height: 52px; border-bottom: 1px solid var(--border-subtle); text-align: left; font-weight: 400; }
-  .yb-t thead th { height: auto; padding: 12px 16px; font: 500 var(--dash-caption)/1.2 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); border-bottom: 1px solid var(--border); }
+  .yb-t thead th { height: auto; padding: 12px 16px; font: 500 var(--dash-caption)/1.2 var(--font-body); letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle); border-bottom: 1px solid var(--border); }
   .yb-t .r { text-align: right; }
   .yb-t tbody th { padding: 0; }
   .yb-month { all: unset; box-sizing: border-box; display: flex; align-items: center; width: 100%; height: 52px; padding: 0 16px; cursor: pointer; color: var(--fg-primary); text-transform: capitalize; }
@@ -303,7 +303,7 @@
   .yb-small a { color: var(--fg-primary); text-underline-offset: 3px; }
   .yb-diffline { display: none; margin: 0; padding: 12px 10px 0; font-size: var(--dash-small); color: var(--fg-secondary); }
   .yb-c { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; min-width: 0; }
-  .yb-cap { margin: 0 0 10px; font: 500 var(--dash-caption)/1.2 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); }
+  .yb-cap { margin: 0 0 10px; font: 500 var(--dash-caption)/1.2 var(--font-body); letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle); }
   .yb-big { margin: 0; font-size: 28px; font-weight: 650; letter-spacing: -.02em; color: var(--fg-primary); }
   .yb-c p { margin: 4px 0 0; }
   .yb-warn { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px !important; color: var(--fg-primary); }

@@ -256,6 +256,7 @@
     .kpis :global(.ui-kpis[data-count="4"] > .funnel-cell) { grid-column: 1 / -1; }
   }
   .funnel-cell { display: flex; flex-direction: column; }
+  .funnel-cell .funnel { margin-top: 12px; }
   .funnel-empty { margin: 6px 0 0; color: var(--fg-subtle); font-size: var(--dash-small); }
   .block { margin-bottom: var(--space-5); }
 
@@ -293,7 +294,8 @@
   .bcard:hover { background: var(--bg-elevated); border-color: var(--border-strong); }
   .bcard__top { display: flex; align-items: center; gap: 10px; }
   .bcard__id { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
-  .bcard__name { font-size: var(--dash-body); font-weight: 600; color: var(--fg-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* El nombre del negocio baja a dos líneas antes que cortarse (E-62). */
+  .bcard__name { font-size: var(--dash-body); font-weight: 600; color: var(--fg-primary); overflow: hidden; line-height: 1.3; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; }
   .bcard__sub { font-size: var(--dash-caption); color: var(--fg-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .bcard__meta { display: flex; flex-wrap: wrap; gap: 6px; min-height: 24px; }
   .bcard__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 9px; border-top: 1px solid var(--border-subtle); }

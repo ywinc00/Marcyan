@@ -175,7 +175,7 @@
   .imp-file { padding-block: 8px; height: auto; }
   .imp-box { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; gap: 12px; background: var(--bg-elevated); }
   .imp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-  .imp-cap { font: 500 var(--dash-caption)/1.2 var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); }
+  .imp-cap { font: 500 var(--dash-caption)/1.2 var(--font-body); letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle); }
   .imp-seg { display: inline-flex; flex-wrap: wrap; gap: 4px; }
   .imp-seg button { min-height: 32px; padding: 5px 11px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: transparent; color: var(--fg-secondary); font: 500 var(--dash-small)/1.2 var(--font-body); cursor: pointer; }
   .imp-seg button[aria-pressed='true'] { background: var(--surface-3); border-color: var(--border-strong); color: var(--fg-primary); }

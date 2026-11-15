@@ -568,8 +568,9 @@
   .seo-tab:hover { color: var(--fg-primary); }
   .seo-tab[aria-current='page'] { color: var(--fg-primary); }
   .seo-tab[aria-current='page']::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--fg-primary); border-radius: 2px; }
-  .seo-tabs__meta { margin: 0 0 9px; display: flex; flex-wrap: wrap; gap: 4px 16px; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); }
+  .seo-tabs__meta { margin: 0 0 9px; display: flex; flex-wrap: wrap; gap: 4px 10px; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); }
   .seo-tabs__meta span { overflow-wrap: anywhere; }
+  .seo-tabs__meta span + span::before { content: '·'; margin-right: 10px; color: var(--fg-faint); }
 
   .seo-stack { display: flex; flex-direction: column; gap: 14px; transition: opacity var(--duration-fast); }
   .seo-stack > :global(.ui-kpis) { margin: 0; }
@@ -600,6 +601,11 @@
   .qs__cols > :nth-child(n+3) { text-align: right; }
   .qs__bar { display: block; height: 4px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); overflow: hidden; }
   .qs__bar i { display: block; height: 100%; border-radius: 999px; background: #6a6a6a; }
+  /* Tableta y portátil estrecho: la barra (adorno) cede su sitio a la búsqueda, que no se corta. */
+  @media (max-width: 1099px) {
+    .qs__cols, .qs__row { grid-template-columns: minmax(0, 1fr) 52px 88px 60px 64px; }
+    .qs__bar, .qs__cols > :nth-child(2) { display: none; }
+  }
   .qs__box { flex: 1 1 auto; min-height: 0; overflow: hidden; }
   .qs__rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
   .qs__row { min-height: 32px; padding: 0 12px; background: #242424; border: 1px solid var(--border-subtle); border-radius: 8px; font-size: var(--dash-small); }

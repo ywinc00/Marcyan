@@ -93,7 +93,7 @@
                 <span class="sc-meta">
                   {#if s.category}<StatusChip tone="neutral" label={categoryLabel(s.category)} />{/if}
                   {#if s.billing === 'variable'}<StatusChip tone="neutral" label="Cambia cada mes" />{/if}
-                  {#if s.intro_until && s.active && String(s.intro_until).slice(0, 10) > new Date().toISOString().slice(0, 10)}<StatusChip tone="warning" label={`Precio de entrada hasta ${fmtDay(s.intro_until)}`} />{/if}
+                  {#if s.intro_until && s.active && String(s.intro_until).slice(0, 10) > new Date().toISOString().slice(0, 10)}<StatusChip tone="warning" label={`${Number(s.intro_amount_cents || 0) === 0 ? 'Gratis' : 'Rebajada'} hasta ${fmtDay(s.intro_until)}`} />{/if}
                   {#if !s.active}<span>{s.ended_at ? `De baja desde ${fmtDay(s.ended_at)}` : 'Pausada'}</span>
                   {:else if s.next_charge_at}<span>Próximo cargo {fmtDay(s.next_charge_at)}{s.started_at ? `; la pagas desde ${fmtDay(s.started_at)}` : ''}</span>
                   {:else}<span>Sin fecha de cargo</span>{/if}
@@ -134,7 +134,8 @@
   .sc-row:first-child { border-top: 0; }
   .sc-row.is-off .sc-main, .sc-row.is-off .sc-price, .sc-row.is-off :global(.brandlogo) { opacity: .55; }
   .sc-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
-  .sc-name { font-size: var(--dash-body); font-weight: 500; color: var(--fg-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* El nombre nunca se corta: en pantallas estrechas pasa a dos líneas. */
+  .sc-name { font-size: var(--dash-body); font-weight: 500; color: var(--fg-primary); overflow-wrap: anywhere; }
   .sc-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: var(--dash-caption); color: var(--fg-subtle); }
   .sc-price { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex: 0 0 auto; }
   .sc-amount { font-size: var(--dash-small); color: var(--fg-primary); font-variant-numeric: tabular-nums; }
@@ -153,12 +154,15 @@
   @media (pointer: coarse) {
     .sc-toggle::after { content: ''; position: absolute; inset: -12px -6px; }
   }
-  /* Móvil: logo | datos | precio arriba y las acciones bajo el precio. */
+  /* Móvil: logo | nombre | precio arriba; debajo, las etiquetas a todo el ancho y las
+     acciones en su propia línea, para que nada se monte encima de los botones. */
   @media (max-width: 479px) {
-    .sc-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; column-gap: 12px; row-gap: 4px; align-items: start; }
-    .sc-row > :global(.brandlogo) { grid-row: 1 / 3; margin-top: 2px; }
-    .sc-main { grid-column: 2; grid-row: 1 / 3; }
+    .sc-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; column-gap: 12px; row-gap: 6px; align-items: start; }
+    .sc-row > :global(.brandlogo) { grid-column: 1; grid-row: 1; margin-top: 2px; }
+    .sc-main { display: contents; }
+    .sc-name { grid-column: 2; grid-row: 1; padding-top: 4px; }
     .sc-price { grid-column: 3; grid-row: 1; }
-    .sc-acts { grid-column: 3; grid-row: 2; justify-self: end; }
+    .sc-meta { grid-column: 2 / -1; grid-row: 2; }
+    .sc-acts { grid-column: 2 / -1; grid-row: 3; justify-self: end; }
   }
 </style>

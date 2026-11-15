@@ -77,3 +77,16 @@ formulario (número de línea en `--fg-subtle`, concepto, total tabular, despleg
 
 Sub-agentes: crítica adversarial de los bocetos (E-64) antes de enseñarlos.
 Ledger aplicable: E-11, E-17, E-19, E-28, E-55, E-61, E-62, E-64, E-68.
+
+## Añadido 2026-11-14 · Agente contable (fase 2)
+Estado: PROPUESTO dentro de la dirección validada (no abre gramática nueva); OK final sobre el render.
+- **Portada (Año), encima del libro del año:** tarjeta «El agente propone» con la misma anatomía que «Por
+  revisar» (Movimientos): cabecera con número, una fila por propuesta con título, una línea de porqué y el
+  monto a la derecha si lo hay. Acciones por fila: «Aplicar» + «Descartar» (o «Entendido» en un aviso) y
+  «Ver en Finanzas». Sin propuestas, la tarjeta no ocupa sitio. Piezas: E-06 (lista con acción por fila),
+  E-08 (vacío que no ocupa sitio), H-07 (acción principal por fila, no por página).
+- **Ajustes → Agente contable:** mismas filas que el resto de Ajustes (texto a la izquierda, control a la
+  derecha): encendido, tope de gasto de IA al mes con lo gastado, «Revisar ahora» y últimas revisiones con
+  su coste. En teléfono cada fila se apila (arreglado: la base flexible en columna inflaba el alto).
+- NO tarjeta de «IA» con brillos ni iconos de chispa → SÍ el mismo tono de las demás tarjetas: el agente es
+  una fuente más de cosas por revisar, no una función aparte.

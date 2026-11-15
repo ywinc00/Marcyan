@@ -259,3 +259,12 @@ Lo que se cambia (sobre lo que hoy hay; E-75: nada de lo que se ve hoy desaparec
 
 Piezas: H-06, H-05, H-07, G-08, C-06 (cifra con procedencia), E-08/E-09/E-10 (vacío, carga, error).
 Ledger aplicable: E-54, E-01, E-27, E-62, E-64, E-75, E-17, E-30.
+
+### Resultado de la fase 3 (2026-11-15) · PROPUESTO al dueño sobre el render
+Construido en `feat/finanzas-libros`. Hubo 5 rondas de crítica adversarial independiente: 6 → 7 → 7,5 → 8 → 8,5/10. El crítico da el visto bueno para enseñarlo.
+- Matriz de 90 capturas (10 secciones a 320, 360, 390, 768, 1024, 1366, 1440, 1920 y 2560). El detector se probó con recortes plantados. Mide: filas cortadas, textos con «…» o recortados por líneas, buscadores que no caben, choque entre texto y objeto (12 px), desplazamiento lateral y errores. Sale a 0. Los únicos «…» son los de la bandeja de Marcy y la tabla de Leads en escritorio, que son a propósito.
+- Inicio cabe en 1366×768, 1440×900, 1920 y 2560 (con un tope de 1000 px de alto). El Resumen de SEO también: tres columnas por debajo de 820 de alto.
+- Objetos de las cifras: 88 px, propios por cada dato. Son los de la lámina (hojas, carpeta, fichas con visto) más sobre, billetes, puntero, página de resultados, podio, personas, campana, aviso, pausa y cohete. En el teléfono, el objeto pasa a una franja bajo la nota cuando la nota no cabe a su lado.
+- Chip de estado neutro con un punto de color, sin azul. Rótulos en mono y minúscula. Sin códigos PRJ, CLI ni LEAD a la vista; MRC se queda porque es el número del brief que ve el cliente.
+- Capturas de la versión final en `design/orbit-rediseno/render/`.
+- Pendiente aparte, no es de este trabajo: la prueba PUB-01/02 de `test:crm` falla también en producción, porque busca el formulario en `Contact.astro` y vive en `FormContacto.astro`.

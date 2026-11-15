@@ -1,6 +1,6 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-11-14",
+  "fecha": "2026-11-15",
   "primeraEjecucion": false,
   "sitemap": 52,
   "inspeccion": true,
@@ -79,7 +79,7 @@
   },
   "sinRastreoReciente": 10,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 61,
+  "certificadoDias": 60,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 52
@@ -113,11 +113,11 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 5,
+    "sesionesUltimos3Dias": 22,
     "sesionesDiaHabitual": 9.1,
     "contactosSemanaHabitual": 0.1,
-    "diasSinContactos": 0,
-    "probabilidadAzar": 1
+    "diasSinContactos": 1,
+    "probabilidadAzar": 0.984
   },
   "lectoresIa": {
     "bloqueadosPorRobots": {},
@@ -151,7 +151,7 @@
     "alta": [],
     "media": [
       {
-        "fecha": "2026-11-14",
+        "fecha": "2026-11-15",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
@@ -161,7 +161,7 @@
     ],
     "info": [
       {
-        "fecha": "2026-11-14",
+        "fecha": "2026-11-15",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",
@@ -172,6 +172,6 @@
   },
   "alertasNuevas": [],
   "pedirIndexacion": [],
-  "colaPendiente": 32,
+  "colaPendiente": 34,
   "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"
 }

@@ -7,12 +7,12 @@
 
 import Button from '../../ui/Button.astro';
 import IconoObjeto from '../IconoObjeto.astro';
-import { serviciosPara, recursos, ciudades, navW, contactoPara, navIcon, type NavLang } from '../../../i18n/w/nav';
+import { gruposServicios, recursos, ciudades, navW, contactoPara, navIcon, type NavLang } from '../../../i18n/w/nav';
 
 interface Props { lang?: NavLang; currentPath?: string }
 const { lang = 'es', currentPath } = Astro.props;
 const ui = navW[lang] ?? navW.es;
-const items = serviciosPara(lang, currentPath);
+const grupos = gruposServicios(lang, currentPath);
 const res = recursos[lang] ?? recursos.es;
 const cities = ciudades[lang] ?? ciudades.es;
 const c = contactoPara(currentPath);
@@ -25,18 +25,25 @@ const ariaCurrent = (href: string) =>
 <div class="dg">
   <div class="dg__group" role="group" aria-labelledby="dg-services">
     <p class="dg__head" id="dg-services">{ui.groups.services}</p>
+    {grupos.map((g) => (
+      <>
+        <p class="dg__sub" id={`dg-g-${g.key}`}>{g.label}</p>
+        <ul class="dg__list" aria-labelledby={`dg-g-${g.key}`}>
+          {g.items.map((s) => (
+            <li>
+              <a class="dg__svc" href={s.href}>
+                <IconoObjeto id={s.id} size={40} />
+                <span class="dg__txt">
+                  <span class="dg__name">{s.name}</span>
+                  <span class="dg__promise">{s.promise}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </>
+    ))}
     <ul class="dg__list">
-      {items.map((s) => (
-        <li>
-          <a class="dg__svc" href={s.href}>
-            <IconoObjeto id={s.id} size={40} />
-            <span class="dg__txt">
-              <span class="dg__name">{s.name}</span>
-              <span class="dg__promise">{s.promise}</span>
-            </span>
-          </a>
-        </li>
-      ))}
       <li>
         <a class="dg__all" href={ui.allServices.href} aria-current={ariaCurrent(ui.allServices.href)}>
           {ui.allServices.label}<span class="dg__chev" aria-hidden="true">›</span>
@@ -93,6 +100,8 @@ const ariaCurrent = (href: string) =>
     color: var(--w-ink-60);
   }
   .dg__list, .dg__cols { list-style: none; margin: 0; padding: 0; }
+  /* Subgrupo de servicios por el trabajo que hacen (Te encuentran · Te eligen · Te contestan). */
+  .dg__sub { margin: 10px 0 0; font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--w-tr-micro, .1em); text-transform: uppercase; color: var(--accent-gold); }
   .dg__cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 12px; }
 
   .dg__svc {

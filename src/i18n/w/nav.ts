@@ -92,6 +92,26 @@ export function serviciosPara(lang: NavLang, currentPath?: string): MegaServicio
   return base.map((s) => (MIAMI_ES[s.id] ? { ...s, href: MIAMI_ES[s.id]! } : s));
 }
 
+/** Servicios agrupados por el trabajo que hacen por el cliente (encargo del megamenú, OK del dueño
+ *  31-oct sobre el laboratorio; agrupado el 15-nov): primero te encuentran, luego te eligen y al
+ *  final te contestan. Mantenimiento va con «Te eligen»: mantiene en pie la web que convence. */
+export interface GrupoServicios { key: 'encuentran' | 'eligen' | 'contestan'; label: string; items: MegaServicio[] }
+const GRUPOS: { key: GrupoServicios['key']; label: Record<NavLang, string>; ids: IconoId[] }[] = [
+  { key: 'encuentran', label: { es: 'Te encuentran', en: 'Get found' }, ids: ['seo-local', 'seo-ia'] },
+  { key: 'eligen', label: { es: 'Te eligen', en: 'Get chosen' }, ids: ['diseno-web', 'ecommerce', 'branding', 'mantenimiento'] },
+  { key: 'contestan', label: { es: 'Te contestan', en: 'Always answer' }, ids: ['ia-conversacional'] },
+];
+export function gruposServicios(lang: NavLang, currentPath?: string): GrupoServicios[] {
+  const items = serviciosPara(lang, currentPath);
+  const byId = new Map(items.map((s) => [s.id, s]));
+  const grupos = GRUPOS.map((g) => ({ key: g.key, label: g.label[lang], items: g.ids.map((id) => byId.get(id)).filter(Boolean) as MegaServicio[] }));
+  // Ningún servicio se queda fuera del menú si mañana se añade uno al catálogo.
+  const usados = new Set(GRUPOS.flatMap((g) => g.ids));
+  const sueltos = items.filter((s) => !usados.has(s.id));
+  if (sueltos.length) grupos[1].items.push(...sueltos);
+  return grupos;
+}
+
 export const recursos: Record<NavLang, NavRecurso[]> = {
   es: [
     { label: 'Blog', href: '/es/blog', icon: 'lucide:pen-line' },

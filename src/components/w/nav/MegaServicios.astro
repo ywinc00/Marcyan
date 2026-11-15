@@ -7,33 +7,38 @@
 // Cerrojo 5: sale de v3, TODO su CSS aquí y solo lee variables.
 import IconoObjeto from '../IconoObjeto.astro';
 import MegaRecursos from './MegaRecursos.astro';
-import { serviciosPara, navW, type NavLang } from '../../../i18n/w/nav';
+import { gruposServicios, navW, type NavLang } from '../../../i18n/w/nav';
 
 interface Props { lang?: NavLang; currentPath?: string }
 const { lang = 'es', currentPath } = Astro.props;
-const items = serviciosPara(lang, currentPath);
+const grupos = gruposServicios(lang, currentPath);
 const ui = navW[lang] ?? navW.es;
 ---
 <div id="nav-mega" class="mega" data-nav-mega hidden>
   <div class="mega__in">
-    <ul class="mega__grid">
-      {items.map((s) => (
-        <li>
-          <a class="mega__cell" href={s.href}>
-            <IconoObjeto id={s.id} size={48} />
-            <span class="mega__txt">
-              <span class="mega__name">{s.name}</span>
-              <span class="mega__promise">{s.promise}</span>
-            </span>
-          </a>
-        </li>
+    <div class="mega__grid">
+      {grupos.map((g) => (
+        <div class:list={['mega__group', `mega__group--${g.key}`]} role="group" aria-labelledby={`mega-g-${g.key}`}>
+          <p class="mega__head" id={`mega-g-${g.key}`}>{g.label}</p>
+          <ul class="mega__list">
+            {g.items.map((s) => (
+              <li>
+                <a class="mega__cell" href={s.href}>
+                  <IconoObjeto id={s.id} size={48} />
+                  <span class="mega__txt">
+                    <span class="mega__name">{s.name}</span>
+                    <span class="mega__promise">{s.promise}</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       ))}
-      <li>
-        <a class="mega__cell mega__all" href={ui.allServices.href}>
-          <span>{ui.allServices.label}</span><span class="mega__chev" aria-hidden="true">›</span>
-        </a>
-      </li>
-    </ul>
+      <a class="mega__cell mega__all" href={ui.allServices.href}>
+        <span>{ui.allServices.label}</span><span class="mega__chev" aria-hidden="true">›</span>
+      </a>
+    </div>
     <span class="mega__rule" aria-hidden="true"></span>
     <MegaRecursos lang={lang} />
   </div>
@@ -63,11 +68,23 @@ const ui = navW[lang] ?? navW.es;
   /* Tableta (panel más estrecho que 900): los recursos ceden ancho a los productos. */
   @media (--lt-lg) { .mega__in { grid-template-columns: minmax(0, 2.6fr) 1px minmax(0, 1fr); } }
 
+  /* Tres grupos por el trabajo que hacen (pieza H-05: rótulo mono como firma de cada grupo).
+     Izquierda: «Te encuentran» y debajo «Te contestan»; derecha: «Te eligen», el más largo.
+     El orden del HTML sigue siendo el de lectura (encuentran, eligen, contestan). */
   .mega__grid {
-    list-style: none; margin: 0; padding: 0;
-    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: repeat(4, auto); grid-auto-flow: column;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 0;
+    grid-template-areas: "a b" "c b" "d b"; grid-template-rows: auto auto 1fr; align-content: start;
   }
+  .mega__group--encuentran { grid-area: a; }
+  .mega__group--eligen { grid-area: b; }
+  .mega__group--contestan { grid-area: c; margin-top: 8px; }
+  .mega__grid > .mega__all { grid-area: d; align-self: end; }
+  .mega__head {
+    margin: 8px 16px 4px;
+    font-family: var(--font-mono); font-size: var(--text-xs); font-weight: 500;
+    letter-spacing: var(--w-tr-micro, .1em); text-transform: uppercase; color: var(--accent-gold);
+  }
+  .mega__list { list-style: none; margin: 0; padding: 0; }
   .mega__cell {
     display: flex; align-items: center; gap: 16px;
     min-height: 84px; padding: 12px 16px; border-radius: var(--w-r-cell, 8px);

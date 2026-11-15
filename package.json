@@ -29,6 +29,7 @@
     "test:finance": "node --experimental-test-module-mocks --no-warnings scripts/test-finance.mjs",
     "test:finance-books": "node --experimental-test-module-mocks --no-warnings scripts/test-finance-books.mjs",
     "test:finance-agent": "node --experimental-test-module-mocks --no-warnings scripts/test-finance-agent.mjs",
+    "test:ficha-llamada": "node scripts/test-ficha-llamada.mjs",
     "test:finance-retention": "node scripts/test-finance-retention.mjs",
     "test:projects": "node scripts/test-projects.mjs",
     "test:seo": "node scripts/test-seo.mjs",

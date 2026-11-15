@@ -202,3 +202,21 @@ una lista larga. Los avisos de carga al lector de pantalla salen de una sola reg
 NO → SÍ: NO rueda en mitad de la pantalla → SÍ armazón con la forma del panel. NO hueco de 48 px que luego crece →
 SÍ hueco con la altura real reservado desde el principio. NO volver al esqueleto al actualizar → SÍ datos a la vista
 y «Actualizando». NO `*{.01ms !important}` → SÍ variante reducida por pieza (brillo quieto, avisos sin desplazamiento).
+
+## Añadido 2026-11-14 · Fase 3 del plan del panel: iconos, cifras, logos, estados e Inicio
+Estado: PROPUESTO (tres direcciones en `design/orbit-rediseno/bocetos.html`), pendiente de que el dueño elija.
+OK previo del dueño: rehacer KpiArt y BrandLogo («Sí, rehazlos»); esto levanta la prohibición de tocarlos.
+- Inventario que se conserva (E-75): saludo, las cuatro cifras con su frase de contexto, actividad por mes, leads
+  por estado, proyectos y leads recientes, actividad acumulada, resumen de Finanzas, contador de Avisos.
+- Común a las tres: una familia de iconos con licencia libre (E-27: se elige viéndolas aplicadas), sin repetidos
+  (Leads y Finanzas compartían sobre); logos reales de Simple Icons (CC0) en Suscripciones con nombre y monto,
+  sin la categoría cruda; mapa de estados forma + color + palabra; orígenes de lead en etiqueta neutra (H-07);
+  nada de ids de sistema a la vista (Avisos enseñaba «LEAD-118», E-10).
+- A «La lista del día»: lista Hoy con un botón por fila encima de las cifras; cifras sin dibujo con seis barras reales.
+- B «Cabina de dos columnas»: cifras en franja sin cajas (C-06) y columna Hoy fija a la derecha.
+- C «Bandeja por prioridad»: Ahora / Hoy / Esta semana, misma bandeja en Inicio y Avisos; cifras compactas con icono.
+- Referencias miradas en imagen (Refero): Linear 4a094449 (iconos de trazo y estados por forma), Programa
+  1ffacf09 (acciones del día con un botón por fila), RevenueCat af663f13 (cifras sin adorno), Mercury 320c6124
+  (franja de cifras y texto que explica el número).
+- Piezas: G-08 (una familia de iconos), H-07 (presupuesto del acento), C-06 (cifras con procedencia), B-01 (lista de
+  filas de ancho completo), E-08/E-09/E-10 (vacío, carga y error). Ledger: E-27, E-61, E-73, E-75, E-19, E-16.

@@ -28,7 +28,8 @@ export function axisNum(n) {
 /** Proporción 0..1 → '3,4 %'. */
 export function pct(n) {
   if (n == null || !Number.isFinite(+n)) return '—';
-  return (Math.round(+n * 1000) / 10).toLocaleString('es-US', { maximumFractionDigits: 1 }) + ' %';
+  // Siempre con un decimal (5.0 % junto a 7.7 %): la columna se lee alineada.
+  return (Math.round(+n * 1000) / 10).toLocaleString('es-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %';
 }
 
 /** Posición media con un decimal. */

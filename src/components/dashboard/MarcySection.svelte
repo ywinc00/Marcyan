@@ -269,7 +269,7 @@
       {#each steps as s, i (s.label)}
         <button type="button" class="step" aria-pressed={i === 0 ? !q.paso && !q.f && !q.motivo : q.paso === s.id} onclick={() => pickStep(s.id)}>
           <span class="step__label">{s.label}</span>
-          <span class="step__n">{s.n}{#if s.drop}<em>−{s.drop}</em>{/if}</span>
+          <span class="step__n">{s.n}{#if s.drop}<em title="Se quedaron en este paso">↓ {s.drop}</em>{/if}</span>
           <span class="step__bar"><i style="width:{s.pct}%"></i></span>
         </button>
       {/each}
@@ -320,7 +320,7 @@
                   <span class="item__r1"><b class="item__t">{title(r)}</b><StatusChip tone={om.tone} label={om.label} /></span>
                   <span class="item__q">{r.last_reply || ''}</span>
                   <span class="item__m">
-                    <span class:fail-txt={!!r.fallo}>{#if r.fallo}{motivoLabel(r.fallo.motivo)} · mensaje {r.fallo.turno}{:else if r.lead_ref}{r.lead_ref}{:else}{meta(r)}{/if}</span>
+                    <span class:fail-txt={!!r.fallo}>{#if r.fallo}{motivoLabel(r.fallo.motivo)} · mensaje {r.fallo.turno}{:else if r.lead_ref}Dejó sus datos{:else}{meta(r)}{/if}</span>
                     <span class="item__when">{rel(r.last_at)}</span>
                   </span>
                 </button>
@@ -411,7 +411,7 @@
             <dt>Mensajes</dt><dd>{conv.turnos.length}</dd>
             <dt>Último</dt><dd>{rel(conv.last_at)}</dd>
             <dt>Coste</dt><dd>{usd(conv.cost_micro_usd, 3)}</dd>
-            {#if conv.lead_ref}<dt>Registro</dt><dd>{#if leadHref(conv.lead_ref)}<a href={leadHref(conv.lead_ref)}>{conv.lead_ref}</a>{:else}{conv.lead_ref}{/if}</dd>{/if}
+            {#if conv.lead_ref}<dt>Registro</dt><dd>{#if leadHref(conv.lead_ref)}<a href={leadHref(conv.lead_ref)}>Ver el lead</a>{:else}Lead guardado{/if}</dd>{/if}
           </dl>
         </div>
         <div class="rail__del">
@@ -425,7 +425,7 @@
     <ConfirmDialog bind:open={delOpen} title="Borrar conversación" confirmLabel="Borrar para siempre" busy={delBusy} onconfirm={borrar}
       message={`Se borrarán los ${conv.turnos.length} mensajes de esta conversación${conv.contact ? ' con ' + (conv.contact_name || conv.contact) : ''}. No se puede deshacer.`}>
       {#if conv.lead_ref && /^LEAD-/i.test(conv.lead_ref)}
-        <label class="del-check"><input type="checkbox" bind:checked={delLead} disabled={delBusy} /> Borrar también {conv.lead_ref} y sus citas</label>
+        <label class="del-check"><input type="checkbox" bind:checked={delLead} disabled={delBusy} /> Borrar también su lead y sus citas</label>
       {/if}
     </ConfirmDialog>
   {/if}
@@ -433,7 +433,7 @@
 
 <style>
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); }
-  .cap { margin: 0 0 8px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); }
+  .cap { margin: 0 0 8px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle); }
   .muted { color: var(--fg-subtle); }
   .small { font-size: var(--dash-caption); line-height: 1.5; }
 
@@ -441,6 +441,11 @@
   .seg { display: inline-flex; padding: 3px; gap: 2px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius-md); }
   .seg button { min-height: 32px; padding: 5px 12px; border: 0; border-radius: 7px; background: transparent; color: var(--fg-secondary); font: inherit; font-size: var(--dash-small); font-weight: 500; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
   .seg button:hover { color: var(--fg-primary); }
+  /* Teléfono estrecho: las cuatro pestañas reparten el ancho en vez de salirse (E-62). */
+  @media (max-width: 399px) {
+    .seg { display: flex; width: 100%; }
+    .seg button { flex: 1 1 auto; justify-content: center; padding: 5px 6px; }
+  }
   .seg button[aria-selected='true'] { background: var(--surface-3); color: var(--fg-primary); }
   .seg button:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
   .seg__live { min-width: 18px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--accent-teal-dim); color: var(--accent-teal); font-size: var(--dash-caption); font-weight: 600; }
@@ -452,19 +457,24 @@
   .step:last-child { border-right: 0; }
   .step:hover { background: var(--bg-elevated); }
   .step:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; }
-  .step[aria-pressed='true'] { background: var(--bg-elevated); box-shadow: inset 0 -2px 0 var(--accent-gold); }
+  .step[aria-pressed='true'] { background: var(--bg-elevated); box-shadow: inset 0 -2px 0 var(--fg-primary); }
   .step__label { font-size: var(--dash-small); color: var(--fg-secondary); }
   .step__n { font-size: 26px; font-weight: 650; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
-  .step__n em { font-style: normal; font-size: var(--dash-caption); font-weight: 600; color: var(--color-warning, #f5b338); margin-left: 6px; }
+  .step__n em { font-style: normal; font-family: var(--font-mono); font-size: var(--dash-mono); font-weight: 400; color: var(--fg-subtle); margin-left: 8px; letter-spacing: 0; }
   .step__bar { height: 4px; border-radius: 4px; background: var(--bg-elevated); overflow: hidden; margin-top: auto; }
-  .step__bar i { display: block; height: 100%; background: var(--accent-teal); border-radius: 4px; }
+  .step__bar i { display: block; height: 100%; background: var(--fg-secondary); border-radius: 4px; }
   .step--side { background: rgba(96, 165, 250, .04); }
   .why { padding: 14px 18px 10px; }
   .why ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
   .why button { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 90px 26px; align-items: center; gap: 10px; padding: 6px 8px; margin: 0 -8px; border: 0; border-radius: var(--radius-sm); background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
   .why button:hover, .why button[aria-pressed='true'] { background: var(--bg-elevated); }
   .why button:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 1px; }
-  .why__t { font-size: var(--dash-small); color: var(--fg-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .why__t { font-size: var(--dash-small); color: var(--fg-secondary); overflow: hidden; line-height: 1.3; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; }
+  /* Teléfono: el motivo baja a dos líneas en vez de cortarse (E-62). */
+  @media (max-width: 479px) {
+    .why button { grid-template-columns: minmax(0, 1fr) 64px 22px; }
+    .why__t { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.3; }
+  }
   .why b { text-align: right; font-variant-numeric: tabular-nums; }
   /* Huecos de la primera carga: misma línea que el número y el motivo reales. */
   .sk-n { display: inline-block; width: 52px; height: .9em; vertical-align: middle; }
@@ -473,7 +483,8 @@
   .step:disabled, .why button:disabled { cursor: default; }
   .step:disabled:hover, .why button:disabled:hover { background: transparent; }
   .why__bar { height: 6px; border-radius: 4px; background: var(--bg-elevated); overflow: hidden; }
-  .why__bar i { display: block; height: 100%; background: var(--color-warning, #f5b338); border-radius: 4px; }
+  /* Fase 3: barras de proporción en gris claro (como la referencia); el ámbar competía con el naranja. */
+  .why__bar i { display: block; height: 100%; background: var(--fg-secondary); border-radius: 4px; }
 
   /* ── Consola de tres columnas ── */
   .console { scroll-margin-top: 72px; display: grid; grid-template-columns: 320px minmax(0, 1fr) 280px; height: min(74vh, 760px); min-height: 520px; overflow: hidden; }
@@ -498,7 +509,7 @@
   .item__m > :first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .item { min-width: 0; }
   .item__when { white-space: nowrap; }
-  .fail-txt { color: var(--color-warning, #f5b338); }
+  .fail-txt { color: var(--fg-secondary); }
 
   .thread { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
   .thread__head { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: 1px solid var(--border-subtle); }
@@ -520,7 +531,7 @@
   .toolcard { align-self: flex-end; display: inline-flex; gap: 6px; align-items: center; padding: 5px 10px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-elevated); color: var(--fg-secondary); font-size: var(--dash-caption); }
   .ev { align-self: flex-end; font-size: var(--dash-caption); color: var(--fg-subtle); }
   .ev--warn { color: var(--color-warning, #f5b338); }
-  .ev--live { align-self: center; color: var(--accent-teal); }
+  .ev--live { align-self: center; color: var(--fg-subtle); }
   .failbox { align-self: stretch; padding: 9px 12px; border: 1px solid rgba(245, 179, 56, .45); border-radius: 10px; background: rgba(245, 179, 56, .06); color: var(--color-warning, #f5b338); font-size: var(--dash-small); }
   .failbox--rail { display: flex; flex-direction: column; gap: 2px; }
   .failbox--rail span { color: var(--fg-secondary); font-size: var(--dash-caption); }

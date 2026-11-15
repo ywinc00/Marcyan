@@ -6,7 +6,16 @@
   import { untrack } from 'svelte';
   import { api } from '../lib/api.js';
   import { toastError } from '../lib/toast.svelte.js';
-  import { fmtDateTime, rel } from '../lib/dates.js';
+  import { fmtDateTime, fmtDate, rel } from '../lib/dates.js';
+  // «Recibido hace 3 días» / «Recibido el 07 nov 2026»: una sola forma de leerlo.
+  function recibido(v) {
+    const r = rel(v);
+    if (!r) return '';
+    if (r === 'ahora' || /^\d+[mh]$/.test(r)) return 'Recibido hoy';
+    const d = r.match(/^(\d+)d$/);
+    if (d) return d[1] === '1' ? 'Recibido ayer' : `Recibido hace ${d[1]} días`;
+    return 'Recibido el ' + fmtDate(v);
+  }
   import { route, setQuery, href } from '../lib/router.svelte.js';
   import PageHeader from '../ui/PageHeader.svelte';
   import KpiGrid from '../ui/KpiGrid.svelte';
@@ -172,7 +181,7 @@
 <label class="search">
   <span class="search__icon" aria-hidden="true"><Icon name="search" size={16} /></span>
   <span class="sr-only">Buscar briefs</span>
-  <input class="ui-input search__input" type="search" placeholder="Buscar negocio, persona o MRC"
+  <input class="ui-input search__input" type="search" placeholder="Buscar briefs" title="Busca por negocio, persona o número MRC"
     value={searchText} oninput={onSearchInput}
     onfocus={() => (searchFocused = true)} onblur={() => (searchFocused = false)} />
 </label>
@@ -218,7 +227,7 @@
         </div>
         <div class="bcard__foot">
           <span class="mono">{r.project_id}</span>
-          <span class="mono soft" title={fmtDateTime(r.created_at)}>Recibido {rel(r.created_at)}</span>
+          <span class="mono soft" title={fmtDateTime(r.created_at)}>{recibido(r.created_at)}</span>
         </div>
       </a>
     {/each}
@@ -247,6 +256,7 @@
     .kpis :global(.ui-kpis[data-count="4"] > .funnel-cell) { grid-column: 1 / -1; }
   }
   .funnel-cell { display: flex; flex-direction: column; }
+  .funnel-cell .funnel { margin-top: 12px; }
   .funnel-empty { margin: 6px 0 0; color: var(--fg-subtle); font-size: var(--dash-small); }
   .block { margin-bottom: var(--space-5); }
 
@@ -259,7 +269,7 @@
     cursor: pointer; transition: border-color var(--duration-fast), background-color var(--duration-fast), color var(--duration-fast);
   }
   .pill:hover { border-color: var(--border-strong); color: var(--fg-primary); }
-  .pill[aria-pressed="true"] { background: var(--accent-gold-dim); border-color: var(--accent-gold-line); color: var(--fg-primary); }
+  .pill[aria-pressed="true"] { background: var(--surface-3); border-color: var(--border-strong); color: var(--fg-primary); }
   /* Hueco del recuento mientras llegan las cifras: la fila no cambia de ancho (E-09). */
   .pill__hueco { display: inline-block; width: 22px; height: 14px; vertical-align: middle; }
   .pill__n { min-width: 18px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--bg-elevated); color: var(--fg-secondary); font-size: var(--dash-caption); text-align: center; font-variant-numeric: tabular-nums; }
@@ -284,7 +294,8 @@
   .bcard:hover { background: var(--bg-elevated); border-color: var(--border-strong); }
   .bcard__top { display: flex; align-items: center; gap: 10px; }
   .bcard__id { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
-  .bcard__name { font-size: var(--dash-body); font-weight: 600; color: var(--fg-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* El nombre del negocio baja a dos líneas antes que cortarse (E-62). */
+  .bcard__name { font-size: var(--dash-body); font-weight: 600; color: var(--fg-primary); overflow: hidden; line-height: 1.3; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; }
   .bcard__sub { font-size: var(--dash-caption); color: var(--fg-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .bcard__meta { display: flex; flex-wrap: wrap; gap: 6px; min-height: 24px; }
   .bcard__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 9px; border-top: 1px solid var(--border-subtle); }

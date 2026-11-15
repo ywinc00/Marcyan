@@ -240,7 +240,7 @@
   .grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(300px, 1fr); gap: var(--space-5); align-items: start; }
   .col { display: flex; flex-direction: column; gap: var(--space-5); min-width: 0; }
   .sk-grid { display: grid; grid-template-columns: 1.65fr 1fr; gap: var(--space-5); margin-top: var(--space-5); }
-  .cap { margin: 0 0 4px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); }
+  .cap { margin: 0 0 4px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle); }
   .cap--gap { margin-top: var(--space-4); }
   .interest { margin: 0; font-size: var(--dash-body); color: var(--fg-primary); line-height: 1.5; }
   .msg { white-space: pre-wrap; word-break: break-word; line-height: 1.6; color: var(--fg-primary); font-size: var(--dash-body); padding: 12px 14px; background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); max-height: 420px; overflow-y: auto; }
@@ -248,7 +248,7 @@
   .small { font-size: var(--dash-small); color: var(--fg-subtle); margin-top: var(--space-3); }
   .links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
   .links li { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
-  .links__k { width: 56px; flex: 0 0 auto; font-size: var(--dash-caption); text-transform: uppercase; letter-spacing: var(--tracking-wide); color: var(--fg-subtle); }
+  .links__k { width: 56px; flex: 0 0 auto; font-size: var(--dash-caption); text-transform: none; font-family: var(--font-mono); letter-spacing: 0; color: var(--fg-subtle); }
   .links__v { color: var(--fg-primary); font-weight: 500; text-decoration: none; }
   .links__v:hover { text-decoration: underline; }
   .hint-dup { display: flex; gap: 8px; align-items: flex-start; margin: var(--space-3) 0 0; font-size: var(--dash-small); color: var(--fg-secondary); line-height: 1.45; }

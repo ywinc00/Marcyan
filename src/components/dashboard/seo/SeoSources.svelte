@@ -15,6 +15,7 @@
     through = {},          // { gsc: 'YYYY-MM-DD', ga4: 'YYYY-MM-DD' } último día con datos
     syncing = false,
     onedit, onstatus,
+    mode = 'full',         // fase 3: 'alerts' = solo se pinta si alguna fuente pide atención
   } = $props();
 
   const has = $derived({ gsc: Boolean(project?.gsc_site_url), ga4: Boolean(project?.ga4_property_id), indexation: Boolean(project?.gsc_site_url) });
@@ -46,8 +47,12 @@
   const views = $derived(Object.fromEntries(keys.map((k) => [k, view(k)])));
   const triggerTxt = $derived(state && state.trigger === 'cron' ? 'automático' : 'manual');
   const generalErr = $derived(state && state.error ? state.error : null);
+  const allQuiet = $derived(!generalErr && keys.every((k) => !views[k].err && !views[k].fix && views[k].tone !== 'error' && views[k].tone !== 'warning'));
 </script>
 
+{#if mode === 'alerts' && allQuiet}
+  <!-- Todo al día: el detalle de cada fuente está en «Estado de Google». -->
+{:else}
 <Card flush>
   <div class="src-head">
     <p class="src-head__t">
@@ -88,6 +93,7 @@
     {/each}
   </ul>
 </Card>
+{/if}
 
 <style>
   .src-head { padding: 14px 20px; border-bottom: 1px solid var(--border-subtle); }

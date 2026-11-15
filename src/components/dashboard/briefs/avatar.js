@@ -1,7 +1,7 @@
 // Monograma del negocio (iniciales + color estable por hash). Es la pieza
 // aprobada de las tarjetas de briefs; vive aquí para que la lista y la
 // ficha usen la misma.
-const AVATAR_PALETTE = ['#6366f1', '#0ea5e9', '#14b8a6', '#f97316', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'];
+const AVATAR_PALETTE = ['#333333']   // fase 3: monograma neutro, sin colores que compitan (H-07);
 
 export function initials(s) {
   const parts = (s || '').trim().split(/\s+/).filter(Boolean);

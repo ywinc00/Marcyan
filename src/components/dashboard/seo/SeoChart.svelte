@@ -17,20 +17,45 @@
     unitOne = '',         // singular ('clic'); sin él se usa el plural
     label = '',           // nombre accesible del gráfico
     pendingLabel = 'Google aún no publica estos días',
+    fill = false,         // fase 3: llena el alto de su tarjeta (SEO a pantalla)
   } = $props();
 
   // El lienzo mide lo mismo que su caja (1 unidad = 1 px): los rótulos se
   // leen a 11 px también en el teléfono, en vez de encogerse con el SVG.
-  let boxW = $state(560);
+  let boxW = $state(560), plotH = $state(0), plotEl = $state();
+  // El alto solo se mide cuando el gráfico llena su tarjeta (un observador menos en el resto).
+  $effect(() => {
+    if (!fill || !plotEl || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver((es) => { const h = Math.round(es[0].contentRect.height); if (h !== plotH) plotH = h; });
+    ro.observe(plotEl);
+    return () => ro.disconnect();
+  });
   const VBW = $derived(Math.max(260, Math.round(boxW || 560)));
-  const VBH = $derived(VBW < 480 ? 180 : 210);
+  const VBH = $derived(fill && plotH ? Math.max(90, Math.round(plotH)) : (VBW < 480 ? 180 : 210));
   const PAD_R = 8, PAD_T = 14, PAD_B = 26;
   const uid = 'sc' + Math.random().toString(36).slice(2, 8);
   const color = $derived(tone === 'data' ? 'var(--accent-teal)' : 'var(--accent-gold)');
 
   const n = $derived(series.length);
   const values = $derived(series.map((p) => p.v).filter((v) => v != null));
-  const scale = $derived(niceScale(values.length ? Math.max(...values) : 0));
+  // Escala con aire arriba: la línea no toca el techo (si la cima cae justo en una
+  // marca, se prueba con 3, 4 o 5 tramos y se queda la que deja la cima por debajo).
+  function roomyScale(m) {
+    if (!(m > 0)) return niceScale(0);
+    const target = m * 1.06;
+    let best = null;
+    for (const parts of [4, 5, 3]) {
+      const raw = target / parts;
+      const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+      let step = [1, 2, 2.5, 5, 10].map((k) => k * mag).find((v) => v >= raw) || 10 * mag;
+      if (step < 1) step = 1;
+      step = Math.ceil(step);
+      const max = step * parts;
+      if (!best || max < best.max) best = { max, ticks: Array.from({ length: parts + 1 }, (_, i) => i * step) };
+    }
+    return best;
+  }
+  const scale = $derived(roomyScale(values.length ? Math.max(...values) : 0));
   // A6-R6: el margen izquierdo se mide con el rótulo más largo del eje
   // (mono de 11 px ≈ 6,7 px por carácter + 8 de separación + 4 de aire), con
   // el mínimo de siempre (40) para no mover los gráficos de números cortos.
@@ -124,7 +149,8 @@
   const liveText = $derived(hovered ? `${dayShort(hovered.date)}: ${hovered.v == null ? 'sin datos todavía' : nfmt(hovered.v) + ' ' + (hovered.v === 1 && unitOne ? unitOne : unit)}` : '');
 </script>
 
-<div class="sc-box" bind:clientWidth={boxW}>
+<div class="sc-box" class:is-fill={fill} bind:clientWidth={boxW}>
+  <div class="sc-plot" bind:this={plotEl}>
   {#if tip}
     <span class="chart-tip sc-tip sc-tip--{tip.align}" class:sc-tip--below={tip.below} style="left:{tip.left}%;top:{tip.top}%">
       {#if hovered.v == null}
@@ -177,6 +203,7 @@
       <text x={x(l.i)} y={VBH - 7} text-anchor={l.a} class="sc__lbl">{l.t}</text>
     {/each}
   </svg>
+  </div>
   {#if firstPending >= 0}
     <p class="sc-legend"><span class="sc-legend__sw" aria-hidden="true"></span>{pendingLabel}: {dayRangeShort(series[firstPending].date, series[n - 1].date)}</p>
   {/if}
@@ -184,15 +211,19 @@
 
 <style>
   .sc-box { position: relative; }
+  .sc-plot { position: relative; }
+  .sc-box.is-fill { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+  .sc-box.is-fill .sc-plot { flex: 1 1 auto; min-height: 90px; }
+  .sc-box.is-fill .sc { position: absolute; inset: 0; height: 100%; }
   .sc { width: 100%; height: auto; display: block; touch-action: pan-y; cursor: crosshair; border-radius: var(--radius-sm); }
   .sc:focus { outline: none; }
   .sc:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 4px; }
   .sc__lbl { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 11px; }
-  .sc__grid { stroke: var(--border); stroke-dasharray: 3 4; }
+  .sc__grid { stroke: var(--chart-grid); }
   .sc__guide { stroke: var(--border-strong); stroke-dasharray: 3 4; stroke-width: 1; }
   .sc__pending { fill: var(--bg-elevated); opacity: .55; }
   .sc-legend { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; font-size: var(--dash-caption); color: var(--fg-subtle); }
-  .sc-legend__sw { width: 12px; height: 10px; border-radius: 2px; background: var(--bg-elevated); border: 1px solid var(--border); flex: 0 0 auto; }
+  .sc-legend__sw { width: 14px; height: 6px; border-radius: 3px; background: repeating-linear-gradient(135deg, #4a4a4a 0 2px, transparent 2px 4px); flex: 0 0 auto; }
   /* El tooltip base (.chart-tip) vive en dashboard.css; aquí solo se acota
      a la caja: en los bordes se alinea hacia dentro y arriba baja bajo el punto. */
   .sc-tip { line-height: 1.25; }

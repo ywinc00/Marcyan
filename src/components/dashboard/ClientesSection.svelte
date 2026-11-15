@@ -46,7 +46,7 @@
   // En pantallas estrechas el texto de ayuda del buscador se cortaba: allí va uno corto.
   let narrow = $state(false);
   $effect(() => {
-    const mq = window.matchMedia('(max-width: 719px)');
+    const mq = window.matchMedia('(max-width: 1279px)');
     narrow = mq.matches;
     const on = (e) => { narrow = e.matches; };
     mq.addEventListener('change', on);
@@ -132,9 +132,9 @@
   <LoadingState loading={loading && !loaded} skeleton={kpiSkel} label="Cargando las cifras de clientes">
   {#if summary}
     <KpiGrid count={3} label="Resumen de clientes">
-      <Kpi label="Clientes activos" value={summary.active} note={summary.inactive ? `${plural(summary.inactive, 'inactivo', 'inactivos')} aparte` : 'Ninguno inactivo'} />
-      <Kpi label="Con proyecto en curso" value={summary.with_active_projects} tone="data" href={href('progreso', [], { estado: 'activo' })} note="Ver el avance en Progreso" />
-      <Kpi label="Saldo por cobrar" value={money(summary.balance_cents)} note="Facturas emitidas sin pagar, sin borradores" />
+      <Kpi label="Clientes activos" value={summary.active} art="users" note={summary.inactive ? `${plural(summary.inactive, 'inactivo', 'inactivos')} aparte` : 'Ninguno inactivo'} />
+      <Kpi label="Con proyecto en curso" value={summary.with_active_projects} art="folder" href={href('progreso', [], { estado: 'activo' })} note="Ver el avance en Progreso" />
+      <Kpi label="Saldo por cobrar" value={money(summary.balance_cents)} art="invoice" note="Facturas emitidas sin pagar, sin borradores" />
     </KpiGrid>
   {/if}
   </LoadingState>
@@ -182,7 +182,7 @@
                 <span class="mono-av" style="background:{monoColor(clientName(c))}" aria-hidden="true">{initials(clientName(c))}</span>
                 <span class="c-text">
                   <span class="c-name">{clientName(c)}</span>
-                  <span class="c-sub">{[c.business_name && c.owner_name ? c.owner_name : '', c.client_code].filter(Boolean).join(' · ')}</span>
+                  <span class="c-sub">{c.business_name && c.owner_name ? c.owner_name : ''}</span>
                 </span>
               </a>
             {:else if col.key === 'contact'}
@@ -222,6 +222,7 @@
   .c-cell:hover .c-name { text-decoration: underline; text-underline-offset: 3px; }
   .c-text { min-width: 0; display: flex; flex-direction: column; }
   .c-name { color: var(--fg-primary); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  @media (max-width: 719px) { .c-name { white-space: normal; } }
   .c-sub { font-size: var(--dash-caption); color: var(--fg-subtle); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .mono-av { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; flex: 0 0 auto; border-radius: var(--radius-pill); color: #fff; font-family: var(--font-display); font-size: 11px; font-weight: 700; line-height: 1; }
   .contact { display: flex; flex-direction: column; min-width: 0; }

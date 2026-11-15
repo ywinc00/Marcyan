@@ -202,3 +202,69 @@ una lista larga. Los avisos de carga al lector de pantalla salen de una sola reg
 NO → SÍ: NO rueda en mitad de la pantalla → SÍ armazón con la forma del panel. NO hueco de 48 px que luego crece →
 SÍ hueco con la altura real reservado desde el principio. NO volver al esqueleto al actualizar → SÍ datos a la vista
 y «Actualizando». NO `*{.01ms !important}` → SÍ variante reducida por pieza (brillo quieto, avisos sin desplazamiento).
+
+## Añadido 2026-11-14 · Fase 3 del plan del panel: iconos, cifras, logos, estados e Inicio
+Estado: PROPUESTO (tres direcciones en `design/orbit-rediseno/bocetos.html`), pendiente de que el dueño elija.
+OK previo del dueño: rehacer KpiArt y BrandLogo («Sí, rehazlos»); esto levanta la prohibición de tocarlos.
+- Inventario que se conserva (E-75): saludo, las cuatro cifras con su frase de contexto, actividad por mes, leads
+  por estado, proyectos y leads recientes, actividad acumulada, resumen de Finanzas, contador de Avisos.
+- Común a las tres: una familia de iconos con licencia libre (E-27: se elige viéndolas aplicadas), sin repetidos
+  (Leads y Finanzas compartían sobre); logos reales de Simple Icons (CC0) en Suscripciones con nombre y monto,
+  sin la categoría cruda; mapa de estados forma + color + palabra; orígenes de lead en etiqueta neutra (H-07);
+  nada de ids de sistema a la vista (Avisos enseñaba «LEAD-118», E-10).
+- A «La lista del día»: lista Hoy con un botón por fila encima de las cifras; cifras sin dibujo con seis barras reales.
+- B «Cabina de dos columnas»: cifras en franja sin cajas (C-06) y columna Hoy fija a la derecha.
+- C «Bandeja por prioridad»: Ahora / Hoy / Esta semana, misma bandeja en Inicio y Avisos; cifras compactas con icono.
+- Referencias miradas en imagen (Refero): Linear 4a094449 (iconos de trazo y estados por forma), Programa
+  1ffacf09 (acciones del día con un botón por fila), RevenueCat af663f13 (cifras sin adorno), Mercury 320c6124
+  (franja de cifras y texto que explica el número).
+- Piezas: G-08 (una familia de iconos), H-07 (presupuesto del acento), C-06 (cifras con procedencia), B-01 (lista de
+  filas de ancho completo), E-08/E-09/E-10 (vacío, carga y error). Ledger: E-27, E-61, E-73, E-75, E-19, E-16.
+
+## Añadido 2026-11-15 · Fase 3 decidida: la referencia original de Orbit es la madre
+Estado: VALIDADO por: el dueño, 2026-11-15 («quiero un panel de admin como este… acercarlo al nivel de calidad de
+Orbit original»; la lógica de Finanzas, el agente y Ajustes se queda). Sustituye a las direcciones A, B y C de
+arriba. El render final se le enseña antes de mergear.
+Referencia madre: la lámina original de Orbit que mandó el dueño (sesión del 2026-11-15, no se guarda en el repo
+porque es de un tercero). Ledger E-54: se traen sus ELEMENTOS medidos (proporciones, escala, gráficos, rótulos
+monoespaciados, ilustraciones de las cifras, logos), re-tematizados con nuestro contenido.
+
+Medido en la referencia (por imagen): barra lateral #151515, fondo #1c1c1c, tarjeta de gráfico #1f1f1f, tarjeta de
+cifra #272727 con degradado hacia abajo, borde ~#3a3a3a, ítem activo #2b2b2b sin acento, naranja #ea702d que sube a
+melocotón #f5cc9e en la barra activa. Cifras en blanco; el color solo en la comparación pequeña (+5 verde, −2 rojo).
+
+Lo que se cambia (sobre lo que hoy hay; E-75: nada de lo que se ve hoy desaparece):
+1. Rampa de superficies neutra (H-06): fondo #1b1b1b, barra lateral #151515, tarjeta #202020, elevado #272727,
+   activo #2b2b2b, bordes blancos al 8 / 5 / 13 %. Fuera el tinte azulado y el negro casi puro (E-01).
+2. Rótulo monoespaciado (H-05) con JetBrains Mono (ya instalada, OFL): captions de la barra lateral, meta de la
+   cabecera, notas de las cifras, ejes de los gráficos, cabeceras de tabla y montos de suscripción. En minúscula
+   de frase como la referencia, no en mayúsculas con tracking. Inter se queda para todo lo demás.
+3. Presupuesto del acento (H-07): las cifras dejan de pintarse en naranja, verde o rojo; el ítem activo del menú pasa
+   a gris claro sin raya naranja; avatares y orígenes de lead en neutro. Naranja: botón principal, barra activa del
+   gráfico, línea del área, contador de Avisos y foco.
+4. Iconos: Hugeicons trazo redondeado (MIT, el estilo de la referencia), trazo 1,5, una sola familia (G-08).
+5. Ilustraciones de las cifras (KpiArt) rehechas como en la referencia: objetos grandes, monocromos y en relieve,
+   cortados por el borde inferior derecho de la tarjeta.
+6. Logos de suscripción reales (Simple Icons, CC0) dibujados en el propio panel, en claro, con el monto en mono a la
+   derecha; sin servicios externos de favicons.
+7. Inicio cabe en la pantalla (≥ 1100 de ancho y ≥ 700 de alto): cifras, «Actividad por mes» + «Proyectos
+   recientes», y abajo «Leads por estado» + «Leads recientes» + «Actividad acumulada». Las listas enseñan las filas
+   que caben; «Ver todos» en la cabecera de cada tarjeta. Por debajo de esas medidas, la página fluye como hoy.
+8. Gráficos como la referencia: barras con esquina redondeada y degradado gris, la activa en naranja que aclara
+   hacia arriba, globo con el dato y guía discontinua al eje; eje a la derecha en mono; píldoras de estado finas con
+   el nombre dentro.
+9. SEO: la primera pantalla resume (cifras, clics e impresiones en un gráfico, indexación y las mejores búsquedas);
+   la lista completa de páginas y de búsquedas pasa a pestañas propias (Resumen, Páginas, Búsquedas). El estado de
+   sincronización se condensa en una línea.
+
+Piezas: H-06, H-05, H-07, G-08, C-06 (cifra con procedencia), E-08/E-09/E-10 (vacío, carga, error).
+Ledger aplicable: E-54, E-01, E-27, E-62, E-64, E-75, E-17, E-30.
+
+### Resultado de la fase 3 (2026-11-15) · PROPUESTO al dueño sobre el render
+Construido en `feat/finanzas-libros`. Hubo 5 rondas de crítica adversarial independiente: 6 → 7 → 7,5 → 8 → 8,5/10. El crítico da el visto bueno para enseñarlo.
+- Matriz de 90 capturas (10 secciones a 320, 360, 390, 768, 1024, 1366, 1440, 1920 y 2560). El detector se probó con recortes plantados. Mide: filas cortadas, textos con «…» o recortados por líneas, buscadores que no caben, choque entre texto y objeto (12 px), desplazamiento lateral y errores. Sale a 0. Los únicos «…» son los de la bandeja de Marcy y la tabla de Leads en escritorio, que son a propósito.
+- Inicio cabe en 1366×768, 1440×900, 1920 y 2560 (con un tope de 1000 px de alto). El Resumen de SEO también: tres columnas por debajo de 820 de alto.
+- Objetos de las cifras: 88 px, propios por cada dato. Son los de la lámina (hojas, carpeta, fichas con visto) más sobre, billetes, puntero, página de resultados, podio, personas, campana, aviso, pausa y cohete. En el teléfono, el objeto pasa a una franja bajo la nota cuando la nota no cabe a su lado.
+- Chip de estado neutro con un punto de color, sin azul. Rótulos en mono y minúscula. Sin códigos PRJ, CLI ni LEAD a la vista; MRC se queda porque es el número del brief que ve el cliente.
+- Capturas de la versión final en `design/orbit-rediseno/render/`.
+- Pendiente aparte, no es de este trabajo: la prueba PUB-01/02 de `test:crm` falla también en producción, porque busca el formulario en `Contact.astro` y vive en `FormContacto.astro`.

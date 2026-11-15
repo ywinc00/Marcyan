@@ -6,6 +6,7 @@
   import EmptyState from '../ui/EmptyState.svelte';
   import StatusChip from '../ui/StatusChip.svelte';
   import DataTable from '../ui/DataTable.svelte';
+  import Icon from '../ui/Icon.svelte';
   import { nfmt, fmtDateTime, coverageState, issueLabel } from './format.js';
 
   let {
@@ -15,7 +16,10 @@
     syncing = false,
     gscFailed = false,      // Search Console falló en la última sincronización (el motivo ya se ve arriba)
     onsync, onedit, onstatus,
+    mode = 'full',          // fase 3: 'summary' (Resumen de SEO) | 'full' (pestaña Páginas)
+    onpages,                // abre la pestaña Páginas
   } = $props();
+  const summary = $derived(mode === 'summary');
 
   const DONUT_R = 34, DONUT_C = 2 * Math.PI * 34;
   const total = $derived(indexation ? Number(indexation.total) || 0 : 0);
@@ -42,7 +46,9 @@
 
 <Card title="Indexación" caption="Search Console">
   {#snippet actions()}
-    {#if indexation && indexation.checked_at}<span class="ix-when">Revisado {fmtDateTime(indexation.checked_at)}</span>{/if}
+    {#if summary && reliable && indexation.pages && indexation.pages.length}
+      <button type="button" class="ix-more" onclick={onpages}>Ver páginas<Icon name="chevron" size={14} /></button>
+    {:else if indexation && indexation.checked_at}<span class="ix-when">Revisado {fmtDateTime(indexation.checked_at)}</span>{/if}
   {/snippet}
 
   {#if !hasGsc}
@@ -76,7 +82,7 @@
         <p class="ix-note__a">Sin sitemap no hay un total de páginas con el que comparar. Envíalo en Search Console, Sitemaps. Mientras tanto se revisa solo la página de inicio.</p>
       </div>
     {:else}
-      <div class="ix">
+      <div class="ix" class:ix--sum={summary}>
         <svg class="ix__donut" viewBox="0 0 88 88" role="img" aria-label="{nfmt(indexed)} de {nfmt(total)} URLs del sitemap indexadas">
           <defs>
             <linearGradient id="seoIdxDonut" x1="0" y1="0" x2="1" y2="1">
@@ -92,14 +98,14 @@
         <div class="ix__body">
           <p class="ix__ratio"><span class="ix__num">{nfmt(indexed)}</span> <span class="ix__of">de {nfmt(total)}</span></p>
           <p class="ix__cap">URLs del sitemap indexadas</p>
-          {#if unchecked > 0}<p class="ix__cap">Revisadas {nfmt(checkedN)} de {nfmt(total)}. Las {nfmt(unchecked)} restantes se revisan en las próximas actualizaciones.</p>{/if}
-          <div class="ix__bar" role="img" aria-label="{nfmt(indexed)} de {nfmt(total)} URLs indexadas">
+          {#if unchecked > 0}{#if summary}<p class="ix__cap">{nfmt(unchecked)} por revisar</p>{:else}<p class="ix__cap">Revisadas {nfmt(checkedN)} de {nfmt(total)}. {unchecked === 1 ? 'La que falta se revisa' : `Las ${nfmt(unchecked)} que faltan se revisan`} en las próximas actualizaciones.</p>{/if}{/if}
+          {#if !summary}<div class="ix__bar" role="img" aria-label="{nfmt(indexed)} de {nfmt(total)} URLs indexadas">
             <div class="ix__fill" style="width:{Math.round(ratio * 100)}%"></div>
-          </div>
-          <div class="ix__legend">
+          </div>{/if}
+          {#if !summary}<div class="ix__legend">
             <span><span class="dot dot--on"></span>Indexadas {nfmt(indexed)}</span>
             <span><span class="dot"></span>Sin indexar {nfmt(indexation.not_indexed)}</span>
-          </div>
+          </div>{/if}
         </div>
       </div>
     {/if}
@@ -110,14 +116,14 @@
 
     {#if reliable && indexation.issues && indexation.issues.length}
       <h3 class="ix__sub">Por qué no están indexadas</h3>
-      <ul class="ix__issues">
-        {#each indexation.issues as it, i (i)}
+      <ul class="ix__issues" class:ix__issues--sum={summary}>
+        {#each summary ? indexation.issues.slice(0, 3) : indexation.issues as it, i (i)}
           <li class="ix__issue"><span class="ix__reason">{issueLabel(coverageState(it.reason).label)}</span><span class="ix__count">{nfmt(it.count)}</span></li>
         {/each}
       </ul>
     {/if}
 
-    {#if reliable && shownPages.length}
+    {#if !summary && reliable && shownPages.length}
       <h3 class="ix__sub">Páginas{#if indexation.pages.length > PAGE_LIMIT} (las primeras {PAGE_LIMIT} de {nfmt(indexation.pages.length)}){/if}</h3>
       <DataTable columns={pageCols} rows={shownPages} rowKey="url" caption="Estado de cada página del sitemap en Google">
         {#snippet cell(row, col)}
@@ -132,13 +138,23 @@
 </Card>
 
 <style>
-  .ix-when { font-size: var(--dash-caption); color: var(--fg-subtle); white-space: nowrap; }
+  .ix-when { font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); white-space: nowrap; }
+  .ix-more { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; min-height: 28px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; color: var(--fg-secondary); font-size: var(--dash-caption); }
+  .ix-more:hover { color: var(--fg-primary); border-color: var(--border-strong); background: var(--bg-elevated); }
+  .ix-more:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .ix--sum { gap: var(--space-4); flex-wrap: nowrap; align-items: center; }
+  .ix--sum .ix__body { flex: 1 1 auto; gap: 4px; }
+  .ix--sum .ix__donut { width: 72px; height: 72px; }
+  /* Motivos en el resumen: filas planas (sin caja) para que la tarjeta quepa. */
+  .ix__issues.ix__issues--sum { grid-template-columns: 1fr; gap: 0; }
+  .ix__issues--sum .ix__issue { padding: 3px 0; background: none; border: 0; border-radius: 0; border-bottom: 1px solid var(--border-subtle); }
+  .ix__issues--sum .ix__issue:last-child { border-bottom: 0; }
   .ix { display: flex; align-items: center; gap: var(--space-5); flex-wrap: wrap; }
   .ix__donut { width: 96px; height: 96px; flex: 0 0 auto; display: block; }
-  .ix__pct { fill: var(--fg-primary); font-weight: 650; font-size: 15px; letter-spacing: -0.02em; }
+  .ix__pct { fill: var(--fg-primary); font-family: var(--font-mono); font-weight: 500; font-size: 13px; letter-spacing: -0.02em; }
   .ix__body { flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
   .ix__ratio { margin: 0; display: flex; align-items: baseline; gap: 6px; }
-  .ix__num { font-size: 30px; font-weight: 650; letter-spacing: -0.025em; line-height: 1; color: var(--fg-primary); }
+  .ix__num { font-size: 26px; font-weight: 500; letter-spacing: -0.025em; line-height: 1; color: var(--fg-primary); }
   .ix__of { font-size: var(--dash-body); color: var(--fg-secondary); }
   .ix__cap { margin: 0; font-size: var(--dash-caption); color: var(--fg-subtle); }
   .ix__bar { height: 10px; background: var(--bg-elevated); border-radius: var(--radius-pill); overflow: hidden; margin-top: 4px; }
@@ -152,7 +168,7 @@
   .ix-note__a { margin: 4px 0 0; font-size: var(--dash-small); color: var(--fg-secondary); line-height: 1.5; }
   .ix-warn { margin: var(--space-4) 0 0; font-size: var(--dash-small); color: var(--color-warning); line-height: 1.5; }
 
-  .ix__sub { margin: var(--space-5) 0 10px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); }
+  .ix__sub { margin: var(--space-4) 0 8px; font-family: var(--font-mono); font-size: var(--dash-mono); font-weight: 400; color: var(--fg-subtle); }
   .ix__issues { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 8px; }
   .ix__issue { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: 10px 12px; background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); }
   .ix__reason { font-size: var(--dash-small); color: var(--fg-secondary); min-width: 0; overflow-wrap: anywhere; }

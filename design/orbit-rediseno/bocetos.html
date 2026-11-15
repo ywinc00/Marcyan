@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbit · bocetos del rediseño (fase 3)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e11; --side: #0b0b0e; --card: #16161a; --el: #1b1b20; --el2: #23232a;
+    --b: rgba(255,255,255,.07); --bs: rgba(255,255,255,.045); --bst: rgba(255,255,255,.11);
+    --fg: #ededf0; --fg2: #a1a1aa; --fg3: #8b8b95;
+    --acc: #f97316; --teal: #34d399; --ok: #22c55e; --warn: #f5b338; --err: #ef4444; --info: #60a5fa;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #08080a; color: var(--fg); font: 400 14px/1.45 Inter, system-ui, sans-serif; }
+  .intro { max-width: 1240px; margin: 0 auto; padding: 40px 24px 8px; }
+  .intro h1 { font-size: 28px; font-weight: 600; letter-spacing: -.025em; margin: 0 0 6px; }
+  .intro p { color: var(--fg2); max-width: 80ch; margin: 0 0 6px; }
+  .dir { max-width: 1240px; margin: 36px auto; padding: 0 24px; }
+  .dir-h { display: flex; align-items: baseline; gap: 14px; margin-bottom: 6px; }
+  .dir-h b { font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+  .dir-h span { color: var(--fg3); font-size: 13px; }
+  .dir-why { color: var(--fg2); margin: 0 0 14px; max-width: 95ch; }
+  .dir-why em { font-style: normal; color: var(--fg); }
+  .shell { display: grid; grid-template-columns: 236px 1fr; background: var(--bg); border: 1px solid var(--b); border-radius: 14px; overflow: hidden; min-height: 640px; }
+  .side { background: var(--side); border-right: 1px solid var(--b); padding: 18px 12px; display: flex; flex-direction: column; gap: 2px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-weight: 650; letter-spacing: .14em; font-size: 13px; color: var(--acc); padding: 0 8px 14px; }
+  .brand i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--acc); display: inline-block; }
+  .cap { font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--fg3); padding: 14px 8px 6px; }
+  .nav { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 9px; color: var(--fg2); font-size: 14px; }
+  .nav .ic { width: 18px; height: 18px; color: var(--fg3); }
+  .nav.on { background: var(--el); color: var(--fg); box-shadow: inset 2px 0 0 var(--acc); }
+  .nav.on .ic { color: var(--acc); }
+  .nav .n { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--fg); background: var(--el2); border-radius: 999px; padding: 1px 7px; }
+  .sub { display: flex; align-items: center; gap: 10px; padding: 6px 8px; font-size: 13px; color: var(--fg2); }
+  .sub .lg { width: 22px; height: 22px; border-radius: 6px; background: var(--el); display: grid; place-items: center; flex: none; }
+  .sub .lg img, .sub .lg svg { width: 14px; height: 14px; }
+  .sub .nm { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sub .am { color: var(--fg3); font-variant-numeric: tabular-nums; font-size: 12px; }
+  .sub-all { font-size: 12px; color: var(--fg3); padding: 4px 8px; text-decoration: underline; text-underline-offset: 3px; }
+  .main { padding: 22px 26px; min-width: 0; }
+  .top { display: flex; justify-content: space-between; align-items: center; color: var(--fg3); font-size: 13px; border-bottom: 1px solid var(--b); padding-bottom: 12px; margin-bottom: 18px; }
+  h2 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -.025em; }
+  .sub2 { color: var(--fg3); margin: 2px 0 16px; }
+  .card { background: var(--card); border: 1px solid var(--b); border-radius: 14px; }
+  .ic { display: inline-grid; place-items: center; flex: none; }
+  .ic svg { width: 100%; height: 100%; }
+  /* Lista del día */
+  .today { padding: 6px 0; }
+  .today-h { display: flex; align-items: center; gap: 8px; padding: 12px 18px 8px; font-weight: 600; }
+  .today-h .cnt { font-size: 11px; color: var(--fg2); background: var(--el2); border-radius: 999px; padding: 1px 8px; font-weight: 500; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 10px 18px; border-top: 1px solid var(--bs); }
+  .row .tile { width: 32px; height: 32px; border-radius: 9px; border: 1px solid var(--b); background: var(--el); display: grid; place-items: center; color: var(--fg2); flex: none; }
+  .row .tile .ic { width: 17px; height: 17px; }
+  .row .txt { flex: 1; min-width: 0; }
+  .row .txt b { font-weight: 500; }
+  .row .txt small { display: block; color: var(--fg3); font-size: 12px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 5px 12px; border-radius: 9px; border: 1px solid var(--b); background: var(--el); color: var(--fg); font: 500 13px/1 Inter, sans-serif; white-space: nowrap; }
+  .btn.p { background: var(--acc); border-color: var(--acc); color: #0e0e11; font-weight: 600; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  /* KPIs */
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin: 14px 0; }
+  .kpi { padding: 16px 18px; }
+  .kpi .l { color: var(--fg2); font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
+  .kpi .v { font-size: 28px; font-weight: 650; letter-spacing: -.02em; margin: 8px 0 2px; font-variant-numeric: tabular-nums; }
+  .kpi .c { color: var(--fg3); font-size: 12px; }
+  .bars { display: flex; align-items: flex-end; gap: 4px; height: 30px; }
+  .bars i { width: 7px; border-radius: 2px; background: var(--el2); display: block; }
+  .bars i:last-child { background: var(--fg2); }
+  .kpi .tile2 { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--b); display: grid; place-items: center; color: var(--fg2); }
+  .kpi .tile2 .ic { width: 16px; height: 16px; }
+  .strip { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); margin: 6px 0 18px; }
+  .strip > div { padding: 4px 18px; border-left: 1px solid var(--b); }
+  .strip > div:first-child { border-left: 0; padding-left: 0; }
+  .strip .v { font-size: 26px; font-weight: 650; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .strip .l { color: var(--fg2); font-size: 13px; }
+  .strip .c { color: var(--fg3); font-size: 12px; }
+  .ghost { border: 1px dashed var(--b); border-radius: 14px; color: var(--fg3); padding: 18px; font-size: 13px; }
+  .cols { display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 14px; align-items: start; }
+  .grp { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--fg3); padding: 14px 18px 4px; font-weight: 500; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 3px 10px 3px 8px; font-size: 12px; font-weight: 500; }
+  .chip .ic { width: 13px; height: 13px; }
+  .legend { max-width: 1240px; margin: 36px auto 60px; padding: 0 24px; }
+  .legend table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--b); border-radius: 14px; overflow: hidden; }
+  .legend td, .legend th { text-align: left; padding: 10px 14px; border-top: 1px solid var(--bs); font-size: 13px; }
+  .legend th { color: var(--fg3); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; font-weight: 500; border-top: 0; }
+  .note { color: var(--fg3); font-size: 12px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>Orbit: rediseño del panel (fase 3). Tres direcciones</h1>
+  <p>Las tres conservan lo que usas cada día (saludo, las cuatro cifras, gráficos, proyectos y leads recientes, el resumen de Finanzas) y arreglan lo mismo: una sola familia de iconos sin repetidos, logos reales en las suscripciones, un mapa de colores de estado y nada de códigos internos a la vista. Cambian en la idea: cómo te cuenta Inicio lo que necesita atención hoy, cómo se ven las cifras y qué familia de iconos se usa.</p>
+  <p>Los iconos son de familias abiertas con licencia libre (Lucide, Phosphor y Tabler) y los logos, de Simple Icons. Datos de ejemplo.</p>
+</div>
+
+<section class="dir" id="A">
+  <div class="dir-h"><b>A · La lista del día</b><span>iconos Lucide (los del sitio público, trazo 1,5)</span></div>
+  <p class="dir-why">Inicio abre con <em>una lista de lo que hay que hacer hoy</em>, una fila por cosa y un solo botón por fila. Debajo, las cuatro cifras de siempre, sin dibujo: la cifra, su periodo y seis barras reales de los últimos meses. Inspirada en el «Pulse» de Programa (acciones recomendadas del día) y en las cifras de RevenueCat. A favor: se lee en dos segundos qué toca. En contra: Inicio crece hacia abajo los días con muchas cosas.</p>
+  <div class="shell" data-set="lucide"></div>
+</section>
+
+<section class="dir" id="B">
+  <div class="dir-h"><b>B · Cabina de dos columnas</b><span>iconos Phosphor (regular, trazo algo más redondo)</span></div>
+  <p class="dir-why">Las cifras pasan a <em>una franja sin cajas</em> (cifra, periodo y de dónde sale) y lo de hoy va en <em>una columna fija a la derecha</em> que acompaña mientras miras gráficos y listas. Inspirada en Mercury (franja de cifras y texto que explica el número) y en el panel lateral de Linear. A favor: todo a la vista en escritorio. En contra: en teléfono la columna baja debajo de las cifras.</p>
+  <div class="shell" data-set="ph"></div>
+</section>
+
+<section class="dir" id="C">
+  <div class="dir-h"><b>C · Bandeja por prioridad</b><span>iconos Tabler (trazo 2, más marcado)</span></div>
+  <p class="dir-why">Inicio y Avisos hablan el mismo idioma: <em>una bandeja agrupada en Ahora, Hoy y Esta semana</em>, con un punto de color por grupo y lo más urgente arriba (como la bandeja de Linear). Las cifras quedan en una línea compacta arriba, con su frase de contexto y un icono de la familia en vez del dibujo brillante. A favor: lo urgente nunca se pierde entre lo informativo. En contra: es el cambio más grande respecto a hoy.</p>
+  <div class="shell" data-set="tabler"></div>
+</section>
+
+<section class="legend">
+  <div class="dir-h"><b>Común a las tres · Mapa de estados</b><span>forma + color + palabra, nunca solo color</span></div>
+  <table>
+    <thead><tr><th>Estado</th><th>Cómo se ve</th><th>Dónde sale</th></tr></thead>
+    <tbody id="legend"></tbody>
+  </table>
+  <p class="note">El naranja queda solo para la acción principal, el foco, la sección activa y una cifra destacada. Los orígenes de un lead (chat, diagnóstico, contacto) pasan a etiqueta neutra con su icono, sin color propio.</p>
+</section>
+
+<script>
+const SETS = {
+  lucide: { inicio: 'lucide:layout-dashboard', leads: 'lucide:user-plus', clientes: 'lucide:users', marcy: 'lucide:message-circle', briefs: 'lucide:clipboard-list', finanzas: 'lucide:wallet', progreso: 'lucide:milestone', seo: 'lucide:trending-up', avisos: 'lucide:bell', ajustes: 'lucide:settings',
+    phone: 'lucide:phone', invoice: 'lucide:receipt', spark: 'lucide:list-checks', cal: 'lucide:calendar-check', doc: 'lucide:file-text', alert: 'lucide:circle-alert' },
+  ph: { inicio: 'ph:house', leads: 'ph:user-plus', clientes: 'ph:users', marcy: 'ph:chat-circle', briefs: 'ph:clipboard-text', finanzas: 'ph:wallet', progreso: 'ph:flag-banner', seo: 'ph:chart-line-up', avisos: 'ph:bell', ajustes: 'ph:gear-six',
+    phone: 'ph:phone', invoice: 'ph:receipt', spark: 'ph:list-checks', cal: 'ph:calendar-check', doc: 'ph:file-text', alert: 'ph:warning-circle' },
+  tabler: { inicio: 'tabler:home', leads: 'tabler:user-plus', clientes: 'tabler:users', marcy: 'tabler:message-circle', briefs: 'tabler:clipboard-list', finanzas: 'tabler:wallet', progreso: 'tabler:flag', seo: 'tabler:chart-line', avisos: 'tabler:bell', ajustes: 'tabler:settings',
+    phone: 'tabler:phone', invoice: 'tabler:receipt', spark: 'tabler:list-check', cal: 'tabler:calendar-check', doc: 'tabler:file-text', alert: 'tabler:alert-circle' },
+};
+const NAV = [['inicio','Inicio'],['leads','Leads',2],['clientes','Clientes'],['marcy','Marcy',1],['briefs','Briefs',3],['finanzas','Finanzas'],['progreso','Progreso'],['seo','SEO'],['avisos','Avisos',6],['ajustes','Ajustes']];
+const SUBS = [['googleworkspace','Google Workspace','$14'],['vercel','Vercel','$20'],['adobe','Adobe Creative Cloud','$60'],['anthropic','Claude','$20']];
+const TODAY = [
+  ['phone','Jorge Garza quiere que lo llames a las 6','Marcy te pasó la conversación hace 3 minutos','Abrir conversación','now'],
+  ['invoice','Factura vencida: $450 de Bayou City Smiles','Venció hace 6 días','Ver factura','now'],
+  ['leads','2 leads nuevos sin contactar','Garza Auto Repair y Limpiezas Ana, desde el chat','Ver leads','today'],
+  ['briefs','3 briefs esperando revisión','El más antiguo llegó el 11 de noviembre','Revisar','today'],
+  ['spark','El agente contable te deja 3 propuestas','Un recibo de Vercel, un cargo de Google y el cierre de octubre','Revisar','today'],
+  ['cal','Octubre está listo para cerrar','Faltan 2 recibos que no bloquean','Revisar octubre','week'],
+];
+const KPIS = [['Leads recibidos','7','este mes, 5 más que en octubre',[2,3,2,4,2,7]],['Briefs pendientes','3','en cola de revisión',[1,2,1,2,3,3]],['Proyectos activos','3','en curso',[2,2,3,3,4,3]],['Cobrado este mes','$2,500','de 3 facturas',[4,3,5,6,6,2.5]]];
+const KPI_IC = ['leads','briefs','progreso','finanzas'];
+
+const ICONS = {"lucide:layout-dashboard":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><rect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/></g></svg>","lucide:user-plus":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M19 8v6m3-3h-6\"/></g></svg>","lucide:users":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M16 3.128a4 4 0 0 1 0 7.744M22 21v-2a4 4 0 0 0-3-3.87\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/></g></svg>","lucide:message-circle":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092a10 10 0 1 0-4.777-4.719\"/></svg>","lucide:clipboard-list":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><rect width=\"8\" height=\"4\" x=\"8\" y=\"2\" rx=\"1\" ry=\"1\"/><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2m4 7h4m-4 5h4m-8-5h.01M8 16h.01\"/></g></svg>","lucide:wallet":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1\"/><path d=\"M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4\"/></g></svg>","lucide:milestone":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 13v8m0-18v3m6.172 0a2 2 0 0 1 1.414.586l2.06 2.06a1.207 1.207 0 0 1 0 1.708l-2.06 2.06a2 2 0 0 1-1.414.586H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z\"/></svg>","lucide:trending-up":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M16 7h6v6\"/><path d=\"m22 7l-8.5 8.5l-5-5L2 17\"/></g></svg>","lucide:bell":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M10.268 21a2 2 0 0 0 3.464 0m-10.47-5.674A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326\"/></svg>","lucide:settings":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M9.671 4.136a2.34 2.34 0 0 1 4.659 0a2.34 2.34 0 0 0 3.319 1.915a2.34 2.34 0 0 1 2.33 4.033a2.34 2.34 0 0 0 0 3.831a2.34 2.34 0 0 1-2.33 4.033a2.34 2.34 0 0 0-3.319 1.915a2.34 2.34 0 0 1-4.659 0a2.34 2.34 0 0 0-3.32-1.915a2.34 2.34 0 0 1-2.33-4.033a2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></g></svg>","lucide:phone":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233a14 14 0 0 0 6.392 6.384\"/></svg>","lucide:receipt":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M12 17V7m4 1h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8\"/><path d=\"M4 3a1 1 0 0 1 1-1a1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1a1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2a1 1 0 0 1-1-1z\"/></g></svg>","lucide:list-checks":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M13 5h8m-8 7h8m-8 7h8M3 17l2 2l4-4M3 7l2 2l4-4\"/></svg>","lucide:calendar-check":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M8 2v3m8-3v3\"/><rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M3 9h18M9 15l2 2l4-4\"/></g></svg>","lucide:file-text":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z\"/><path d=\"M14 2v5a1 1 0 0 0 1 1h5M10 9H8m8 4H8m8 4H8\"/></g></svg>","lucide:circle-alert":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 8v4m0 4h.01\"/></g></svg>","ph:house":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"m219.31 108.68l-80-80a16 16 0 0 0-22.62 0l-80 80A15.87 15.87 0 0 0 32 120v96a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-56h32v56a8 8 0 0 0 8 8h64a8 8 0 0 0 8-8v-96a15.87 15.87 0 0 0-4.69-11.32M208 208h-48v-56a8 8 0 0 0-8-8h-48a8 8 0 0 0-8 8v56H48v-88l80-80l80 80Z\"/></svg>","ph:user-plus":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"M256 136a8 8 0 0 1-8 8h-16v16a8 8 0 0 1-16 0v-16h-16a8 8 0 0 1 0-16h16v-16a8 8 0 0 1 16 0v16h16a8 8 0 0 1 8 8m-57.87 58.85a8 8 0 0 1-12.26 10.3C165.75 181.19 138.09 168 108 168s-57.75 13.19-77.87 37.15a8 8 0 0 1-12.25-10.3c14.94-17.78 33.52-30.41 54.17-37.17a68 68 0 1 1 71.9 0c20.65 6.76 39.23 19.39 54.18 37.17M108 152a52 52 0 1 0-52-52a52.06 52.06 0 0 0 52 52\"/></svg>","ph:users":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"M117.25 157.92a60 60 0 1 0-66.5 0a95.83 95.83 0 0 0-47.22 37.71a8 8 0 1 0 13.4 8.74a80 80 0 0 1 134.14 0a8 8 0 0 0 13.4-8.74a95.83 95.83 0 0 0-47.22-37.71M40 108a44 44 0 1 1 44 44a44.05 44.05 0 0 1-44-44m210.14 98.7a8 8 0 0 1-11.07-2.33A79.83 79.83 0 0 0 172 168a8 8 0 0 1 0-16a44 44 0 1 0-16.34-84.87a8 8 0 1 1-5.94-14.85a60 60 0 0 1 55.53 105.64a95.83 95.83 0 0 1 47.22 37.71a8 8 0 0 1-2.33 11.07\"/></svg>","ph:chat-circle":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"M128 24a104 104 0 0 0-91.82 152.88l-11.35 34.05a16 16 0 0 0 20.24 20.24l34.05-11.35A104 104 0 1 0 128 24m0 192a87.87 87.87 0 0 1-44.06-11.81a8 8 0 0 0-6.54-.67L40 216l12.47-37.4a8 8 0 0 0-.66-6.54A88 88 0 1 1 128 216\"/></svg>","ph:clipboard-text":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"M168 152a8 8 0 0 1-8 8H96a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8m-8-40H96a8 8 0 0 0 0 16h64a8 8 0 0 0 0-16m56-64v168a16 16 0 0 1-16 16H56a16 16 0 0 1-16-16V48a16 16 0 0 1 16-16h36.26a47.92 47.92 0 0 1 71.48 0H200a16 16 0 0 1 16 16M96 64h64a32 32 0 0 0-64 0m104-16h-26.75A47.9 47.9 0 0 1 176 64v8a8 8 0 0 1-8 8H88a8 8 0 0 1-8-8v-8a47.9 47.9 0 0 1 2.75-16H56v168h144Z\"/></svg>","ph:wallet":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"M216 64H56a8 8 0 0 1 0-16h136a8 8 0 0 0 0-16H56a24 24 0 0 0-24 24v128a24 24 0 0 0 24 24h160a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16m0 128H56a8 8 0 0 1-8-8V78.63A23.8 23.8 0 0 0 56 80h160Zm-48-60a12 12 0 1 1 12 12a12 12 0 0 1-12-12\"/></svg>","ph:flag-banner":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"M238.76 51.73A8 8 0 0 0 232 48H40a8 8 0 0 0-5.66 13.66L76.69 104l-42.35 42.34A8 8 0 0 0 40 160h133.62l-28.84 60.56a8 8 0 1 0 14.44 6.88l80-168a8 8 0 0 0-.46-7.71M181.23 144H59.31l34.35-34.34a8 8 0 0 0 0-11.32L59.31 64h160Z\"/></svg>","ph:chart-line-up":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"M232 208a8 8 0 0 1-8 8H32a8 8 0 0 1-8-8V48a8 8 0 0 1 16 0v108.69l50.34-50.35a8 8 0 0 1 11.32 0L128 132.69L180.69 80H160a8 8 0 0 1 0-16h40a8 8 0 0 1 8 8v40a8 8 0 0 1-16 0V91.31l-58.34 58.35a8 8 0 0 1-11.32 0L96 123.31l-56 56V200h184a8 8 0 0 1 8 8\"/></svg>","ph:bell":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"M221.8 175.94c-5.55-9.56-13.8-36.61-13.8-71.94a80 80 0 1 0-160 0c0 35.34-8.26 62.38-13.81 71.94A16 16 0 0 0 48 200h40.81a40 40 0 0 0 78.38 0H208a16 16 0 0 0 13.8-24.06M128 216a24 24 0 0 1-22.62-16h45.24A24 24 0 0 1 128 216m-80-32c7.7-13.24 16-43.92 16-80a64 64 0 1 1 128 0c0 36.05 8.28 66.73 16 80Z\"/></svg>","ph:gear-six":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"M128 80a48 48 0 1 0 48 48a48.05 48.05 0 0 0-48-48m0 80a32 32 0 1 1 32-32a32 32 0 0 1-32 32m109.94-52.79a8 8 0 0 0-3.89-5.4l-29.83-17l-.12-33.62a8 8 0 0 0-2.83-6.08a111.9 111.9 0 0 0-36.72-20.67a8 8 0 0 0-6.46.59L128 41.85L97.88 25a8 8 0 0 0-6.47-.6a112.1 112.1 0 0 0-36.68 20.75a8 8 0 0 0-2.83 6.07l-.15 33.65l-29.83 17a8 8 0 0 0-3.89 5.4a106.5 106.5 0 0 0 0 41.56a8 8 0 0 0 3.89 5.4l29.83 17l.12 33.62a8 8 0 0 0 2.83 6.08a111.9 111.9 0 0 0 36.72 20.67a8 8 0 0 0 6.46-.59L128 214.15L158.12 231a7.9 7.9 0 0 0 3.9 1a8.1 8.1 0 0 0 2.57-.42a112.1 112.1 0 0 0 36.68-20.73a8 8 0 0 0 2.83-6.07l.15-33.65l29.83-17a8 8 0 0 0 3.89-5.4a106.5 106.5 0 0 0-.03-41.52m-15 34.91l-28.57 16.25a8 8 0 0 0-3 3c-.58 1-1.19 2.06-1.81 3.06a7.94 7.94 0 0 0-1.22 4.21l-.15 32.25a95.9 95.9 0 0 1-25.37 14.3L134 199.13a8 8 0 0 0-3.91-1h-3.83a8.1 8.1 0 0 0-4.1 1l-28.84 16.1A96 96 0 0 1 67.88 201l-.11-32.2a8 8 0 0 0-1.22-4.22c-.62-1-1.23-2-1.8-3.06a8.1 8.1 0 0 0-3-3.06l-28.6-16.29a90.5 90.5 0 0 1 0-28.26l28.52-16.28a8 8 0 0 0 3-3c.58-1 1.19-2.06 1.81-3.06a7.94 7.94 0 0 0 1.22-4.21l.15-32.25a95.9 95.9 0 0 1 25.37-14.3L122 56.87a8 8 0 0 0 4.1 1h3.64a8.1 8.1 0 0 0 4.1-1l28.84-16.1A96 96 0 0 1 188.12 55l.11 32.2a8 8 0 0 0 1.22 4.22c.62 1 1.23 2 1.8 3.06a8.1 8.1 0 0 0 3 3.06l28.6 16.29a90.5 90.5 0 0 1 .05 28.29Z\"/></svg>","ph:phone":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"m222.37 158.46l-47.11-21.11l-.13-.06a16 16 0 0 0-15.17 1.4a8 8 0 0 0-.75.56L134.87 160c-15.42-7.49-31.34-23.29-38.83-38.51l20.78-24.71c.2-.25.39-.5.57-.77a16 16 0 0 0 1.32-15.06v-.12L97.54 33.64a16 16 0 0 0-16.62-9.52A56.26 56.26 0 0 0 32 80c0 79.4 64.6 144 144 144a56.26 56.26 0 0 0 55.88-48.92a16 16 0 0 0-9.51-16.62M176 208A128.14 128.14 0 0 1 48 80a40.2 40.2 0 0 1 34.87-40a.6.6 0 0 0 0 .12l21 47l-20.67 24.74a6 6 0 0 0-.57.77a16 16 0 0 0-1 15.7c9.06 18.53 27.73 37.06 46.46 46.11a16 16 0 0 0 15.75-1.14a8 8 0 0 0 .74-.56L168.89 152l47 21.05h.11A40.21 40.21 0 0 1 176 208\"/></svg>","ph:receipt":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"M72 104a8 8 0 0 1 8-8h96a8 8 0 0 1 0 16H80a8 8 0 0 1-8-8m8 40h96a8 8 0 0 0 0-16H80a8 8 0 0 0 0 16m152-88v152a8 8 0 0 1-11.58 7.15L192 200.94l-28.42 14.21a8 8 0 0 1-7.16 0L128 200.94l-28.42 14.21a8 8 0 0 1-7.16 0L64 200.94l-28.42 14.21A8 8 0 0 1 24 208V56a16 16 0 0 1 16-16h176a16 16 0 0 1 16 16m-16 0H40v139.06l20.42-10.22a8 8 0 0 1 7.16 0L96 199.06l28.42-14.22a8 8 0 0 1 7.16 0L160 199.06l28.42-14.22a8 8 0 0 1 7.16 0L216 195.06Z\"/></svg>","ph:list-checks":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"M224 128a8 8 0 0 1-8 8h-88a8 8 0 0 1 0-16h88a8 8 0 0 1 8 8m-96-56h88a8 8 0 0 0 0-16h-88a8 8 0 0 0 0 16m88 112h-88a8 8 0 0 0 0 16h88a8 8 0 0 0 0-16M82.34 42.34L56 68.69L45.66 58.34a8 8 0 0 0-11.32 11.32l16 16a8 8 0 0 0 11.32 0l32-32a8 8 0 0 0-11.32-11.32m0 64L56 132.69l-10.34-10.35a8 8 0 0 0-11.32 11.32l16 16a8 8 0 0 0 11.32 0l32-32a8 8 0 0 0-11.32-11.32m0 64L56 196.69l-10.34-10.35a8 8 0 0 0-11.32 11.32l16 16a8 8 0 0 0 11.32 0l32-32a8 8 0 0 0-11.32-11.32\"/></svg>","ph:calendar-check":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"M208 32h-24v-8a8 8 0 0 0-16 0v8H88v-8a8 8 0 0 0-16 0v8H48a16 16 0 0 0-16 16v160a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16M72 48v8a8 8 0 0 0 16 0v-8h80v8a8 8 0 0 0 16 0v-8h24v32H48V48Zm136 160H48V96h160zm-38.34-85.66a8 8 0 0 1 0 11.32l-48 48a8 8 0 0 1-11.32 0l-24-24a8 8 0 0 1 11.32-11.32L116 164.69l42.34-42.35a8 8 0 0 1 11.32 0\"/></svg>","ph:file-text":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"m213.66 82.34l-56-56A8 8 0 0 0 152 24H56a16 16 0 0 0-16 16v176a16 16 0 0 0 16 16h144a16 16 0 0 0 16-16V88a8 8 0 0 0-2.34-5.66M160 51.31L188.69 80H160ZM200 216H56V40h88v48a8 8 0 0 0 8 8h48zm-32-80a8 8 0 0 1-8 8H96a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8m0 32a8 8 0 0 1-8 8H96a8 8 0 0 1 0-16h64a8 8 0 0 1 8 8\"/></svg>","ph:warning-circle":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 256 256\"><path fill=\"currentColor\" d=\"M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24m0 192a88 88 0 1 1 88-88a88.1 88.1 0 0 1-88 88m-8-80V80a8 8 0 0 1 16 0v56a8 8 0 0 1-16 0m20 36a12 12 0 1 1-12-12a12 12 0 0 1 12 12\"/></svg>","tabler:home":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M5 12H3l9-9l9 9h-2M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7\"/><path d=\"M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6\"/></g></svg>","tabler:user-plus":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 7a4 4 0 1 0 8 0a4 4 0 0 0-8 0m8 12h6m-3-3v6M6 21v-2a4 4 0 0 1 4-4h4\"/></svg>","tabler:users":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2m1-17.87a4 4 0 0 1 0 7.75M21 21v-2a4 4 0 0 0-3-3.85\"/></svg>","tabler:message-circle":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"m3 20l1.3-3.9C1.976 12.663 2.874 8.228 6.4 5.726c3.526-2.501 8.59-2.296 11.845.48c3.255 2.777 3.695 7.266 1.029 10.501S11.659 20.922 7.7 19z\"/></svg>","tabler:clipboard-list":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2\"/><path d=\"M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2m0 7h.01M13 12h2m-6 4h.01M13 16h2\"/></g></svg>","tabler:wallet":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6\"/><path d=\"M20 12v4h-4a2 2 0 0 1 0-4z\"/></g></svg>","tabler:flag":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 5a5 5 0 0 1 7 0a5 5 0 0 0 7 0v9a5 5 0 0 1-7 0a5 5 0 0 0-7 0zm0 16v-7\"/></svg>","tabler:chart-line":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 19h16M4 15l4-6l4 2l4-5l4 4\"/></svg>","tabler:bell":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3H4a4 4 0 0 0 2-3v-3a7 7 0 0 1 4-6M9 17v1a3 3 0 0 0 6 0v-1\"/></svg>","tabler:settings":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37c1 .608 2.296.07 2.572-1.065\"/><path d=\"M9 12a3 3 0 1 0 6 0a3 3 0 0 0-6 0\"/></g></svg>","tabler:phone":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2\"/></svg>","tabler:receipt":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16l-3-2l-2 2l-2-2l-2 2l-2-2zM9 7h6m-6 4h6m-2 4h2\"/></svg>","tabler:list-check":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3.5 5.5L5 7l2.5-2.5m-4 7L5 13l2.5-2.5m-4 7L5 19l2.5-2.5M11 6h9m-9 6h9m-9 6h9\"/></svg>","tabler:calendar-check":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M11.5 21H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6M16 3v4M8 3v4m-4 4h16m-5 8l2 2l4-4\"/></svg>","tabler:file-text":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><path d=\"M14 3v4a1 1 0 0 0 1 1h4\"/><path d=\"M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2M9 9h1m-1 4h6m-6 4h6\"/></g></svg>","tabler:alert-circle":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3 12a9 9 0 1 0 18 0a9 9 0 0 0-18 0m9-4v4m0 4h.01\"/></svg>","lucide:circle-dot":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"12\" cy=\"12\" r=\"10\"/></g></svg>","lucide:circle-dashed":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M10.1 2.182a10 10 0 0 1 3.8 0m0 19.636a10 10 0 0 1-3.8 0m7.509-18.097a10 10 0 0 1 2.69 2.7M2.182 13.9a10 10 0 0 1 0-3.8m18.097 7.509a10 10 0 0 1-2.7 2.69M21.818 10.1a10 10 0 0 1 0 3.8M3.721 6.391a10 10 0 0 1 2.7-2.69m-.03 16.578a10 10 0 0 1-2.69-2.7\"/></svg>","lucide:clock":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 6v6l4 2\"/></g></svg>","lucide:circle-check":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16 9l-5.5 5.5L8 12\"/></g></svg>","lucide:circle-pause":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><g fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M10 15V9m4 6V9\"/></g></svg>","simple-icons:google":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"#ededf0\" d=\"M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133c-1.147 1.147-2.933 2.4-6.053 2.4c-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0C5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36c2.16-2.16 2.84-5.213 2.84-7.667c0-.76-.053-1.467-.173-2.053z\"/></svg>","simple-icons:vercel":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"#ededf0\" d=\"m12 1.608l12 20.784H0Z\"/></svg>","simple-icons:adobe":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"#ff4d3d\" d=\"m13.966 22.624l-1.69-4.281H8.122l3.892-9.144l5.662 13.425zM8.884 1.376H0v21.248zm15.116 0h-8.884L24 22.624Z\"/></svg>","simple-icons:anthropic":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 24 24\"><path fill=\"#d97757\" d=\"M17.304 3.541h-3.672l6.696 16.918H24Zm-10.608 0L0 20.459h3.744l1.37-3.553h7.005l1.369 3.553h3.744L10.536 3.541Zm-.371 10.223L8.616 7.82l2.291 5.945Z\"/></svg>"};
+async function svg(name) { return ICONS[name] || ''; }
+const ic = (name, cls = '') => `<span class="ic ${cls}" data-i="${name}"></span>`;
+
+function sidebar(set) {
+  const s = SETS[set];
+  return `<aside class="side"><div class="brand"><i></i>MARCYAN</div><div class="cap">Operación</div>`
+    + NAV.map(([id, label, n]) => `<div class="nav ${id === 'inicio' ? 'on' : ''}">${ic(s[id])}<span>${label}</span>${n ? `<span class="n">${n}</span>` : ''}</div>`).join('')
+    + `<div class="cap">Suscripciones · $114/mes</div>`
+    + SUBS.map(([slug, nm, am]) => `<div class="sub"><span class="lg" data-logo="${slug}"></span><span class="nm">${nm}</span><span class="am">${am}</span></div>`).join('')
+    + `<span class="sub-all">Ver todas en Finanzas</span></aside>`;
+}
+function todayRows(set, rows, buttons = true) {
+  const s = SETS[set];
+  return rows.map(([k, t, sm, a]) => `<div class="row"><span class="tile">${ic(s[k] || s.alert)}</span><span class="txt"><b>${t}</b><small>${sm}</small></span>${buttons ? `<span class="btn">${a}</span>` : ''}</div>`).join('');
+}
+const head = () => `<div class="top"><span>Inicio · 3 proyectos activos</span><span>Actualizado 11:13 p.m.</span></div><h2>Buenas noches, Yan</h2><p class="sub2">Sábado 14 de noviembre</p>`;
+
+function dirA() {
+  return sidebar('lucide') + `<div class="main">${head()}
+    <div class="card today"><div class="today-h">Hoy<span class="cnt">${TODAY.length}</span></div>${todayRows('lucide', TODAY)}</div>
+    <div class="kpis">${KPIS.map(([l, v, c, b], i) => `<div class="card kpi"><div class="l">${l}<span class="bars">${b.map((x) => `<i style="height:${Math.max(4, x * 4)}px"></i>`).join('')}</span></div><div class="v"${i === 3 ? ' style="color:var(--teal)"' : ''}>${v}</div><div class="c">${c}</div></div>`).join('')}</div>
+    <div class="ghost">Igual que hoy: actividad por mes, leads por estado, proyectos y leads recientes, actividad acumulada.</div></div>`;
+}
+function dirB() {
+  return sidebar('ph') + `<div class="main">${head()}
+    <div class="cols"><div>
+      <div class="strip">${KPIS.map(([l, v, c], i) => `<div><div class="l">${l}</div><div class="v"${i === 3 ? ' style="color:var(--teal)"' : ''}>${v}</div><div class="c">${c}</div></div>`).join('')}</div>
+      <div class="ghost" style="height:180px">Actividad por mes (el gráfico de siempre)</div><div style="height:12px"></div>
+      <div class="ghost" style="height:160px">Proyectos y leads recientes (igual que hoy)</div>
+    </div>
+    <div class="card today"><div class="today-h">Hoy<span class="cnt">${TODAY.length}</span></div>${todayRows('ph', TODAY.slice(0, 5), false)}<div class="row" style="justify-content:center;color:var(--fg3);font-size:12px">Cada fila abre su sitio</div></div></div></div>`;
+}
+function dirC() {
+  const s = SETS.tabler;
+  const groups = [['now', 'Ahora', 'var(--err)'], ['today', 'Hoy', 'var(--warn)'], ['week', 'Esta semana', 'var(--fg3)']];
+  return sidebar('tabler') + `<div class="main">${head()}
+    <div class="kpis">${KPIS.map(([l, v, c], i) => `<div class="card kpi" style="display:flex;gap:12px;align-items:center;padding:12px 14px"><span class="tile2">${ic(s[KPI_IC[i]])}</span><div><div class="l" style="font-size:12px">${l}</div><div class="v" style="font-size:22px;margin:0${i === 3 ? ';color:var(--teal)' : ''}">${v}</div><div class="c">${c}</div></div></div>`).join('')}</div>
+    <div class="card today">${groups.map(([g, label, col]) => {
+      const rows = TODAY.filter((r) => r[4] === g);
+      return rows.length ? `<div class="grp" style="display:flex;align-items:center;gap:8px"><span class="dot" style="background:${col}"></span>${label} · ${rows.length}</div>` + todayRows('tabler', rows) : '';
+    }).join('')}</div>
+    <div class="ghost" style="margin-top:14px">Debajo, igual que hoy: gráficos, proyectos y leads recientes. Avisos usa esta misma bandeja con sus filtros.</div></div>`;
+}
+
+const STATES = [
+  ['Nuevo, por atender', 'lucide:circle-dot', 'var(--info)', 'Leads nuevos, briefs sin abrir'],
+  ['En curso', 'lucide:circle-dashed', 'var(--fg2)', 'Proyectos, conversaciones abiertas'],
+  ['Esperando al cliente', 'lucide:clock', 'var(--warn)', 'Facturas abiertas, propuestas enviadas'],
+  ['Vencido o con error', 'lucide:circle-alert', 'var(--err)', 'Facturas vencidas, envíos fallidos'],
+  ['Hecho, cobrado o convertido', 'lucide:circle-check', 'var(--ok)', 'Proyectos terminados, leads convertidos'],
+  ['En pausa o archivado', 'lucide:circle-pause', 'var(--fg3)', 'Proyectos parados, leads perdidos'],
+];
+document.getElementById('legend').innerHTML = STATES.map(([l, i, c, w]) =>
+  `<tr><td>${l}</td><td><span class="chip" style="color:${c};background:color-mix(in oklch, ${c} 14%, transparent)">${ic(i)}${l.split(',')[0]}</span></td><td style="color:var(--fg2)">${w}</td></tr>`).join('');
+
+const DIRS = { A: dirA, B: dirB, C: dirC };
+for (const [k, f] of Object.entries(DIRS)) document.querySelector(`#${k} .shell`).innerHTML = f();
+
+(async () => {
+  await Promise.all([...document.querySelectorAll('[data-i]')].map(async (el) => { el.innerHTML = await svg(el.dataset.i); }));
+  const BRAND = { googleworkspace: 'simple-icons:google', vercel: 'simple-icons:vercel', adobe: 'simple-icons:adobe', anthropic: 'simple-icons:anthropic' };
+  await Promise.all([...document.querySelectorAll('[data-logo]')].map(async (el) => { el.innerHTML = await svg(BRAND[el.dataset.logo]); }));
+  document.body.dataset.ready = '1';
+})();
+</script>
+</body>
+</html>

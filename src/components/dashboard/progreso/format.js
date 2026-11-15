@@ -25,7 +25,8 @@ export const M_STATUSES = [
 
 // Colores reales de cada tono (para SVG, donde no llegan las clases).
 export const TONE_COLOR = {
-  info: 'var(--color-info)',
+  // Fase 3: el avance en curso va en gris claro (el azul competía, sin estar en la lámina).
+  info: 'var(--fg-secondary)',
   warning: 'var(--color-warning)',
   success: 'var(--color-success)',
   neutral: 'var(--fg-subtle)',
@@ -130,7 +131,7 @@ export function truncateLabel(label, max = 16) {
 }
 
 // ── Monograma de cliente/proyecto ─────────────────────────────
-const MONO_PALETTE = ['#6366f1', '#0ea5e9', '#14b8a6', '#f97316', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'];
+const MONO_PALETTE = ['#333333']   // fase 3: monograma neutro, sin colores que compitan (H-07);
 export function monoColor(n) {
   let h = 0; const s = n || '?';
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;

@@ -1,5 +1,6 @@
 // /api/admin/subscriptions/:id   (id = subscriptions.id BIGINT → string)
-//   PATCH  → { active, name, amount_cents, cycle, category, next_charge_at, notes }
+//   PATCH  → { active, name, amount_cents, cycle, category, next_charge_at, notes,
+//              started_at, ended_at, account_id }  (pausar pone la baja; reactivar, un alta nueva)
 //            toggle/editar {ok, subscription} (monto > 0; next_charge_at sale avanzado)
 //   DELETE → elimina la suscripción {ok, deleted}
 // Protegido con requireAdmin. Montos en CENTAVOS USD.

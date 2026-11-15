@@ -84,7 +84,7 @@
     'sin-soporte': 'Este navegador no admite avisos.',
     'ios-instalar': 'En iPhone, instala Orbit primero: Compartir y luego "Añadir a pantalla de inicio". Ábrelo desde ahí y activa los avisos.',
     bloqueado: 'Los avisos están bloqueados para este sitio. Permítelos en los ajustes del navegador y vuelve aquí.',
-    'sin-llave': 'Falta la llave de avisos en Vercel.',
+    'sin-llave': 'Avisos al teléfono sin activar',
     'sin-base': 'Falta preparar la base de datos de los avisos.',
   };
 </script>
@@ -99,10 +99,10 @@
 {:else if state === 'apagado'}
   <button type="button" class="b b--ghost" disabled={busy} onclick={activar}><Icon name="avisos" size={16} />Avisos en este dispositivo</button>
 {:else if NOTE[state]}
-  <p class="push-note">{NOTE[state]}</p>
+  <p class="push-note" title={state === 'sin-llave' ? 'Falta activarlos en el servidor del panel; hasta entonces los avisos solo se ven aquí.' : undefined}>{NOTE[state]}</p>
 {/if}
 
 <style>
   .push-hold { visibility: hidden; }
-  .push-note { margin: 0; max-width: 340px; font-size: var(--dash-caption); line-height: 1.4; color: var(--fg-subtle); }
+  .push-note { margin: 0; max-width: 340px; font-family: var(--font-mono); font-size: var(--dash-mono); line-height: 1.4; color: var(--fg-subtle); }
 </style>

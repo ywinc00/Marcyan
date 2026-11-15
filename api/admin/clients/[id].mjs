@@ -98,6 +98,15 @@ export default async function handler(req, res) {
         });
       }
       const impact = await clientDeleteImpact(id);
+      // Los cobros son parte de los libros (meses cerrados incluidos): no se borran en cascada.
+      if (Number(impact.payments) > 0) {
+        return res.status(409).json({
+          ok: false,
+          error: 'Este cliente tiene cobros registrados y forman parte de los libros. Archívalo en lugar de borrarlo.',
+          reason: 'has_payments',
+          impact,
+        });
+      }
       const ok = await deleteClient(id);
       if (!ok) return res.status(500).json({ ok: false, error: 'No se pudo eliminar' });
       console.log(`[admin/clients/:id DELETE] ${before.client_code} eliminado por ${session.email}`, impact);

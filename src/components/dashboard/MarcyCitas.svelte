@@ -160,7 +160,7 @@
 
 <style>
   .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); }
-  .cap { margin: 0 0 6px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-subtle); }
+  .cap { margin: 0 0 6px; font-size: var(--dash-caption); font-weight: 500; letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle); }
   .muted { color: var(--fg-subtle); font-size: var(--dash-small); }
   .cal__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 12px 16px; border-bottom: 1px solid var(--border-subtle); }
   .cal__nav { display: flex; gap: 6px; }

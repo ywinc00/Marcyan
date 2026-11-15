@@ -17,9 +17,11 @@ export { FIELDS, BRIEF_SERVICES, labelFor, isLegacyBrief };
 // slug = cómo se escribe en la URL (#/briefs?estado=en-curso).
 // tone = color del chip (nunca solo color: siempre con su texto).
 export const STATUSES = [
-  { id: 'pending',     slug: 'pendiente',  label: 'Pendiente',  tone: 'warning' },
-  { id: 'contacted',   slug: 'contactado', label: 'Contactado', tone: 'info' },
-  { id: 'in_progress', slug: 'en-curso',   label: 'En curso',   tone: 'data' },
+  // Fase 3 · mapa de estados del panel: por atender = naranja, esperando al cliente
+  // y en curso = gris, hecho = verde (forma y texto siempre con el color).
+  { id: 'pending',     slug: 'pendiente',  label: 'Pendiente',  tone: 'info' },
+  { id: 'contacted',   slug: 'contactado', label: 'Contactado', tone: 'neutral' },
+  { id: 'in_progress', slug: 'en-curso',   label: 'En curso',   tone: 'neutral' },
   { id: 'completed',   slug: 'completado', label: 'Completado', tone: 'success' },
   { id: 'archived',    slug: 'archivado',  label: 'Archivado',  tone: 'neutral' },
 ];

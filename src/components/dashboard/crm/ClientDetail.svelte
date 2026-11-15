@@ -168,9 +168,9 @@
 
   {#if related}
     <KpiGrid count={3} label="Cuentas del cliente">
-      <Kpi label="Facturado" value={money(related.totals.invoiced_cents)} note={related.totals.draft_cents ? `${money(related.totals.draft_cents)} en borradores aparte` : 'Facturas emitidas, sin anuladas'} />
-      <Kpi label="Cobrado" value={money(related.totals.paid_cents)} tone="data" note="Pagos registrados" />
-      <Kpi label="Saldo pendiente" value={money(related.totals.balance_cents)} note={related.totals.balance_cents > 0 ? 'Por cobrar' : 'Al día'} />
+      <Kpi label="Facturado" value={money(related.totals.invoiced_cents)} art="invoice" note={related.totals.draft_cents ? `${money(related.totals.draft_cents)} en borradores aparte` : 'Facturas emitidas, sin anuladas'} />
+      <Kpi label="Cobrado" value={money(related.totals.paid_cents)} art="coins" note="Pagos registrados" />
+      <Kpi label="Saldo pendiente" value={money(related.totals.balance_cents)} art="clock" note={related.totals.balance_cents > 0 ? 'Por cobrar' : 'Al día'} />
     </KpiGrid>
   {/if}
 

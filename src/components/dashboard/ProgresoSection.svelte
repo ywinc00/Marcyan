@@ -167,7 +167,7 @@
       <div class="pl-search">
         <Icon name="search" size={16} />
         <label class="sr-only" for="prj-search">Buscar proyectos</label>
-        <input id="prj-search" class="ui-input" type="search" placeholder="Buscar proyecto, cliente o MRC"
+        <input id="prj-search" class="ui-input" type="search" placeholder="Buscar proyectos" title="Busca por proyecto, cliente o número MRC"
                value={searchText} oninput={onSearch} />
       </div>
     </div>
@@ -201,7 +201,7 @@
             <div class="pcard__top">
               <span class="pcard__mono" style={`background:${monoColor(r.client_name || r.name || r.project_code)}`} aria-hidden="true">{initials(r.client_name || r.name)}</span>
               <div class="pcard__hd">
-                <span class="pcard__id">{r.project_code || ('PRJ-' + r.id)}{#if r.service_type}<span class="pcard__svc">{' · ' + serviceLabel(r.service_type)}</span>{/if}</span>
+                <span class="pcard__id">{r.service_type ? serviceLabel(r.service_type) : 'Proyecto'}</span>
                 <span class="pcard__name">{r.name || 'Proyecto sin nombre'}</span>
               </div>
               <StatusChip tone={st.tone} label={st.label} />
@@ -291,6 +291,8 @@
     font-size: var(--dash-card-title); font-weight: 600; color: var(--fg-primary); line-height: 1.3; letter-spacing: -0.01em;
     display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
   }
+  /* Teléfono: hasta tres líneas, el nombre entero se lee (E-62). */
+  @media (max-width: 479px) { .pcard__name { -webkit-line-clamp: 4; line-clamp: 4; } }
   .pcard__sub { display: flex; align-items: center; gap: 6px; font-size: var(--dash-small); color: var(--fg-subtle); min-width: 0; }
   .pcard__client { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .pcard__dot { color: var(--fg-subtle); }
@@ -301,7 +303,7 @@
   .pcard__pct { font-size: var(--dash-caption); font-weight: 600; width: 38px; text-align: right; font-variant-numeric: tabular-nums; }
   .pcard__foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 10px; border-top: 1px solid var(--border-subtle); }
   .pcard__hit { font-size: var(--dash-small); color: var(--fg-secondary); }
-  .pcard__amt { font-size: var(--dash-small); font-weight: 600; color: var(--accent-teal); font-variant-numeric: tabular-nums; }
+  .pcard__amt { font-family: var(--font-mono); font-size: var(--dash-mono); font-weight: 500; color: var(--fg-primary); font-variant-numeric: tabular-nums; }
 
   /* Móvil: en media columna la cifra de dinero no cabe junto a la ilustración;
      se oculta solo esa ilustración (la cifra manda). */

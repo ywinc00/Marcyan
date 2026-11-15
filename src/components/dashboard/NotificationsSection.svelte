@@ -15,7 +15,7 @@
   import { route, href, setQuery, parseHash, navigate } from './lib/router.svelte.js';
   import { toast, toastError } from './lib/toast.svelte.js';
   import {
-    avisos, setUnread, readFilters, listParams, openTarget, visibleRef, cleanTitle,
+    avisos, setUnread, readFilters, listParams, openTarget, cleanTitle,
     markAllAction, isModifiedClick, TYPE_FILTERS, STATE_FILTERS,
   } from './lib/avisos.svelte.js';
   import PageHeader from './ui/PageHeader.svelte';
@@ -271,7 +271,7 @@
   const kpiNote = (t) => {
     if (!loaded) return 'Sin datos';
     const c = counts.by_type[t] || { total: 0, unread: 0 };
-    return c.unread ? `${c.unread} sin leer` : (c.total ? 'Todo leído' : 'Ninguno en la bandeja');
+    return c.unread ? `${c.unread} sin leer` : (c.total ? 'Todo leído' : 'Ninguno en la bandeja');
   };
 </script>
 
@@ -357,24 +357,14 @@
         {#each rows as n (n.id)}
           {@const tm = typeMeta(n.type)}
           {@const target = openTarget(n.link || n.url)}
-          {@const ref = visibleRef(n.ref)}
           {@const isBusy = !!busy[String(n.id)]}
           <li class="note note--{tm.cls}" class:unread={!n.read_at && !n.archived_at}>
             <span class="note__icon note__icon--{tm.cls}" aria-hidden="true">
-              {#if tm.cls === 'lead'}
-                <svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="6" width="17" height="12" rx="2" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 7.5L12 13l7.5-5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              {:else if tm.cls === 'brief'}
-                <svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3.5" width="14" height="17" rx="2" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.4"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-              {:else if tm.cls === 'handoff'}
-                <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 20 17h-9l-5 4v-4H4a1.5 1.5 0 0 1-1.5-1.5v-8A1.5 1.5 0 0 1 4 6z" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="9" cy="11.5" r="1" fill="currentColor"/><circle cx="12" cy="11.5" r="1" fill="currentColor"/><circle cx="15" cy="11.5" r="1" fill="currentColor"/></svg>
-              {:else}
-                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" fill="currentColor" fill-opacity="0.14" stroke="currentColor" stroke-width="1.4"/><path d="M12 8v4.5M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-              {/if}
+              <Icon name={tm.cls === 'lead' ? 'leads' : tm.cls === 'brief' ? 'briefs' : tm.cls === 'handoff' ? 'marcy' : 'alert'} size={18} />
             </span>
             <div class="note__body">
               <div class="note__top">
                 <StatusChip tone={tm.tone} label={tm.label} />
-                {#if ref}<span class="note__ref">{ref}</span>{/if}
                 <!-- El punto de no leído va EN la fila, antes de la hora (OP-28). -->
                 <span class="note__when" title={fmtDateTime(n.created_at)}>
                   {#if !n.read_at && !n.archived_at}<span class="note__dot" aria-hidden="true"></span><span class="sr-only">Sin leer, </span>{/if}
@@ -393,7 +383,7 @@
                 {#if !n.archived_at}
                   <button type="button" class="note__act" disabled={isBusy} onclick={() => toggleRead(n)}
                           aria-label={`${n.read_at ? 'Marcar como no leído' : 'Marcar como leído'}: ${cleanTitle(n.title)}`}>
-                    {n.read_at ? 'Marcar como no leído' : 'Marcar como leído'}
+                    {n.read_at ? 'Marcar no leído' : 'Marcar leído'}
                   </button>
                 {/if}
                 {#if archiveAvailable}
@@ -464,16 +454,15 @@
   .note__icon--lead    { --tint: var(--color-info); }
   .note__icon--brief   { --tint: var(--accent-teal); }
   .note__icon--handoff { --tint: var(--color-warning); }
+  /* Fase 3: ficha neutra con el icono de la familia del panel; el tipo lo dice
+     el chip con texto, no tres tintes distintos compitiendo (H-07). */
   .note__icon--lead, .note__icon--brief, .note__icon--handoff {
-    color: var(--tint);
-    border-color: color-mix(in srgb, var(--tint) 28%, transparent);
-    background: color-mix(in srgb, var(--tint) 10%, transparent);
+    color: var(--fg-secondary);
   }
   .note__icon--system  { color: var(--fg-subtle); }
 
   .note__body { min-width: 0; flex: 1 1 auto; }
   .note__top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
-  .note__ref { font-size: var(--dash-caption); font-weight: 500; color: var(--fg-secondary); letter-spacing: .02em; font-variant-numeric: tabular-nums; }
   .note__when { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: var(--dash-caption); color: var(--fg-subtle); white-space: nowrap; font-variant-numeric: tabular-nums; }
   .note__dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold); flex: 0 0 auto; }
 
@@ -481,8 +470,9 @@
   .note__text { margin: 2px 0 0; font-size: var(--dash-small); color: var(--fg-secondary); line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
 
   .note__foot { display: flex; align-items: center; flex-wrap: wrap; gap: 4px var(--space-4); margin-top: 8px; }
-  .note__open { display: inline-flex; align-items: center; gap: 2px; min-height: 28px; font-size: var(--dash-small); font-weight: 600; color: var(--accent-teal); text-decoration: none; border-radius: var(--radius-sm, 6px); }
-  .note__open:hover { color: var(--fg-primary); }
+  @media (max-width: 399px) { .note__foot { column-gap: 12px; } }
+  .note__open { display: inline-flex; align-items: center; gap: 2px; min-height: 28px; font-size: var(--dash-small); font-weight: 500; color: var(--fg-primary); text-decoration: none; border-radius: var(--radius-sm, 6px); }
+  .note__open:hover { color: var(--fg-secondary); }
   .note__act { min-height: 28px; padding: 0; background: transparent; border: 0; cursor: pointer; font: inherit; font-size: var(--dash-small); color: var(--fg-secondary); border-radius: var(--radius-sm, 6px); }
   .note__act:hover:not(:disabled) { color: var(--fg-primary); text-decoration: underline; text-underline-offset: 3px; }
   .note__act:disabled { opacity: .45; cursor: progress; }

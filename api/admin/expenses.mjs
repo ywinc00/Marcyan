@@ -39,6 +39,11 @@ export default async function handler(req, res) {
         spent_at: body.spent_at,
         vendor: body.vendor,
         notes: body.notes,
+        // Campos de libro (migración 025): account_id, vendor_id, business_pct, receipt_status.
+        account_id: body.account_id,
+        vendor_id: body.vendor_id,
+        business_pct: body.business_pct,
+        receipt_status: body.receipt_status,
       });
       return res.status(201).json({ ok: true, expense });
     } catch (err) {

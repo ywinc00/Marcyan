@@ -12,17 +12,20 @@
    ═══════════════════════════════════════════════════════════════ */
 :root {
   /* ── Superficies en capas (Orbit) ── */
-  --bg-base:     #0e0e11;   /* fondo del main */
-  --bg-2:        #0b0b0e;   /* sidebar (más oscuro que el main) */
-  --bg-card:     #16161a;   /* surface — tarjetas/paneles */
-  --bg-elevated: #1b1b20;   /* surface-2 — hover, inputs, nested */
-  --surface-3:   #23232a;   /* tooltips, chips activos */
-  --bg-overlay:  rgba(8, 8, 11, 0.72);
+  /* Fase 3 (2026-11-15): rampa NEUTRA medida en la lámina original de Orbit
+     (barra #151515, fondo #1c1c1c, tarjeta #1f1f1f, activo #2b2b2b). Fuera el
+     tinte azulado y el negro casi puro de antes (#0e0e11 / #16161a, E-01). */
+  --bg-base:     #1b1b1b;   /* fondo del main */
+  --bg-2:        #151515;   /* sidebar (más oscuro que el main) */
+  --bg-card:     #202020;   /* surface — tarjetas/paneles */
+  --bg-elevated: #272727;   /* surface-2 — hover, inputs, nested */
+  --surface-3:   #2e2e2e;   /* tooltips, chips activos, ítem activo */
+  --bg-overlay:  rgba(10, 10, 10, 0.72);
 
   /* ── Bordes HAIRLINE translúcidos (clave del look Orbit) ── */
-  --border:        rgba(255, 255, 255, 0.07);
-  --border-subtle: rgba(255, 255, 255, 0.045);
-  --border-strong: rgba(255, 255, 255, 0.11);
+  --border:        rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-strong: rgba(255, 255, 255, 0.13);
   --border-accent: var(--accent-gold-line);
 
   /* ── Texto: niveles (neutro frío, estilo Orbit) ──
@@ -30,13 +33,15 @@
         (5,3:1 sobre --bg-card, 5,1:1 sobre --bg-elevated) y queda para texto
         de apoyo legible. Placeholder y deshabilitado usan un tercer nivel
         explícito, --fg-faint (no es texto que haya que leer). */
-  --fg-primary:   #f4f4f5;
-  --fg-secondary: #a1a1aa;
-  --fg-subtle:    #8b8b95;
-  --fg-faint:     #6b6b74;   /* SOLO placeholder / deshabilitado / decoración */
+  /* Neutros sin tinte (fase 3). Contraste sobre la tarjeta #202020:
+     primario 16:1, secundario 7,4:1, sutil 5,0:1 (AA), tenue solo decoración. */
+  --fg-primary:   #f2f2f2;
+  --fg-secondary: #a8a8a8;
+  --fg-subtle:    #8f8f8f;
+  --fg-faint:     #6a6a6a;   /* SOLO placeholder / deshabilitado / decoración */
   /* ⚑ Texto sobre el acento naranja: antes blanco (2,8:1), ahora el fondo
      del panel #0e0e11 (6,9:1). Decisión del gate orbit.md, con antes/después. */
-  --fg-inverse:   #0e0e11;
+  --fg-inverse:   #141414;
 
   /* ── Acento ÚNICO: Naranja Orbit (lo lleva el token "gold") ── */
   --accent-gold:       #f97316;
@@ -81,16 +86,23 @@
         las de Orbit (Inter 500, no monospace). ── */
   --font-display: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-body:    'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono:    'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Fase 3: monoespaciada de verdad para rótulos, meta, ejes y notas (H-05),
+     como la lámina original de Orbit. Inter sigue para todo lo demás. */
+  --font-mono:    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
   /* Orbit: títulos apretados */
   --tracking-tight: -0.025em;
 
   /* Tonos fijos de los gráficos e iconos de Inicio, ahora como tokens
      (SH-22): mismo aspecto, una sola fuente. */
-  --chart-idle-top:  #2a2a2f;
-  --chart-idle-base: var(--bg-elevated);
-  --icon-muted:      #4a4a55;
+  --chart-idle-top:  #424242;
+  --chart-idle-base: #262626;
+  --chart-grid:      rgba(255, 255, 255, 0.07);
+  --chart-peak:      #f7cfa3;   /* melocotón de la cima de la barra activa (referencia) */
+  --icon-muted:      #5a5a5a;
+  /* Cifras y notas: la comparación pequeña lleva el color, la cifra no (H-07). */
+  --delta-up:   #4ade80;
+  --delta-down: #f87171;
   /* Brillo del esqueleto de carga (pieza E-09): la superficie elevada un 6 %
      más clara, nunca un blanco suelto escrito a mano. */
   --skel-shine: color-mix(in srgb, var(--bg-elevated), #fff 6%);
@@ -100,8 +112,9 @@
   --dash-small:   13px;
   --dash-body:    14px;
   --dash-card-title: 15px;
-  --dash-title:   28px;
-  --dash-kpi:     30px;
+  --dash-title:   26px;
+  --dash-kpi:     28px;
+  --dash-mono:    12px;
 
   /* Alturas de la carcasa móvil y zonas seguras del iPhone */
   --mobilebar-h: 56px;
@@ -251,29 +264,30 @@ select.inp,
   align-items: center;
   gap: 12px;
 }
+/* Fase 3: píldora de la lámina original de Orbit (degradado que se aclara hacia
+   la punta, nombre en mono dentro, a la derecha). Neutra: sin acento (H-07). */
 .funnel__pill {
   width: var(--w);
-  min-width: 28%;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
+  min-width: max(34%, calc(11ch + 26px));
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), #3b3b3b);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: var(--radius-pill);
-  padding: 7px 14px;
-  font-size: var(--dash-small);
+  padding: 4px 12px;
+  font-family: var(--font-mono);
+  font-size: var(--dash-mono);
   color: var(--fg-primary);
+  text-align: right;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   transition: width .4s ease;
 }
-.funnel__pill--accent {
-  background: rgba(var(--accent-gold-rgb), .16);
-  border-color: var(--accent-gold-line);
-  color: var(--accent-gold);
-}
+.funnel__pill--accent { border-color: rgba(255, 255, 255, 0.16); }
 .funnel__n {
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   color: var(--fg-secondary);
-  font-size: 13px;
+  font-size: var(--dash-mono);
   text-align: right;
 }
 
@@ -394,15 +408,15 @@ select.inp,
 .ui-page-head {
   display: flex; align-items: center; justify-content: space-between;
   gap: var(--space-3) var(--space-4); flex-wrap: wrap;
-  margin: var(--space-5) 0 var(--space-5);
-  min-height: 40px;
+  margin: 18px 0 16px;
+  min-height: 38px;
 }
 .ui-page-head__text { min-width: 0; }
 .ui-page-title {
   margin: 0;
   display: inline-flex; align-items: center; gap: 10px;
-  font-family: var(--font-display); font-weight: 600; font-size: var(--dash-title);
-  line-height: 1.15; letter-spacing: var(--tracking-tight); color: var(--fg-primary);
+  font-family: var(--font-display); font-weight: 500; font-size: var(--dash-title);
+  line-height: 1.15; letter-spacing: -0.02em; color: var(--fg-primary);
 }
 .ui-page-sub { margin: 4px 0 0; font-size: var(--dash-body); color: var(--fg-secondary); }
 .ui-page-head__actions { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
@@ -439,62 +453,101 @@ select.inp,
   .ui-kpis[data-count="5"] > :first-child { grid-column: 1 / -1; }
 }
 
-/* ── KPI ── */
+/* ── KPI (fase 3, medido en la lámina original de Orbit) ──
+   Tarjeta de 1 px de borde con un degradado que baja de #272727 a la tarjeta;
+   rótulo 13 px, cifra 28/500 en blanco, nota en mono 12 px. El objeto en
+   relieve (KpiArt) va abajo a la derecha y la tarjeta lo corta. */
 .ui-kpi {
-  display: block; min-width: 0;
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-  padding: 18px 20px; color: inherit; text-decoration: none;
+  position: relative; overflow: hidden; isolation: isolate;
+  display: flex; flex-direction: column; min-width: 0; min-height: 104px;
+  container-type: inline-size;
+  background: linear-gradient(165deg, #292929 0%, #222 46%, #1f1f1f 100%);
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 15px 18px 14px; color: inherit; text-decoration: none;
 }
 .ui-kpi--link { transition: border-color var(--duration-fast), background-color var(--duration-fast); }
-.ui-kpi--link:hover { border-color: var(--border-strong); background: var(--bg-elevated); }
-.ui-kpi__label { margin: 0 0 10px; font-size: var(--dash-small); font-weight: 500; color: var(--fg-secondary); }
-.ui-kpi__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: 50px; }
+.ui-kpi--link:hover { border-color: var(--border-strong); }
+.ui-kpi--link:hover .ui-kpi__art { opacity: 1; }
+.ui-kpi__label { position: relative; z-index: 1; margin: 0; font-size: var(--dash-small); font-weight: 400; color: var(--fg-secondary); }
 .ui-kpi__num {
-  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  font-family: var(--font-display); font-weight: 650; font-size: var(--dash-kpi);
-  line-height: 1; letter-spacing: var(--tracking-tight); color: var(--fg-primary);
+  position: relative; z-index: 1; display: block;
+  margin: 8px 0 0; max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-family: var(--font-display); font-weight: 500; font-size: var(--dash-kpi);
+  line-height: 1.05; letter-spacing: -0.02em; color: var(--fg-primary);
   font-variant-numeric: tabular-nums;
 }
-.ui-kpi__num.is-accent { color: var(--accent-gold); }
-.ui-kpi__num.is-data { color: var(--accent-teal); }
-.ui-kpi__num.is-error { color: var(--color-error); } /* A4: Vencido / Neto negativo */
-.ui-kpi__note { margin: 12px 0 0; font-size: var(--dash-small); color: var(--fg-subtle); line-height: 1.4; }
-.ui-kpi__note .is-data { color: var(--accent-teal); font-weight: 600; }
+.ui-kpi__note {
+  position: relative; z-index: 1; margin: auto 0 0; padding-top: 10px;
+  font-family: var(--font-mono); font-size: var(--dash-mono); letter-spacing: -0.01em;
+  color: var(--fg-subtle); line-height: 1.45;
+}
+/* La nota deja libre la mitad visible del objeto; la cifra va arriba y usa todo el ancho. */
+/* El texto acaba 12 px antes del objeto (88 px, su silueta empieza a 13 px de su borde). */
+.ui-kpi.has-art .ui-kpi__note { max-width: calc(100% - 74px); }
+.ui-kpi__note .is-data, .ui-kpi__note .is-up { color: var(--delta-up); font-weight: 500; }
+.ui-kpi__note .is-down { color: var(--delta-down); font-weight: 500; }
+/* La variación («↑ +15.1 %», «−$3,800») es un bloque: nunca se parte (E-62). */
+.ui-kpi__note .is-up, .ui-kpi__note .is-down, .ui-kpi__note .is-data, .ui-kpi__note .nw,
+.ui-kpi__note .fin-up, .ui-kpi__note .fin-down { white-space: nowrap; }
+.ui-kpi__note.is-error { color: var(--delta-down); }
+.ui-kpi__art {
+  position: absolute; z-index: 0; right: 0; bottom: -16px;
+  width: 88px; opacity: .95; pointer-events: none;
+  transition: opacity var(--duration-fast);
+}
+.ui-kpi__art svg { width: 100%; height: auto; }
+/* Tarjeta estrecha (dos por fila en el teléfono): la nota usa todo el ancho y el
+   objeto, más pequeño, tiene su propia franja debajo; nunca se pisan. */
+@container (max-width: 159px) {
+  .ui-kpi.has-art .ui-kpi__note { max-width: calc(100% - 64px); }
+  .ui-kpi.has-art.is-strip .ui-kpi__note { max-width: none; margin-bottom: 34px; }
+  .ui-kpi__art { width: 62px; bottom: -12px; }
+  /* Teléfono: la nota va SIEMPRE justo bajo la cifra (con franja o sin ella), así
+     las tarjetas vecinas se leen a la misma altura. */
+  .ui-kpi__note { margin-top: 0; }
+}
 @media (max-width: 719px) {
-  .ui-kpi { padding: 14px 16px; }
-  .ui-kpi__num { font-size: 26px; }
+  .ui-kpi { padding: 13px 14px 12px; min-height: 96px; }
+  .ui-kpi__num { font-size: 24px; }
 }
 
-/* ── Tarjeta ── */
+/* ── Tarjeta ── (fase 3: radio 12 y padding 18 como la referencia) */
 .ui-card {
   min-width: 0;
-  background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg);
-  padding: 20px;
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px;
 }
 .ui-card--flush { padding: 0; overflow: hidden; }
-.ui-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-4); }
+.ui-card__head { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 8px var(--space-3); margin-bottom: var(--space-4); }
 .ui-card__titles { min-width: 0; }
-.ui-card__caption { margin: 0 0 6px; font-size: var(--dash-small); font-weight: 500; color: var(--fg-secondary); }
-.ui-card__title { margin: 0; font-size: var(--dash-card-title); font-weight: 600; color: var(--fg-primary); letter-spacing: -0.01em; }
-.ui-card__actions { display: flex; align-items: center; gap: var(--space-2); flex: 0 0 auto; }
+.ui-card__caption { margin: 0 0 6px; font-family: var(--font-mono); font-size: var(--dash-mono); font-weight: 400; color: var(--fg-subtle); }
+.ui-card__title { margin: 0; font-size: var(--dash-body); font-weight: 500; color: var(--fg-primary); letter-spacing: -0.005em; }
+.ui-card__actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); flex: 0 1 auto; min-width: 0; }
 
 /* ── Chip de estado (color + texto, nunca solo color) ── */
+/* Fase 3, ronda 2: ficha NEUTRA con un punto de color delante (forma + color +
+   palabra). Mapa del panel, sin azul (la lámina no lo tiene): por atender o
+   activo = naranja, hecho o positivo = verde, aviso = ámbar, error = rojo,
+   resto (en curso, pausa, archivado) = gris. */
 .ui-chip {
-  --chip: var(--fg-secondary);
+  --chip: var(--fg-faint);
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 3px 10px; border-radius: var(--radius-pill);
+  padding: 2px 9px 2px 8px; border-radius: var(--radius-pill);
   font-size: var(--dash-caption); font-weight: 500; line-height: 1.45; white-space: nowrap;
-  color: var(--chip);
-  background: color-mix(in srgb, var(--chip) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--chip) 26%, transparent);
+  color: var(--fg-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
 }
-.ui-chip--neutral { --chip: var(--fg-secondary); background: var(--bg-elevated); border-color: var(--border); }
-.ui-chip--accent  { --chip: var(--accent-gold); }
-.ui-chip--data    { --chip: var(--accent-teal); }
-.ui-chip--success { --chip: var(--color-success); }
+.ui-chip::before { content: ''; flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%; background: var(--chip); }
+.ui-chip--neutral { --chip: var(--fg-faint); }
+.ui-chip--accent,
+.ui-chip--info    { --chip: var(--accent-gold); color: var(--fg-primary); }
+.ui-chip--data,
+.ui-chip--success { --chip: var(--delta-up); }
 .ui-chip--warning { --chip: var(--color-warning); }
-.ui-chip--error   { --chip: var(--color-error); }
-.ui-chip--info    { --chip: var(--color-info); }
+.ui-chip--error   { --chip: var(--delta-down); color: var(--fg-primary); }
+@media (forced-colors: active) { .ui-chip::before { background: CanvasText; } }
 
 /* ── Vacío (E-08) ── */
 .ui-empty {
@@ -604,13 +657,15 @@ select.inp,
 .ui-confirm__msg { margin: 0; font-size: var(--dash-body); color: var(--fg-secondary); line-height: 1.55; }
 
 /* ── Tabla de datos → tarjetas por debajo de 720 px ── */
-.ui-table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+/* Si la tabla no cabe (tableta, portátil estrecho), se desplaza DENTRO de su tarjeta con
+   la barra visible; nunca se corta la última columna (E-62). */
+.ui-table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow-x: auto; overflow-y: hidden; }
 .ui-table { width: 100%; border-collapse: collapse; font-size: var(--dash-body); }
 .ui-table th {
   text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); white-space: nowrap;
-  font-size: var(--dash-caption); font-weight: 500; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle);
+  font-family: var(--font-mono); font-size: var(--dash-mono); font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--fg-subtle);
 }
-.ui-table td { height: 52px; padding: 10px 16px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; color: var(--fg-secondary); }
+.ui-table td { height: 46px; padding: 8px 16px; border-bottom: 1px solid var(--border-subtle); vertical-align: middle; color: var(--fg-secondary); }
 .ui-table .is-end { text-align: right; }
 .ui-table tbody tr { transition: background-color var(--duration-fast); }
 .ui-table tbody tr:hover td { background: var(--bg-elevated); }
@@ -637,7 +692,7 @@ select.inp,
   }
   .ui-table td:not(.is-primary):not(.is-action)::before {
     content: attr(data-label); flex: 0 0 auto;
-    font-size: var(--dash-caption); font-weight: 500; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle);
+    font-size: var(--dash-caption); font-weight: 500; letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle);
   }
   .ui-table td.is-wide { flex-direction: column; align-items: stretch; gap: 6px; }
 }

@@ -11,6 +11,7 @@
   import StatusChip from '../ui/StatusChip.svelte';
   import Icon from '../ui/Icon.svelte';
   import ExpenseForm from './ExpenseForm.svelte';
+  import { receiptUrl } from './books.js';
   import { api, errorMessage, isSessionError } from '../lib/api.js';
   import { toast, toastError } from '../lib/toast.svelte.js';
   import { route, setQuery } from '../lib/router.svelte.js';
@@ -89,7 +90,7 @@
   const scope = $derived(month ? monthLong(month) : 'todos los meses');
 </script>
 
-<Card title="Gastos" caption="Puntuales del negocio">
+<Card title="Gastos" caption="Todo lo que sale">
   {#snippet actions()}
     <button type="button" class="b b--mini" onclick={openNew}>Nuevo gasto</button>
   {/snippet}
@@ -139,6 +140,10 @@
                 <span class="xc-sub">
                   {#if r.category}<StatusChip tone="neutral" label={categoryLabel(r.category)} />{/if}
                   {#if r.vendor}<span>{r.vendor}</span>{/if}
+                  {#if r.subscription_id}<span>Cargo de suscripción</span>{/if}
+                  {#if r.review_status === 'pending'}<StatusChip tone="warning" label="Sin revisar" />{/if}
+                  {#if r.receipt_status === 'attached'}<a class="xc-rec" href={receiptUrl(r.id)} target="_blank" rel="noopener">Ver recibo</a>
+                  {:else if r.receipt_status !== 'not_required' && !r.subscription_id && Number(r.amount_cents) >= 7500}<span class="xc-norec">Falta recibo</span>{/if}
                 </span>
               {:else if col.key === 'amount'}
                 <span class="xc-money">{formatUsd(r.amount_cents)}</span>
@@ -171,6 +176,8 @@
   onconfirm={confirmDelete} />
 
 <style>
+  .xc-rec { color: var(--fg-primary); text-underline-offset: 3px; }
+  .xc-norec { color: var(--color-warning); }
   .xc-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
   .xc-filter { min-width: 0; }
   .xc-total { margin: 0 0 12px; font-size: var(--dash-small); color: var(--fg-subtle); }

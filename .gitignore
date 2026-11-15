@@ -36,3 +36,6 @@ docs/redes/
 
 # Resultados de cada pasada de las pruebas de comportamiento (la línea base vive en scripts/evals/)
 data/evals/
+
+# Capturas de referencia de terceros (solo para enseñar bocetos, no se publican)
+design/finanzas/refs/

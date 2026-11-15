@@ -527,7 +527,7 @@
   .recover > span:first-child { display: inline-flex; align-items: center; gap: 8px; }
   .recover :global(.ui-icon) { color: var(--color-warning); }
   .recover__a { display: flex; gap: 6px; }
-  .part { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: var(--space-5) 0 var(--space-3); font-size: var(--dash-small); font-weight: 600; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--fg-subtle); }
+  .part { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: var(--space-5) 0 var(--space-3); font-size: var(--dash-small); font-weight: 600; letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle); }
   .part__s { font-weight: 400; letter-spacing: 0; text-transform: none; }
 
   @media (max-width: 1099px) {

@@ -52,7 +52,7 @@
   // En pantallas estrechas el texto de ayuda del buscador se cortaba: allí va uno corto.
   let narrow = $state(false);
   $effect(() => {
-    const mq = window.matchMedia('(max-width: 719px)');
+    const mq = window.matchMedia('(max-width: 1279px)');
     narrow = mq.matches;
     const on = (e) => { narrow = e.matches; };
     mq.addEventListener('change', on);
@@ -174,9 +174,9 @@
   <LoadingState loading={loading && !loaded} skeleton={kpiSkel} label="Cargando las cifras de leads">
   {#if stats}
     <KpiGrid count={3} label="Resumen de leads">
-      <Kpi label="Este mes" value={stats.this_month ?? 0} note={`${stats.prev_month ?? 0} el mes pasado`} />
-      <Kpi label="Por atender" value={stats.new ?? 0} tone={stats.new ? 'accent' : ''} href={href('leads', [], { estado: 'nuevo' })} note="Nuevos sin contactar todavía" />
-      <Kpi label="Convertidos" value={stats.converted ?? 0} note={`${conversion} % de ${stats.total} leads`} />
+      <Kpi label="Este mes" value={stats.this_month ?? 0} art="inbox" note={`vs. ${stats.prev_month ?? 0} el mes anterior`} />
+      <Kpi label="Por atender" value={stats.new ?? 0} art="bell" tone={stats.new ? 'accent' : ''} href={href('leads', [], { estado: 'nuevo' })} note="Nuevos sin contactar todavía" />
+      <Kpi label="Convertidos" value={stats.converted ?? 0} art="check" note={`${conversion} % de ${stats.total} leads`} />
     </KpiGrid>
   {/if}
   </LoadingState>
@@ -235,6 +235,8 @@
                 <span class="c-text">
                   <span class="c-name">{lead.name || 'Sin nombre'}</span>
                   <span class="c-sub">{[lead.business_name, lead.email || lead.phone].filter(Boolean).join(' · ') || lead.ref_id}</span>
+                  <!-- Entre 720 y 1099 px la columna Origen se pliega aquí, bajo el contacto. -->
+                  <span class="c-src">{leadSource(lead.source).label}</span>
                 </span>
               </a>
             {:else if col.key === 'source'}
@@ -281,7 +283,7 @@
   .c-cell:hover .c-name { text-decoration: underline; text-underline-offset: 3px; }
   .c-text { min-width: 0; display: flex; flex-direction: column; }
   .c-name { color: var(--fg-primary); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .c-sub { font-size: var(--dash-caption); color: var(--fg-subtle); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 300px; }
+  .c-sub { font-size: var(--dash-caption); color: var(--fg-subtle); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: clamp(120px, 14vw, 300px); }
   .mono-av { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; flex: 0 0 auto; border-radius: var(--radius-pill); color: #fff; font-family: var(--font-display); font-size: 11px; font-weight: 700; line-height: 1; }
   .mono-av--anon { background: var(--bg-elevated); color: var(--fg-secondary); border: 1px solid var(--border-strong); }
   .dim { color: var(--fg-subtle); white-space: nowrap; font-size: var(--dash-small); font-variant-numeric: tabular-nums; }
@@ -289,16 +291,30 @@
 
   /* Interés y mensaje SIEMPRE por separado (CRM-01): el interés en una línea
      de apoyo y el mensaje debajo; el texto completo está en la ficha. */
-  .msg { display: flex; flex-direction: column; gap: 2px; max-width: 360px; min-width: 0; }
+  .msg { display: flex; flex-direction: column; gap: 2px; max-width: clamp(140px, 18vw, 360px); min-width: 0; }
   .msg__interest { font-size: var(--dash-caption); color: var(--fg-subtle); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .msg__text { color: var(--fg-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .msg__interest:only-child { font-size: var(--dash-body); color: var(--fg-secondary); }
 
+  .c-src { display: none; margin-top: 2px; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); }
+  /* Tableta y portátil estrecho: sin la columna Origen (va bajo el contacto), la
+     tabla cabe entera y el estado se ve sin desplazarla (ronda 3 de la crítica). */
+  @media (min-width: 720px) and (max-width: 1099px) {
+    .list :global(.ui-table th:nth-child(2)), .list :global(.ui-table td:nth-child(2)) { display: none; }
+    .c-src { display: block; }
+  }
+  /* Teléfono estrecho: el selector de estado baja a su fila, bajo el nombre, que así
+     usa todo el ancho de la tarjeta. */
+  @media (max-width: 479px) {
+    .list :global(.ui-table td.is-primary) { grid-column: 1 / -1; }
+    .list :global(.ui-table td.is-action) { grid-column: 1 / -1; grid-row: 2; padding: 0 0 12px; margin: 0 0 4px; justify-content: flex-start; border-bottom: 1px solid var(--border-subtle); }
+    .list :global(.ui-table td.is-primary) { border-bottom: 0; padding-bottom: 8px; margin-bottom: 0; }
+  }
   @media (max-width: 719px) {
     .origin { flex: 1 1 100%; }
     .msg { max-width: none; }
     .msg__interest { white-space: normal; overflow-wrap: anywhere; }
     .msg__text { white-space: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; }
-    .c-sub { max-width: none; }
+    .c-sub { max-width: none; white-space: normal; overflow-wrap: anywhere; }
   }
 </style>

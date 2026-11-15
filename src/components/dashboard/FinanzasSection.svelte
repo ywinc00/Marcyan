@@ -27,6 +27,14 @@
   import NewClientDialog from './crm/NewClientDialog.svelte';
   import ExpensesCard from './finanzas/ExpensesCard.svelte';
   import SubscriptionsCard from './finanzas/SubscriptionsCard.svelte';
+  import YearBook from './finanzas/YearBook.svelte';
+  import AgentProposals from './finanzas/AgentProposals.svelte';
+  import TaxSheet from './finanzas/TaxSheet.svelte';
+  import PendingReview from './finanzas/PendingReview.svelte';
+  import ImportDialog from './finanzas/ImportDialog.svelte';
+  import RecordsPanel from './finanzas/RecordsPanel.svelte';
+  import ExpenseForm from './finanzas/ExpenseForm.svelte';
+  import Modal from './ui/Modal.svelte';
 
   import { api, errorMessage, isSessionError } from './lib/api.js';
   import { route, href, setQuery, navigate } from './lib/router.svelte.js';
@@ -41,6 +49,59 @@
 
   // ── Ruta ──────────────────────────────────────────────────────
   const detailRef = $derived(route.sub[0] === 'facturas' && route.sub[1] ? route.sub[1] : '');
+  // Pestañas (design/finanzas.md, OK del dueño 2026-11-14): Año es la portada;
+  // Impuestos es la hoja del contador. El resumen de arriba se queda en todas.
+  const TABS = [
+    { id: '', label: 'Año' },
+    { id: 'facturas', label: 'Facturas' },
+    { id: 'movimientos', label: 'Movimientos' },
+    { id: 'impuestos', label: 'Impuestos' },
+    { id: 'registros', label: 'Registros' },
+  ];
+  // Enlaces viejos (#/finanzas?estado=vencida) siguen llevando a Facturas, y los
+  // avisos del cierre (#/finanzas/cierre/AAAA-MM) abren ese mes en el Año.
+  const tab = $derived.by(() => {
+    const s = route.sub[0] || '';
+    if (s === 'cierre') return '';
+    if (TABS.some((t) => t.id === s)) return s;
+    if (!s && ['estado', 'q', 'pag', 'proyecto'].some((k) => route.query[k])) return 'facturas';
+    return '';
+  });
+  $effect(() => {
+    if (route.sub[0] === 'cierre' && /^\d{4}-\d{2}$/.test(route.sub[1] || '')) navigate('finanzas', [], { mes: route.sub[1] }, { replace: true });
+  });
+  let pendingMonth = $state('');
+  let taxPending = $state(0);
+  function goTab(id) { navigate('finanzas', id ? [id] : [], {}); }
+
+  // Registros: un apartado a la vez (?ver=), las suscripciones primero.
+  const REGS = [
+    { id: 'suscripciones', label: 'Suscripciones' },
+    { id: 'cuentas', label: 'Cuentas', kind: 'accounts' },
+    { id: 'contratistas', label: 'Proveedores y contratistas', kind: 'vendors' },
+    { id: 'devoluciones', label: 'Devoluciones', kind: 'refunds' },
+    { id: 'ingresos', label: 'Ingresos sin factura', kind: 'income' },
+    { id: 'impuestos', label: 'Pagos de impuestos', kind: 'tax-payments' },
+    { id: 'millaje', label: 'Millaje', kind: 'mileage' },
+  ];
+  const reg = $derived(REGS.find((r) => r.id === route.query.ver) || REGS[0]);
+
+  // Acciones rápidas del teléfono (Recibo, Millaje, Registrar) y diálogos.
+  let importOpen = $state(false);
+  let pendingReview = $state(null);
+  let quickExpenseOpen = $state(false);
+  let quickReceipt = $state(false);
+  let newRecord = $state(false);
+  let registerOpen = $state(false);
+  function quickRecibo() { quickReceipt = true; quickExpenseOpen = true; }
+  function quickMillaje() { newRecord = true; navigate('finanzas', ['registros'], { ver: 'millaje' }); }
+  function register(what) {
+    registerOpen = false;
+    if (what === 'gasto') { quickReceipt = false; quickExpenseOpen = true; return; }
+    if (what === 'factura') { invoiceFormOpen = true; return; }
+    newRecord = true; navigate('finanzas', ['registros'], { ver: what });
+  }
+  function afterMovement() { loadSummary(); expensesCard?.load(); pendingReview?.load(); }
   const filter = $derived(STATUS_FILTERS.find((f) => f.id === (route.query.estado || '')) || STATUS_FILTERS[0]);
   const search = $derived((route.query.q || '').slice(0, 200));
   const page = $derived(Math.max(1, parseInt(route.query.pag, 10) || 1));
@@ -49,7 +110,7 @@
   const projectFilter = $derived(/^\d{1,12}$/.test(route.query.proyecto || '') ? route.query.proyecto : '');
   // La lista vuelve con sus filtros (la ficha conserva la query del hash).
   const listQuery = $derived(Object.fromEntries(Object.entries(route.query).filter(([k]) => ['estado', 'q', 'pag', 'mes', 'cat', 'proyecto'].includes(k))));
-  const backHref = $derived(href('finanzas', [], listQuery));
+  const backHref = $derived(href('finanzas', ['facturas'], listQuery));
 
   // ── Resumen ───────────────────────────────────────────────────
   let summary = $state(null);
@@ -105,7 +166,7 @@
   }
 
   // Lista y resumen se recargan al entrar en la vista o al cambiar filtros.
-  $effect(() => { if (!detailRef) { filter; search; page; projectFilter; loadInvoices(); } });
+  $effect(() => { if (!detailRef && tab === 'facturas') { filter; search; page; projectFilter; loadInvoices(); } });
   $effect(() => { if (!detailRef) loadSummary(); });
   // El buscador refleja la URL (al llegar por enlace o con Atrás). Solo copia
   // si de verdad cambió: la URL guarda el texto recortado y, si se copiara
@@ -135,9 +196,10 @@
   function invoiceCreated(inv) {
     navigate('finanzas', ['facturas', inv.invoice_number], listQuery);
   }
-  async function afterChange() { await Promise.all([loadInvoices(), loadSummary()]); }
+  async function afterChange() { await Promise.all([tab === 'facturas' ? loadInvoices() : null, loadSummary()]); }
   function refreshAll() { afterChange(); refreshShell(); expensesCard?.load(); }
   let expensesCard = $state(null);
+  let yearBook = $state(null);
 
   const columns = [
     { key: 'number', label: 'Factura', primary: true },
@@ -152,12 +214,24 @@
 
 <div class="fin">
 {#if detailRef}
-  <InvoiceDetail ref={detailRef} {backHref} onclose={() => navigate('finanzas', [], listQuery)} />
+  <InvoiceDetail ref={detailRef} {backHref} onclose={() => navigate('finanzas', ['facturas'], listQuery)} />
 {:else}
   <PageHeader title="Finanzas" subtitle="Lo que entra, lo que se debe y lo que sale.">
     {#snippet actions()}
       <button type="button" class="b" onclick={refreshAll} disabled={summaryLoading || invLoading}><Icon name="refresh" size={16} />Actualizar</button>
-      <button type="button" class="b b--primary" onclick={() => (invoiceFormOpen = true)}>Nueva factura</button>
+      {#if tab === '' && pendingMonth}
+        <button type="button" class="b" onclick={() => (invoiceFormOpen = true)}>Nueva factura</button>
+        <a class="b b--primary fin-desk" href={href('finanzas', [], { mes: pendingMonth })}>Revisar {monthLong(pendingMonth).split(' ')[0]}</a>
+      {:else if tab === 'impuestos'}
+        <button type="button" class="b" onclick={() => (invoiceFormOpen = true)}>Nueva factura</button>
+        {#if taxPending > 0}
+          <a class="b b--primary" href={href('finanzas', ['movimientos'], { ver: 'pendientes' })}>Revisar {taxPending} movimiento{taxPending === 1 ? '' : 's'}</a>
+        {:else}
+          <a class="b b--primary" href={`/api/admin/finance/books?view=export&year=${route.query.ano || new Date().getFullYear()}`} download><Icon name="download" size={16} />Para el contador</a>
+        {/if}
+      {:else}
+        <button type="button" class="b b--primary" onclick={() => (invoiceFormOpen = true)}>Nueva factura</button>
+      {/if}
     {/snippet}
   </PageHeader>
 
@@ -168,30 +242,52 @@
     <KpiGrid count={5} label="Resumen del mes">
       <Kpi label="Cobrado (mes)" art="coins" tone={summary && summary.collected_this_month_cents > 0 ? 'data' : ''} value={summary ? fmtUsd0(summary.collected_this_month_cents) : '…'}>
         {#if summary && collectedDelta !== null}
-          <span class:fin-up={collectedDelta >= 0} class:fin-down={collectedDelta < 0}>{collectedDelta >= 0 ? '+' : ''}{collectedDelta}%</span> vs el mismo tramo de {prevMonthName}
+          <span class:fin-up={collectedDelta >= 0} class:fin-down={collectedDelta < 0}>{collectedDelta >= 0 ? '+' : ''}{collectedDelta} %</span> <span title="Frente al mismo tramo de {prevMonthName}">vs. {prevMonthName.slice(0, 3)}</span>
         {:else}Pagos recibidos este mes{/if}
       </Kpi>
-      <Kpi label="Por cobrar" art="invoice" tone={summary && summary.ar_total_cents > 0 ? 'accent' : ''} href={href('finanzas', [], { estado: 'abiertas' })}
+      <Kpi label="Por cobrar" art="invoice" tone={summary && summary.ar_total_cents > 0 ? 'accent' : ''} href={href('finanzas', ['facturas'], { estado: 'abiertas' })}
         value={summary ? fmtUsd0(summary.ar_total_cents) : '…'}>
-        {#if summary && !summary.counts.open_invoices}Ninguna factura abierta{#if summary.draft_count}{` (${summary.draft_count} en borrador, aparte)`}{/if}
+        {#if summary && !summary.counts.open_invoices}Ninguna factura abierta{#if summary.draft_count}{`, ${summary.draft_count} en borrador`}{/if}
         {:else if summary}
-          Saldo de {summary.counts.open_invoices} factura{summary.counts.open_invoices === 1 ? '' : 's'} abierta{summary.counts.open_invoices === 1 ? '' : 's'}, sin borradores{#if summary.draft_count}{` (${summary.draft_count} aparte)`}{/if}
+          {summary.counts.open_invoices} abierta{summary.counts.open_invoices === 1 ? '' : 's'}{#if summary.draft_count}{`, ${summary.draft_count} borrador${summary.draft_count === 1 ? '' : 'es'}`}{/if}
         {:else}Saldo de las facturas abiertas{/if}
       </Kpi>
       <Kpi label="Vencido" art="alert" tone={summary && summary.overdue_cents > 0 ? 'error' : ''}
-        href={href('finanzas', [], { estado: 'vencida' })} value={summary ? fmtUsd0(summary.overdue_cents) : '…'}>
+        href={href('finanzas', ['facturas'], { estado: 'vencida' })} value={summary ? fmtUsd0(summary.overdue_cents) : '…'}>
         {#if summary && summary.overdue_count > 0}
-          {summary.overdue_count} factura{summary.overdue_count === 1 ? '' : 's'} pasada{summary.overdue_count === 1 ? '' : 's'} de fecha con saldo
-        {:else}Ninguna factura pasada de fecha{/if}
+          {summary.overdue_count} factura{summary.overdue_count === 1 ? '' : 's'} vencida{summary.overdue_count === 1 ? '' : 's'}
+        {:else}Nada vencido{/if}
       </Kpi>
       <Kpi label="Gastos (mes)" art="card" value={summary ? fmtUsd0(summary.expenses_this_month_cents) : '…'}>
-        {#if summary}Gastos puntuales. Suscripciones aparte: {formatUsd(summary.subscriptions_monthly_cents)} al mes{:else}Gastos puntuales del mes{/if}
+        {#if summary}
+          {summary.subscription_charges_this_month ? `${summary.subscription_charges_this_month} cargo${summary.subscription_charges_this_month === 1 ? '' : 's'} de suscripciones` : 'Apuntados este mes'}{#if summary.expenses_pending_this_month}{`, ${summary.expenses_pending_this_month} sin revisar aún`}{/if}
+        {:else}Gastos del mes{/if}
       </Kpi>
       <Kpi label="Neto (mes)" art="chart-up" tone={summary && net !== 0 ? (net > 0 ? 'data' : 'error') : ''} value={summary ? fmtUsd0(net) : '…'}
-        note="Cobrado menos gastos del mes y suscripciones (estimado mensual)" />
+        note="Lo que quedó este mes" />
     </KpiGrid>
   {/if}
 
+  <!-- ═══ Pestañas: en el teléfono, un selector con las mismas opciones ═══ -->
+  <nav class="fin-tabs" aria-label="Partes de Finanzas">
+    {#each TABS as t (t.id)}
+      <a class="fin-tab" href={href('finanzas', t.id ? [t.id] : [], {})} aria-current={tab === t.id ? 'page' : undefined}>{t.label}</a>
+    {/each}
+  </nav>
+  <label class="fin-tabsel">
+    <span class="sr-only">Parte de Finanzas</span>
+    <select class="ui-input" value={tab} onchange={(e) => goTab(e.currentTarget.value)}>
+      {#each TABS as t (t.id)}<option value={t.id}>{t.label}</option>{/each}
+    </select>
+  </label>
+
+  {#if tab === ''}
+  <div class="fin-block fin-agent">
+    <AgentProposals onchanged={() => { loadSummary(); yearBook?.load?.(); }} />
+  </div>
+  <div class="fin-block">
+    <YearBook bind:this={yearBook} bind:pendingMonth onchanged={loadSummary} />
+  </div>
   <div class="fin-block">
     {#if summary}
       <RevenueChart revenue={summary.revenue_by_month || []} delta={collectedDelta} prevLabel={prevMonthName} />
@@ -199,7 +295,9 @@
       <LoadingState loading={true} rows={1} height={346} label="Cargando el gráfico…" />
     {/if}
   </div>
-
+  {:else if tab === 'impuestos'}
+  <div class="fin-block"><TaxSheet bind:pendingCount={taxPending} /></div>
+  {:else if tab === 'facturas'}
   <!-- ═══ Facturas ═══ -->
   <div class="fin-block">
     <Card title="Facturas">
@@ -291,11 +389,47 @@
     </Card>
   </div>
 
-  <!-- ═══ Egresos ═══ -->
-  <div class="fin-egresos">
-    <ExpensesCard bind:this={expensesCard} onchanged={loadSummary} />
-    <SubscriptionsCard onchanged={loadSummary} />
+  {:else if tab === 'movimientos'}
+  <div class="fin-block">
+    <PendingReview bind:this={pendingReview} onchanged={() => { loadSummary(); expensesCard?.load(); }} onimport={() => (importOpen = true)} />
   </div>
+  <div class="fin-block">
+    <ExpensesCard bind:this={expensesCard} onchanged={loadSummary} />
+  </div>
+  {:else if tab === 'registros'}
+  <div class="fin-regs" role="group" aria-label="Registros">
+    {#each REGS as r (r.id)}
+      <a class="fin-pill" href={href('finanzas', ['registros'], r.id === 'suscripciones' ? {} : { ver: r.id })} aria-current={reg.id === r.id ? 'page' : undefined}>{r.label}</a>
+    {/each}
+  </div>
+  <div class="fin-block">
+    {#if reg.id === 'suscripciones'}
+      <p class="fin-hint">Cada cargo de una suscripción se apunta solo como gasto del mes. Revisa en cada una desde cuándo la pagas para que cuenten los cargos de este año.</p>
+      <SubscriptionsCard onchanged={loadSummary} />
+    {:else}
+      <RecordsPanel kind={reg.kind} bind:openNew={newRecord} onchanged={loadSummary} />
+    {/if}
+  </div>
+  {/if}
+
+  <!-- Teléfono: lo que se hace con el móvil en la mano, al alcance del pulgar -->
+  <nav class="fin-bar" aria-label="Acciones rápidas de Finanzas">
+    <button type="button" onclick={quickRecibo}><Icon name="camera" size={20} /><span>Recibo</span></button>
+    <button type="button" onclick={quickMillaje}><Icon name="car" size={20} /><span>Millaje</span></button>
+    <button type="button" onclick={() => (registerOpen = true)}><Icon name="plus" size={20} /><span>Registrar</span></button>
+  </nav>
+  <ExpenseForm bind:open={quickExpenseOpen} withReceipt={quickReceipt} onsaved={afterMovement} />
+  <ImportDialog bind:open={importOpen} ondone={afterMovement} />
+  <Modal bind:open={registerOpen} title="Registrar" size="sm">
+    <div class="fin-reg-menu">
+      <button type="button" class="b" onclick={() => register('gasto')}>Un gasto</button>
+      <button type="button" class="b" onclick={() => register('factura')}>Una factura</button>
+      <button type="button" class="b" onclick={() => register('ingresos')}>Un ingreso sin factura</button>
+      <button type="button" class="b" onclick={() => register('devoluciones')}>Una devolución a un cliente</button>
+      <button type="button" class="b" onclick={() => register('impuestos')}>Un pago de impuestos</button>
+      <button type="button" class="b" onclick={() => register('millaje')}>Un viaje en coche (millaje)</button>
+    </div>
+  </Modal>
 
   <InvoiceForm bind:open={invoiceFormOpen} onsaved={invoiceCreated} />
   <PaymentForm bind:open={payOpen} invoice={payInvoice} onsaved={afterChange} />
@@ -316,8 +450,8 @@
   .fin :global(select.ui-input:disabled) { cursor: not-allowed; opacity: .7; }
 
   .fin-block { margin-bottom: var(--space-5); }
-  .fin-up { color: var(--accent-teal); font-weight: 600; }
-  .fin-down { color: var(--color-error); font-weight: 600; }
+  .fin-up { color: var(--delta-up); font-weight: 500; }
+  .fin-down { color: var(--delta-down); font-weight: 500; }
 
   /* Filtros en pastillas con su recuento (E-06). El activo NO es naranja
      (H-07): un nivel más de superficie, borde fuerte y texto primario. */
@@ -361,15 +495,50 @@
   .fin-pager__txt { font-size: var(--dash-small); color: var(--fg-subtle); }
   .fin-pager__btns { display: inline-flex; gap: 6px; }
 
-  .fin-egresos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; margin-bottom: var(--space-6); }
-
-  @media (max-width: 1099px) { .fin-egresos { grid-template-columns: 1fr; } }
+  /* Pestañas: subrayado blanco de 2 px en la activa (no naranja: H-07). */
+  .fin-tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--border); margin: 0 0 var(--space-5); }
+  .fin-tab { position: relative; padding: 10px 0 11px; color: var(--fg-subtle); text-decoration: none; font-size: var(--dash-body); }
+  .fin-tab:hover { color: var(--fg-primary); }
+  .fin-tab[aria-current='page'] { color: var(--fg-primary); }
+  .fin-tab[aria-current='page']::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--fg-primary); border-radius: 2px; }
+  .fin-tab:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; border-radius: 4px; }
+  .fin-tabsel { display: none; margin: 0 0 var(--space-4); }
+  .fin-regs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 var(--space-4); }
+  .fin-regs .fin-pill { text-decoration: none; }
+  .fin-regs .fin-pill[aria-current='page'] { background: var(--surface-3); border-color: var(--border-strong); color: var(--fg-primary); }
+  .fin-hint { margin: 0 0 12px; color: var(--fg-secondary); font-size: var(--dash-small); max-width: 70ch; }
+  .fin-reg-menu { display: grid; gap: 8px; }
+  .fin-reg-menu .b { justify-content: flex-start; min-height: 44px; }
+  .fin-bar { display: none; }
+  @media (max-width: 719px) {
+    .fin-tabs { display: none; }
+    .fin-tabsel { display: block; }
+    .fin-tabsel .ui-input { min-height: 44px; }
+    /* Barra de acciones abajo, con la zona segura del iPhone; el contenido
+       deja su hueco para que nada quede tapado. */
+    .fin { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+    .fin-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+      padding: 8px max(12px, env(safe-area-inset-left, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-right, 0px));
+      background: var(--bg-2); border-top: 1px solid var(--border); }
+    .fin-bar button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 52px; border: 0; border-radius: var(--radius-md);
+      background: transparent; color: var(--fg-secondary); font: 500 var(--dash-caption)/1.2 var(--font-body); cursor: pointer; }
+    .fin-bar button:active { background: var(--bg-elevated); }
+    .fin-bar button:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; }
+  }
   /* Móvil estrecho: las cifras de dinero necesitan el ancho entero (en dos
      columnas "$2,300" se cortaba en "$2,3…"). Solo en esta sección. */
+  /* Teléfono: el resumen en dos columnas (el primero a lo ancho) para que lo
+     pendiente se vea sin bajar tanto. El objeto se queda (un solo sistema en todo el
+     panel): la cifra ya no comparte fila con él y cabe entera. */
   @media (max-width: 479px) {
-    .fin :global(.ui-kpis[data-count="5"]) { grid-template-columns: 1fr; }
+    .fin :global(.ui-kpis[data-count="5"]) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .fin :global(.ui-kpis[data-count="5"] > :first-child) { grid-column: 1 / -1; }
+    .fin :global(.ui-kpis[data-count="5"] .ui-kpi) { padding: 14px 14px; }
+    .fin :global(.ui-kpis[data-count="5"] .ui-kpi__num) { font-size: 26px; }
+    .fin :global(.ui-kpis[data-count="5"] .ui-kpi__row) { min-height: 36px; }
     .fin :global(.ui-kpis[data-count="3"]) { grid-template-columns: 1fr; }
   }
+  @media (max-width: 719px) { .fin-desk { display: none; } }
   @media (max-width: 719px) {
     .fin-table :global(.ui-table-wrap) { border-top: 0; }
     /* Tarjeta dentro de tarjeta: un nivel más de la rampa (H-06). */

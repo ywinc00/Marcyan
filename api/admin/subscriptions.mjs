@@ -35,6 +35,8 @@ export default async function handler(req, res) {
         next_charge_at: body.next_charge_at,
         active: body.active === undefined ? true : !!body.active,
         notes: body.notes,
+        started_at: body.started_at,
+        account_id: body.account_id,
       });
       return res.status(201).json({ ok: true, subscription });
     } catch (err) {

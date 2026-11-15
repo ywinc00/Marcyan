@@ -20,6 +20,10 @@ const telHou = nap.houston.replace(/[^\d+]/g, '');
 const telMia = nap.miami.replace(/[^\d+]/g, '');
 const pathEn = Astro.url.pathname === '/en' || Astro.url.pathname.startsWith('/en/');
 const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
+// Encargo legal 2026-11-15 §2a-2b: aviso de privacidad bajo el botón y casilla opcional de SMS y
+// WhatsApp, sin marcar y sin bloquear el envío. El texto exacto viaja con el lead.
+const sms: string | undefined = f.smsConsent;
+const priv = f.privacy as { pre: string; link: string; href: string; post: string } | undefined;
 ---
 <form
   class:list={['contact__form', cls]} id={`${idp}-contact-form`} novalidate data-contact-form data-source={source} data-err-id={`${idp}-form-error`}
@@ -53,6 +57,13 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
     </label>
   </div>
 
+  {sms && (
+    <label class="chk" for={`${idp}-sms`}>
+      <input type="checkbox" id={`${idp}-sms`} name="sms_consent" value="yes" data-sms-text={sms} />
+      <span>{sms}</span>
+    </label>
+  )}
+
   <label class="field" for={`${idp}-city`}>
     <span class="field__lbl">{f.city.label}</span>
     <select id={`${idp}-city`} name="city_state">
@@ -77,6 +88,7 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
   <Button type="submit" variant="primary" size="lg" class="u-full bstate" data-submit>
     <BtnStates sending={f.sending} done={doneLbl}>{f.submit}</BtnStates>
   </Button>
+  {priv && <p class="form-legal">{priv.pre}<a href={priv.href}>{priv.link}</a>{priv.post}</p>}
 
   <p class="form-status form-status--error" id={`${idp}-form-error`} data-form-error hidden></p>
   <p class="form-status form-status--ok" id={`${idp}-form-success`} data-form-ok role="status" hidden></p>
@@ -106,6 +118,24 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
        donde las sombras desaparecen. Es el mismo anillo que el resto del sitio. */
     border-color: var(--accent-gold); outline: 2px solid var(--accent-gold); outline-offset: 2px;
   }
+
+  /* Casilla con la gramática de las del brief (SchemaField .chk): borde, foco de 2 px y oro al marcar. */
+  .chk {
+    display: flex; align-items: flex-start; gap: var(--space-3); min-height: var(--tap-min);
+    padding: var(--space-3); border: 1px solid var(--border); border-radius: var(--radius-md);
+    background: var(--bg-elevated); color: var(--fg-secondary); font-size: var(--text-sm); line-height: 1.45; cursor: pointer;
+    transition: border-color var(--duration-fast), background var(--duration-fast), color var(--duration-fast);
+  }
+  .chk input { flex: 0 0 auto; width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--accent-gold); cursor: pointer; }
+  .chk:hover { border-color: var(--border-accent); color: var(--fg-primary); }
+  .chk:has(input:checked) { border-color: var(--accent-gold-line); background: var(--accent-gold-dim); color: var(--fg-primary); }
+  .chk:has(input:focus-visible) { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+  .chk:has(input:disabled) { cursor: default; opacity: .7; }
+  /* Aviso de privacidad bajo el botón (línea de reaseguro, pieza D-10). */
+  .form-legal { margin: calc(var(--space-2) * -1) 0 0; font-size: var(--text-sm); line-height: 1.5; color: var(--fg-secondary); text-align: center; }
+  .form-legal a { color: var(--fg-primary); text-decoration: underline; text-underline-offset: 2px; }
+  .form-legal a:hover { color: var(--accent-gold); }
+  @media (prefers-reduced-motion: reduce) { .chk { transition: none; } }
 
   .form-status { font-size: var(--text-sm); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); }
   .form-status:focus { outline: none; }
@@ -200,6 +230,13 @@ const hrefBrief = pathEn ? '/en/project-brief' : '/formulario';
       const fd = new FormData(form);
       const data: Record<string, string> = {};
       for (const [k, v] of fd.entries()) data[k] = typeof v === 'string' ? v.trim() : '';
+      // Prueba de la casilla de SMS y WhatsApp (§2b): si marcó o no, el texto exacto y la página.
+      const smsEl = form.querySelector('[name="sms_consent"]') as HTMLInputElement | null;
+      if (smsEl) {
+        data.sms_consent = smsEl.checked ? 'yes' : 'no';
+        data.sms_consent_text = smsEl.dataset.smsText || '';
+      }
+      data.page_url = location.origin + location.pathname;
       data.lang = (document.documentElement.lang || 'es').slice(0, 2).toLowerCase() === 'en' ? 'en' : 'es';
 
       if (data.website_hp) { delete form.dataset.busy; return; } // honeypot

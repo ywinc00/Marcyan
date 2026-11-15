@@ -92,8 +92,8 @@
                 <span class="sc-name">{s.name}</span>
                 <span class="sc-meta">
                   {#if s.category}<StatusChip tone="neutral" label={categoryLabel(s.category)} />{/if}
-                  {#if s.billing === 'variable'}<StatusChip tone="neutral" label="Cambia cada mes" />{/if}
-                  {#if s.intro_until && s.active && String(s.intro_until).slice(0, 10) > new Date().toISOString().slice(0, 10)}<StatusChip tone="warning" label={`${Number(s.intro_amount_cents || 0) === 0 ? 'Gratis' : 'Rebajada'} hasta ${fmtDay(s.intro_until)}`} />{/if}
+                  {#if s.billing === 'variable'}<span class="sc-var">Cambia cada mes</span>{/if}
+                  {#if s.intro_until && s.active && String(s.intro_until).slice(0, 10) > new Date().toISOString().slice(0, 10)}<StatusChip tone="warning" label={`${Number(s.intro_amount_cents || 0) === 0 ? 'Gratis' : formatUsd(s.intro_amount_cents)} hasta ${fmtDay(s.intro_until)}`} />{/if}
                   {#if !s.active}<span>{s.ended_at ? `De baja desde ${fmtDay(s.ended_at)}` : 'Pausada'}</span>
                   {:else if s.next_charge_at}<span>Próximo cargo {fmtDay(s.next_charge_at)}{s.started_at ? `; la pagas desde ${fmtDay(s.started_at)}` : ''}</span>
                   {:else}<span>Sin fecha de cargo</span>{/if}
@@ -132,7 +132,11 @@
   .sc-list { list-style: none; margin: 0; padding: 0; }
   .sc-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border-subtle); }
   .sc-row:first-child { border-top: 0; }
-  .sc-row.is-off .sc-main, .sc-row.is-off .sc-price, .sc-row.is-off :global(.brandlogo) { opacity: .55; }
+  /* Atenuada igual en escritorio y en móvil (allí .sc-main no pinta su propia caja). */
+  .sc-row.is-off .sc-name, .sc-row.is-off .sc-meta, .sc-row.is-off .sc-price, .sc-row.is-off :global(.brandlogo) { opacity: .55; }
+  /* «Cambia cada mes» es un aviso de cómo cobra, no una categoría: sin punto y con borde discontinuo. */
+  .sc-var { display: inline-flex; align-items: center; min-height: 22px; padding: 0 8px; border: 1px dashed var(--fg-faint);
+    border-radius: var(--radius-pill); font-size: var(--dash-caption); color: var(--fg-secondary); white-space: nowrap; }
   .sc-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
   /* El nombre nunca se corta: en pantallas estrechas pasa a dos líneas. */
   .sc-name { font-size: var(--dash-body); font-weight: 500; color: var(--fg-primary); overflow-wrap: anywhere; }

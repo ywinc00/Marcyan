@@ -111,7 +111,7 @@
       {#snippet badge()}<span class="pd-chip"><StatusChip tone={st.tone} label={st.label} /></span>{/snippet}
     </PageHeader>
     <div class="pd-meta">
-      <span class="pd-mono" style={`background:${monoColor(project.client_name || project.name || project.project_code)}`} aria-hidden="true">{initials(project.client_name || project.name)}</span>
+      <span class="pd-mono" style={`background:${monoColor(project.client_id, project.client_name || project.name || project.project_code)}`} aria-hidden="true">{initials(project.client_name || project.name)}</span>
       <span class="pd-code">{project.project_code}</span>
       <span class="pd-dot" aria-hidden="true">·</span>
       <span>{project.client_name || 'Sin cliente'}</span>

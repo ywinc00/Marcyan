@@ -227,7 +227,7 @@
               {@const who = lead.name || lead.business_name || lead.email}
               <a class="c-cell" href={href('leads', [lead.ref_id], route.query)}>
                 {#if who}
-                  <span class="mono-av" style="background:{monoColor(who)}" aria-hidden="true">{initials(who)}</span>
+                  <span class="mono-av" style="background:{monoColor(lead.ref_id, who)}" aria-hidden="true">{initials(who)}</span>
                 {:else}
                   <!-- Sin nombre, negocio ni correo: icono neutro, nunca letras sacadas del código (A2-R8) -->
                   <span class="mono-av mono-av--anon" aria-hidden="true"><Icon name="clientes" size={14} /></span>

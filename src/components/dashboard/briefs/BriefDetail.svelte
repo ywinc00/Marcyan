@@ -326,7 +326,7 @@
   </div>
 
   <div class="idrow">
-    <span class="avatar" style="background:{avatarColor(data.business_name)}" aria-hidden="true">{initials(data.business_name)}</span>
+    <span class="avatar" style="background:{avatarColor(brief?.project_id, data.business_name)}" aria-hidden="true">{initials(data.business_name)}</span>
     <div class="idrow__txt">
       <p class="idrow__main"><span class="mono">{brief.project_id}</span>
         {#if data.owner_name}<span>{data.owner_name}</span>{/if}

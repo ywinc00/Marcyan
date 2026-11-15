@@ -179,7 +179,7 @@
           {#snippet cell(c, col)}
             {#if col.key === 'client'}
               <a class="c-cell" href={href('clientes', [c.id], route.query)}>
-                <span class="mono-av" style="background:{monoColor(clientName(c))}" aria-hidden="true">{initials(clientName(c))}</span>
+                <span class="mono-av" style="background:{monoColor(c.id, clientName(c))}" aria-hidden="true">{initials(clientName(c))}</span>
                 <span class="c-text">
                   <span class="c-name">{clientName(c)}</span>
                   <span class="c-sub">{c.business_name && c.owner_name ? c.owner_name : ''}</span>

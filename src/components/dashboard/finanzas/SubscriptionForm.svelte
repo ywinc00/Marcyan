@@ -47,7 +47,7 @@
     tried = true; formError = '';
     if (!form.name.trim()) { formError = 'Escribe el nombre del servicio.'; return; }
     if (cents == null) { formError = 'Revisa el monto.'; return; }
-    if (form.intro && (introCents == null || !form.intro_until)) { formError = 'El precio de entrada lleva monto (0 si fue gratis) y hasta cuándo.'; return; }
+    if (form.intro && (introCents == null || !form.intro_until)) { formError = 'El precio de entrada lleva monto (0 si fue gratis) y la fecha desde la que se paga el precio normal.'; return; }
     saving = true;
     const body = {
       name: form.name.trim(), amount_cents: cents, cycle: form.cycle,
@@ -92,9 +92,11 @@
           </select>
         {/snippet}
       </Field>
-      <Field label="Próximo cargo" hint="Avanza solo cada mes o cada año.">
-        {#snippet children(f)}<input class="ui-input" id={f.id} type="date" aria-describedby={f.describedby} bind:value={form.next_charge_at} />{/snippet}
-      </Field>
+      {#if form.active}
+        <Field label="Próximo cargo" hint="Avanza solo cada mes o cada año.">
+          {#snippet children(f)}<input class="ui-input" id={f.id} type="date" aria-describedby={f.describedby} bind:value={form.next_charge_at} />{/snippet}
+        </Field>
+      {/if}
       <Field label="La pagas desde" hint="Cada cargo desde esa fecha cuenta como gasto del mes.">
         {#snippet children(f)}<input class="ui-input" id={f.id} type="date" aria-describedby={f.describedby} bind:value={form.started_at} />{/snippet}
       </Field>
@@ -107,20 +109,21 @@
           </select>
         {/snippet}
       </Field>
+      <Field label="Cómo cobra" hint={form.billing === 'variable' ? 'Cada mes el cargo sale «por confirmar» con el último monto, y la factura real lo sustituye.' : 'El mismo monto cada vez.'}>
+        {#snippet children(f)}
+          <select class="ui-input" id={f.id} aria-describedby={f.describedby} bind:value={form.billing}>
+            <option value="fixed">Siempre lo mismo</option>
+            <option value="variable">Cambia cada mes (por uso, asientos…)</option>
+          </select>
+        {/snippet}
+      </Field>
     </div>
-    <Field label="Cómo cobra" hint={form.billing === 'variable' ? 'Cada mes el cargo sale «por confirmar» con el último monto, y la factura real lo sustituye.' : 'El mismo monto cada vez.'}>
-      {#snippet children(f)}
-        <select class="ui-input" id={f.id} aria-describedby={f.describedby} bind:value={form.billing}>
-          <option value="fixed">Siempre lo mismo</option>
-          <option value="variable">Cambia cada mes (por uso, asientos…)</option>
-        </select>
-      {/snippet}
-    </Field>
     <label class="sf-check"><input type="checkbox" bind:checked={form.intro} /> Empezó con meses gratis o a precio rebajado</label>
     {#if form.intro}
-      <div class="sf-grid">
+      <!-- Ligado a su casilla: sangrado y con la línea a la izquierda. -->
+      <div class="sf-grid sf-sub">
         <MoneyInput label="Precio de entrada" bind:value={form.intro_amount} bind:cents={introCents} showErrors={tried} allowZero />
-        <Field label="Hasta" hint="El primer cargo a precio normal.">
+        <Field label="Precio normal desde" hint="Ese día ya se cobra el monto de arriba.">
           {#snippet children(f)}<input class="ui-input" id={f.id} type="date" aria-describedby={f.describedby} bind:value={form.intro_until} />{/snippet}
         </Field>
       </div>
@@ -151,5 +154,6 @@
   .sf-check input { width: 18px; height: 18px; accent-color: var(--accent-teal); }
   .sf-err { margin: 0; padding: 10px 12px; border-radius: var(--radius-md); font-size: var(--dash-small);
     color: var(--color-error); background: rgba(var(--color-error-rgb), .08); border: 1px solid rgba(var(--color-error-rgb), .28); }
+  .sf-sub { margin: -6px 0 0 8px; padding-left: 20px; border-left: 2px solid var(--border-strong); }
   @media (max-width: 479px) { .sf-grid { grid-template-columns: 1fr; } }
 </style>

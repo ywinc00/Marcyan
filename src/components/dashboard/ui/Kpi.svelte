@@ -21,9 +21,12 @@
       const cw = card.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
       if (cw >= 160) { if (strip) strip = false; return; }
       const el = card.querySelector('.ui-kpi__note');
-      const len = el ? el.textContent.trim().length : 0;
+      const txt = el ? el.textContent.trim() : '';
+      const len = txt.length;
+      const longest = txt.split(/\s+/).reduce((m, w) => Math.max(m, w.length), 0);
       const perLine = Math.max(1, Math.floor((cw - 64) / 7.3));
-      const next = len > perLine * 2;
+      // Franja si la nota pasa de dos líneas o si una sola palabra no cabe junto al objeto.
+      const next = len > perLine * 2 || longest > perLine;
       if (next !== strip) strip = next;
     };
     const ro = new ResizeObserver(check);

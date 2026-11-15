@@ -195,7 +195,7 @@
 
   // KPIs
   // Nota corta (cabe en una línea de la cifra): el rango ya se ve arriba, en las pastillas.
-  const prevTxt = $derived(`vs. ${days} días previos`);
+  const prevTxt = $derived(`vs. ${days} días antes`);
   const dClicks = $derived(sumG ? delta(sumG.current.clicks, sumG.previous && sumG.previous.clicks) : null);
   const dImpr = $derived(sumG ? delta(sumG.current.impressions, sumG.previous && sumG.previous.impressions) : null);
   const dPos = $derived(sumG ? delta(sumG.current.position, sumG.previous && sumG.previous.position, { lowerIsBetter: true }) : null);

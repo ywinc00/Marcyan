@@ -483,13 +483,13 @@ select.inp,
   color: var(--fg-subtle); line-height: 1.45;
 }
 /* La nota deja libre la mitad visible del objeto; la cifra va arriba y usa todo el ancho. */
-.ui-kpi.has-art .ui-kpi__note { max-width: calc(100% - clamp(26px, 20cqw, 56px)); }
+.ui-kpi.has-art .ui-kpi__note { max-width: calc(100% - clamp(40px, 30cqw, 70px)); }
 .ui-kpi__note .is-data, .ui-kpi__note .is-up { color: var(--delta-up); font-weight: 500; }
 .ui-kpi__note .is-down { color: var(--delta-down); font-weight: 500; }
 .ui-kpi__note.is-error { color: var(--delta-down); }
 .ui-kpi__art {
   position: absolute; z-index: 0; right: 0; bottom: -16px;
-  width: clamp(64px, 46cqw, 120px); opacity: .95; pointer-events: none;
+  width: clamp(64px, 38cqw, 120px); opacity: .95; pointer-events: none;
   transition: opacity var(--duration-fast);
 }
 .ui-kpi__art svg { width: 100%; height: auto; }

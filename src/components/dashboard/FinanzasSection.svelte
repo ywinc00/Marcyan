@@ -28,6 +28,7 @@
   import ExpensesCard from './finanzas/ExpensesCard.svelte';
   import SubscriptionsCard from './finanzas/SubscriptionsCard.svelte';
   import YearBook from './finanzas/YearBook.svelte';
+  import AgentProposals from './finanzas/AgentProposals.svelte';
   import TaxSheet from './finanzas/TaxSheet.svelte';
   import PendingReview from './finanzas/PendingReview.svelte';
   import ImportDialog from './finanzas/ImportDialog.svelte';
@@ -198,6 +199,7 @@
   async function afterChange() { await Promise.all([tab === 'facturas' ? loadInvoices() : null, loadSummary()]); }
   function refreshAll() { afterChange(); refreshShell(); expensesCard?.load(); }
   let expensesCard = $state(null);
+  let yearBook = $state(null);
 
   const columns = [
     { key: 'number', label: 'Factura', primary: true },
@@ -280,8 +282,11 @@
   </label>
 
   {#if tab === ''}
+  <div class="fin-block fin-agent">
+    <AgentProposals onchanged={() => { loadSummary(); yearBook?.load?.(); }} />
+  </div>
   <div class="fin-block">
-    <YearBook bind:pendingMonth onchanged={loadSummary} />
+    <YearBook bind:this={yearBook} bind:pendingMonth onchanged={loadSummary} />
   </div>
   <div class="fin-block">
     {#if summary}

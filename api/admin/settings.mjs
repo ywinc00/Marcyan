@@ -25,6 +25,12 @@ export function cleanSetting(key, value) {
     const registered = !!(value && value.registered);
     return { registered, local_rate: null };
   }
+  if (key === 'finance.agent') {
+    const v = value && typeof value === 'object' ? value : {};
+    const cap = Number(v.monthly_cap_usd);
+    if (!Number.isFinite(cap) || cap < 1 || cap > 200) throw new BooksError('El tope va de 1 a 200 USD al mes.');
+    return { enabled: Boolean(v.enabled), monthly_cap_usd: Math.round(cap * 100) / 100 };
+  }
   if (key === 'finance.entity') {
     const type = value && ENTITY_TYPES.includes(value.type) ? value.type : null;
     if (!type) throw new BooksError('Elige la forma del negocio.');

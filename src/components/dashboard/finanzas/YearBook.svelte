@@ -30,7 +30,7 @@
   let w9Missing = $state([]);
   let pendingCount = $state(null);    // { blocking, warnings } del primer mes por cerrar
 
-  async function load() {
+  export async function load() {
     error = '';
     const y = year;
     try {

@@ -4,6 +4,8 @@
   //  · Perfil fiscal: forma del negocio (y socios), cómo declaras, método y
   //    sales tax de Texas. Alimenta el cálculo del trimestral de Finanzas.
   //  · Cuentas por donde entra y sale el dinero.
+  //  · Agente contable: encendido, tope de gasto de IA, «Revisar ahora» y sus
+  //    últimas pasadas (fase 2: solo propone; nada se aplica sin el dueño).
   //  · Avisos en este dispositivo.
   //  · Equipo: quién puede entrar (se cambia en Vercel, por seguridad).
   //  · Topes de seguridad de Marcy y formularios (solo lectura).
@@ -17,10 +19,13 @@
   import { api, errorMessage, isSessionError } from './lib/api.js';
   import { toast } from './lib/toast.svelte.js';
   import { route, href } from './lib/router.svelte.js';
+  import { fmtDateTime } from './lib/dates.js';
+  import { formatUsd } from './finanzas/fin.js';
 
   const PARTS = [
     { id: 'fiscal', label: 'Perfil fiscal' },
     { id: 'cuentas', label: 'Cuentas' },
+    { id: 'agente', label: 'Agente contable' },
     { id: 'avisos', label: 'Avisos' },
     { id: 'equipo', label: 'Equipo' },
     { id: 'topes', label: 'Topes de Marcy' },
@@ -65,6 +70,44 @@
     single_llc: 'LLC de un solo dueño: para impuestos federales cuenta como negocio de una persona (Schedule C).',
     partnership: 'Sociedad (Form 1065): cada socio paga por su parte; el trimestral se calcula para cada uno.',
   };
+
+  // ── Agente contable ──
+  let agent = $state(null);
+  let agentError = $state('');
+  let capInput = $state('');
+  let running = $state(false);
+  async function loadAgent() {
+    agentError = '';
+    try { agent = await api('/api/admin/finance/agent'); capInput = String(agent.settings.monthly_cap_usd); }
+    catch (e) { if (!isSessionError(e)) agentError = errorMessage(e, 'No se pudo cargar el agente.'); }
+  }
+  $effect(() => { if (part.id === 'agente' && !agent) loadAgent(); });
+  async function saveAgent(next, done) {
+    await save('finance.agent', next, done);
+    if (agent && data && data.finance['finance.agent']) agent.settings = { ...agent.settings, ...data.finance['finance.agent'] };
+  }
+  async function runNow() {
+    running = true; fieldError = { ...fieldError, run: '' };
+    try {
+      const j = await api('/api/admin/finance/agent', { method: 'POST', body: { action: 'run' } });
+      agent = j.state;
+      const n = j.run.proposals;
+      toast(n ? `Revisado: ${n} propuesta${n === 1 ? '' : 's'} en Finanzas` : 'Revisado: nada que proponer');
+    } catch (e) {
+      if (!isSessionError(e)) fieldError = { ...fieldError, run: errorMessage(e, 'No se pudo revisar.') };
+    } finally { running = false; }
+  }
+  const usd2 = (v) => formatUsd(Math.round(Number(v || 0) * 100));
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  const RUN_WORDS = { nothing_new: 'Nada nuevo que revisar', skipped: 'No revisó', failed: 'Falló', running: 'Revisando' };
+  function runLine(r) {
+    if (r.status === 'done') {
+      const what = r.events ? `Revisó ${plural(r.events, 'cosa nueva', 'cosas nuevas')}` : 'Revisó lo pendiente';
+      return r.proposals ? `${what} y propuso ${r.proposals}` : `${what}, sin propuestas`;
+    }
+    const base = RUN_WORDS[r.status] || 'Revisión';
+    return (r.status === 'skipped' || r.status === 'failed') && r.note ? `${base}: ${r.note.charAt(0).toLowerCase()}${r.note.slice(1)}` : base;
+  }
 </script>
 
 <div class="aj">
@@ -143,6 +186,57 @@
           </section>
         {:else if part.id === 'cuentas'}
           <RecordsPanel kind="accounts" />
+        {:else if part.id === 'agente'}
+          {#if agentError}
+            <ErrorState title="No se pudo cargar el agente" message={agentError} onretry={loadAgent} />
+          {:else}
+            <LoadingState loading={!agent} rows={3} height={72} gap={1} label="Cargando el agente contable">
+              {#if agent}
+                {@const s = agent.settings}
+                <section class="aj-card" aria-label="Agente contable">
+                  <div class="aj-row">
+                    <div class="aj-txt"><h3>Agente contable</h3><p>Cada mañana mira los correos de facturas, lo importado del banco y los meses por cerrar, y te deja propuestas en Finanzas. Solo propone: no paga, no mueve dinero ni presenta impuestos.</p></div>
+                    <div class="aj-ctl">
+                      <label class="aj-switch"><input type="checkbox" checked={s.enabled} disabled={saving === 'finance.agent'}
+                        onchange={(e) => saveAgent({ enabled: e.currentTarget.checked, monthly_cap_usd: s.monthly_cap_usd }, e.currentTarget.checked ? 'Agente encendido' : 'Agente apagado')} /><span>{s.enabled ? 'Encendido' : 'Apagado'}</span></label>
+                    </div>
+                  </div>
+                  <div class="aj-row">
+                    <div class="aj-txt"><h3>Tope de gasto de IA al mes</h3><p>Este mes lleva {usd2(agent.month_spend_usd)} de {usd2(s.monthly_cap_usd)}. Solo gasta los días que hay algo nuevo; si llega al tope, para hasta el mes siguiente y te avisa.</p></div>
+                    <div class="aj-ctl">
+                      <div class="aj-save">
+                        <label class="aj-inline"><span class="sr-only">Tope en dólares</span>$<input class="ui-input aj-cap" type="number" min="1" max="200" step="1" inputmode="numeric" bind:value={capInput} /></label>
+                        <button type="button" class="b" disabled={saving === 'finance.agent' || Number(capInput) === s.monthly_cap_usd}
+                          onclick={() => saveAgent({ enabled: s.enabled, monthly_cap_usd: Number(capInput) }, 'Tope guardado')}>Guardar</button>
+                      </div>
+                      {#if fieldError['finance.agent']}<span class="aj-err" role="status">{fieldError['finance.agent']}</span>{/if}
+                    </div>
+                  </div>
+                  <div class="aj-row">
+                    <div class="aj-txt"><h3>Revisar ahora</h3><p>Útil justo después de importar un extracto. Hasta 4 veces al día; la revisión de cada mañana sigue igual.</p></div>
+                    <div class="aj-ctl">
+                      <button type="button" class="b" disabled={running || !s.enabled} onclick={runNow}>{running ? 'Revisando…' : 'Revisar ahora'}</button>
+                      {#if fieldError.run}<span class="aj-err" role="status">{fieldError.run}</span>{/if}
+                    </div>
+                  </div>
+                  <div class="aj-row aj-row--stack">
+                    <div class="aj-txt"><h3>Últimas revisiones</h3><p>{agent.proposals.length ? `Tienes ${plural(agent.proposals.length, 'propuesta esperando', 'propuestas esperando')} en Finanzas.` : 'No hay propuestas esperando.'}</p>
+                      {#if agent.proposals.length}<a class="aj-link" href={href('finanzas')}>Ver en Finanzas</a>{/if}</div>
+                    {#if agent.runs.length}
+                      <ul class="aj-list aj-runs">
+                        {#each agent.runs as r (r.id)}
+                          <li><span><b>{fmtDateTime(r.started_at)}</b>{r.trigger === 'manual' ? ', a mano' : ''}<br />{runLine(r)}</span><em>{usd2(r.cost_usd)}</em></li>
+                        {/each}
+                      </ul>
+                    {:else}
+                      <p class="aj-empty">Aún no ha revisado nada. La primera revisión es mañana temprano, o pulsa «Revisar ahora».</p>
+                    {/if}
+                  </div>
+                  <p class="aj-foot">Usa la IA de Anthropic. Los correos le llegan sin direcciones ni teléfonos, y lo que dicen se trata como datos, nunca como órdenes. Para revisión de tu contador, no es consejo fiscal.</p>
+                </section>
+              {/if}
+            </LoadingState>
+          {/if}
         {:else if part.id === 'avisos'}
           <section class="aj-card" aria-label="Avisos">
             <div class="aj-row">
@@ -240,9 +334,18 @@
   .aj-list--num b { font-variant-numeric: tabular-nums; font-weight: 600; }
   .aj-list--num span { color: var(--fg-secondary); }
   .aj-tag { margin-left: 8px; font-size: var(--dash-caption); color: var(--fg-subtle); }
+  .aj-cap { min-width: 0 !important; width: 90px; }
+  .aj-link { display: inline-block; margin-top: 6px; color: var(--fg-secondary); font-size: var(--dash-small); text-underline-offset: 3px; }
+  .aj-link:hover { color: var(--fg-primary); }
+  .aj-runs li { align-items: baseline; font-size: var(--dash-small); color: var(--fg-secondary); }
+  .aj-runs b { font-weight: 500; color: var(--fg-primary); }
+  .aj-runs em { font-style: normal; font-variant-numeric: tabular-nums; color: var(--fg-subtle); white-space: nowrap; }
+  .aj-empty { flex: 1 1 320px; margin: 0; color: var(--fg-subtle); font-size: var(--dash-small); }
   .aj-foot { margin: 0; padding: 12px 20px; border-top: 1px solid var(--border-subtle); color: var(--fg-subtle); font-size: var(--dash-small); }
   @container (max-width: 560px) {
     .aj-row { flex-direction: column; align-items: stretch; }
+    /* En columna, la base flexible sería ALTO: cada bloque mide lo que ocupa. */
+    .aj-row > * { flex: 0 0 auto; }
     .aj-ctl { align-items: stretch; }
     .aj-ctl .ui-input { min-width: 0; width: 100%; }
     .aj-partner { grid-template-columns: minmax(0, 1fr) 96px auto; }

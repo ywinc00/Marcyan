@@ -44,6 +44,7 @@ mock.module('../lib/auth.mjs', {
   namedExports: {
     requireAdmin: async () => ({ email: 'prueba@marcyan.test' }),
     safeEqual: (a, b) => a === b,
+    getAllowedEmails: () => ['prueba@marcyan.test'],
   },
 });
 
@@ -621,6 +622,21 @@ await check('asignar un cargo importado a su suscripción suprime el automático
   });
   await imp.resolveExpense('1', 'subscription', { subscription_id: '7' }, 'yo');
   assert.ok(log.some((e) => /INSERT INTO finance_suppressed_refs/.test(e.text) && e.params[0] === 'sub:7:2026-10-20'));
+});
+
+// ── Ajustes: el perfil fiscal se valida antes de guardar ──
+const settingsApi = await import('../api/admin/settings.mjs');
+await check('ajustes: sociedad con socios que suman 100; nada de valores raros', () => {
+  const c = settingsApi.cleanSetting;
+  assert.deepEqual(c('finance.filing', 'mfj'), 'mfj');
+  assert.throws(() => c('finance.filing', 'x'), /individual o conjunta/);
+  assert.throws(() => c('finance.entity', { type: 'partnership', from: '2026-01-01', partners: [{ name: 'A', share: 60 }, { name: 'B', share: 30 }] }), /suman 90/);
+  assert.throws(() => c('finance.entity', { type: 'partnership', from: '2026-01-01', partners: [{ name: 'A', share: 100 }] }), /al menos dos/);
+  const ok = c('finance.entity', { type: 'partnership', from: '2026-01-01', partners: [{ name: 'Yan', share: 50 }, { name: 'Socia', share: 50 }] });
+  assert.equal(ok.periods[0].partners.length, 2);
+  assert.deepEqual(c('finance.entity', { type: 'single_llc', from: '2026-01-01', partners: [{ name: 'x', share: 1 }] }).periods[0].partners, []);
+  assert.throws(() => c('finance.otra', 1), /desconocido/);
+  assert.deepEqual(c('finance.sales_tax_tx', { registered: 1, local_rate: 99 }), { registered: true, local_rate: null });
 });
 
 if (fails.length) {

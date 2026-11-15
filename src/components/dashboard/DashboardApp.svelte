@@ -16,6 +16,7 @@
   import ProgresoSection from './ProgresoSection.svelte';
   import SeoSection from './SeoSection.svelte';
   import NotificationsSection from './NotificationsSection.svelte';
+  import AjustesSection from './AjustesSection.svelte';
   import Icon from './ui/Icon.svelte';
   import Toast from './ui/Toast.svelte';
   import { continueSkeletons } from './ui/LoadingState.svelte';
@@ -92,6 +93,7 @@
     { id: 'progreso', label: 'Progreso' },
     { id: 'seo',      label: 'SEO' },
     { id: 'avisos',   label: 'Avisos' },
+    { id: 'ajustes',  label: 'Ajustes' },
   ];
 
   const section = $derived(route.section);
@@ -558,6 +560,8 @@
         <SeoSection />
       {:else if section === 'avisos'}
         <NotificationsSection />
+      {:else if section === 'ajustes'}
+        <AjustesSection />
       {/if}
     </main>
   </div>

@@ -8,7 +8,6 @@
 //   GET ?view=export&year=2026        → CSV con todos los movimientos del año (para el contador)
 //   GET ?view=settings                → ajustes de Finanzas
 //   POST { action: 'close' | 'reopen', month }        → cerrar o reabrir un mes
-//   POST { action: 'setting', key, value }             → cambiar un ajuste de Finanzas
 //   POST { action: 'charges' }                         → generar ya los cargos de suscripciones
 // Protegido con requireAdmin. Montos en CENTAVOS USD.
 import { requireAdmin } from '../../../lib/auth.mjs';
@@ -64,7 +63,6 @@ export default async function handler(req, res) {
       const by = session.email || null;
       if (body.action === 'close') return res.status(200).json({ ok: true, checklist: await closeMonth(body.month, by) });
       if (body.action === 'reopen') return res.status(200).json({ ok: true, checklist: await reopenMonth(body.month, by) });
-      if (body.action === 'setting') return res.status(200).json({ ok: true, settings: await setFinanceSetting(String(body.key || ''), body.value, by) });
       if (body.action === 'charges') return res.status(200).json({ ok: true, charges: await generateSubscriptionCharges() });
       return res.status(400).json({ ok: false, error: 'Acción desconocida.' });
     }

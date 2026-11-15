@@ -74,7 +74,8 @@ const cards = [
     cta: { label: m.proyecto.cta, href: '#precios', variant: 'link' as const },
   },
   {
-    title: m.mensual.title, text: m.mensual.text, icon: MODELO_ICONS[1],
+    // Calendario que pasa hoja (pedido del dueño, 2026-11-14), pareja de la tarjeta de pago.
+    title: m.mensual.title, text: m.mensual.text, icon: MODELO_ICONS[1], objeto: 'calendario' as const,
     itemsLead: m.mensual.lead, items: m.mensual.items,
     cta: { label: m.mensual.cta, href: '#contacto', track: 'proposal_requested', variant: 'link' as const },
   },

@@ -394,7 +394,9 @@ await check('PUB-01/02: contacto en inglés lleva al brief en inglés y el aviso
   assert.equal(contactLang({ headers: { referer: 'https://marcyan.com/es/houston/' } }, {}), 'es');
   assert.equal(contactLang({ headers: { referer: 'https://marcyan.com/english' } }, {}), 'es');
   assert.equal(contactLang({ headers: {} }, {}), 'es');
-  const src = fs.readFileSync(path.join(ROOT, 'src/components/sections/Contact.astro'), 'utf8');
+  // El formulario salió de Contact.astro a su propio componente (FormContacto.astro) en el
+  // rediseño de los formularios; la regla se comprueba donde vive ahora.
+  const src = fs.readFileSync(path.join(ROOT, 'src/components/forms/FormContacto.astro'), 'utf8');
   assert.ok(!src.includes('data-href-brief="/formulario"'), 'el enlace al brief no va fijo en español');
   assert.match(src, /pathEn \? '\/en\/project-brief' : '\/formulario'/);
 });

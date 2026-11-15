@@ -13,7 +13,7 @@ import TarjetasModelo from '../../TarjetasModelo.astro';
 import type { IconoId } from '../../objects/registry';
 
 interface Card {
-  title: string; text: string; icon: IconoId; items: string[]; itemsLead?: string;
+  title: string; text: string; icon: IconoId; objeto?: 'tarjeta-pago'; items: string[]; itemsLead?: string;
   cta: { label: string; href: string; track?: string; variant?: 'primary' | 'link' };
 }
 interface Props {

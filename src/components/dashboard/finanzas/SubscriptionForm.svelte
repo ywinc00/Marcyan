@@ -12,7 +12,8 @@
   let { open = $bindable(false), subscription = null, onsaved } = $props();
 
   const editing = $derived(!!subscription);
-  let form = $state({ name: '', category: '', amount: '', cycle: 'monthly', next_charge_at: '', notes: '', active: true });
+  let form = $state({ name: '', category: '', amount: '', cycle: 'monthly', next_charge_at: '', notes: '', active: true, started_at: '' });
+  let shownStart = $state('');
   let cents = $state(null);
   let saving = $state(false);
   let formError = $state('');
@@ -27,9 +28,10 @@
     formError = ''; tried = false;
     const s = subscription;
     shownCharge = s ? dayISO(s.next_charge_at) : '';
+    shownStart = s && s.started_at ? dayISO(s.started_at) : '';
     form = s
-      ? { name: s.name || '', category: s.category || '', amount: centsToInput(s.amount_cents), cycle: s.cycle || 'monthly', next_charge_at: dayISO(s.next_charge_at), notes: s.notes || '', active: !!s.active }
-      : { name: '', category: '', amount: '', cycle: 'monthly', next_charge_at: '', notes: '', active: true };
+      ? { name: s.name || '', category: s.category || '', amount: centsToInput(s.amount_cents), cycle: s.cycle || 'monthly', next_charge_at: dayISO(s.next_charge_at), notes: s.notes || '', active: !!s.active, started_at: s.started_at ? dayISO(s.started_at) : '' }
+      : { name: '', category: '', amount: '', cycle: 'monthly', next_charge_at: '', notes: '', active: true, started_at: '' };
   });
 
   async function submit(e) {
@@ -43,6 +45,9 @@
       notes: form.notes.trim() || null, active: form.active,
     };
     if (!editing || form.next_charge_at !== shownCharge) body.next_charge_at = form.next_charge_at || null;
+    // Alta: desde cuándo se paga. Los cargos desde esa fecha se apuntan solos como
+    // gasto en los meses abiertos (los cerrados no se tocan).
+    if (form.started_at && form.started_at !== shownStart) body.started_at = form.started_at;
     if (!legacyCategory || form.category !== legacyCategory) body.category = form.category || null;
     try {
       const j = editing
@@ -75,6 +80,9 @@
       </Field>
       <Field label="Próximo cargo" hint="Avanza solo cada mes o cada año.">
         {#snippet children(f)}<input class="ui-input" id={f.id} type="date" aria-describedby={f.describedby} bind:value={form.next_charge_at} />{/snippet}
+      </Field>
+      <Field label="La pagas desde" hint="Cada cargo desde esa fecha cuenta como gasto del mes.">
+        {#snippet children(f)}<input class="ui-input" id={f.id} type="date" aria-describedby={f.describedby} bind:value={form.started_at} />{/snippet}
       </Field>
       <Field label="Categoría">
         {#snippet children(f)}

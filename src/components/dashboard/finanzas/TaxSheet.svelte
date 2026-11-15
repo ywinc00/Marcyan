@@ -100,7 +100,7 @@
                 <a class="b b--mini" href={href('finanzas', ['registros'], { ver: 'contratistas' })}>Ya lo tengo</a></div>
             {/each}
             {#if !sc.miles}
-              <div class="tx-row"><span class="tx-ic tx-ic--info"><Icon name="note" size={16} /></span>
+              <div class="tx-row"><span class="tx-ic tx-ic--info"><Icon name="car" size={16} /></span>
                 <span class="tx-txt">No hay millaje apuntado. Si usas el coche para ver clientes, se deduce.</span>
                 <a class="b b--mini" href={href('finanzas', ['registros'], { ver: 'millaje' })}>Apuntar</a></div>
             {/if}

@@ -93,7 +93,7 @@
                 <span class="sc-meta">
                   {#if s.category}<StatusChip tone="neutral" label={categoryLabel(s.category)} />{/if}
                   {#if !s.active}<span>Pausada</span>
-                  {:else if s.next_charge_at}<span>Próximo cargo {fmtDay(s.next_charge_at)}</span>
+                  {:else if s.next_charge_at}<span>Próximo cargo {fmtDay(s.next_charge_at)}{s.started_at ? `; la pagas desde ${fmtDay(s.started_at)}` : ''}</span>
                   {:else}<span>Sin fecha de cargo</span>{/if}
                 </span>
               </div>

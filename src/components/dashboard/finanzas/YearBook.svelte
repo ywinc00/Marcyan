@@ -146,7 +146,7 @@
                 <tr class="yb-row" class:is-open={isOpen} class:is-flag={st === 'toclose'}>
                   <th scope="row">
                     <button type="button" class="yb-month" aria-expanded={isOpen} onclick={() => toggle(m.month)}>
-                      <span class="yb-mname">{monthLong(m.month).split(' ')[0]}</span><span class="yb-mshort" aria-hidden="true">{monthShort(m.month)}<span class="yb-mstate" class:is-warn={st === 'toclose'}>{st === 'closed' ? 'Cerrado' : st === 'current' ? 'En curso' : 'Por cerrar'}</span></span>
+                      <span class="yb-mname">{monthLong(m.month).split(' ')[0]}</span><span class="yb-mshort" aria-hidden="true"><span class="yb-mcap">{monthShort(m.month)}</span><span class="yb-mstate" class:is-warn={st === 'toclose'}>{st === 'closed' ? 'Cerrado' : st === 'current' ? 'En curso' : 'Por cerrar'}</span></span>
                     </button>
                   </th>
                   <td class="r yb-wide">{fmtUsd0(m.income)}</td>
@@ -186,7 +186,7 @@
             </tbody>
             <tfoot>
               <tr class="yb-tot">
-                <th scope="row">{year === thisYear ? `${year} hasta hoy` : year}</th>
+                <th scope="row"><span class="yb-mname">{year === thisYear ? `${year} hasta hoy` : year}</span><span class="yb-mshort" aria-hidden="true">{year}</span></th>
                 <td class="r yb-wide">{fmtUsd0(totals.income)}</td>
                 <td class="r yb-wide">{fmtUsd0(totals.out)}</td>
                 <td class="r" class:neg={totals.net < 0}>{fmtUsd0(totals.net)}</td>
@@ -308,13 +308,14 @@
   @container (max-width: 640px) {
     /* El estado pasa debajo del mes (texto, no solo icono) y la comparación con
        el año anterior, a una línea bajo la tabla: nada se pierde (E-62). */
-    .yb-t { table-layout: fixed; }
     .yb-st, .yb-diff { display: none; }
     .yb-diffline { display: block; }
     .yb-month { height: auto; min-height: 56px; padding-block: 8px; }
     .yb-wide { display: none; }
     .yb-mname { display: none; }
-    .yb-mshort { display: inline; text-transform: capitalize; }
+    .yb-mshort { display: inline; text-transform: none; }
+    .yb-mcap { text-transform: capitalize; }
+    .yb-t td.r { white-space: nowrap; }
     .yb-t th, .yb-t td { padding: 0 10px; }
     .yb-month { padding: 0 10px; }
     .yb-st { padding-left: 10px !important; }

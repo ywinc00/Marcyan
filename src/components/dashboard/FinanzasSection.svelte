@@ -29,6 +29,11 @@
   import SubscriptionsCard from './finanzas/SubscriptionsCard.svelte';
   import YearBook from './finanzas/YearBook.svelte';
   import TaxSheet from './finanzas/TaxSheet.svelte';
+  import PendingReview from './finanzas/PendingReview.svelte';
+  import ImportDialog from './finanzas/ImportDialog.svelte';
+  import RecordsPanel from './finanzas/RecordsPanel.svelte';
+  import ExpenseForm from './finanzas/ExpenseForm.svelte';
+  import Modal from './ui/Modal.svelte';
 
   import { api, errorMessage, isSessionError } from './lib/api.js';
   import { route, href, setQuery, navigate } from './lib/router.svelte.js';
@@ -66,6 +71,35 @@
   });
   let pendingMonth = $state('');
   function goTab(id) { navigate('finanzas', id ? [id] : [], {}); }
+
+  // Registros: un apartado a la vez (?ver=), las suscripciones primero.
+  const REGS = [
+    { id: 'suscripciones', label: 'Suscripciones' },
+    { id: 'cuentas', label: 'Cuentas', kind: 'accounts' },
+    { id: 'contratistas', label: 'Proveedores y contratistas', kind: 'vendors' },
+    { id: 'devoluciones', label: 'Devoluciones', kind: 'refunds' },
+    { id: 'ingresos', label: 'Ingresos sin factura', kind: 'income' },
+    { id: 'impuestos', label: 'Pagos de impuestos', kind: 'tax-payments' },
+    { id: 'millaje', label: 'Millaje', kind: 'mileage' },
+  ];
+  const reg = $derived(REGS.find((r) => r.id === route.query.ver) || REGS[0]);
+
+  // Acciones rápidas del teléfono (Recibo, Millaje, Registrar) y diálogos.
+  let importOpen = $state(false);
+  let pendingReview = $state(null);
+  let quickExpenseOpen = $state(false);
+  let quickReceipt = $state(false);
+  let newRecord = $state(false);
+  let registerOpen = $state(false);
+  function quickRecibo() { quickReceipt = true; quickExpenseOpen = true; }
+  function quickMillaje() { newRecord = true; navigate('finanzas', ['registros'], { ver: 'millaje' }); }
+  function register(what) {
+    registerOpen = false;
+    if (what === 'gasto') { quickReceipt = false; quickExpenseOpen = true; return; }
+    if (what === 'factura') { invoiceFormOpen = true; return; }
+    newRecord = true; navigate('finanzas', ['registros'], { ver: what });
+  }
+  function afterMovement() { loadSummary(); expensesCard?.load(); pendingReview?.load(); }
   const filter = $derived(STATUS_FILTERS.find((f) => f.id === (route.query.estado || '')) || STATUS_FILTERS[0]);
   const search = $derived((route.query.q || '').slice(0, 200));
   const page = $derived(Math.max(1, parseInt(route.query.pag, 10) || 1));
@@ -344,13 +378,45 @@
 
   {:else if tab === 'movimientos'}
   <div class="fin-block">
+    <PendingReview bind:this={pendingReview} onchanged={() => { loadSummary(); expensesCard?.load(); }} onimport={() => (importOpen = true)} />
+  </div>
+  <div class="fin-block">
     <ExpensesCard bind:this={expensesCard} onchanged={loadSummary} />
   </div>
   {:else if tab === 'registros'}
+  <div class="fin-regs" role="group" aria-label="Registros">
+    {#each REGS as r (r.id)}
+      <a class="fin-pill" href={href('finanzas', ['registros'], r.id === 'suscripciones' ? {} : { ver: r.id })} aria-current={reg.id === r.id ? 'page' : undefined}>{r.label}</a>
+    {/each}
+  </div>
   <div class="fin-block">
-    <SubscriptionsCard onchanged={loadSummary} />
+    {#if reg.id === 'suscripciones'}
+      <p class="fin-hint">Cada cargo de una suscripción se apunta solo como gasto del mes. Revisa en cada una desde cuándo la pagas para que cuenten los cargos de este año.</p>
+      <SubscriptionsCard onchanged={loadSummary} />
+    {:else}
+      <RecordsPanel kind={reg.kind} bind:openNew={newRecord} onchanged={loadSummary} />
+    {/if}
   </div>
   {/if}
+
+  <!-- Teléfono: lo que se hace con el móvil en la mano, al alcance del pulgar -->
+  <nav class="fin-bar" aria-label="Acciones rápidas de Finanzas">
+    <button type="button" onclick={quickRecibo}><Icon name="camera" size={20} /><span>Recibo</span></button>
+    <button type="button" onclick={quickMillaje}><Icon name="car" size={20} /><span>Millaje</span></button>
+    <button type="button" onclick={() => (registerOpen = true)}><Icon name="plus" size={20} /><span>Registrar</span></button>
+  </nav>
+  <ExpenseForm bind:open={quickExpenseOpen} withReceipt={quickReceipt} onsaved={afterMovement} />
+  <ImportDialog bind:open={importOpen} ondone={afterMovement} />
+  <Modal bind:open={registerOpen} title="Registrar" size="sm">
+    <div class="fin-reg-menu">
+      <button type="button" class="b" onclick={() => register('gasto')}>Un gasto</button>
+      <button type="button" class="b" onclick={() => register('factura')}>Una factura</button>
+      <button type="button" class="b" onclick={() => register('ingresos')}>Un ingreso sin factura</button>
+      <button type="button" class="b" onclick={() => register('devoluciones')}>Una devolución a un cliente</button>
+      <button type="button" class="b" onclick={() => register('impuestos')}>Un pago de impuestos</button>
+      <button type="button" class="b" onclick={() => register('millaje')}>Un viaje en coche (millaje)</button>
+    </div>
+  </Modal>
 
   <InvoiceForm bind:open={invoiceFormOpen} onsaved={invoiceCreated} />
   <PaymentForm bind:open={payOpen} invoice={payInvoice} onsaved={afterChange} />
@@ -424,10 +490,27 @@
   .fin-tab[aria-current='page']::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--fg-primary); border-radius: 2px; }
   .fin-tab:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; border-radius: 4px; }
   .fin-tabsel { display: none; margin: 0 0 var(--space-4); }
+  .fin-regs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 var(--space-4); }
+  .fin-regs .fin-pill { text-decoration: none; }
+  .fin-regs .fin-pill[aria-current='page'] { background: var(--surface-3); border-color: var(--border-strong); color: var(--fg-primary); }
+  .fin-hint { margin: 0 0 12px; color: var(--fg-secondary); font-size: var(--dash-small); max-width: 70ch; }
+  .fin-reg-menu { display: grid; gap: 8px; }
+  .fin-reg-menu .b { justify-content: flex-start; min-height: 44px; }
+  .fin-bar { display: none; }
   @media (max-width: 719px) {
     .fin-tabs { display: none; }
     .fin-tabsel { display: block; }
     .fin-tabsel .ui-input { min-height: 44px; }
+    /* Barra de acciones abajo, con la zona segura del iPhone; el contenido
+       deja su hueco para que nada quede tapado. */
+    .fin { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+    .fin-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+      padding: 8px max(12px, env(safe-area-inset-left, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-right, 0px));
+      background: var(--bg-2); border-top: 1px solid var(--border); }
+    .fin-bar button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 52px; border: 0; border-radius: var(--radius-md);
+      background: transparent; color: var(--fg-secondary); font: 500 var(--dash-caption)/1.2 var(--font-body); cursor: pointer; }
+    .fin-bar button:active { background: var(--bg-elevated); }
+    .fin-bar button:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; }
   }
   /* Móvil estrecho: las cifras de dinero necesitan el ancho entero (en dos
      columnas "$2,300" se cortaba en "$2,3…"). Solo en esta sección. */

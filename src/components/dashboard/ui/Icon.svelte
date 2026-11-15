@@ -51,6 +51,9 @@
     plus:      'M12 5v14M5 12h14',
     calendar:  'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
     pencil:    'M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4',
+    // Finanzas (aditivo, misma familia): foto del recibo y millaje.
+    camera:    'M4 8h3l2-3h6l2 3h3v11H4zM12 16.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z',
+    car:       'M5 16v-4l2-5h10l2 5v4M3 16h18M7 19v-3M17 19v-3M7.5 13h.01M16.5 13h.01',
   };
 </script>
 

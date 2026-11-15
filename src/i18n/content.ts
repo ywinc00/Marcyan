@@ -17,6 +17,9 @@ export const nap = {
   miami: '+1 786-938-1754',
   hours: 'Lun–Vie 9am–6pm CT',
   hoursEn: 'Mon to Fri, 9am to 6pm CT',
+  // El mismo horario en hora de Miami (este, una hora más), para la ficha de esa ciudad.
+  hoursEt: 'Lun–Vie 10am–7pm ET',
+  hoursEtEn: 'Mon to Fri, 10am to 7pm ET',
 };
 
 export const content = {

@@ -152,7 +152,7 @@ export const miamiHub = {
     local: {
       nap: [
         { label: 'Línea directa', value: nap.miami, href: telHref },
-        { label: 'Horario', value: nap.hours },
+        { label: 'Horario', value: nap.hoursEt },
         { label: 'Idiomas', value: 'Español · Inglés' },
       ],
       mapLabel: 'Mapa del área de Miami con las zonas que atendemos',

@@ -20,6 +20,7 @@ export const ROUTE_PAIRS: ReadonlyArray<readonly [string, string]> = [
   ['/es/diagnostico', '/en/checkup'],
   ['/es/herramientas', '/en/tools'],
   ['/privacidad', '/en/privacy'],
+  ['/accesibilidad', '/en/accessibility'],
   ['/terminos', '/en/terms'],
   ['/formulario', '/en/project-brief'],
 ];

@@ -108,6 +108,10 @@ export default async function handler(req, res) {
       source,
       ipAddress:     clientIp(req),
       userAgent:     sanitize(req.headers['user-agent'], 500),
+      page_url:      sanitize(body.page_url, 500),
+      // Casilla de SMS y WhatsApp (§2b): solo si el formulario la enseñó.
+      smsConsent:    body.sms_consent === 'yes' ? true : (body.sms_consent === 'no' ? false : undefined),
+      smsConsentText: sanitize(body.sms_consent_text, 500),
     };
 
     const refId = await createLead(data);

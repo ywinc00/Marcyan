@@ -130,7 +130,7 @@ export function truncateLabel(label, max = 16) {
 }
 
 // ── Monograma de cliente/proyecto ─────────────────────────────
-const MONO_PALETTE = ['#6366f1', '#0ea5e9', '#14b8a6', '#f97316', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'];
+const MONO_PALETTE = ['#333333']   // fase 3: monograma neutro, sin colores que compitan (H-07);
 export function monoColor(n) {
   let h = 0; const s = n || '?';
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;

@@ -8,19 +8,21 @@
 // ── Leads ────────────────────────────────────────────────────
 // Tonos distintos por estado (CRM-14): Contactado y Convertido ya no comparten color.
 export const LEAD_STATUSES = [
-  { id: 'new',       slug: 'nuevo',      label: 'Nuevo',      plural: 'Nuevos',      tone: 'accent'  },
-  { id: 'contacted', slug: 'contactado', label: 'Contactado', plural: 'Contactados', tone: 'info'    },
+  // Fase 3 · mapa de estados: nuevo = azul (por atender), contactado = ámbar
+  // (esperando al cliente), convertido = verde. El naranja queda para la acción.
+  { id: 'new',       slug: 'nuevo',      label: 'Nuevo',      plural: 'Nuevos',      tone: 'info'    },
+  { id: 'contacted', slug: 'contactado', label: 'Contactado', plural: 'Contactados', tone: 'warning' },
   { id: 'converted', slug: 'convertido', label: 'Convertido', plural: 'Convertidos', tone: 'success' },
   { id: 'archived',  slug: 'archivado',  label: 'Archivado',  plural: 'Archivados',  tone: 'neutral' },
   // Prueba y spam no cuentan en las estadísticas ni salen en "Todos".
   { id: 'test',      slug: 'prueba',     label: 'Prueba',     plural: 'Pruebas',     tone: 'neutral' },
   { id: 'spam',      slug: 'spam',       label: 'Spam',       plural: 'Spam',        tone: 'error'   },
 ];
-// Origen: Contacto y Diagnóstico ya no comparten color (CRM-14).
+// Origen en etiqueta neutra (fase 3, H-07): el color es para el estado, no para el canal.
 export const LEAD_SOURCES = [
   { id: 'contact',    slug: 'contacto',    label: 'Contacto',    tone: 'neutral' },
-  { id: 'chat',       slug: 'chat',        label: 'Chatbot',     tone: 'data'    },
-  { id: 'diagnostic', slug: 'diagnostico', label: 'Diagnóstico', tone: 'warning' },
+  { id: 'chat',       slug: 'chat',        label: 'Chatbot',     tone: 'neutral' },
+  { id: 'diagnostic', slug: 'diagnostico', label: 'Diagnóstico', tone: 'neutral' },
 ];
 
 const byId = (list, id) => list.find((x) => x.id === id) || null;
@@ -127,7 +129,7 @@ export const INVOICE_STATUS = {
   overdue: { label: 'Vencida', tone: 'error' }, void: { label: 'Anulada', tone: 'neutral' },
 };
 export const BRIEF_STATUS = {
-  pending: { label: 'Pendiente', tone: 'accent' }, contacted: { label: 'Contactado', tone: 'info' },
+  pending: { label: 'Pendiente', tone: 'info' }, contacted: { label: 'Contactado', tone: 'info' },
   in_progress: { label: 'En curso', tone: 'data' }, completed: { label: 'Completado', tone: 'success' },
   archived: { label: 'Archivado', tone: 'neutral' },
 };
@@ -170,7 +172,7 @@ export function deleteImpactText(impact) {
 }
 
 // ── Monograma (mismo criterio que Briefs) ────────────────────
-const MONO_PALETTE = ['#6366f1', '#0ea5e9', '#14b8a6', '#f97316', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b'];
+const MONO_PALETTE = ['#333333']   // fase 3: monograma neutro, sin colores que compitan (H-07);
 export function initials(s) {
   const parts = String(s || '?').replace(/[^\p{L}\p{N}\s]/gu, ' ').trim().split(/\s+/).filter(Boolean);
   if (!parts.length) return '?';

@@ -337,9 +337,11 @@
 </script>
 
 {#snippet brandMark(large)}
+  <!-- Fase 3: la marca del panel como en la lámina original (ficha con el
+       icono de Orbit + nombre en blanco), sin el naranja en cursiva. -->
   <span class="brand" class:brand--lg={large}>
-    <span class="planet" aria-hidden="true"></span>
-    <span class="wordmark">MAR<em>CYAN</em></span>
+    <span class="brand__tile" aria-hidden="true"><img src="/dashboard/orbit-icon.svg" alt="" width="22" height="22" /></span>
+    <span class="wordmark">Orbit</span>
   </span>
 {/snippet}
 
@@ -348,7 +350,7 @@
        se está (sin cambio de sección el efecto de ruta no lo cerraría). -->
   {#each items as item (item.id)}
     <a class="nav__item" class:active={section === item.id} href={href(item.id)} aria-current={section === item.id ? 'page' : undefined} onclick={() => (menuOpen = false)}>
-      <Icon name={item.id} size={18} />
+      <Icon name={item.id} size={20} />
       <span>{item.label}</span>
       {#if item.id === 'avisos' && unreadBadge}
         <span class="nav__count"><span aria-hidden="true">{unreadBadge}</span><span class="sr-only">, {avisos.unread === 1 ? '1 sin leer' : `${unreadBadge} sin leer`}</span></span>
@@ -359,7 +361,9 @@
 
 {#snippet subsBlock(list, showEmptyHint)}
   <div class="side-subs">
-    <span class="nav__cap">Suscripciones</span>
+    <!-- El gasto mensual sube a la cabecera del bloque (antes era una tarjeta
+         aparte con la cifra en naranja). -->
+    <span class="nav__cap nav__cap--row"><span>Suscripciones</span>{#if activeSubs.length}<span class="nav__cap-num">{money(monthlyRunRate)}/mes</span>{/if}</span>
     {#if data.subsError && !data.subs.length}
       <p class="subs__hint subs__hint--err">No se pudieron cargar. <button class="inline-btn" onclick={refreshShell}>Reintentar</button></p>
     {:else if !data.subsLoaded}
@@ -369,19 +373,16 @@
         <div class="subs">
           {#each list as s (s.id)}
             <div class="subs__row" title={`${s.name} · ${money(s.amount_cents)}/${s.cycle === 'yearly' ? 'año' : 'mes'}`}>
-              <BrandLogo name={s.name} size={22} />
+              <BrandLogo name={s.name} size={18} />
               <span class="subs__name">{s.name}</span>
-              <span class="subs__tag">{s.category}</span>
+              <span class="subs__amt">{money(s.amount_cents)}{s.cycle === 'yearly' ? '/año' : ''}</span>
             </div>
           {/each}
         </div>
       {:else if showEmptyHint}
         <p class="subs__hint">Sin coincidencias.</p>
       {/if}
-      <div class="runrate">
-        <span class="runrate__cap">Gasto / mes</span>
-        <span class="runrate__num">{money(monthlyRunRate)}</span>
-      </div>
+      <a class="subs__all" href={href('finanzas', ['registros'])} onclick={() => (menuOpen = false)}>Ver todas en Finanzas</a>
     {:else}
       <p class="subs__hint">Agrega tus suscripciones en <a href={href('finanzas')} onclick={() => (menuOpen = false)}>Finanzas</a>.</p>
     {/if}
@@ -443,14 +444,14 @@
       {@render brandMark(false)}
 
       <div class="search">
-        <span class="search__ico"><Icon name="search" size={16} /></span>
+        <span class="search__ico"><Icon name="search" size={18} /></span>
         <input bind:this={searchEl} type="search" placeholder="Buscar" aria-label="Buscar secciones y suscripciones"
           aria-keyshortcuts={isMac ? 'Meta+K' : 'Control+K'} bind:value={navQuery} onkeydown={onNavSearchKey} />
         <kbd aria-hidden="true">{kbdLabel}</kbd>
       </div>
 
       <nav class="nav" aria-label="Secciones">
-        <span class="nav__cap">Operación</span>
+        <span class="nav__cap">Navegación</span>
         {#if filteredNav.length}
           {@render navList(filteredNav)}
         {:else}
@@ -461,8 +462,8 @@
       {@render subsBlock(filteredSubs, true)}
 
       <div class="sidebar__foot" class:is-off={!online} role="status">
-        {#if online}<span class="online" aria-hidden="true"></span> En línea
-        {:else}<Icon name="wifiOff" size={14} /> Sin conexión{/if}
+        {#if online}<span class="online" aria-hidden="true"></span>En línea
+        {:else}<Icon name="wifiOff" size={14} />Sin conexión{/if}
       </div>
     </aside>
 
@@ -501,9 +502,9 @@
       <!-- ═══ Escritorio: barra superior ═══ -->
       <header class="topbar">
         <div class="crumbs">
-          <span class="crumb"><Icon name={section} size={16} />{sectionTitle}</span>
+          <span class="crumb"><Icon name={section} size={18} />{sectionTitle}</span>
           {#if section === 'inicio' && activeProjectCount > 0}
-            <span class="crumb crumb--muted">· {activeProjectCount} proyecto{activeProjectCount === 1 ? '' : 's'} activo{activeProjectCount === 1 ? '' : 's'}</span>
+            <span class="crumb crumb--muted">{activeProjectCount} proyecto{activeProjectCount === 1 ? '' : 's'} activo{activeProjectCount === 1 ? '' : 's'}</span>
           {/if}
         </div>
         <div class="topbar__right">
@@ -574,12 +575,16 @@
   .center { min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center; padding: calc(var(--space-5) + var(--safe-top)) var(--space-4) calc(var(--space-5) + var(--safe-bottom)); }
 
   /* ── Marca ── */
-  .brand { display: flex; align-items: center; gap: var(--space-3); }
+  .brand { display: flex; align-items: center; gap: 12px; }
   .brand--lg { justify-content: center; margin-bottom: var(--space-2); }
+  .brand__tile { width: 34px; height: 34px; flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; background: #262626; border: 1px solid var(--border); }
+  .brand__tile img { display: block; width: 22px; height: 22px; border-radius: 5px; }
+  .brand--lg .brand__tile { width: 40px; height: 40px; }
+  .wordmark { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.01em; font-size: 17px; color: var(--fg-primary); }
+  .brand--lg .wordmark { font-size: 20px; }
+  /* El planeta suelto queda solo para la barra del móvil. */
   .planet { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--accent-gold); position: relative; flex: 0 0 auto; display: inline-block; }
   .planet::after { content: ''; position: absolute; inset: 5px; border-radius: 50%; background: var(--accent-gold); }
-  .wordmark { font-family: var(--font-display); font-weight: 700; letter-spacing: .14em; font-size: 15px; color: var(--accent-gold); }
-  .wordmark em { font-style: italic; font-weight: 400; color: var(--accent-gold); opacity: .85; }
 
   /* ── Login ── */
   .login { width: 100%; max-width: 380px; display: flex; flex-direction: column; gap: var(--space-3); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-7) var(--space-6); }
@@ -600,56 +605,75 @@
   /* La columna de la barra lateral se pinta en la carcasa para que el fondo
      siga aunque el contenido sea más largo que la pantalla. */
   .shell {
-    display: grid; grid-template-columns: 220px minmax(0, 1fr); min-height: 100vh;
-    background: linear-gradient(90deg, var(--bg-2) 0 219px, var(--border) 219px 220px, transparent 220px);
+    display: grid; grid-template-columns: 240px minmax(0, 1fr); min-height: 100vh;
+    background: linear-gradient(90deg, var(--bg-2) 0 239px, var(--border) 239px 240px, transparent 240px);
   }
+  /* Fase 3: barra lateral como la lámina original (marca, búsqueda, filete,
+     rótulo mono, ítems de 40 px, activo en gris claro sin acento). */
   .sidebar {
-    position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto;
+    position: sticky; top: 0; align-self: start; height: 100vh; height: 100dvh; overflow-y: auto;
     background: var(--bg-2); border-right: 1px solid var(--border);
-    padding: var(--space-5) var(--space-4); display: flex; flex-direction: column; gap: var(--space-5);
+    padding: 18px 14px 14px; display: flex; flex-direction: column; gap: 18px;
   }
-  .nav { display: flex; flex-direction: column; gap: 3px; }
-  .nav__cap { font-size: var(--dash-caption); font-weight: 500; letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--fg-subtle); padding: 0 10px var(--space-2); }
-  .nav__item { display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 8px 10px; border-radius: var(--radius-md); color: var(--fg-secondary); font-size: var(--dash-body); text-decoration: none; transition: background-color var(--duration-fast), color var(--duration-fast); }
+  .sidebar > .brand { padding: 0 2px; }
+  .nav { display: flex; flex-direction: column; gap: 2px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .nav--m { padding-top: 0; border-top: 0; }
+  .nav__cap { font-family: var(--font-mono); font-size: var(--dash-mono); font-weight: 400; letter-spacing: 0; color: var(--fg-subtle); padding: 0 10px 10px; }
+  .nav__cap--row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .nav__cap-num { color: var(--fg-secondary); font-variant-numeric: tabular-nums; }
+  .nav__item { display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 8px 10px; border-radius: 10px; color: var(--fg-secondary); font-size: var(--dash-body); text-decoration: none; transition: background-color var(--duration-fast), color var(--duration-fast); }
+  .nav__item :global(.ui-icon) { flex: 0 0 auto; color: var(--fg-subtle); transition: color var(--duration-fast); }
   .nav__item:hover { background: var(--bg-elevated); color: var(--fg-primary); }
+  .nav__item:hover :global(.ui-icon) { color: var(--fg-primary); }
   .nav__count { margin-left: auto; min-width: 22px; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); color: var(--accent-gold); font-size: var(--dash-caption); font-weight: 600; line-height: 1.5; text-align: center; font-variant-numeric: tabular-nums; }
-  .nav__item.active { background: var(--bg-elevated); color: var(--accent-gold); box-shadow: inset 2px 0 0 var(--accent-gold), 0 0 0 1px var(--border); font-weight: 600; }
-  .sidebar__foot { margin-top: auto; display: flex; align-items: center; gap: 7px; font-size: var(--dash-caption); color: var(--accent-teal); padding: 8px 10px; border: 1px solid var(--accent-teal-line); border-radius: var(--radius-md); }
-  .sidebar__foot.is-off { color: var(--color-warning); border-color: color-mix(in srgb, var(--color-warning) 32%, transparent); }
-  .online { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-teal); }
+  /* Portátil de poco alto: la barra lateral se aprieta antes de desplazarse. */
+  @media (max-height: 820px) {
+    .sidebar { gap: 14px; padding-top: 14px; }
+    .nav { padding-top: 12px; }
+    .nav__item { min-height: 36px; padding: 6px 10px; }
+  }
+  .nav__item.active { background: var(--surface-3); color: var(--fg-primary); font-weight: 500; }
+  .nav__item.active :global(.ui-icon) { color: var(--fg-primary); }
+  .sidebar__foot { margin-top: auto; display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); padding: 12px 10px 2px; border-top: 1px solid var(--border); }
+  .sidebar__foot.is-off { color: var(--color-warning); }
+  .online { width: 6px; height: 6px; border-radius: 50%; background: var(--delta-up); box-shadow: 0 0 0 3px color-mix(in srgb, var(--delta-up) 18%, transparent); }
 
   /* ── Suscripciones (barra lateral y menú móvil) ── */
-  .side-subs { display: flex; flex-direction: column; gap: 4px; }
+  .side-subs { display: flex; flex-direction: column; gap: 2px; }
+  .subs__amt { margin-left: auto; flex: 0 0 auto; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); font-variant-numeric: tabular-nums; }
+  .subs__all { display: block; margin: 4px 10px 0; font-size: var(--dash-caption); color: var(--fg-subtle); text-decoration: none; }
+  .subs__all:hover { color: var(--fg-primary); }
   .subs__hint { margin: 4px 10px 0; font-size: var(--dash-caption); color: var(--fg-subtle); line-height: 1.5; }
   .subs__hint a { color: var(--fg-secondary); }
   .subs__hint--err { color: var(--fg-secondary); }
   .subs__skel { display: flex; flex-direction: column; gap: 8px; padding: 4px 10px; }
   .subs__skel .ui-skel { display: block; height: 22px; }
   .inline-btn { background: none; border: 0; padding: 0; color: var(--fg-primary); text-decoration: underline; cursor: pointer; font: inherit; }
-  .runrate { display: flex; flex-direction: column; gap: 5px; margin: 8px 0 0; padding: 14px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; }
-  .runrate__cap { font-size: 11px; font-weight: 500; letter-spacing: var(--tracking-wider); text-transform: uppercase; color: var(--fg-subtle); }
-  .runrate__num { font-family: var(--font-display); font-weight: 700; font-size: 22px; line-height: 1; letter-spacing: var(--tracking-tight); color: var(--accent-gold); font-variant-numeric: tabular-nums; }
 
   /* ── Búsqueda (Ctrl K / ⌘K) ── */
-  .search { display: flex; align-items: center; gap: 8px; padding: 0 10px 0 12px; min-height: 38px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; color: var(--fg-secondary); transition: border-color var(--duration-fast), box-shadow var(--duration-fast); }
+  .search { display: flex; align-items: center; gap: 10px; padding: 0 10px 0 12px; min-height: 40px; background: var(--bg-elevated); border: 1px solid transparent; border-radius: 10px; color: var(--fg-secondary); transition: border-color var(--duration-fast), box-shadow var(--duration-fast); }
   .search:focus-within { border-color: var(--accent-gold); box-shadow: 0 0 0 3px var(--accent-gold-dim); }
   .search__ico { display: inline-flex; color: var(--fg-subtle); }
   .search input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; font-family: inherit; font-size: var(--dash-small); color: var(--fg-primary); padding: 8px 0; }
   .search input::-webkit-search-cancel-button { display: none; }
   .search input:focus-visible { outline: none; }   /* el anillo lo pinta .search:focus-within */
-  .search kbd { font-family: inherit; font-size: 11px; color: var(--fg-subtle); background: var(--bg-elevated); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); white-space: nowrap; }
+  .search input { font-size: var(--dash-body); }
+  .search input::placeholder { color: var(--fg-secondary); }
+  .search kbd { font-family: var(--font-mono); font-size: 11px; color: var(--fg-subtle); background: transparent; padding: 0 2px; border: 0; white-space: nowrap; }
 
   /* ── Main ── */
-  .main { padding: var(--space-5) var(--space-6) var(--space-7); min-width: 0; }
+  /* --chrome-y: lo que la carcasa ocupa en alto (relleno de arriba + cabecera +
+     relleno de abajo). Inicio lo resta para caber en la pantalla. */
+  .main { --chrome-y: 76px; padding: 12px 24px 20px; min-width: 0; }
   .main:focus { outline: none; }
-  .topbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-4); flex-wrap: wrap; padding-bottom: var(--space-4); border-bottom: 1px solid var(--border); }
-  .crumbs { display: flex; align-items: center; gap: 12px; min-width: 0; }
-  .crumb { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: var(--dash-body); color: var(--fg-primary); white-space: nowrap; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3) var(--space-4); flex-wrap: wrap; min-height: 44px; }
+  .crumbs { display: flex; align-items: center; gap: 18px; min-width: 0; }
+  .crumb { display: inline-flex; align-items: center; gap: 10px; font-weight: 500; font-size: var(--dash-body); color: var(--fg-primary); white-space: nowrap; }
   .crumb :global(.ui-icon) { color: var(--fg-secondary); }
-  .crumb--muted { color: var(--fg-subtle); font-weight: 400; }
+  .crumb--muted { font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); font-weight: 400; }
   .topbar__right { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; justify-content: flex-end; }
-  .updated { font-size: var(--dash-small); color: var(--fg-subtle); white-space: nowrap; }
-  .me { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex: 0 0 auto; border-radius: var(--radius-pill); background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-deep)); color: var(--fg-inverse); font-family: var(--font-display); font-weight: 700; font-size: 13px; line-height: 1; box-shadow: 0 0 0 2px var(--bg-base); }
+  .updated { font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); white-space: nowrap; }
+  .me { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex: 0 0 auto; border-radius: var(--radius-pill); background: var(--surface-3); border: 1px solid var(--border-strong); color: var(--fg-primary); font-family: var(--font-display); font-weight: 600; font-size: 13px; line-height: 1; }
   .offline { display: flex; align-items: center; gap: 10px; margin-top: var(--space-4); padding: 10px 14px; border-radius: var(--radius-md); background: color-mix(in srgb, var(--color-warning) 10%, transparent); border: 1px solid color-mix(in srgb, var(--color-warning) 32%, transparent); color: var(--fg-primary); font-size: var(--dash-small); }
   .offline :global(.ui-icon) { color: var(--color-warning); flex: 0 0 auto; }
 
@@ -713,7 +737,7 @@
   .boot-login__field { display: block; height: var(--tap-min); }
   .boot__title { display: block; height: 32px; width: 300px; max-width: 70vw; }
   .boot__me { display: inline-block; width: 32px; height: 32px; border-radius: var(--radius-pill); flex: 0 0 auto; }
-  .boot__kpi { display: block; height: 144px; border-radius: var(--radius-lg); }
+  .boot__kpi { display: block; height: 104px; border-radius: 12px; }
   .boot__charts { display: grid; gap: 14px; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
   .boot__chart { display: block; height: 300px; border-radius: var(--radius-lg); }
   @media (max-width: 719px) { .boot__kpi { height: 136px; } .boot__chart:first-child { height: 288px; } .boot__chart { height: 298px; } }

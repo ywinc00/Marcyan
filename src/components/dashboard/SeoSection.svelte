@@ -13,9 +13,9 @@
   // La lógica pura (validación, ventanas, errores en español) está en
   // lib/seo-core.mjs, compartida con el servidor.
   // ─────────────────────────────────────────────────────────────
-  import { untrack } from 'svelte';
+  import { untrack, onMount } from 'svelte';
   import { api, errorMessage, isSessionError } from './lib/api.js';
-  import { route, setSub, setQuery } from './lib/router.svelte.js';
+  import { route, setSub, setQuery, href } from './lib/router.svelte.js';
   import { toast } from './lib/toast.svelte.js';
   import PageHeader from './ui/PageHeader.svelte';
   import KpiGrid from './ui/KpiGrid.svelte';
@@ -32,7 +32,7 @@
   import SeoSources from './seo/SeoSources.svelte';
   import SeoProjectForm from './seo/SeoProjectForm.svelte';
   import SeoStatusDialog from './seo/SeoStatusDialog.svelte';
-  import { nfmt, pct, pos, dayShort } from './seo/format.js';
+  import { nfmt, pct, pos, dayShort, whenTxt } from './seo/format.js';
   import { RANGE_OPTIONS, DEFAULT_DAYS, delta, buildSeries, globalHealth } from '../../../lib/seo-core.mjs';
 
   // ── Lista de proyectos ──
@@ -194,7 +194,8 @@
   const queries = $derived(topQ ? topQ.queries.map((q, i) => ({ ...q, rank: i + 1 })) : []);
 
   // KPIs
-  const prevTxt = $derived(`vs ${days} días anteriores`);
+  // Nota corta (cabe en una línea de la cifra): el rango ya se ve arriba, en las pastillas.
+  const prevTxt = 'vs. antes';
   const dClicks = $derived(sumG ? delta(sumG.current.clicks, sumG.previous && sumG.previous.clicks) : null);
   const dImpr = $derived(sumG ? delta(sumG.current.impressions, sumG.previous && sumG.previous.impressions) : null);
   const dPos = $derived(sumG ? delta(sumG.current.position, sumG.previous && sumG.previous.position, { lowerIsBetter: true }) : null);
@@ -224,6 +225,23 @@
   });
   // Título del gráfico: los días que de verdad pinta.
   const chartCap = $derived(sumG ? (partialG ? `Del ${dayShort(sumG.current.data_from)} al ${dayShort(sumG.through)}` : `${days} días hasta el ${dayShort(sumG.through)}`) : '');
+  // ── Fase 3: pestañas y Resumen a pantalla ──
+  const VIEWS = [{ id: 'resumen', label: 'Resumen' }, { id: 'paginas', label: 'Páginas' }, { id: 'busquedas', label: 'Búsquedas' }];
+  const ver = $derived(VIEWS.some((v) => v.id === route.query.ver) ? route.query.ver : 'resumen');
+  function pickVer(v) { setQuery({ ver: v === 'resumen' ? '' : v }, { replace: false }); }
+  let metric = $state('clicks');       // qué pinta el gráfico del Resumen: un solo gráfico, un solo color
+  let fit = $state(false);
+  onMount(() => {
+    const mq = window.matchMedia('(min-width: 1100px) and (min-height: 700px)');
+    const sync = () => (fit = mq.matches);
+    sync();
+    mq.addEventListener?.('change', sync);
+    return () => mq.removeEventListener?.('change', sync);
+  });
+  const fitOn = $derived(fit && ver === 'resumen' && Boolean(detail) && (hasGsc || hasGa4));
+  // Mejores búsquedas: tantas filas como quepan (34 px + 6 de separación), cinco si la página fluye.
+  let qH = $state(0);
+  const qRows = $derived(fitOn && qH ? Math.max(1, Math.min(10, Math.floor((qH + 6) / 40))) : 5);
   const qCols = [
     { key: 'query', label: 'Búsqueda', primary: true },
     { key: 'clicks', label: 'Clics', align: 'end' },
@@ -233,6 +251,7 @@
   ];
 </script>
 
+<div class="seo" class:is-fit={fitOn}>
 <PageHeader title="SEO">
   {#snippet actions()}
     <button type="button" class="b seo-health seo-health--{health.tone}" onclick={() => (statusOpen = true)} aria-haspopup="dialog">
@@ -246,27 +265,24 @@
   {#if isOff}
     {offTxt}
   {:else if d}
-    <span class={d.dir === 'flat' ? '' : d.better ? 'is-data' : 'seo-down'}>{d.dir === 'up' ? '↑' : d.dir === 'down' ? '↓' : '→'} {d.txt}</span> {prevTxt}
+    <span class={d.dir === 'flat' ? '' : d.better ? 'is-up' : 'is-down'}>{d.dir === 'up' ? '↑' : d.dir === 'down' ? '↓' : '→'} {d.txt}</span> <span title="frente a los {days} días anteriores">{prevTxt}</span>
   {:else}
     {okTxt}
   {/if}
 {/snippet}
 
-<!-- Huecos con la forma real (pieza E-09): la barra de trabajo, la línea de fuentes y
-     el bloque de datos (tarjeta de fuentes, cinco cifras, rango y dos gráficos). -->
+<!-- Huecos con la forma real (pieza E-09): franja de fuentes, cifras y la fila de gráfico e indexación. -->
 {#snippet detalleSkel()}
   <div class="seo-stack">
-    <div class="ui-skel sk-seo-card"></div>
+    <div class="ui-skel sk-seo-strip"></div>
     <div class="ui-kpis" data-count="5">{#each [0, 1, 2, 3, 4] as i (i)}<div class="ui-skel sk-seo-kpi"></div>{/each}</div>
-    <div class="ui-skel sk-seo-line"></div>
-    <div class="seo-charts"><div class="ui-skel sk-seo-chart"></div><div class="ui-skel sk-seo-chart"></div></div>
+    <div class="seo-row"><div class="ui-skel sk-seo-chart"></div><div class="ui-skel sk-seo-chart"></div></div>
   </div>
 {/snippet}
 {#snippet paginaSkel()}
-  <!-- Un solo bloque: así el hueco no suma la separación del contenedor de carga. -->
   <div>
     <div class="seo-bar"><div class="ui-skel sk-seo-bar"></div></div>
-    <div class="seo-meta"><span class="ui-skel sk-seo-meta"></span></div>
+    <div class="seo-tabs"><span class="ui-skel sk-seo-tabs"></span></div>
     {@render detalleSkel()}
   </div>
 {/snippet}
@@ -281,7 +297,7 @@
       </EmptyState>
     </Card>
   {:else}
-    <!-- Barra de trabajo: proyecto, rango y actualizar -->
+    <!-- Barra de trabajo: proyecto, rango y acciones del proyecto -->
     <div class="seo-bar">
       <label class="seo-bar__pick">
         <span class="sr-only">Proyecto</span>
@@ -298,9 +314,13 @@
         {/each}
       </div>
       {#if selected}
-        <button type="button" class="b seo-bar__sync" onclick={() => syncNow()} disabled={Boolean(syncingId) || !configured || !(selected.gsc_site_url || selected.ga4_property_id)}>
-          <span class:seo-spin={syncing}><Icon name="refresh" size={16} /></span>{syncing ? 'Actualizando…' : 'Actualizar ahora'}
-        </button>
+        <div class="seo-bar__acts">
+          <button type="button" class="b" onclick={() => syncNow()} disabled={Boolean(syncingId) || !configured || !(selected.gsc_site_url || selected.ga4_property_id)}>
+            <span class:seo-spin={syncing}><Icon name="refresh" size={16} /></span>{syncing ? 'Actualizando…' : 'Actualizar ahora'}
+          </button>
+          <button type="button" class="b" onclick={openEdit}><Icon name="edit" size={16} />Editar</button>
+          <button type="button" class="ui-icon-btn seo-del" onclick={() => (delOpen = true)} aria-label="Eliminar proyecto" title="Eliminar proyecto"><Icon name="trash" size={18} /></button>
+        </div>
       {/if}
     </div>
 
@@ -309,14 +329,20 @@
         {#snippet action()}<button type="button" class="b" onclick={() => setSub([], { replace: true })}>Ver el más reciente</button>{/snippet}
       </EmptyState>
     {:else if selected}
-      {#if proj}
-        <p class="seo-meta">
-          {#if proj.domain}<span>{proj.domain}</span>{/if}
-          <span>Search Console: {proj.gsc_site_url || 'sin configurar'}</span>
-          <span>Analytics: {proj.ga4_property_id || 'sin configurar'}</span>
-          {#if proj.active === false}<span>Pausado: no entra en la sincronización automática</span>{/if}
+      <!-- Pestañas (fase 3): la primera pantalla resume; las listas largas van aparte. -->
+      <div class="seo-tabs">
+        <nav class="seo-tabs__nav" aria-label="Partes de SEO">
+          {#each VIEWS as v (v.id)}
+            <a class="seo-tab" href={href('seo', [routeId], { ...route.query, ver: v.id === 'resumen' ? '' : v.id })} aria-current={ver === v.id ? 'page' : undefined}>{v.label}</a>
+          {/each}
+        </nav>
+        <p class="seo-tabs__meta">
+          {#if proj && proj.domain}<span>{proj.domain}</span>{/if}
+          {#if sumG}<span title="Search Console publica con 2 o 3 días de retraso">Search Console: {windowTxt}</span>{/if}
+          {#if sumA}<span title="Analytics, sin el día de hoy">Analytics: {dayShort(sumA.current.start)} al {dayShort(sumA.current.end)}</span>{/if}
+          {#if proj && proj.active === false}<span>Pausado: fuera de la sincronización automática</span>{:else if syncState && syncState.at}<span title="Se sincroniza solo cada madrugada">Actualizado {whenTxt(syncState.at)}</span>{/if}
         </p>
-      {/if}
+      </div>
 
       {#if detailError && !detail}
         <ErrorState title="No se pudieron cargar los datos" message={detailError} onretry={() => loadDetail(String(selected.id), days)} />
@@ -335,100 +361,130 @@
                     {#snippet action()}<button type="button" class="b" onclick={openEdit}>Añadir los identificadores</button>{/snippet}
                   </EmptyState>
                 </Card>
+              {:else if ver === 'paginas'}
+                <SeoIndexation indexation={detail.metrics.indexation} {hasGsc} state={syncState && syncState.sources ? syncState.sources.indexation : null}
+                  {syncing} gscFailed={Boolean(gscErr)} onsync={() => syncNow()} onedit={openEdit} onstatus={() => (statusOpen = true)} />
+              {:else if ver === 'busquedas'}
+                {#if hasGsc}
+                  <Card title="Búsquedas" caption="Search Console">
+                    {#snippet actions()}
+                      {#if topQ && topQ.range}<span class="seo-cap">{dayShort(topQ.range.startDate)} al {dayShort(topQ.range.endDate)}</span>{/if}
+                    {/snippet}
+                    {#if queries.length}
+                      <div class="seo-q"><DataTable columns={qCols} rows={queries} rowKey="rank" caption="Búsquedas con más clics">
+                        {#snippet cell(row, col)}
+                          {#if col.key === 'query'}
+                            <span class="q"><span class="q__rank">{row.rank}</span><span class="q__text">{row.query || '—'}</span></span>
+                          {:else if col.key === 'clicks'}<span class="num num--hi">{nfmt(row.clicks)}</span>
+                          {:else if col.key === 'impressions'}<span class="num">{nfmt(row.impressions)}</span>
+                          {:else if col.key === 'ctr'}<span class="num num--dim">{pct(row.ctr)}</span>
+                          {:else}<span class="num num--dim">{pos(row.position)}</span>{/if}
+                        {/snippet}
+                      </DataTable></div>
+                    {:else}
+                      <EmptyState compact title="Sin búsquedas registradas"
+                        text={topQ ? 'Google no registró búsquedas con clics o impresiones en ese período.' : 'El resumen de búsquedas se guarda en cada sincronización.'} />
+                    {/if}
+                  </Card>
+                {:else}
+                  <Card><EmptyState compact title="Search Console sin configurar" text="Las búsquedas salen de Search Console. Añade su propiedad al proyecto.">
+                    {#snippet action()}<button type="button" class="b" onclick={openEdit}>Editar proyecto</button>{/snippet}
+                  </EmptyState></Card>
+                {/if}
               {:else}
-              <SeoSources project={proj} state={syncState} {configured} {syncing}
+              <SeoSources mode="alerts" project={proj} state={syncState} {configured} {syncing}
                 through={{ gsc: sumG && sumG.through, ga4: sumA && sumA.through }}
                 onedit={openEdit} onstatus={() => (statusOpen = true)} />
+              {#if partialTxt}
+                <p class="seo-window seo-window--warn" role="note">{partialTxt}</p>
+              {/if}
 
               <KpiGrid count={kpiCount} label="Resumen del período">
-                <Kpi label="Clics" value={hasGsc && sumG ? nfmt(sumG.current.clicks) : '—'} art="cursor" tone="accent">
-                  {@render kpiNote(dClicks, sumG ? (sumG.previous ? 'sin cambios' : 'sin período previo para comparar') : gscEmptyTxt, 'Search Console sin configurar.', !hasGsc)}
+                <Kpi label="Clics" value={hasGsc && sumG ? nfmt(sumG.current.clicks) : '—'} art="cursor">
+                  {@render kpiNote(dClicks, sumG ? (sumG.previous ? 'sin cambios' : 'sin período previo') : gscEmptyTxt, 'Search Console sin configurar.', !hasGsc)}
                 </Kpi>
                 <Kpi label="Impresiones" value={hasGsc && sumG ? nfmt(sumG.current.impressions) : '—'} art="eye">
-                  {@render kpiNote(dImpr, sumG ? (sumG.previous ? 'sin cambios' : 'sin período previo para comparar') : gscEmptyTxt, 'Search Console sin configurar.', !hasGsc)}
+                  {@render kpiNote(dImpr, sumG ? (sumG.previous ? 'sin cambios' : 'sin período previo') : gscEmptyTxt, 'Search Console sin configurar.', !hasGsc)}
                 </Kpi>
                 <Kpi label="Posición media" value={hasGsc && sumG ? pos(sumG.current.position) : '—'} art="medal">
                   {@render kpiNote(dPos, sumG ? 'ponderada por impresiones' : gscEmptyTxt, 'Search Console sin configurar.', !hasGsc)}
                 </Kpi>
-                <Kpi label="Sesiones" value={hasGa4 && sumA ? nfmt(sumA.current.sessions) : '—'} art="users" tone="data">
-                  {@render kpiNote(dSess, sumA ? (sumA.previous ? 'sin cambios' : 'sin período previo para comparar') : ga4EmptyTxt, 'Analytics sin configurar.', !hasGa4)}
+                <Kpi label="Sesiones" value={hasGa4 && sumA ? nfmt(sumA.current.sessions) : '—'} art="users">
+                  {@render kpiNote(dSess, sumA ? (sumA.previous ? 'sin cambios' : 'sin período previo') : ga4EmptyTxt, 'Analytics sin configurar.', !hasGa4)}
                 </Kpi>
                 {#if showKeyEvents}
                   <Kpi label="Eventos clave" value={nfmt(sumA.current.key_events)} art="check">
-                    {@render kpiNote(dKey, 'contactos y objetivos de Analytics', '', false)}
+                    {@render kpiNote(dKey, 'contactos y objetivos', '', false)}
                   </Kpi>
                 {/if}
               </KpiGrid>
-              {#if sumG || sumA}
-                <p class="seo-window">
-                  {#if sumG}Search Console: {windowTxt} (publica con 2 o 3 días de retraso).{/if}
-                  {#if sumA}Analytics: {dayShort(sumA.current.start)} al {dayShort(sumA.current.end)}, sin el día de hoy.{/if}
-                </p>
-                {#if partialTxt}
-                  <p class="seo-window seo-window--warn" role="note">{partialTxt}</p>
-                {/if}
-              {/if}
 
               {#if hasGsc}
-                {#if gscDaily.length}
-                  <div class="seo-charts">
-                    <Card title="Clics por día" caption="Search Console">
-                      {#snippet actions()}<span class="seo-cap">{chartCap}</span>{/snippet}
-                      <SeoChart series={clicksSeries} tone="accent" unit="clics" unitOne="clic" label="Clics por día" {pendingLabel} />
+                <div class="seo-row seo-row--a">
+                  {#if gscDaily.length}
+                    <Card tag="article" caption="Search Console" title={metric === 'clicks' ? 'Clics por día' : 'Impresiones por día'}>
+                      {#snippet actions()}
+                        <span class="seo-cap">{chartCap}</span>
+                        <div class="seo-range seo-range--sm" role="group" aria-label="Qué se ve en el gráfico">
+                          <button type="button" class="seo-range__b" aria-pressed={metric === 'clicks'} onclick={() => (metric = 'clicks')}>Clics</button>
+                          <button type="button" class="seo-range__b" aria-pressed={metric === 'impressions'} onclick={() => (metric = 'impressions')}>Impresiones</button>
+                        </div>
+                      {/snippet}
+                      {#key metric}
+                        <SeoChart fill={fitOn} series={metric === 'clicks' ? clicksSeries : imprSeries} tone="accent"
+                          unit={metric === 'clicks' ? 'clics' : 'impresiones'} unitOne={metric === 'clicks' ? 'clic' : 'impresión'}
+                          label={metric === 'clicks' ? 'Clics por día' : 'Impresiones por día'} {pendingLabel} />
+                      {/key}
                     </Card>
-                    <Card title="Impresiones por día" caption="Search Console">
-                      {#snippet actions()}<span class="seo-cap">{chartCap}</span>{/snippet}
-                      <SeoChart series={imprSeries} tone="data" unit="impresiones" unitOne="impresión" label="Impresiones por día" {pendingLabel} />
+                  {:else}
+                    <Card title="Clics e impresiones" caption="Search Console">
+                      {#if gscErr}
+                        <EmptyState compact title="No se pudieron leer los datos de Search Console" text="El motivo y qué hacer están en el estado de Google.">
+                          {#snippet action()}<button type="button" class="b" onclick={() => (statusOpen = true)}>Ver estado de Google</button>{/snippet}
+                        </EmptyState>
+                      {:else}
+                        <EmptyState compact title="Aún no hay datos de Search Console"
+                          text={configured ? 'Se traen cada madrugada. Si no quieres esperar, actualiza ahora.' : 'Cuando el acceso a Google esté configurado, aquí verás los clics e impresiones de cada día.'}>
+                          {#snippet action()}{#if configured}<button type="button" class="b" onclick={() => syncNow()} disabled={Boolean(syncingId)}>{syncing ? 'Actualizando…' : 'Actualizar ahora'}</button>{/if}{/snippet}
+                        </EmptyState>
+                      {/if}
                     </Card>
-                  </div>
-                {:else}
-                  <Card title="Clics e impresiones" caption="Search Console">
-                    {#if gscErr}
-                      <EmptyState compact title="No se pudieron leer los datos de Search Console" text="El motivo y qué hacer están arriba, en Search Console.">
-                        {#snippet action()}<button type="button" class="b" onclick={() => (statusOpen = true)}>Ver estado de Google</button>{/snippet}
-                      </EmptyState>
+                  {/if}
+                  <SeoIndexation mode="summary" onpages={() => pickVer('paginas')} indexation={detail.metrics.indexation} {hasGsc} state={syncState && syncState.sources ? syncState.sources.indexation : null}
+                    {syncing} gscFailed={Boolean(gscErr)} onsync={() => syncNow()} onedit={openEdit} onstatus={() => (statusOpen = true)} />
+                </div>
+
+                {#if topQ || gscDaily.length}
+                  <Card tag="article" title="Mejores búsquedas">
+                    {#snippet actions()}
+                      {#if topQ && topQ.range}<span class="seo-cap">{dayShort(topQ.range.startDate)} al {dayShort(topQ.range.endDate)}</span>{/if}
+                      {#if queries.length > qRows}<button type="button" class="seo-more" onclick={() => pickVer('busquedas')}>Ver las {queries.length}<Icon name="chevron" size={14} /></button>{/if}
+                    {/snippet}
+                    {#if queries.length}
+                      <div class="qs">
+                        <div class="qs__cols" aria-hidden="true"><span>Búsqueda</span><span>Clics</span><span>Impresiones</span><span>CTR</span><span>Posición</span></div>
+                        <div class="qs__box" bind:clientHeight={qH}>
+                          <ol class="qs__rows">
+                            {#each queries.slice(0, qRows) as q (q.rank)}
+                              <li class="qs__row">
+                                <span class="q"><span class="q__rank">{q.rank}</span><span class="q__text ellip">{q.query || '—'}</span></span>
+                                <span class="num num--hi"><span class="qs__lbl">Clics </span>{nfmt(q.clicks)}</span>
+                                <span class="num"><span class="qs__lbl">Impr. </span>{nfmt(q.impressions)}</span>
+                                <span class="num num--dim"><span class="qs__lbl">CTR </span>{pct(q.ctr)}</span>
+                                <span class="num num--dim"><span class="qs__lbl">Pos. </span>{pos(q.position)}</span>
+                              </li>
+                            {/each}
+                          </ol>
+                        </div>
+                      </div>
                     {:else}
-                      <EmptyState compact title="Aún no hay datos de Search Console"
-                        text={configured ? 'Se traen cada madrugada. Si no quieres esperar, actualiza ahora.' : 'Cuando el acceso a Google esté configurado, aquí verás los clics e impresiones de cada día.'}>
-                        {#snippet action()}{#if configured}<button type="button" class="b" onclick={() => syncNow()} disabled={Boolean(syncingId)}>{syncing ? 'Actualizando…' : 'Actualizar ahora'}</button>{/if}{/snippet}
-                      </EmptyState>
+                      <EmptyState compact title="Sin búsquedas registradas"
+                        text={topQ ? 'Google no registró búsquedas con clics o impresiones en ese período.' : 'El resumen de búsquedas se guarda en cada sincronización.'} />
                     {/if}
                   </Card>
                 {/if}
               {/if}
-
-              <SeoIndexation indexation={detail.metrics.indexation} {hasGsc} state={syncState && syncState.sources ? syncState.sources.indexation : null}
-                {syncing} gscFailed={Boolean(gscErr)} onsync={() => syncNow()} onedit={openEdit} onstatus={() => (statusOpen = true)} />
-
-              {#if hasGsc && (topQ || gscDaily.length)}
-                <Card title="Top búsquedas" caption="Search Console">
-                  {#snippet actions()}
-                    {#if topQ && topQ.range}<span class="seo-cap">{dayShort(topQ.range.startDate)} al {dayShort(topQ.range.endDate)}</span>{/if}
-                  {/snippet}
-                  {#if queries.length}
-                    <div class="seo-q"><DataTable columns={qCols} rows={queries} rowKey="rank" caption="Búsquedas con más clics">
-                      {#snippet cell(row, col)}
-                        {#if col.key === 'query'}
-                          <span class="q"><span class="q__rank">{row.rank}</span><span class="q__text">{row.query || '—'}</span></span>
-                        {:else if col.key === 'clicks'}<span class="num num--hi">{nfmt(row.clicks)}</span>
-                        {:else if col.key === 'impressions'}<span class="num">{nfmt(row.impressions)}</span>
-                        {:else if col.key === 'ctr'}<span class="num num--dim">{pct(row.ctr)}</span>
-                        {:else}<span class="num num--dim">{pos(row.position)}</span>{/if}
-                      {/snippet}
-                    </DataTable></div>
-                  {:else}
-                    <EmptyState compact title="Sin búsquedas registradas"
-                      text={topQ ? 'Google no registró búsquedas con clics o impresiones en ese período.' : 'El resumen de búsquedas se guarda en cada sincronización.'} />
-                  {/if}
-                </Card>
               {/if}
-
-              {/if}
-
-              <div class="seo-foot">
-                {#if hasGsc || hasGa4}<button type="button" class="b" onclick={openEdit}>Editar proyecto</button>{:else}<span></span>{/if}
-                <button type="button" class="b b--danger" onclick={() => (delOpen = true)}>Eliminar proyecto</button>
-              </div>
             </div>
           {/if}
         </LoadingState>
@@ -436,6 +492,7 @@
     {/if}
   {/if}
 </LoadingState>
+</div>
 
 <SeoProjectForm bind:open={formOpen} project={formProject} {configured} onsaved={onSaved} />
 <SeoStatusDialog bind:open={statusOpen} {projects} {configured} {days}
@@ -453,62 +510,98 @@
   .seo-health--warning .seo-health__dot { background: var(--color-warning); }
   .seo-health--error .seo-health__dot { background: var(--color-error); }
 
-  .seo-bar { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-3); }
-  .seo-bar__pick { flex: 1 1 260px; max-width: 420px; min-width: 0; }
+  /* ── Página (fase 3): en un portátil o mayor, el Resumen cabe en la pantalla (E-77) ── */
+  .seo { display: flex; flex-direction: column; }
+  .seo > :global(.ui-page-head) { margin: 6px 0 14px; }
+  .seo.is-fit { height: calc(100dvh - var(--chrome-y, 76px)); min-height: 0; }
+  .seo.is-fit .seo-stack { flex: 1 1 auto; min-height: 0; }
+  .seo.is-fit .seo-row--a { flex: 1.35 1 0; min-height: 0; }
+  .seo.is-fit .seo-stack > :global(.ui-card:last-child) { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; }
+
+  .seo-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .seo-bar__pick { flex: 1 1 260px; max-width: 380px; min-width: 0; }
   .seo-bar__pick select { width: 100%; }
-  .seo-bar__sync { margin-left: auto; }
+  .seo-bar__acts { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .seo-del:hover { color: var(--color-error); }
   .seo-spin { display: inline-flex; animation: seo-spin 1s linear infinite; }
   @keyframes seo-spin { to { transform: rotate(360deg); } }
 
-  /* Rango: pastillas segmentadas (E-06) con el estado en la URL. Neutras:
-     el naranja queda para la acción principal (H-07). */
+  /* Rango y conmutador del gráfico: pastillas segmentadas (E-06), neutras (H-07). */
   .seo-range { display: inline-flex; padding: 3px; gap: 2px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-pill); }
   .seo-range__b { all: unset; box-sizing: border-box; cursor: pointer; padding: 6px 12px; min-height: 30px; display: inline-flex; align-items: center; border-radius: var(--radius-pill); font-size: var(--dash-small); font-weight: 500; color: var(--fg-secondary); white-space: nowrap; transition: background-color var(--duration-fast), color var(--duration-fast); }
   .seo-range__b:hover { color: var(--fg-primary); }
   .seo-range__b[aria-pressed='true'] { background: var(--surface-3); color: var(--fg-primary); box-shadow: inset 0 0 0 1px var(--border-strong); }
   .seo-range__b:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
-  @media (pointer: coarse) { .seo-range__b { min-height: 38px; } }
+  .seo-range--sm .seo-range__b { padding: 3px 10px; min-height: 26px; font-size: var(--dash-caption); }
+  @media (pointer: coarse) { .seo-range__b, .seo-range--sm .seo-range__b { min-height: 38px; } }
 
-  .seo-meta { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 var(--space-4); font-size: var(--dash-caption); color: var(--fg-subtle); }
-  .seo-meta span { overflow-wrap: anywhere; }
+  /* Pestañas como las de Finanzas (subrayado), con la ventana de datos en mono a la derecha. */
+  .seo-tabs { display: flex; align-items: flex-end; justify-content: space-between; gap: 6px 20px; flex-wrap: wrap; border-bottom: 1px solid var(--border); margin: 0 0 14px; }
+  .seo-tabs__nav { display: flex; gap: 22px; }
+  .seo-tab { position: relative; display: inline-flex; align-items: center; min-height: 36px; padding-bottom: 2px; font-size: var(--dash-body); color: var(--fg-secondary); text-decoration: none; }
+  .seo-tab:hover { color: var(--fg-primary); }
+  .seo-tab[aria-current='page'] { color: var(--fg-primary); }
+  .seo-tab[aria-current='page']::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--fg-primary); border-radius: 2px; }
+  .seo-tabs__meta { margin: 0 0 9px; display: flex; flex-wrap: wrap; gap: 4px 16px; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); }
+  .seo-tabs__meta span { overflow-wrap: anywhere; }
 
-  .seo-stack { display: flex; flex-direction: column; gap: var(--space-4); transition: opacity var(--duration-fast); }
-  /* Huecos de SEO con las medidas del contenido real (1440): tarjeta de fuentes 128,
-     cifras 162, línea del rango 18, gráficos 331. */
-  .sk-seo-bar { height: 38px; width: min(560px, 100%); }
-  .sk-seo-meta { display: inline-block; height: 15px; width: min(520px, 90%); }
-  .sk-seo-card { height: 128px; border-radius: var(--radius-lg); }
-  .sk-seo-kpi { height: 162px; border-radius: var(--radius-lg); }
-  .sk-seo-line { height: 18px; width: 40%; }
-  .sk-seo-chart { height: 331px; border-radius: var(--radius-lg); }
-  /* Teléfono: la barra parte en varias líneas y la tarjeta de fuentes crece. */
-  @media (max-width: 719px) { .sk-seo-bar { height: 158px; } .sk-seo-card { height: 310px; } }
+  .seo-stack { display: flex; flex-direction: column; gap: 14px; transition: opacity var(--duration-fast); }
+  .seo-stack > :global(.ui-kpis) { margin: 0; }
   .seo-stack.is-reloading { opacity: .7; }
-  .seo-window { margin: -6px 0 0; font-size: var(--dash-caption); color: var(--fg-subtle); line-height: 1.5; }
-  .seo-window--warn { color: var(--color-warning); }
-  .seo-down { color: var(--color-error); font-weight: 600; }
+  .seo-row { display: grid; gap: 14px; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+  .seo-row > :global(.ui-card) { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  .seo-row > :global(.ui-card) :global(.ui-card__actions) { gap: 12px; }
 
-  .seo-charts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
-  .seo-cap { font-size: var(--dash-caption); color: var(--fg-subtle); white-space: nowrap; }
+  /* Huecos con las medidas del contenido real (1440): franja 34, cifras 104, fila 300. */
+  .sk-seo-bar { height: 38px; width: min(620px, 100%); }
+  .sk-seo-tabs { display: inline-block; height: 26px; width: 240px; margin-bottom: 9px; }
+  .sk-seo-strip { height: 34px; border-radius: 10px; }
+  .sk-seo-kpi { height: 104px; border-radius: 12px; }
+  .sk-seo-chart { height: 300px; border-radius: 12px; }
+  @media (max-width: 719px) { .sk-seo-bar { height: 128px; } .sk-seo-strip { height: 70px; } }
+  .seo-window { margin: 0; font-size: var(--dash-caption); color: var(--fg-subtle); line-height: 1.5; }
+  .seo-window--warn { color: var(--color-warning); }
+
+  .seo-cap { font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); white-space: nowrap; }
+  .seo-more { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; min-height: 28px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; color: var(--fg-secondary); font-size: var(--dash-caption); white-space: nowrap; }
+  .seo-more:hover { color: var(--fg-primary); border-color: var(--border-strong); background: var(--bg-elevated); }
+  .seo-more:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
+
+  /* Mejores búsquedas: filas compactas como «Recent Projects» de la referencia. */
+  .qs { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+  .qs__cols, .qs__row { display: grid; grid-template-columns: minmax(0, 1fr) 72px 96px 64px 72px; gap: 12px; align-items: center; }
+  .qs__cols { padding: 0 12px 8px; font-family: var(--font-mono); font-size: var(--dash-mono); color: var(--fg-subtle); }
+  .qs__cols > :not(:first-child) { text-align: right; }
+  .qs__box { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+  .qs__rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+  .qs__row { min-height: 34px; padding: 0 12px; background: #242424; border: 1px solid var(--border-subtle); border-radius: 8px; font-size: var(--dash-small); }
+  .qs__row > .num { text-align: right; }
+  /* Rótulo de cada cifra: oculto a la vista en escritorio (lo dicen las columnas), visible en el teléfono. */
+  .qs__lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .ellip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 
   .q { display: inline-flex; align-items: center; gap: 10px; min-width: 0; max-width: 100%; }
-  .q__rank { flex: 0 0 auto; width: 22px; height: 22px; border-radius: var(--radius-sm); display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--fg-secondary); background: var(--bg-elevated); border: 1px solid var(--border); }
-  .q__text { color: var(--fg-primary); overflow-wrap: anywhere; }
-  .num { font-variant-numeric: tabular-nums; color: var(--fg-secondary); }
-  .num--hi { color: var(--fg-primary); font-weight: 600; }
+  .q__rank { flex: 0 0 auto; width: 20px; height: 20px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; color: var(--fg-secondary); background: var(--bg-elevated); border: 1px solid var(--border); }
+  .q__text { color: var(--fg-primary); }
+  .num { font-family: var(--font-mono); font-size: var(--dash-mono); font-variant-numeric: tabular-nums; color: var(--fg-secondary); }
+  .num--hi { color: var(--fg-primary); }
   .num--dim { color: var(--fg-subtle); }
 
-  .seo-foot { display: flex; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-2); }
-
-  @media (max-width: 1023px) { .seo-charts { grid-template-columns: 1fr; } }
+  @media (max-width: 1099px) { .seo-row { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 719px) {
-    /* Búsquedas en el teléfono: las 4 cifras en 2 columnas (media tarjeta). */
+    /* Búsquedas en el teléfono (pestaña): las 4 cifras en 2 columnas. */
     .seo-q :global(.ui-table tr) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 20px; }
     .seo-q :global(.ui-table td.is-primary) { grid-column: 1 / -1; }
     .seo-q :global(.ui-table td:not(.is-primary):not(.is-action)) { grid-column: auto; }
     .seo-bar__pick { flex-basis: 100%; max-width: none; }
-    .seo-bar__sync { margin-left: 0; }
+    .seo-bar__acts { margin-left: 0; flex-wrap: wrap; }
+    /* Resumen: la búsqueda arriba y sus cuatro cifras debajo, con su rótulo. */
+    .qs__cols { display: none; }
+    .qs__row { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 4px; padding: 8px 12px; }
+    .qs__row > .q { grid-column: 1 / -1; }
+    .qs__row > .num { text-align: left; }
+    .qs__lbl { position: static; width: auto; height: auto; overflow: visible; clip: auto; color: var(--fg-faint); }
   }
-  /* Movimiento reducido (pieza F-02): sin desplazamiento ni giro; el dato o el texto de estado se ven igual. */
+  /* Movimiento reducido (pieza F-02). */
   @media (prefers-reduced-motion: reduce) { .seo-spin { animation: none; } }
 </style>

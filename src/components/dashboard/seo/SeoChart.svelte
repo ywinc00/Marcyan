@@ -17,13 +17,14 @@
     unitOne = '',         // singular ('clic'); sin él se usa el plural
     label = '',           // nombre accesible del gráfico
     pendingLabel = 'Google aún no publica estos días',
+    fill = false,         // fase 3: llena el alto de su tarjeta (SEO a pantalla)
   } = $props();
 
   // El lienzo mide lo mismo que su caja (1 unidad = 1 px): los rótulos se
   // leen a 11 px también en el teléfono, en vez de encogerse con el SVG.
-  let boxW = $state(560);
+  let boxW = $state(560), plotH = $state(0);
   const VBW = $derived(Math.max(260, Math.round(boxW || 560)));
-  const VBH = $derived(VBW < 480 ? 180 : 210);
+  const VBH = $derived(fill && plotH ? Math.max(120, Math.round(plotH)) : (VBW < 480 ? 180 : 210));
   const PAD_R = 8, PAD_T = 14, PAD_B = 26;
   const uid = 'sc' + Math.random().toString(36).slice(2, 8);
   const color = $derived(tone === 'data' ? 'var(--accent-teal)' : 'var(--accent-gold)');
@@ -124,7 +125,8 @@
   const liveText = $derived(hovered ? `${dayShort(hovered.date)}: ${hovered.v == null ? 'sin datos todavía' : nfmt(hovered.v) + ' ' + (hovered.v === 1 && unitOne ? unitOne : unit)}` : '');
 </script>
 
-<div class="sc-box" bind:clientWidth={boxW}>
+<div class="sc-box" class:is-fill={fill} bind:clientWidth={boxW}>
+  <div class="sc-plot" bind:clientHeight={plotH}>
   {#if tip}
     <span class="chart-tip sc-tip sc-tip--{tip.align}" class:sc-tip--below={tip.below} style="left:{tip.left}%;top:{tip.top}%">
       {#if hovered.v == null}
@@ -177,6 +179,7 @@
       <text x={x(l.i)} y={VBH - 7} text-anchor={l.a} class="sc__lbl">{l.t}</text>
     {/each}
   </svg>
+  </div>
   {#if firstPending >= 0}
     <p class="sc-legend"><span class="sc-legend__sw" aria-hidden="true"></span>{pendingLabel}: {dayRangeShort(series[firstPending].date, series[n - 1].date)}</p>
   {/if}
@@ -184,11 +187,15 @@
 
 <style>
   .sc-box { position: relative; }
+  .sc-plot { position: relative; }
+  .sc-box.is-fill { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+  .sc-box.is-fill .sc-plot { flex: 1 1 auto; min-height: 120px; }
+  .sc-box.is-fill .sc { position: absolute; inset: 0; height: 100%; }
   .sc { width: 100%; height: auto; display: block; touch-action: pan-y; cursor: crosshair; border-radius: var(--radius-sm); }
   .sc:focus { outline: none; }
   .sc:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 4px; }
   .sc__lbl { fill: var(--fg-subtle); font-family: var(--font-mono); font-size: 11px; }
-  .sc__grid { stroke: var(--border); stroke-dasharray: 3 4; }
+  .sc__grid { stroke: var(--chart-grid); }
   .sc__guide { stroke: var(--border-strong); stroke-dasharray: 3 4; stroke-width: 1; }
   .sc__pending { fill: var(--bg-elevated); opacity: .55; }
   .sc-legend { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; font-size: var(--dash-caption); color: var(--fg-subtle); }

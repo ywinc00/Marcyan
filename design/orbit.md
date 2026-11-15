@@ -220,3 +220,42 @@ OK previo del dueño: rehacer KpiArt y BrandLogo («Sí, rehazlos»); esto levan
   (franja de cifras y texto que explica el número).
 - Piezas: G-08 (una familia de iconos), H-07 (presupuesto del acento), C-06 (cifras con procedencia), B-01 (lista de
   filas de ancho completo), E-08/E-09/E-10 (vacío, carga y error). Ledger: E-27, E-61, E-73, E-75, E-19, E-16.
+
+## Añadido 2026-11-15 · Fase 3 decidida: la referencia original de Orbit es la madre
+Estado: VALIDADO por: el dueño, 2026-11-15 («quiero un panel de admin como este… acercarlo al nivel de calidad de
+Orbit original»; la lógica de Finanzas, el agente y Ajustes se queda). Sustituye a las direcciones A, B y C de
+arriba. El render final se le enseña antes de mergear.
+Referencia madre: la lámina original de Orbit que mandó el dueño (sesión del 2026-11-15, no se guarda en el repo
+porque es de un tercero). Ledger E-54: se traen sus ELEMENTOS medidos (proporciones, escala, gráficos, rótulos
+monoespaciados, ilustraciones de las cifras, logos), re-tematizados con nuestro contenido.
+
+Medido en la referencia (por imagen): barra lateral #151515, fondo #1c1c1c, tarjeta de gráfico #1f1f1f, tarjeta de
+cifra #272727 con degradado hacia abajo, borde ~#3a3a3a, ítem activo #2b2b2b sin acento, naranja #ea702d que sube a
+melocotón #f5cc9e en la barra activa. Cifras en blanco; el color solo en la comparación pequeña (+5 verde, −2 rojo).
+
+Lo que se cambia (sobre lo que hoy hay; E-75: nada de lo que se ve hoy desaparece):
+1. Rampa de superficies neutra (H-06): fondo #1b1b1b, barra lateral #151515, tarjeta #202020, elevado #272727,
+   activo #2b2b2b, bordes blancos al 8 / 5 / 13 %. Fuera el tinte azulado y el negro casi puro (E-01).
+2. Rótulo monoespaciado (H-05) con JetBrains Mono (ya instalada, OFL): captions de la barra lateral, meta de la
+   cabecera, notas de las cifras, ejes de los gráficos, cabeceras de tabla y montos de suscripción. En minúscula
+   de frase como la referencia, no en mayúsculas con tracking. Inter se queda para todo lo demás.
+3. Presupuesto del acento (H-07): las cifras dejan de pintarse en naranja, verde o rojo; el ítem activo del menú pasa
+   a gris claro sin raya naranja; avatares y orígenes de lead en neutro. Naranja: botón principal, barra activa del
+   gráfico, línea del área, contador de Avisos y foco.
+4. Iconos: Hugeicons trazo redondeado (MIT, el estilo de la referencia), trazo 1,5, una sola familia (G-08).
+5. Ilustraciones de las cifras (KpiArt) rehechas como en la referencia: objetos grandes, monocromos y en relieve,
+   cortados por el borde inferior derecho de la tarjeta.
+6. Logos de suscripción reales (Simple Icons, CC0) dibujados en el propio panel, en claro, con el monto en mono a la
+   derecha; sin servicios externos de favicons.
+7. Inicio cabe en la pantalla (≥ 1100 de ancho y ≥ 700 de alto): cifras, «Actividad por mes» + «Proyectos
+   recientes», y abajo «Leads por estado» + «Leads recientes» + «Actividad acumulada». Las listas enseñan las filas
+   que caben; «Ver todos» en la cabecera de cada tarjeta. Por debajo de esas medidas, la página fluye como hoy.
+8. Gráficos como la referencia: barras con esquina redondeada y degradado gris, la activa en naranja que aclara
+   hacia arriba, globo con el dato y guía discontinua al eje; eje a la derecha en mono; píldoras de estado finas con
+   el nombre dentro.
+9. SEO: la primera pantalla resume (cifras, clics e impresiones en un gráfico, indexación y las mejores búsquedas);
+   la lista completa de páginas y de búsquedas pasa a pestañas propias (Resumen, Páginas, Búsquedas). El estado de
+   sincronización se condensa en una línea.
+
+Piezas: H-06, H-05, H-07, G-08, C-06 (cifra con procedencia), E-08/E-09/E-10 (vacío, carga, error).
+Ledger aplicable: E-54, E-01, E-27, E-62, E-64, E-75, E-17, E-30.

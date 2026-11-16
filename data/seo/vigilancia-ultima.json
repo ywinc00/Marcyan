@@ -1,15 +1,16 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-11-15",
+  "fecha": "2026-11-16",
   "primeraEjecucion": false,
-  "sitemap": 52,
+  "sitemap": 54,
   "inspeccion": true,
   "indexadas": 29,
-  "inspeccionadas": 52,
+  "inspeccionadas": 54,
   "porEstado": {
     "Submitted and indexed": 29,
     "Crawled - currently not indexed": 21,
-    "Alternate page with proper canonical tag": 2
+    "Alternate page with proper canonical tag": 2,
+    "URL is unknown to Google": 2
   },
   "porGrupo": {
     "home·en": {
@@ -17,7 +18,7 @@
       "indexadas": 1
     },
     "otras·en": {
-      "total": 5,
+      "total": 6,
       "indexadas": 1
     },
     "servicios·en": {
@@ -53,7 +54,7 @@
       "indexadas": 2
     },
     "otras·es": {
-      "total": 5,
+      "total": 6,
       "indexadas": 3
     },
     "herramientas·es": {
@@ -79,10 +80,10 @@
   },
   "sinRastreoReciente": 10,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 60,
+  "certificadoDias": 59,
   "medicion": {
     "idsEnSitio": {
-      "G-4GJPX4PTRV": 52
+      "G-4GJPX4PTRV": 54
     },
     "idsGa4": [
       "G-4GJPX4PTRV"
@@ -113,11 +114,11 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 22,
+    "sesionesUltimos3Dias": 29,
     "sesionesDiaHabitual": 9.1,
     "contactosSemanaHabitual": 0.1,
-    "diasSinContactos": 1,
-    "probabilidadAzar": 0.984
+    "diasSinContactos": 2,
+    "probabilidadAzar": 0.9677
   },
   "lectoresIa": {
     "bloqueadosPorRobots": {},
@@ -151,7 +152,7 @@
     "alta": [],
     "media": [
       {
-        "fecha": "2026-11-15",
+        "fecha": "2026-11-16",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
@@ -161,7 +162,15 @@
     ],
     "info": [
       {
-        "fecha": "2026-11-15",
+        "fecha": "2026-11-16",
+        "cliente": "marcyan",
+        "nivel": "info",
+        "tipo": "sitemap",
+        "detalle": "2 URL nuevas en el sitemap",
+        "url": null
+      },
+      {
+        "fecha": "2026-11-16",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",
@@ -172,6 +181,6 @@
   },
   "alertasNuevas": [],
   "pedirIndexacion": [],
-  "colaPendiente": 34,
+  "colaPendiente": 36,
   "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"
 }

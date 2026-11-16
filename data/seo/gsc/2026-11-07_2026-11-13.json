@@ -1,0 +1,208 @@
+{
+  "cliente": "marcyan",
+  "tipo": "semana",
+  "periodo": {
+    "desde": "2026-11-07",
+    "hasta": "2026-11-13"
+  },
+  "anterior": {
+    "desde": "2026-10-31",
+    "hasta": "2026-11-06"
+  },
+  "anioPasado": {
+    "desde": "2025-11-08",
+    "hasta": "2025-11-14"
+  },
+  "totales": {
+    "actual": {
+      "clicks": 4,
+      "impresiones": 149,
+      "ctr": 2.68,
+      "posicion": 16.2
+    },
+    "anterior": {
+      "clicks": 0,
+      "impresiones": 136,
+      "ctr": 0,
+      "posicion": 17.2
+    },
+    "anioPasado": null
+  },
+  "deltaClicks": 4,
+  "marcaVsSinMarca": {
+    "actual": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 0,
+        "ctr": 0,
+        "posicion": null
+      },
+      "sinMarca": {
+        "clicks": 0,
+        "impresiones": 76,
+        "ctr": 0,
+        "posicion": 23.4
+      }
+    },
+    "anterior": {
+      "marca": {
+        "clicks": 0,
+        "impresiones": 0,
+        "ctr": 0,
+        "posicion": null
+      },
+      "sinMarca": {
+        "clicks": 0,
+        "impresiones": 67,
+        "ctr": 0,
+        "posicion": 26.2
+      }
+    }
+  },
+  "porGrupo": [
+    {
+      "clave": "home",
+      "clicks": 3,
+      "impresiones": 16,
+      "ctr": 18.75,
+      "posicion": 2.4,
+      "dClicks": 3,
+      "dImpresiones": 8,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "ciudades",
+      "clicks": 1,
+      "impresiones": 56,
+      "ctr": 1.79,
+      "posicion": 23.1,
+      "dClicks": 1,
+      "dImpresiones": 37,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "blog",
+      "clicks": 0,
+      "impresiones": 74,
+      "ctr": 0,
+      "posicion": 13.2,
+      "dClicks": 0,
+      "dImpresiones": -26,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "landings",
+      "clicks": 0,
+      "impresiones": 31,
+      "ctr": 0,
+      "posicion": 13.6,
+      "dClicks": 0,
+      "dImpresiones": 13,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "otras",
+      "clicks": 0,
+      "impresiones": 27,
+      "ctr": 0,
+      "posicion": 5.3,
+      "dClicks": 0,
+      "dImpresiones": 11,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "servicios",
+      "clicks": 0,
+      "impresiones": 10,
+      "ctr": 0,
+      "posicion": 4.9,
+      "dClicks": 0,
+      "dImpresiones": 7,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "precios",
+      "clicks": 0,
+      "impresiones": 9,
+      "ctr": 0,
+      "posicion": 4,
+      "dClicks": 0,
+      "dImpresiones": 9,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "herramientas",
+      "clicks": 0,
+      "impresiones": 0,
+      "ctr": 0,
+      "posicion": null,
+      "dClicks": 0,
+      "dImpresiones": -9,
+      "clicksAnioPasado": null
+    }
+  ],
+  "porIdioma": [
+    {
+      "clave": "en",
+      "clicks": 3,
+      "impresiones": 85,
+      "ctr": 3.53,
+      "posicion": 7,
+      "dClicks": 3,
+      "dImpresiones": 61,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "es",
+      "clicks": 1,
+      "impresiones": 138,
+      "ctr": 0.72,
+      "posicion": 17.1,
+      "dClicks": 1,
+      "dImpresiones": -11,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasSuben": [
+    {
+      "clave": "https://marcyanstudio.com/en",
+      "clicks": 3,
+      "impresiones": 16,
+      "ctr": 18.75,
+      "posicion": 2.4,
+      "dClicks": 3,
+      "dImpresiones": 11,
+      "clicksAnioPasado": null
+    },
+    {
+      "clave": "https://marcyanstudio.com/es/houston",
+      "clicks": 1,
+      "impresiones": 33,
+      "ctr": 3.03,
+      "posicion": 28.9,
+      "dClicks": 1,
+      "dImpresiones": 16,
+      "clicksAnioPasado": null
+    }
+  ],
+  "paginasBajan": [],
+  "candidatasRefresco": [
+    {
+      "url": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+      "posicion": 11.5,
+      "impresiones": 47,
+      "ctr": 0
+    }
+  ],
+  "demandaSinPagina": [
+    {
+      "query": "diseño de sitios web responsive en houston",
+      "pagina": "https://marcyanstudio.com/es/houston",
+      "posicion": 42.7,
+      "impresiones": 10
+    }
+  ],
+  "avisos": [
+    "Alguna comparación cruza el periodo 13-may-2025 a 27-abr-2026 en el que Google registró mal las impresiones: comparar solo clics."
+  ]
+}

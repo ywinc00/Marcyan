@@ -1,9 +1,9 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-11-09",
+  "fecha": "2026-11-16",
   "periodo": {
-    "desde": "2026-10-10",
-    "hasta": "2026-11-06"
+    "desde": "2026-10-17",
+    "hasta": "2026-11-13"
   },
   "estado": "ok",
   "nota": "Menos de 3 páginas en el top 10 con impresiones suficientes: todavía no hay referencia propia; solo se marcan las páginas del top 20 con 100 o más impresiones y ningún clic.",
@@ -12,5 +12,49 @@
     "4-6": null,
     "7-10": null
   },
-  "titulosQueNoConvencen": []
+  "titulosQueNoConvencen": [
+    {
+      "pagina": "https://marcyanstudio.com/es/blog/cuanto-cuesta-chatbot-whatsapp-guia",
+      "posicion": 13.1,
+      "impresiones": 103,
+      "clics": 0,
+      "ctrPct": 0,
+      "referenciaPct": null,
+      "motivo": "se ve y nadie la abre",
+      "tituloActual": "Precio de un chatbot de WhatsApp en EE. UU. (2026) | Marcyan Studio",
+      "descripcionActual": "Cuánto cuesta un chatbot de WhatsApp para un negocio en Estados Unidos en 2026, en dólares: apps, desarrollo a medida y el cobro de Meta por mensaje.",
+      "busquedasPrincipales": [
+        {
+          "consulta": "precio chatbot whatsapp",
+          "impresiones": 54,
+          "clics": 0,
+          "posicion": 13.9
+        },
+        {
+          "consulta": "chatbot whatsapp precio",
+          "impresiones": 35,
+          "clics": 0,
+          "posicion": 12.3
+        },
+        {
+          "consulta": "cuanto cuesta un chatbot de whatsapp",
+          "impresiones": 6,
+          "clics": 0,
+          "posicion": 10.8
+        },
+        {
+          "consulta": "cuanto cuesta implementar chatbot con ia para whatsapp",
+          "impresiones": 2,
+          "clics": 0,
+          "posicion": 19.5
+        },
+        {
+          "consulta": "cuanto cuesta un chatbot",
+          "impresiones": 2,
+          "clics": 0,
+          "posicion": 9
+        }
+      ]
+    }
+  ]
 }

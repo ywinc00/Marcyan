@@ -1,6 +1,6 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-11-16",
+  "fecha": "2026-11-17",
   "primeraEjecucion": false,
   "sitemap": 54,
   "inspeccion": true,
@@ -80,7 +80,7 @@
   },
   "sinRastreoReciente": 10,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 59,
+  "certificadoDias": 58,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 54
@@ -114,11 +114,11 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 29,
+    "sesionesUltimos3Dias": 28,
     "sesionesDiaHabitual": 9.1,
     "contactosSemanaHabitual": 0.1,
-    "diasSinContactos": 2,
-    "probabilidadAzar": 0.9677
+    "diasSinContactos": 3,
+    "probabilidadAzar": 0.9512
   },
   "lectoresIa": {
     "bloqueadosPorRobots": {},
@@ -152,7 +152,7 @@
     "alta": [],
     "media": [
       {
-        "fecha": "2026-11-16",
+        "fecha": "2026-11-17",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
@@ -162,15 +162,7 @@
     ],
     "info": [
       {
-        "fecha": "2026-11-16",
-        "cliente": "marcyan",
-        "nivel": "info",
-        "tipo": "sitemap",
-        "detalle": "2 URL nuevas en el sitemap",
-        "url": null
-      },
-      {
-        "fecha": "2026-11-16",
+        "fecha": "2026-11-17",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",

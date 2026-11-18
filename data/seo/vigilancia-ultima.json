@@ -1,14 +1,14 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-11-17",
+  "fecha": "2026-11-18",
   "primeraEjecucion": false,
   "sitemap": 54,
   "inspeccion": true,
-  "indexadas": 29,
+  "indexadas": 28,
   "inspeccionadas": 54,
   "porEstado": {
-    "Submitted and indexed": 29,
-    "Crawled - currently not indexed": 21,
+    "Submitted and indexed": 28,
+    "Crawled - currently not indexed": 22,
     "Alternate page with proper canonical tag": 2,
     "URL is unknown to Google": 2
   },
@@ -63,7 +63,7 @@
     },
     "ciudades·es": {
       "total": 6,
-      "indexadas": 2
+      "indexadas": 1
     },
     "landings·es": {
       "total": 12,
@@ -80,7 +80,7 @@
   },
   "sinRastreoReciente": 10,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 58,
+  "certificadoDias": 57,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 54
@@ -114,11 +114,11 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 28,
-    "sesionesDiaHabitual": 9.1,
+    "sesionesUltimos3Dias": 11,
+    "sesionesDiaHabitual": 9.3,
     "contactosSemanaHabitual": 0.1,
-    "diasSinContactos": 3,
-    "probabilidadAzar": 0.9512
+    "diasSinContactos": 4,
+    "probabilidadAzar": 0.9345
   },
   "lectoresIa": {
     "bloqueadosPorRobots": {},
@@ -149,10 +149,19 @@
     "recientes": []
   },
   "alertas": {
-    "alta": [],
+    "alta": [
+      {
+        "fecha": "2026-11-18",
+        "cliente": "marcyan",
+        "nivel": "alta",
+        "tipo": "indexacion",
+        "detalle": "Salió del índice: Crawled - currently not indexed",
+        "url": "https://marcyanstudio.com/es/miami/doral"
+      }
+    ],
     "media": [
       {
-        "fecha": "2026-11-17",
+        "fecha": "2026-11-18",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
@@ -162,7 +171,7 @@
     ],
     "info": [
       {
-        "fecha": "2026-11-17",
+        "fecha": "2026-11-18",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",
@@ -171,8 +180,17 @@
       }
     ]
   },
-  "alertasNuevas": [],
+  "alertasNuevas": [
+    {
+      "fecha": "2026-11-18",
+      "cliente": "marcyan",
+      "nivel": "alta",
+      "tipo": "indexacion",
+      "detalle": "Salió del índice: Crawled - currently not indexed",
+      "url": "https://marcyanstudio.com/es/miami/doral"
+    }
+  ],
   "pedirIndexacion": [],
-  "colaPendiente": 36,
+  "colaPendiente": 35,
   "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"
 }

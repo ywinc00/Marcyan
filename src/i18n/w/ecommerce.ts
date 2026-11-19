@@ -297,7 +297,7 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
     franja,
     hermanas: {
       title: "<span class='w-tone'>Tu tienda vende.</span> Lo demás le trae clientes.",
-      lead: 'Lo que hace que te encuentren en Miami, conectado con tu tienda.',
+      lead: 'Servicios de Marcyan para tu tienda en Miami.',
       guia: { title: 'Guía de precios de una web', text: 'Cuánto cuesta una página web, con precios reales.' },
       diag: { title: 'Diagnóstico gratis', text: 'Revisa si tu negocio pierde clientes online.' },
       precios: { title: 'Precios', text: 'Todos los precios de entrada, a la vista.' },

@@ -50,7 +50,7 @@ const base = (city: IaCity) => {
             { canal: 'web' as const, x: 1104, y: 44, w: 250, quien: 'Visitante', texto: 'Hola, ¿abren mañana para el almuerzo?', hora: '11:10 p. m.' },
             { canal: 'llamada' as const, x: 1030, y: 318, w: 318, quien: '(305) 555-0142', texto: 'No dejó mensaje', hora: '11:14 p. m.' },
             { canal: 'whatsapp' as const, x: 110, y: 352, w: 300, quien: 'Yoel T.', texto: 'Buenas, ¿tienen platos sin gluten?', hora: '11:21 p. m.', extra: true },
-            { canal: 'instagram' as const, x: 402, y: 400, w: 290, quien: 'andrea.gm', texto: '¿Llevan pedidos a Brickell esta noche?', hora: '11:33 p. m.', extra: true },
+            { canal: 'instagram' as const, x: 402, y: 400, w: 290, quien: 'andrea.gm', texto: '¿Llevan pedidos a Brickell mañana?', hora: '11:33 p. m.', extra: true },
             { canal: 'sms' as const, x: 1030, y: 452, w: 318, quien: '(786) 555-0187', texto: '¿Aceptan reservas para diez?', hora: '11:41 p. m.', extra: true },
             { canal: 'web' as const, x: 714, y: 404, w: 290, quien: 'Visitante', texto: 'Hi, is there parking nearby?', hora: '11:52 p. m.', extra: true, enLang: true },
           ],
@@ -245,7 +245,7 @@ const base = (city: IaCity) => {
             { label: 'Paso 03', title: 'Resuelve o te lo pasa', text: 'Agenda y contesta lo que puede, y te pasa con resumen lo que necesita una persona.' },
           ]
         : [
-            { label: 'Paso 01', title: 'Entiende lo que le piden', text: 'Entiende el español de cada cliente, con sus palabras, y también el inglés.' },
+            { label: 'Paso 01', title: 'Entiende lo que le piden', text: 'Lee el español de cada cliente, con sus palabras, y también el inglés.' },
             { label: 'Paso 02', title: 'Mira tu menú y tu horario', text: 'Tu carta, tus horas y las mesas libres. Lo que no está en tus datos, no lo inventa.' },
             { label: 'Paso 03', title: 'Reserva o te lo pasa', text: 'Aparta la mesa cuando puede, y te pasa con resumen los eventos, las quejas y lo que necesita una persona.' },
           ]) as [{ label: string; title: string; text: string }, { label: string; title: string; text: string }, { label: string; title: string; text: string }],
@@ -438,7 +438,7 @@ const base = (city: IaCity) => {
         : 'No tienes que configurarla tú entre servicio y servicio. Lo hacemos contigo y Marcy queda contestando con los datos de tu local.',
       sr: 'Ejemplo de cómo empiezas con Marcy: la conoces, revisas el horario y los idiomas de tu negocio, conectas tus canales y queda lista para contestar.',
       /** Horario del negocio de ejemplo dentro de la pieza de alta (AltaMarcy); el mismo de las reglas y de los hilos. */
-      horario: H ? 'Lun a sáb · 9:00 a. m. a 7:00 p. m.' : 'Mar a dom · mediodía a 10:00\u00a0p.\u00a0m.',
+      horario: H ? 'Lun a sáb · 9:00 a. m. a 7:00 p. m.' : 'Mar a dom · mediodía a 10\u00a0p.\u00a0m.',
       steps: (H
         ? [
             ['Nos cuentas tu negocio', 'Horario, servicios, zona y cómo quieres que conteste.'],

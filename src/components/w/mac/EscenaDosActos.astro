@@ -28,12 +28,12 @@ import { logoReserva, type LogoReservaId } from './mac';
 
 interface Props {
   lang?: 'es' | 'en';
-  /** Ciudad de la página: Miami enseña su propio negocio de ejemplo (un restaurante), nunca el de Houston (E-65 c). */
-  ciudad?: 'houston' | 'miami';
+  /** Ejemplo propio de la página (resumen, formulario, ventanas y filas); Miami no enseña el de Houston (E-65 c). */
+  ejemplo?: EjemploEscena;
   id?: string;
   class?: string;
 }
-const { lang = 'es', ciudad = 'houston', id, class: cls } = Astro.props;
+const { lang = 'es', ejemplo, id, class: cls } = Astro.props;
 
 const logoMods = import.meta.glob('../marcas/LogoMarca.astro', { eager: true }) as Record<string, { default: any }>;
 const LogoMarca = Object.values(logoMods)[0]?.default ?? null;
@@ -41,6 +41,7 @@ const uid = 'da' + Math.random().toString(36).slice(2, 8);
 
 type Canal = 'whatsapp' | 'instagram' | 'messenger' | 'form' | 'web' | 'llamada' | 'sms';
 interface Ventana { canal: Canal; x: number; y: number; w: number; quien: string; texto: string; hora: string; extra?: boolean; enLang?: boolean }
+export interface EjemploEscena { resumen: string; pedir: string; campos: string[]; ventanas: Ventana[]; filas: Array<{ canal: Canal; txt: string; est: 'ok' | 'aviso' }> }
 
 const T = {
   es: {
@@ -108,34 +109,8 @@ const T = {
     ] as Array<{ canal: Canal; txt: string; est: 'ok' | 'aviso' }>,
   },
 }[lang];
-// Miami (solo en español: no hay página de IA de Miami en inglés): un restaurante de ejemplo, prefijos 305 y 786
-// y barrios de Miami-Dade. Mismas posiciones y largos parecidos que las ventanas de Houston.
-if (ciudad === 'miami' && lang === 'es') {
-  T.resumen = 'Ejemplo animado: de noche llegan a un restaurante mensajes por WhatsApp, Instagram, Messenger, el formulario y el chat de la web; Marcy los contesta y por la mañana el panel muestra todo respondido, y te avisa de la llamada perdida y del mensaje de texto.';
-  T.pedir = 'Reservar mesa';
-  T.campos = ['Nombre', 'Personas', 'Mensaje'];
-  T.ventanas = [
-    { canal: 'whatsapp', x: 36, y: 50, w: 300, quien: 'Mariela R.', texto: '¿Tienen mesa para seis el sábado?', hora: '10:47 p. m.' },
-    { canal: 'instagram', x: 318, y: 74, w: 290, quien: 'lucia.mia', texto: 'Hola, ¿hacen comida para una fiesta en Doral?', hora: '10:52 p. m.' },
-    { canal: 'form', x: 584, y: 46, w: 300, quien: 'Javier M.', texto: '¿Se puede reservar el local para un evento?', hora: '11:02 p. m.' },
-    { canal: 'messenger', x: 862, y: 66, w: 290, quien: 'Kate L.', texto: 'Hi! Can we book a table for four on Friday?', hora: '11:06 p. m.', enLang: true },
-    { canal: 'web', x: 1104, y: 44, w: 250, quien: 'Visitante', texto: 'Hola, ¿abren mañana para el almuerzo?', hora: '11:10 p. m.' },
-    { canal: 'llamada', x: 1030, y: 318, w: 318, quien: '(305) 555-0142', texto: 'No dejó mensaje', hora: '11:14 p. m.' },
-    { canal: 'whatsapp', x: 110, y: 352, w: 300, quien: 'Yoel T.', texto: 'Buenas, ¿tienen platos sin gluten?', hora: '11:21 p. m.', extra: true },
-    { canal: 'instagram', x: 402, y: 400, w: 290, quien: 'sabor.casa', texto: 'Me interesa, ¿llevan pedidos a Brickell?', hora: '11:33 p. m.', extra: true },
-    { canal: 'sms', x: 1030, y: 452, w: 318, quien: '(786) 555-0187', texto: '¿Aceptan reservas para diez?', hora: '11:41 p. m.', extra: true },
-    { canal: 'web', x: 714, y: 404, w: 290, quien: 'Visitante', texto: 'Hi, is there parking nearby?', hora: '11:52 p. m.', extra: true, enLang: true },
-  ];
-  T.filas = [
-    { canal: 'whatsapp', txt: 'Mariela R. y Yoel T.', est: 'ok' },
-    { canal: 'instagram', txt: 'lucia.mia y sabor.casa', est: 'ok' },
-    { canal: 'form', txt: 'Javier M. · evento', est: 'ok' },
-    { canal: 'messenger', txt: 'Kate L. · en inglés', est: 'ok' },
-    { canal: 'web', txt: '2 visitantes', est: 'ok' },
-    { canal: 'llamada', txt: '(305) 555-0142', est: 'aviso' },
-    { canal: 'sms', txt: '(786) 555-0187', est: 'aviso' },
-  ];
-}
+// Ejemplo propio de la página (Miami: src/i18n/w/ia-chat.ts, `escena`); sin él, el de siempre.
+if (ejemplo) Object.assign(T, ejemplo);
 const otro = lang === 'es' ? 'en' : 'es';
 
 const MARCA: Partial<Record<Canal, LogoReservaId>> = { whatsapp: 'whatsapp', instagram: 'instagram', messenger: 'messenger' };

@@ -34,6 +34,37 @@ const base = (city: IaCity) => {
     // Acto 2 del hero: ocupa la línea de la pregunta del acto 1 (sin hueco encima del H1).
     respondido: 'Respondido por Marcy.',
 
+    // Escena del hero (EscenaDosActos): Miami enseña su restaurante de ejemplo, prefijos 305 y 786 y barrios de
+    // Miami-Dade, con las mismas posiciones y largos parecidos que las ventanas de Houston (que usa las de la pieza).
+    escena: H
+      ? undefined
+      : {
+          resumen: 'Ejemplo animado: de noche llegan a un restaurante mensajes por WhatsApp, Instagram, Messenger, el formulario y el chat de la web; Marcy los contesta y por la mañana el panel muestra todo respondido, y te avisa de la llamada perdida y del mensaje de texto.',
+          pedir: 'Reservar mesa',
+          campos: ['Nombre', 'Personas', 'Mensaje'],
+          ventanas: [
+            { canal: 'whatsapp' as const, x: 36, y: 50, w: 300, quien: 'Mariela R.', texto: '¿Tienen mesa para seis el sábado?', hora: '10:47 p. m.' },
+            { canal: 'instagram' as const, x: 318, y: 74, w: 290, quien: 'lucia.mia', texto: 'Hola, ¿hacen comida para una fiesta en Doral?', hora: '10:52 p. m.' },
+            { canal: 'form' as const, x: 584, y: 46, w: 300, quien: 'Javier M.', texto: '¿Se puede reservar el local para un evento?', hora: '11:02 p. m.' },
+            { canal: 'messenger' as const, x: 862, y: 66, w: 290, quien: 'Kate L.', texto: 'Hi! Can we book a table for four on Friday?', hora: '11:06 p. m.', enLang: true },
+            { canal: 'web' as const, x: 1104, y: 44, w: 250, quien: 'Visitante', texto: 'Hola, ¿abren mañana para el almuerzo?', hora: '11:10 p. m.' },
+            { canal: 'llamada' as const, x: 1030, y: 318, w: 318, quien: '(305) 555-0142', texto: 'No dejó mensaje', hora: '11:14 p. m.' },
+            { canal: 'whatsapp' as const, x: 110, y: 352, w: 300, quien: 'Yoel T.', texto: 'Buenas, ¿tienen platos sin gluten?', hora: '11:21 p. m.', extra: true },
+            { canal: 'instagram' as const, x: 402, y: 400, w: 290, quien: 'andrea.gm', texto: '¿Llevan pedidos a Brickell esta noche?', hora: '11:33 p. m.', extra: true },
+            { canal: 'sms' as const, x: 1030, y: 452, w: 318, quien: '(786) 555-0187', texto: '¿Aceptan reservas para diez?', hora: '11:41 p. m.', extra: true },
+            { canal: 'web' as const, x: 714, y: 404, w: 290, quien: 'Visitante', texto: 'Hi, is there parking nearby?', hora: '11:52 p. m.', extra: true, enLang: true },
+          ],
+          filas: [
+            { canal: 'whatsapp' as const, txt: 'Mariela R. y Yoel T.', est: 'ok' as const },
+            { canal: 'instagram' as const, txt: 'lucia.mia y andrea.gm', est: 'ok' as const },
+            { canal: 'form' as const, txt: 'Javier M. · evento', est: 'ok' as const },
+            { canal: 'messenger' as const, txt: 'Kate L. · en inglés', est: 'ok' as const },
+            { canal: 'web' as const, txt: '2 visitantes', est: 'ok' as const },
+            { canal: 'llamada' as const, txt: '(305) 555-0142', est: 'aviso' as const },
+            { canal: 'sms' as const, txt: '(786) 555-0187', est: 'aviso' as const },
+          ],
+        },
+
     // 01 · Sin Marcy / con Marcy (W-CORE-25)
     sinCon: {
       label: 'Lo que se te escapa',
@@ -77,7 +108,7 @@ const base = (city: IaCity) => {
             { label: 'Te lo pasa', kind: 'mid' as Kind, note: '¿Me llaman mañana? Te deja la nota' },
           ]
         : [
-            { label: 'Respondido', kind: 'ok' as Kind, note: '¿Mesa para seis el sábado? Reservó a las 8:00 p. m.' },
+            { label: 'Respondido', kind: 'ok' as Kind, note: '¿Mesa para seis el sábado? Reservó a las 7:30\u00a0p.\u00a0m.' },
             { label: 'Respondido', kind: 'ok' as Kind, note: '¿Abren para el almuerzo? Le dio el horario' },
             { label: 'Te lo pasa', kind: 'mid' as Kind, note: '¿Menú para eventos? Te pide la propuesta' },
             { label: 'Respondido', kind: 'ok' as Kind, note: '¿Llevan a Brickell? Sí, está en tu zona' },
@@ -93,7 +124,7 @@ const base = (city: IaCity) => {
         : '<span class="w-tone">Primero WhatsApp.</span> Y la misma voz en tus otros canales.',
       text: H
         ? 'Tu web, tu WhatsApp, tu Instagram y tu Messenger: Marcy lleva cada conversación con los datos de tu negocio, pregunta la zona y el trabajo antes de pasártela y no deja ninguna a medias. Antes de empezar te decimos cuáles se pueden conectar en tu caso.'
-        : 'En Miami muchos clientes escriben primero por WhatsApp, y también por Instagram, Messenger y tu web. Marcy contesta con tu menú, tu horario y tus reservas, y no deja ninguna conversación a medias. Antes de empezar te decimos cuáles se pueden conectar en tu caso.',
+        : 'WhatsApp suele ser la primera puerta, pero también te escriben por Instagram, Messenger y tu web. Marcy contesta con tu menú y tus horas, y no deja ninguna conversación a medias. Antes de empezar te decimos cuáles se pueden conectar en tu caso.',
       points: (H
         ? [
             ['Tu web', 'Contesta en el chat de tu página, a cualquier hora.'],
@@ -104,7 +135,7 @@ const base = (city: IaCity) => {
         : [
             ['WhatsApp', 'Reservas y preguntas contestadas mientras atiendes el salón.'],
             ['Instagram', 'Quien ve tus platos y pregunta recibe respuesta esa misma noche.'],
-            ['Tu web', 'El chat de tu página contesta en español o en inglés.'],
+            ['Tu web', 'El chat de tu página contesta en los dos idiomas de tus clientes.'],
             ['Messenger', 'Los mensajes de tu página de Facebook no se quedan sin leer.'],
           ]) as [string, string][],
       sr: H
@@ -159,10 +190,10 @@ const base = (city: IaCity) => {
               canal: 'WhatsApp', logo: 'whatsapp', quien: 'Mariela R.', ini: 'MR', color: ['#E9DCCB', '#6B4E2E'],
               responder: 'Responder a Mariela R.',
               msgs: [
-                { h: '11:21 p. m.', t: '¿Tienen mesa para seis el sábado en la noche?' },
-                { m: true, h: '11:21 p. m.', t: 'Hola, Mariela. Sí: tengo a las 7:30 p. m. o a las 9:00 p. m. ¿Cuál te aparto?' },
-                { h: '11:22 p. m.', t: 'A las 7:30, por favor. Es un cumpleaños.' },
-                { m: true, h: '11:22 p. m.', t: 'Listo: sábado a las 7:30 p. m., mesa para seis. Te llega la confirmación por aquí.' },
+                { h: '10:47 p. m.', t: '¿Tienen mesa para seis el sábado en la noche?' },
+                { m: true, h: '10:47 p. m.', t: 'Hola, Mariela. Sí: tengo a las 7:30\u00a0p.\u00a0m. o a las 9:00\u00a0p.\u00a0m. ¿Cuál te aparto?' },
+                { h: '10:48 p. m.', t: 'A las 7:30, por favor. Es un cumpleaños.' },
+                { m: true, h: '10:48 p. m.', t: 'Listo: sábado a las 7:30\u00a0p.\u00a0m., mesa para seis. Te llega la confirmación por aquí.' },
               ],
             },
             {
@@ -214,11 +245,11 @@ const base = (city: IaCity) => {
             { label: 'Paso 03', title: 'Resuelve o te lo pasa', text: 'Agenda y contesta lo que puede, y te pasa con resumen lo que necesita una persona.' },
           ]
         : [
-            { label: 'Paso 01', title: 'Entiende lo que le piden', text: 'Lee el mensaje en el español de tu cliente, sea cubano, venezolano o colombiano, o en inglés.' },
-            { label: 'Paso 02', title: 'Mira tu menú y tu horario', text: 'Tu carta, tus horas y tus reservas. Lo que no está en tus datos, no lo inventa.' },
+            { label: 'Paso 01', title: 'Entiende lo que le piden', text: 'Entiende el español de cada cliente, con sus palabras, y también el inglés.' },
+            { label: 'Paso 02', title: 'Mira tu menú y tu horario', text: 'Tu carta, tus horas y las mesas libres. Lo que no está en tus datos, no lo inventa.' },
             { label: 'Paso 03', title: 'Reserva o te lo pasa', text: 'Aparta la mesa cuando puede, y te pasa con resumen los eventos, las quejas y lo que necesita una persona.' },
           ]) as [{ label: string; title: string; text: string }, { label: string; title: string; text: string }, { label: string; title: string; text: string }],
-      ask: H ? '¿Me pueden ver el sábado por una fuga en el baño? Estoy en Katy.' : '¿Tienen mesa para cuatro el sábado a las 8? Es un cumpleaños.',
+      ask: H ? '¿Me pueden ver el sábado por una fuga en el baño? Estoy en Katy.' : '¿Tienen mesa para dos el domingo a la 1:30?',
       actions: (H
         ? [
             ['agenda', 'sábado · libre 10:00 a. m.'],
@@ -226,9 +257,9 @@ const base = (city: IaCity) => {
             ['zona', `${zone} · dentro de tu área`],
           ]
         : [
-            ['reserva', 'sábado · libre 8:00 p. m.'],
-            ['mesa', 'cuatro personas'],
-            ['nota', 'cumpleaños'],
+            ['reserva', 'domingo · libre 1:30\u00a0p.\u00a0m.'],
+            ['mesa', 'dos personas'],
+            ['nota', 'almuerzo'],
           ]) as [string, string][],
       verdicts: H
         ? [
@@ -237,7 +268,7 @@ const base = (city: IaCity) => {
             { label: 'Fuera de horario', kind: 'off' as Kind, note: 'Agenda mañana' },
           ]
         : [
-            { label: 'Respondido', kind: 'ok' as Kind, note: 'Reservó el sábado' },
+            { label: 'Respondido', kind: 'ok' as Kind, note: 'Reservó el domingo' },
             { label: 'Te lo pasa', kind: 'mid' as Kind, note: 'Evento de 50' },
             { label: 'Fuera de horario', kind: 'off' as Kind, note: 'Contesta igual' },
           ],
@@ -261,10 +292,10 @@ const base = (city: IaCity) => {
             'Las quejas y las facturas me las pasa a mí, con un resumen.',
           ]
         : [
-            'Reserva mesas de martes a domingo, de 12 del mediodía a 10 de la noche.',
+            'Reserva mesas de martes a domingo, del mediodía a las 10 de la noche.',
             'Grupos de hasta diez, directo. Si son más, que me pregunten antes.',
             'Si alguien pide precio de un evento, que le diga que le mando la propuesta por escrito.',
-            'Las quejas y las facturas me las pasa a mí, con un resumen.',
+            'Llevamos pedidos a Doral y Brickell. Del resto de Miami-Dade, que me pregunten.',
           ],
       fixedTitle: 'Reglas fijas',
       fixedNote: 'Siempre activas',
@@ -276,10 +307,10 @@ const base = (city: IaCity) => {
             ['off', 'No', 'Dar precios por chat'],
           ]
         : [
-            ['ok', 'Sí', 'Reservar mar a dom · 12:00 a 10:00 p. m.'],
+            ['ok', 'Sí', 'Reservar mar a dom · mediodía a 10\u00a0p.\u00a0m.'],
             ['ok', 'Sí', 'Grupos · hasta diez personas'],
             ['mid', 'Te lo pasa', 'Grupos grandes · te pregunta'],
-            ['off', 'No', 'Dar precios por chat'],
+            ['off', 'No', 'Cotizar eventos por chat'],
           ]) as [Kind, string, string][],
       checksTitle: 'En cada mensaje',
       checksNote: 'Se revisa al momento',
@@ -295,7 +326,7 @@ const base = (city: IaCity) => {
       input: 'Ajustar una regla…',
       sr: H
         ? 'Ejemplo: el dueño de un negocio escribe cómo trabaja (horario, zona, precios y quejas) y Marcy lo convierte en reglas fijas y en revisiones de cada mensaje.'
-        : 'Ejemplo: el dueño de un restaurante escribe cómo funciona su local (horario, grupos, precios y quejas) y Marcy lo convierte en reglas fijas y en revisiones de cada mensaje.',
+        : 'Ejemplo: el dueño de un restaurante escribe cómo funciona su local (horario, grupos, precios de eventos y zona de pedidos) y Marcy lo convierte en reglas fijas y en revisiones de cada mensaje.',
     },
 
     // Lo que pasó hoy (W-ADV-44 vivo + W-ADV-23)
@@ -315,7 +346,7 @@ const base = (city: IaCity) => {
           ]
         : [
             { icon: 'lucide:message-circle', label: 'Reserva de mesa', chip: 'Respondido', tone: 'ok' as const },
-            { icon: 'lucide:calendar', label: 'Mesa sábado 8:00 p. m.', chip: 'Reservada', tone: 'ok' as const },
+            { icon: 'lucide:calendar', label: 'Mesa domingo 1:30\u00a0p.\u00a0m.', chip: 'Reservada', tone: 'ok' as const },
             { icon: 'lucide:help-circle', label: 'Evento de 50', chip: 'Te lo pasa', tone: 'pass' as const },
             { icon: 'lucide:languages', label: 'Turista en inglés', chip: 'Respondido', tone: 'ok' as const },
             { icon: 'lucide:user', label: 'Queja de pedido', chip: 'Te lo pasa', tone: 'pass' as const },
@@ -330,7 +361,7 @@ const base = (city: IaCity) => {
             { label: 'Idioma', value: 'Español e inglés' },
           ]
         : [
-            { label: 'Canal', value: 'WhatsApp' },
+            { label: 'Zona', value: 'Doral y Brickell' },
             { label: 'Reservas', value: 'Mar a dom' },
             { label: 'Grupos', value: 'Hasta diez' },
             { label: 'Idioma', value: 'Español e inglés' },
@@ -346,7 +377,7 @@ const base = (city: IaCity) => {
         : 'Cada reserva y cada conversación que necesita una persona te llega con su resumen. No tienes que abrir otra app en pleno servicio para saber qué pasó.',
       sr: H
         ? 'Ejemplo: una clienta agenda una cita en el chat de la web; a ti te llega la cita por correo y su duda con la factura por WhatsApp.'
-        : 'Ejemplo: una clienta reserva mesa en el chat de la web; a ti te llega la reserva por correo y su pregunta por un cumpleaños por WhatsApp.',
+        : 'Ejemplo: una clienta reserva mesa en el chat de la web; a ti te llega la reserva por correo y su pregunta por un almuerzo de empresa por WhatsApp.',
       ejemplo: 'Ejemplo',
       enLinea: 'en línea',
       escribe: 'Escribe un mensaje',
@@ -358,17 +389,17 @@ const base = (city: IaCity) => {
             { m: true, o: 'b', t: 'Se la paso al dueño con el resumen para que te conteste él.', h: '9:59 p. m.' },
           ]
         : [
-            { t: '¿Tienen mesa para cuatro el sábado a las 8?', h: '9:58 p. m.' },
-            { m: true, o: 'a', t: 'Sí. Te aparté la mesa el sábado a las 8:00 p. m. Te llega la confirmación aquí.', h: '9:58 p. m.' },
-            { t: 'Y quería preguntar por un cumpleaños el mes que viene.', h: '9:59 p. m.' },
+            { t: '¿Tienen mesa para dos el domingo a la 1:30?', h: '9:58 p. m.' },
+            { m: true, o: 'a', t: 'Sí. Te aparté la mesa el domingo a la 1:30\u00a0p.\u00a0m. Te llega la confirmación aquí.', h: '9:58 p. m.' },
+            { t: 'Y quería preguntar por un almuerzo de empresa el mes que viene.', h: '9:59 p. m.' },
             { m: true, o: 'b', t: 'Se lo paso al dueño con el resumen para que te conteste él.', h: '9:59 p. m.' },
           ]) as { m?: boolean; o?: 'a' | 'b'; t: string; h: string }[],
       mail: H
         ? { channel: 'Correo', from: 'Marcy · Tu Negocio', subject: 'Nueva cita: sábado, 10:00 a. m.', body: 'Ana · fuga en el baño · ' + zone, time: '9:58 p. m.' }
-        : { channel: 'Correo', from: 'Marcy · Tu Negocio', subject: 'Nueva reserva: sábado, 8:00 p. m.', body: 'Ana · mesa para cuatro', time: '9:58 p. m.' },
+        : { channel: 'Correo', from: 'Marcy · Tu Negocio', subject: 'Nueva reserva: domingo, 1:30\u00a0p.\u00a0m.', body: 'Ana · mesa para dos', time: '9:58 p. m.' },
       wa: H
         ? { channel: 'WhatsApp', body: 'Ana tiene una duda con su factura pasada. Te dejé el resumen.', time: '9:59 p. m.' }
-        : { channel: 'WhatsApp', body: 'Ana pregunta por un cumpleaños el mes que viene. Te dejé el resumen.', time: '9:59 p. m.' },
+        : { channel: 'WhatsApp', body: 'Ana pregunta por un almuerzo de empresa el mes que viene. Te dejé el resumen.', time: '9:59 p. m.' },
       destA: H
         ? { title: 'Por correo', text: 'Las citas y los contactos nuevos, con todos sus datos.' }
         : { title: 'Por correo', text: 'Las reservas y los contactos nuevos, con todos sus datos.' },
@@ -407,7 +438,7 @@ const base = (city: IaCity) => {
         : 'No tienes que configurarla tú entre servicio y servicio. Lo hacemos contigo y Marcy queda contestando con los datos de tu local.',
       sr: 'Ejemplo de cómo empiezas con Marcy: la conoces, revisas el horario y los idiomas de tu negocio, conectas tus canales y queda lista para contestar.',
       /** Horario del negocio de ejemplo dentro de la pieza de alta (AltaMarcy); el mismo de las reglas y de los hilos. */
-      horario: H ? 'Lun a sáb · 9:00 a. m. a 7:00 p. m.' : 'Mar a dom · 12:00 a 10:00 p. m.',
+      horario: H ? 'Lun a sáb · 9:00 a. m. a 7:00 p. m.' : 'Mar a dom · mediodía a 10:00\u00a0p.\u00a0m.',
       steps: (H
         ? [
             ['Nos cuentas tu negocio', 'Horario, servicios, zona y cómo quieres que conteste.'],

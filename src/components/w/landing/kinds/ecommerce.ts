@@ -66,6 +66,7 @@ const spec: KindSpec = {
       // "Ver precios ›" apunta hoy a /es/precios (hero.secondary): se mantiene (§4.15).
       link: { label: t.link, href: ctx.cluster.hero.secondary?.href ?? '/es/precios' },
       lang: ctx.lang,
+      city: cityOf(ctx),
     };
   },
   sections: [

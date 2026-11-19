@@ -64,7 +64,7 @@ const spec: KindSpec = {
       link: { label: t.link, href: '#faq' },
       respondido: t.respondido,
       lang: ctx.lang,
-      ciudad: cityOf(ctx),
+      escena: t.escena,
     };
   },
   sections: [

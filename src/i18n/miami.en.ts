@@ -14,9 +14,9 @@ import type { FaqItem, CrumbItem } from '../lib/schema';
 import type { RelatedLink } from './clusters';
 import { PRICE_ANCHORS } from './pricing';
 import { nap } from './content';
+import { usd } from './catalogo.generado';
 
 const telHref = 'tel:' + nap.miami.replace(/[^\d+]/g, '');
-const usd = (n: number) => '$' + n.toLocaleString('en-US');
 
 export const miamiHub = {
   meta: {
@@ -50,10 +50,10 @@ export const miamiHub = {
     tag: 'Services in Miami',
     title: 'Everything for your business, in <em>one studio</em>',
     links: [
-      { label: 'Web design in Miami', desc: 'Custom sites, fast and bilingual. From $1,500.', icon: 'lucide:layout-template', price: `from ${usd(PRICE_ANCHORS.web)}` },
-      { label: 'Local SEO in Miami', desc: 'Show up on Google Maps and in AI. From $600/mo.', icon: 'lucide:search', price: `from ${usd(PRICE_ANCHORS.seoLocal)}/mo` },
-      { label: 'Conversational AI in Miami', desc: 'Assistants that answer WhatsApp and book 24/7. From $900.', icon: 'lucide:messages-square', price: `from ${usd(PRICE_ANCHORS.ia)}` },
-      { label: 'Online store in Miami', desc: 'E-commerce that sells, with payments and catalog. From $2,900.', icon: 'lucide:shopping-bag', price: `from ${usd(PRICE_ANCHORS.ecommerce)}` },
+      { label: 'Web design in Miami', desc: `Custom sites, fast and bilingual. From ${usd(PRICE_ANCHORS.web)}.`, icon: 'lucide:layout-template', price: `from ${usd(PRICE_ANCHORS.web)}` },
+      { label: 'Local SEO in Miami', desc: `Show up on Google Maps and in AI. From ${usd(PRICE_ANCHORS.seoLocal)}/mo.`, icon: 'lucide:search', price: `from ${usd(PRICE_ANCHORS.seoLocal)}/mo` },
+      { label: 'Conversational AI in Miami', desc: `Assistants that answer WhatsApp and book 24/7. From ${usd(PRICE_ANCHORS.ia)}.`, icon: 'lucide:messages-square', price: `from ${usd(PRICE_ANCHORS.ia)}` },
+      { label: 'Online store in Miami', desc: `E-commerce that sells, with payments and catalog. From ${usd(PRICE_ANCHORS.ecommerce)}.`, icon: 'lucide:shopping-bag', price: `from ${usd(PRICE_ANCHORS.ecommerce)}` },
     ] as Array<Omit<RelatedLink, 'href'> & { href?: string }>,
   },
   local: {
@@ -81,7 +81,7 @@ export const miamiHub = {
       { q: 'Do you have clients or an office in Miami?', a: 'We\'ll be honest: we are just getting started in Miami, so we do not yet have published case studies from this city or a public address (we work as a service-area business). We do have real, verifiable work done in Houston and Orlando, which we are happy to walk you through on a call. That is why we offer Founding Client spots in Miami.' },
       { q: 'Do you work in the Spanish of Miami?', a: 'Yes. We are a bilingual team focused on the Spanish-speaking market in the United States. In Miami that means the Spanish that is really spoken here, Cuban, Venezuelan, Colombian, and English too. We write and optimize for how your customer actually speaks and searches, not in generic Spanish.' },
       { q: 'Do you serve the whole Miami area?', a: 'Yes. We cover Miami-Dade and its metro area (Doral, Hialeah, Kendall, Coral Gables, Brickell, Aventura and more) as a service-area business, remotely and efficiently. You do not need to visit an office: the entire process, from proposal to delivery, happens online and in your language.' },
-      { q: 'How much do your services cost in Miami?', a: 'We publish our starting prices: web design from $1,500, AI from $900, online store from $2,900 and local SEO from $600 a month. The final price depends on scope, and we always give it to you in writing before we start. You can see them all on our pricing page.' },
+      { q: 'How much do your services cost in Miami?', a: `We publish our starting prices: web design from ${usd(PRICE_ANCHORS.web)}, AI from ${usd(PRICE_ANCHORS.ecommerceEssential)}, online store from ${usd(PRICE_ANCHORS.ecommerce)} and local SEO from ${usd(PRICE_ANCHORS.seoLocal)} a month. The final price depends on scope, and we always give it to you in writing before we start. You can see them all on our pricing page.` },
       { q: 'Why a new bilingual studio in Miami and not an already established one?', a: 'Because we truly speak your language, we have a real local presence (we are not an anonymous remote operation), and we work with honesty: public pricing, no lock-in contracts and no promising the "#1" spot. We are new in Miami, but our work is verifiable, and our Founding Clients get hands-on attention and special terms.' },
     ] as FaqItem[],
   },

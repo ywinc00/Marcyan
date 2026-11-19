@@ -12,11 +12,11 @@ import type { FaqItem, CrumbItem, ListLink } from '../lib/schema';
 import type { RelatedLink } from './clusters';
 import { PRICE_ANCHORS } from './pricing';
 import { nap } from './content';
+import { usd } from './catalogo.generado';
 
 // Display formatting of the canonical figures. Figures ALWAYS come from
 // PRICE_ANCHORS (single source, guarded by check:kb); here we only format them
 // (pricing.ts does not export its usd() and touching it is vetoed).
-const usd = (n: number): string => '$' + n.toLocaleString('en-US');
 
 // Direct-dial href derived from the real NAP (single source in content.ts).
 const telHref = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
@@ -129,7 +129,7 @@ export const houstonHub = {
       { q: 'Do you have an office in Houston?', a: 'We work as a service-area business: we cover Houston and its entire metro area remotely and efficiently, without a public address. You do not need to visit an office. The whole process, from proposal to delivery, happens online and in your language.' },
       { q: 'Do you work in English and Spanish?', a: 'Yes. We are a bilingual studio. We design, write and optimize in real English and Spanish, because in Houston your customers search in both languages.' },
       { q: 'Do you serve only Houston or the metro area too?', a: 'We cover Houston and its entire metro area (Katy, Sugar Land, The Woodlands, Pearland and more). As a service-area business, we can serve you in the areas where you actually operate, with no need for a public address.' },
-      { q: 'How much do your services cost in Houston?', a: 'We publish our starting prices: web design from $1,500, AI from $900, online store from $2,900 and local SEO from $600 a month. The final price depends on scope, and we always put it in writing before we start. You can see them all on our pricing page.' },
+      { q: 'How much do your services cost in Houston?', a: `We publish our starting prices: web design from ${usd(PRICE_ANCHORS.web)}, AI from ${usd(PRICE_ANCHORS.ecommerceEssential)}, online store from ${usd(PRICE_ANCHORS.ecommerce)} and local SEO from ${usd(PRICE_ANCHORS.seoLocal)} a month. The final price depends on scope, and we always put it in writing before we start. You can see them all on our pricing page.` },
       { q: 'Why a local bilingual studio and not a big agency?', a: 'Because we build your site in real English and Spanish so you can capture the Spanish-speaking side of your market, with public pricing and no lock-in contracts. We bring together something few offer as a package: web design, conversational AI and SEO, all bilingual and under one team.' },
     ] as FaqItem[],
   },

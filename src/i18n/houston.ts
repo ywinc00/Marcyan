@@ -11,11 +11,10 @@ import type { FaqItem, CrumbItem, ListLink } from '../lib/schema';
 import type { RelatedLink } from './clusters';
 import { PRICE_ANCHORS } from './pricing';
 import { nap } from './content';
+import { usd } from './catalogo.generado';
 
 // Formato display de las cifras canónicas. Las CIFRAS salen SIEMPRE de
 // PRICE_ANCHORS (fuente única, guardada por check:kb); aquí solo se formatean
-// (pricing.ts no exporta su usd() y está vetado tocarlo).
-const usd = (n: number): string => '$' + n.toLocaleString('en-US');
 
 // href de marcado directo derivado del NAP real (fuente única en content.ts).
 const telHref = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
@@ -137,7 +136,7 @@ export const houstonHub = {
       { q: '¿Tienen oficina en Houston?', a: 'Trabajamos como negocio de área de servicio: cubrimos Houston y toda su área metropolitana de forma remota y eficiente, sin una dirección pública. No necesitas ir a una oficina. Todo el proceso, de la propuesta a la entrega, lo hacemos en línea y en tu idioma.' },
       { q: '¿Trabajan en español e inglés?', a: 'Sí. Somos un equipo bilingüe enfocado en el mercado hispano de Estados Unidos. Diseñamos, escribimos y posicionamos en español e inglés, porque en Houston tus clientes buscan en ambos idiomas.' },
       { q: '¿Atienden solo a Houston o también el área metropolitana?', a: 'Cubrimos Houston y toda su área metropolitana (Katy, Sugar Land, The Woodlands, Pearland y más). Al ser negocio de área de servicio, podemos atenderte en las zonas donde realmente operas, sin necesidad de una dirección pública.' },
-      { q: '¿Cuánto cuestan sus servicios en Houston?', a: 'Publicamos nuestros precios de arranque: diseño web desde $1,500, IA desde $900, tienda en línea desde $2,900 y SEO local desde $600 al mes. El precio final depende del alcance, y siempre te lo damos por escrito antes de empezar. Puedes verlos todos en nuestra página de precios.' },
+      { q: '¿Cuánto cuestan sus servicios en Houston?', a: `Publicamos nuestros precios de arranque: diseño web desde ${usd(PRICE_ANCHORS.web)}, IA desde ${usd(PRICE_ANCHORS.ecommerceEssential)}, tienda en línea desde ${usd(PRICE_ANCHORS.ecommerce)} y SEO local desde ${usd(PRICE_ANCHORS.seoLocal)} al mes. El precio final depende del alcance, y siempre te lo damos por escrito antes de empezar. Puedes verlos todos en nuestra página de precios.` },
       { q: '¿Por qué una agencia hispana local y no una grande?', a: 'Porque hablamos tu idioma, conocemos a tu cliente hispano y te damos atención cercana, con precios públicos y sin contratos que te aten. Reunimos algo que pocos ofrecen en conjunto: diseño web, IA conversacional y SEO, todo bilingüe y bajo un mismo equipo.' },
     ] as FaqItem[],
   },

@@ -92,8 +92,9 @@ Estado: PROPUESTO dentro de la dirección validada (no abre gramática nueva); O
   una fuente más de cosas por revisar, no una función aparte.
 
 ## Añadido 2026-11-18 · Página de cada mes
-Estado: PROPUESTO dentro de la dirección validada; el dueño elige forma (bocetos `design/finanzas/mes/bocetos.html`)
-y da el OK final sobre el render. Pedido del dueño: «entrar en enero y ver qué cobré, en qué gasté, el resumen del
+Estado: VALIDADO por el dueño, 2026-11-18 («la A»; bocetos `design/finanzas/mes/bocetos.html`). Visual: OK sobre el
+render antes de mergear. En la misma orden: el botón «Recibo» del teléfono abre la cámara en el mismo toque y el gasto
+a mano queda aparte (Registrar > Un gasto). Pedido del dueño: «entrar en enero y ver qué cobré, en qué gasté, el resumen del
 mes y todo lo que sea útil».
 - **Ruta:** `#/finanzas/mes/AAAA-MM`, con flechas al mes anterior y siguiente y vuelta al Año. Pulsar un mes en el
   Año abre su página; lo que hoy se despliega en la fila (cifras, «Ver movimientos», cierre) vive dentro, sin perder

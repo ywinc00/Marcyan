@@ -675,7 +675,7 @@ check('cotizar: nunca baja del 85 % de la suma de precios base', () => {
 });
 check('cotizar: lo mensual va aparte y no se descuenta', () => {
   const q = quote([{ servicio: 'web' }, { servicio: 'seoLocal', ubicaciones: 2 }, { servicio: 'maintenance' }]);
-  assert.equal(q.mensual.total, 600 + 200 + 120);
+  assert.equal(q.mensual.total, 399 + 200 + 120); // SEO local mensual: 399 desde el 2026-11-19
   assert.equal(q.pago_unico.descuento_combinacion, 0, 'un solo proyecto de pago único: sin combinación');
 });
 check('cotizar: productos por bloques (tienda esencial con 60 → 2 bloques de 25)', () => {

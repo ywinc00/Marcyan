@@ -22,7 +22,7 @@ Marcyan Studio pone la inteligencia artificial a trabajar para tu negocio: sitio
 ## Servicios y precio de arranque (USD, se cotiza cada proyecto)
 
 - Diseño web: landing desde ${usd(p.webLanding)}, rediseño desde ${usd(p.webRedesign)}, sitio completo desde ${usd(p.web)}.
-- SEO local (Google y Maps): arranque desde ${usd(p.seoInitial)}, plan completo desde ${usd(p.seoLocal)}.
+- SEO local (Google y Maps): arranque desde ${usd(p.seoInitial)}, plan mensual desde ${usd(p.seoLocal)} al mes.
 - SEO para IA (que ChatGPT, Gemini, Perplexity y Claude te recomienden): diagnóstico gratis, bases desde ${usd(p.aeoFoundations)}, seguimiento desde ${usd(p.aeoMonitoring)} al mes.
 - Asistentes de IA (WhatsApp, web, Instagram, llamadas): básico desde ${usd(p.iaBasic)}, completo desde ${usd(p.ia)}.
 - Tienda en línea: esencial desde ${usd(p.ecommerceEssential)}, completa desde ${usd(p.ecommerce)}.

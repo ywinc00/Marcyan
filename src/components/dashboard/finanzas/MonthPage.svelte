@@ -97,6 +97,7 @@
   }
   const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
   const dayShort = (d) => fmtDay(d, { day: 'numeric', month: 'short' });
+  const subsCents = $derived(data ? data.expenses.filter((e) => e.subscription_id).reduce((a, e) => a + e.amount_cents, 0) : 0);
 
   // ── De dónde entró ───────────────────────────────────────────
   const inflow = $derived.by(() => {
@@ -299,10 +300,10 @@
                   {/each}
                 </ul>
               {/if}
-              {#if t.subscriptions || data.estimates.length || (data.mileage && data.mileage.trips)}
+              {#if subsCents || data.estimates.length || (data.mileage && data.mileage.trips)}
                 <ul class="mp-checks">
-                  {#if t.subscriptions}
-                    <li><span class="mp-ic mp-ic--mute" aria-hidden="true">·</span><span class="mp-ck mp-ck--mute">De todo esto, {fmtUsd0(t.subscriptions)} son cargos de suscripciones.</span></li>
+                  {#if subsCents}
+                    <li><span class="mp-ck mp-ck--mute">De todo esto, {fmtUsd0(subsCents)} son cargos de suscripciones.</span></li>
                   {/if}
                   {#each data.estimates as e, k (k)}
                     <li><span class="mp-ic mp-ic--mute" aria-hidden="true">≈</span><span class="mp-ck">{e.name}: cargo estimado de {formatUsd(e.amount_cents)} <small>(aún no cuenta; se corrige solo cuando llegue su factura)</small></span></li>

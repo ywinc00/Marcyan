@@ -41,6 +41,9 @@ function buscarCatalogo(desdeDir = RAIZ) {
 
 export const CATALOGO_JSON = process.env.MARCYAN_CATALOGO || buscarCatalogo();
 export const DESTINO = resolve(RAIZ, 'src/i18n/catalogo.generado.ts');
+// El mismo contenido en .mjs, para lo que corre en el servidor (la base de
+// conocimiento de Marcy y sus guardas), que no pasa por TypeScript.
+export const DESTINO_MJS = resolve(RAIZ, 'lib/catalogo.generado.mjs');
 
 /** Lee el catálogo de Ventas. Lanza si no está donde debe. */
 export function leerCatalogo(ruta = CATALOGO_JSON) {
@@ -97,7 +100,18 @@ export function proyectarPublico(c) {
     papel: p.papel,
   }));
 
-  return { version: c.version, moneda: c.moneda, proyectos, planes, anadidos, paquetes };
+  // El precio de entrada que el dueño quiere ver por servicio en la web, las
+  // fichas y los perfiles. Es lo que manda sobre el «desde» de cada página.
+  const desdePorServicio = (c.desdePorServicio?.servicios ?? []).map((s) => ({
+    servicio: s.servicio,
+    ref: s.ref,
+    ...(typeof s.desde === 'number' ? { desde: s.desde } : {}),
+    ...(typeof s.desdeMensual === 'number' ? { desdeMensual: s.desdeMensual } : {}),
+    ...(typeof s.cuotaMensual === 'number' ? { cuotaMensual: s.cuotaMensual } : {}),
+    ...(s.mensual ? { mensual: s.mensual } : {}),
+  }));
+
+  return { version: c.version, moneda: c.moneda, proyectos, planes, anadidos, paquetes, desdePorServicio };
 }
 
 /** El .ts generado, con el aviso de "no tocar a mano". */
@@ -145,11 +159,34 @@ export function usdMes(n: number, lang: 'es' | 'en' = 'es'): string {
 `;
 }
 
+/** La misma lista, en JavaScript corriente, para el servidor. */
+export function renderizarMjs(publico) {
+  return `// ⚠️ GENERADO — no lo edites a mano.
+// Sale de _cerebro/ventas/catalogo.json con \`npm run sync:catalogo\`.
+// Gemelo de src/i18n/catalogo.generado.ts, para lo que corre en el servidor.
+
+export const CATALOGO = ${JSON.stringify(publico, null, 2)};
+
+/** Precio de arranque de un proyecto: su \`desde\` si lo tiene, si no su \`precio\`. */
+export function desde(id) {
+  const p = CATALOGO.proyectos[id];
+  const v = p && (p.desde ?? p.precio);
+  if (typeof v !== 'number') throw new Error(\`El proyecto "\${id}" no tiene precio.\`);
+  return v;
+}
+
+/** "$1,950" a partir de 1950. */
+export function usd(n) {
+  return '$' + n.toLocaleString('en-US');
+}
+`;
+}
+
 export function sincronizar() {
   const c = leerCatalogo();
   const publico = proyectarPublico(c);
-  const texto = renderizar(publico);
-  writeFileSync(DESTINO, texto, 'utf8');
+  writeFileSync(DESTINO, renderizar(publico), 'utf8');
+  writeFileSync(DESTINO_MJS, renderizarMjs(publico), 'utf8');
   return { version: c.version, destino: DESTINO, proyectos: Object.keys(publico.proyectos).length, planes: Object.keys(publico.planes).length };
 }
 

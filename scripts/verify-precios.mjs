@@ -45,6 +45,13 @@ const PERDONADOS = [
   // como están hasta la página de planes. Viven NOMBRADOS en PENDIENTES_DE_PLAN,
   // no sueltos por el copy, y se van solos cuando esa página entre.
   { texto: /PENDIENTES_DE_PLAN|Lo sustituirá el plan/, motivo: 'excepción nombrada y fechada en pricing.ts' },
+  // Lo que vale el TRABAJO DEL CLIENTE (un tejado, una obra), no lo que
+  // cobramos nosotros: va en el texto que explica por qué perder una llamada
+  // le sale caro a un contratista.
+  {
+    texto: /\$[\d,]+(?:\s+(?:o|or)\s+\$[\d,]+)?\s+(?:job|trabajo|obra|presupuesto)|trabajo de \$|job worth|se te va|walks away/i,
+    motivo: 'valor del trabajo del cliente',
+  },
 ];
 
 // Un precio de verdad lleva al menos tres cifras ($150, $1,500). Los `$1`..`$99`

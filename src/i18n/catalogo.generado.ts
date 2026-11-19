@@ -12,11 +12,15 @@ export const CATALOGO = {
       "precio": 0
     },
     "fichaAlDia": {
-      "nombre": "Ficha al día",
+      "nombre": "Ficha de Google al día",
       "precio": 199
     },
+    "webPagina": {
+      "nombre": "Página web de una página",
+      "precio": 450
+    },
     "webLanding": {
-      "nombre": "Landing + ficha de Google",
+      "nombre": "Página web + ficha de Google",
       "precio": 550
     },
     "webRedesign": {
@@ -127,6 +131,60 @@ export const CATALOGO = {
       "proyecto": "webLanding",
       "orden": 3,
       "papel": "entrada"
+    }
+  ],
+  "desdePorServicio": [
+    {
+      "servicio": "Página web",
+      "ref": "webPagina",
+      "desde": 450,
+      "mensual": "base"
+    },
+    {
+      "servicio": "Ficha de Google",
+      "ref": "fichaAlDia",
+      "desde": 199,
+      "mensual": "presencia"
+    },
+    {
+      "servicio": "Rediseño",
+      "ref": "webRedesign",
+      "desde": 750,
+      "mensual": "base"
+    },
+    {
+      "servicio": "Tienda en línea",
+      "ref": "ecommerceEssential",
+      "desde": 1300,
+      "mensual": "base"
+    },
+    {
+      "servicio": "Asistente con IA",
+      "ref": "iaBasic",
+      "desde": 650,
+      "cuotaMensual": 99
+    },
+    {
+      "servicio": "Reservas con depósito",
+      "ref": "reservas",
+      "desde": 2900,
+      "cuotaMensual": 149
+    },
+    {
+      "servicio": "Aparecer en Google",
+      "ref": "presencia",
+      "desdeMensual": 399
+    },
+    {
+      "servicio": "Aparecer en ChatGPT y Gemini",
+      "ref": "aeoFoundations",
+      "desde": 650,
+      "mensual": "dominio"
+    },
+    {
+      "servicio": "Logo y marca",
+      "ref": "brandingLogo",
+      "desde": 300
     }
   ]
 } as const;

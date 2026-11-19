@@ -15,6 +15,8 @@
 import { HOUSTON_ID, type CrumbItem, type FaqItem, type ServiceInput } from '../lib/schema';
 import type { RelatedLink } from './clusters';
 import type { PriceService } from './pricing';
+import { PRICE_ANCHORS } from './pricing';
+import { usd } from './catalogo.generado';
 
 const LANDING = '/es/houston/seo-para-ia';
 
@@ -49,8 +51,8 @@ export const aeoTiers: PriceService[] = [
     serviceType: 'Optimización para motores de respuesta (AEO)',
     description:
       'Te dejamos listo para que los asistentes de IA te lean y te citen: Bing Places, schema, FAQ y llms.txt.',
-    priceValue: '500',
-    displayPrice: '$500',
+    priceValue: String(PRICE_ANCHORS.aeoFoundations),
+    displayPrice: usd(PRICE_ANCHORS.aeoFoundations),
     displayUnit: 'pago único',
     tagline: 'Te dejamos listo para que la IA te lea y te cite.',
     includes: [
@@ -72,7 +74,7 @@ export const aeoTiers: PriceService[] = [
       'Seguimiento mensual de cómo te ven y te mencionan los asistentes de IA, con ajustes continuos.',
     priceValue: '200',
     monthly: true,
-    displayPrice: '$200',
+    displayPrice: `${usd(PRICE_ANCHORS.aeoMonitoring)}`,
     displayUnit: '/mes',
     tagline: 'Seguimos cómo te ven y te mencionan los asistentes.',
     includes: [
@@ -91,7 +93,7 @@ export const seoIaPage = {
   meta: {
     title: 'SEO para IA en Houston — Que ChatGPT te recomiende | Marcyan',
     description:
-      'Que ChatGPT, Gemini y Meta AI te recomienden a TI cuando preguntan por tu servicio. Diagnóstico de visibilidad en IA gratis; cimientos desde $500. Agencia hispana en Houston.',
+      `Que ChatGPT, Gemini y Meta AI te recomienden a TI cuando preguntan por tu servicio. Diagnóstico de visibilidad en IA gratis; cimientos desde ${usd(PRICE_ANCHORS.aeoFoundations)}. Agencia hispana en Houston.`,
   },
   path: LANDING,
   breadcrumb: [
@@ -161,7 +163,7 @@ export const seoIaPage = {
     items: [
       { q: '¿Qué es el SEO para IA (AEO/GEO)?', a: 'Es el trabajo de optimización para que los asistentes de IA (ChatGPT, Gemini, Meta AI) puedan encontrarte, entenderte y recomendarte cuando alguien pregunta por un servicio como el tuyo. También se le llama AEO (optimización para motores de respuesta) o GEO. En corto: que la IA te cite a ti, no solo a tu competencia.' },
       { q: '¿Es lo mismo que el SEO de toda la vida?', a: 'No, pero se complementan. El SEO clásico busca posicionarte en la lista de resultados de Google; el SEO para IA busca que los asistentes te mencionen en su respuesta directa. Comparten cimientos (un sitio rápido, legible y con buena información), pero la IA usa señales propias, como Bing y los datos estructurados.' },
-      { q: '¿Cuánto cuesta?', a: 'El diagnóstico de visibilidad en IA es gratis, sin compromiso. Si quieres que trabajemos los cimientos (Bing, datos estructurados, preguntas frecuentes y un archivo que guía a la IA) es desde $500 una sola vez, y el monitoreo mensual desde $200 al mes. Todo publicado, sin letra pequeña.' },
+      { q: '¿Cuánto cuesta?', a: `El diagnóstico de visibilidad en IA es gratis, sin compromiso. Si quieres que trabajemos los cimientos (Bing, datos estructurados, preguntas frecuentes y un archivo que guía a la IA) es desde ${usd(PRICE_ANCHORS.aeoFoundations)} una sola vez, y el monitoreo mensual desde ${usd(PRICE_ANCHORS.aeoMonitoring)} al mes. Todo publicado, sin letra pequeña.` },
       { q: '¿En cuánto tiempo se ven resultados?', a: 'Es difícil dar una fecha exacta, y desconfía de quien te la prometa. Como referencia, no garantía, las primeras señales suelen tomar semanas y una presencia más sólida, varios meses. Además, las respuestas de la IA cambian solas: por eso es un trabajo continuo, no un interruptor que se enciende una vez.' },
       { q: '¿Garantizan que ChatGPT me recomiende?', a: 'No, y desconfía de quien lo prometa. Nadie controla qué recomienda la IA y sus respuestas son volátiles. Lo que sí hacemos es prepararte correctamente para tener las mejores probabilidades, y medirlo con honestidad. ChatGPT tampoco acepta pago por recomendaciones locales.' },
       { q: '¿Funciona en español?', a: 'Sí, y es nuestra ventaja: el SEO para IA en español tiene mucha menos competencia que en inglés. Preparamos tu información en español e inglés, para que aparezcas cuando tu cliente pregunta en su idioma.' },

@@ -21,7 +21,7 @@ faq:
   - q: "¿Debo confiar en una agencia que garantiza el primer lugar en Google?"
     a: "No. Nadie controla el algoritmo de Google ni las respuestas de la IA, que cambian todo el tiempo. Quien garantiza el puesto número uno o resultados fijos está vendiendo humo. Una agencia honesta te explica el trabajo, los plazos realistas y lo que sí puede medir, sin prometer posiciones que no dependen de ella."
   - q: "¿Cuánto debería costar un sitio profesional?"
-    a: "En el mercado de Estados Unidos en 2026, un sitio a medida para un negocio pequeño suele ubicarse entre $1,500 y $10,000 según páginas, contenido y funciones (WebFX). En Marcyan, un sitio a medida empieza desde $1,500 con el precio publicado. Desconfía tanto del precio escondido como del 'demasiado barato', que casi siempre es una plantilla."
+    a: "En el mercado de Estados Unidos en 2026, un sitio a medida para un negocio pequeño suele ubicarse entre $1,500 y $10,000 según páginas, contenido y funciones (WebFX). En Marcyan publicamos el precio de cada servicio, sin esconderlo tras una llamada. Desconfía tanto del precio escondido como del 'demasiado barato', que casi siempre es una plantilla."
 related:
   - label: "Precios de Marcyan Studio"
     href: "/es/precios"
@@ -33,7 +33,7 @@ related:
     icon: "lucide:layout-template"
   - label: "Diseño web en Houston"
     href: "/es/houston/diseno-web"
-    desc: "Sitios a medida desde $1,500 para negocios de Houston."
+    desc: "Sitios a medida y bilingües para negocios de Houston."
     icon: "lucide:layout-template"
 ---
 
@@ -52,7 +52,7 @@ Para que tengas contexto, estos son los rangos reales del mercado de Estados Uni
 | Agencia pequeña | desde $6,000 |
 | Diseño a medida | $500–$50,000+ según el tamaño |
 
-Con esa referencia, una tarifa escondida pierde su poder. En Marcyan publicamos todo: un sitio a medida empieza **desde $1,500**, una tienda en línea **desde $2,900**, un asistente con IA **desde $900** y el SEO local **desde $600 al mes**. Puedes verlo completo en nuestra página de [precios](/es/precios), sin agendar nada.
+Con esa referencia, una tarifa escondida pierde su poder. En Marcyan publicamos todo: el precio de cada servicio, web, tienda en línea, asistente con IA y SEO local, está a la vista en nuestra página de [precios](/es/precios), sin agendar nada.
 
 ## ¿Cómo verificas que el portafolio es real?
 
@@ -82,7 +82,7 @@ Una agencia honesta te separa lo que ella cobra de lo que cobran terceros. Algun
 
 - **API de WhatsApp.** Si quieres mensajería automatizada, Meta cobra por mensaje de plantilla enviado, con servicio gratuito dentro de la ventana de atención al cliente de 24 horas ([precios oficiales de Meta](https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing)). Ese cobro es de Meta, no de la agencia, y debe quedar claro desde el inicio.
 - **Apps de delivery.** Si vendes comida, plataformas como DoorDash y Uber Eats cobran al restaurante comisiones de **15% a 30% por pedido**, y el costo efectivo suele subir más al sumar otros cargos ([Rezku, 2026](https://rezku.com/blog/third-party-delivery-fees-in-2026-what-doordash-uber-eats-grubhub-really-cost-restaurants/)). Tu propio sitio con pedidos directos te ahorra esa mordida.
-- **Hosting y mantenimiento.** En el mercado, el hosting va de $10 a $200 al mes y el mantenimiento de $50 a $500 al mes ([WebFX](https://www.webfx.com/web-design/pricing/website-costs/) y [Jim.com](https://www.jim.com/blog/small-business-website-cost), 2026). En Marcyan el mantenimiento empieza desde $120 al mes, y te decimos por adelantado qué corre por tu cuenta.
+- **Hosting y mantenimiento.** En el mercado, el hosting va de $10 a $200 al mes y el mantenimiento de $50 a $500 al mes ([WebFX](https://www.webfx.com/web-design/pricing/website-costs/) y [Jim.com](https://www.jim.com/blog/small-business-website-cost), 2026). En Marcyan el mantenimiento tiene su precio publicado, y te decimos por adelantado qué corre por tu cuenta.
 
 ## ¿Qué NO te podemos prometer?
 

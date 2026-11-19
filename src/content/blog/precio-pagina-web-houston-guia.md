@@ -13,13 +13,13 @@ faq:
   - q: "¿Cuánto cuesta una página web básica en Houston?"
     a: "Un sitio básico tipo folleto, de unas cinco páginas, cuesta entre $1,000 y $4,000 con un estudio o freelancer profesional. Si lo armas tú mismo con un constructor, el costo baja a $10–$200 al mes, pero el resultado depende por completo de tu tiempo y experiencia. Las cifras son del mercado de EE. UU. en 2026 (WebFX y Jim.com) y aplican a Houston."
   - q: "¿Cuál es el precio de un sitio web hecho a medida?"
-    a: "Un diseño profesional a medida, sin plantillas, va desde $500 hasta más de $50,000 según el tamaño del sitio (WebFX, 2026). Para un negocio pequeño en Houston, lo más común es un rango de $1,500 a $10,000. En Marcyan, un sitio a medida empieza desde $1,500, con el precio publicado de forma transparente antes de que firmes nada."
+    a: "Un diseño profesional a medida, sin plantillas, va desde $500 hasta más de $50,000 según el tamaño del sitio (WebFX, 2026). Para un negocio pequeño en Houston, lo más común es un rango de $1,500 a $10,000. En Marcyan publicamos el precio de cada servicio de forma transparente, antes de que firmes nada; puedes verlo completo en nuestra página de precios."
   - q: "¿El precio incluye el dominio y el hosting?"
     a: "No siempre. El hosting es un costo recurrente que en el mercado va de $10 a $200 al mes (WebFX, 2026), y el dominio se paga aparte cada año. En Marcyan te decimos desde el inicio qué incluye el precio y qué costos de terceros (dominio, hosting, APIs) corren por tu cuenta, sin sorpresas en la factura."
   - q: "¿Por qué algunas agencias no muestran sus precios?"
     a: "Muchas prefieren cotizar solo después de una llamada, lo que dificulta comparar. Nosotros publicamos nuestros precios desde el inicio porque creemos que la transparencia ahorra tiempo a ambas partes. Puedes ver todos los precios y qué incluye cada servicio en nuestra página de precios."
   - q: "¿Cuánto cuesta mantener un sitio al mes?"
-    a: "El mantenimiento de un sitio en el mercado cuesta entre $50 y $500 al mes según el alcance (Jim.com, 2026): actualizaciones, respaldos, seguridad y pequeños cambios. En Marcyan, el mantenimiento continuo empieza desde $120 al mes e incluye chequeos de disponibilidad, actualizaciones de seguridad, respaldos y soporte bilingüe."
+    a: "El mantenimiento de un sitio en el mercado cuesta entre $50 y $500 al mes según el alcance (Jim.com, 2026): actualizaciones, respaldos, seguridad y pequeños cambios. En Marcyan ofrecemos mantenimiento continuo con chequeos de disponibilidad, actualizaciones de seguridad, respaldos y soporte bilingüe; el precio está publicado en nuestra página de precios."
 related:
   - label: "Precios de Marcyan Studio"
     href: "/es/precios"
@@ -27,7 +27,7 @@ related:
     icon: "lucide:tag"
   - label: "Diseño web en Houston"
     href: "/es/houston/diseno-web"
-    desc: "Sitios a medida desde $1,500 para negocios de Houston."
+    desc: "Sitios a medida y bilingües para negocios de Houston."
     icon: "lucide:layout-template"
   - label: "Tiendas en línea (e-commerce)"
     href: "/es/houston/ecommerce"
@@ -73,9 +73,9 @@ Si tu presupuesto es muy ajustado y solo necesitas presencia básica, una planti
 
 ## ¿Cuánto cobra Marcyan y qué incluye?
 
-Nosotros publicamos nuestros precios de forma abierta. Un **sitio a medida empieza desde $1,500** —el extremo accesible del rango de diseño personalizado del mercado, no una plantilla disfrazada—. Ese precio incluye diseño y programación desde cero, estructura lista para buscadores y asistentes de IA, versión móvil cuidada y atención bilingüe en español e inglés.
+Nosotros publicamos nuestros precios de forma abierta, en el extremo accesible del rango de diseño personalizado del mercado, no una plantilla disfrazada. Un sitio a medida incluye diseño y programación desde cero, estructura lista para buscadores y asistentes de IA, versión móvil cuidada y atención bilingüe en español e inglés. Puedes ver el precio de cada servicio en nuestra [página de precios](/es/precios).
 
-No escondemos la tarifa hasta una llamada de ventas: puedes ver **todos los precios y qué incluye cada servicio** en nuestra página de [precios](/es/precios), o ir directo a [diseño web en Houston](/es/houston/diseno-web). El mantenimiento continuo, si lo quieres, empieza desde $120 al mes. Te decimos por adelantado qué costos de terceros (dominio, hosting) corren por tu cuenta, para que no haya sorpresas.
+No escondemos la tarifa hasta una llamada de ventas: puedes ver **todos los precios y qué incluye cada servicio** en nuestra página de [precios](/es/precios), o ir directo a [diseño web en Houston](/es/houston/diseno-web). El mantenimiento continuo, si lo quieres, también está publicado ahí. Te decimos por adelantado qué costos de terceros (dominio, hosting) corren por tu cuenta, para que no haya sorpresas.
 
 ## ¿Vale la pena invertir en un sitio profesional?
 

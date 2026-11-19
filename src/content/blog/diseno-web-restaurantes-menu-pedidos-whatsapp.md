@@ -21,7 +21,7 @@ faq:
   - q: "¿Por qué importa que el menú cargue rápido en el celular?"
     a: "Porque la gente revisa tu menú desde el teléfono, casi siempre con hambre y prisa. El 53% de los usuarios móviles abandona una página que tarda más de 3 segundos en cargar (Marketing Dive, citando a Google). Un sitio lento o lleno de fotos pesadas pierde clientes antes de que vean tu plato estrella."
   - q: "¿Cuánto cuesta un sitio web para mi restaurante?"
-    a: "En Marcyan, el diseño web arranca desde 1,500 dólares e incluye menú digital, botón de WhatsApp y un sitio rápido en el celular. Si quieres cobrar en línea con carrito, el e-commerce arranca desde 2,900. Son precios públicos y de arranque; te damos una propuesta personalizada según lo que tu negocio necesite."
+    a: "En Marcyan, el diseño web incluye menú digital, botón de WhatsApp y un sitio rápido en el celular, y para cobrar en línea está el e-commerce. Son precios públicos y de arranque, publicados en nuestra página de precios; te damos una propuesta personalizada según lo que tu negocio necesite."
 related:
   - label: "IA conversacional en Houston"
     href: "/es/houston/ia-conversacional"
@@ -72,7 +72,7 @@ Por eso construimos sitios livianos que abren rápido en el celular. Y hay un be
 
 ## ¿Cuánto cuesta y cómo empiezo?
 
-En Marcyan trabajamos con precios públicos y de arranque. El [diseño web](/es/houston/diseno-web) empieza desde **$1,500** e incluye menú digital, botón de WhatsApp y un sitio rápido en el celular. Si quieres cobrar en línea con carrito, el e-commerce arranca desde **$2,900**. Y un asistente para pedidos y reservas por WhatsApp arranca desde **$900**. Puedes ver todo en [nuestra página de precios](/es/precios). Como referencia, las apps de chatbot por suscripción cuestan entre 15 y 50 dólares al mes de entrada y suben al añadir IA ([Tidio](https://www.tidio.com/blog/chatbot-pricing/)); por eso ofrecemos opciones de pago único gestionadas, sin mensualidad obligatoria.
+En Marcyan trabajamos con precios públicos y de arranque. El [diseño web](/es/houston/diseno-web) incluye menú digital, botón de WhatsApp y un sitio rápido en el celular. Si quieres cobrar en línea con carrito, está el e-commerce, y para pedidos y reservas por WhatsApp, un asistente de pago único. Puedes ver el precio de cada uno en [nuestra página de precios](/es/precios). Como referencia, las apps de chatbot por suscripción cuestan entre 15 y 50 dólares al mes de entrada y suben al añadir IA ([Tidio](https://www.tidio.com/blog/chatbot-pricing/)); por eso ofrecemos opciones de pago único gestionadas, sin mensualidad obligatoria.
 
 ## Lo que NO te vamos a prometer
 

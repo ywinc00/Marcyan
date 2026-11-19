@@ -27,9 +27,10 @@ const priceChain = `Web desde ${usd(PRICE_ANCHORS.web)} · Landing desde ${usd(P
 
 export const houstonHub = {
   meta: {
-    title: 'Diseño de páginas web en Houston | Agencia bilingüe: web, IA y SEO | Marcyan',
+    // Intención de agencia (encargo SEO del 24-oct, OK del dueño 18-nov): «diseño web Houston» es de /es/houston/diseno-web.
+    title: 'Agencia hispana en Houston: páginas web, IA y SEO local | Marcyan',
     description:
-      'Agencia hispana de diseño de páginas web en Houston: sitios a medida, IA conversacional y SEO local. Bilingüe y con precios públicos. Propuesta gratis en 24h.',
+      'Agencia hispana en Houston: webs a medida, asistentes con IA y SEO local para negocios del área. Bilingüe, con precios públicos y propuesta gratis en 24h.',
   },
   path: '/es/houston',
   breadcrumb: [

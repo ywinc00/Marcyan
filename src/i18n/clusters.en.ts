@@ -33,7 +33,7 @@ const enHoustonRestaurants: ClusterPage = {
   meta: {
     title: 'Restaurant Websites in Houston | Marcyan',
     description:
-      `A website with a digital menu and QR code for restaurants and food trucks in Houston. Orders and reservations over WhatsApp, no commissions. From ${usd(PRICE_ANCHORS.web)}. Free proposal.`,
+      `A website with a digital menu and QR code for restaurants and food trucks in Houston. Orders and reservations over WhatsApp, no commissions. From ${usd(PRICE_ANCHORS.webLanding)}. Free proposal.`,
   },
   path: '/en/houston/restaurants',
   breadcrumb: [
@@ -81,8 +81,8 @@ const enHoustonRestaurants: ClusterPage = {
   },
   pricing: {
     tag: 'Investment',
-    title: `A site for your restaurant, <em>from ${usd(PRICE_ANCHORS.web)}</em>`,
-    price: `${usd(PRICE_ANCHORS.web)}`,
+    title: `A site for your restaurant, <em>from ${usd(PRICE_ANCHORS.webLanding)}</em>`,
+    price: `${usd(PRICE_ANCHORS.webLanding)}`,
     unit: 'one-time project',
     lead: 'Priced per project. The final number depends on the size of the menu, the photos, and the order or reservation features.',
     features: [
@@ -94,7 +94,7 @@ const enHoustonRestaurants: ClusterPage = {
       'Fast on mobile and ready for Google',
     ],
     cta: { label: 'I want my restaurant website', href: '#contacto' },
-    note: `${usd(PRICE_ANCHORS.web)} is the starting point for a professional site with a menu. An AI assistant that answers and takes orders over WhatsApp 24/7 (from ${usd(PRICE_ANCHORS.ia)}) and local SEO to show up on Google and Maps (from ${usd(PRICE_ANCHORS.seoLocal)}/mo) are added on based on what you need. We give you a clear scope and price in writing, with no surprises.`,
+    note: `${usd(PRICE_ANCHORS.webLanding)} is the starting point: a one-page landing page. A full custom site with your menu starts at ${usd(PRICE_ANCHORS.web)}. An AI assistant that answers and takes orders over WhatsApp 24/7 (from ${usd(PRICE_ANCHORS.iaBasic)}) and local SEO to show up on Google and Maps (from ${usd(PRICE_ANCHORS.seoLocal)}/mo) are added on based on what you need. We give you a clear scope and price in writing, with no surprises.`,
     tone: 'gold',
   },
   proof: {
@@ -107,7 +107,7 @@ const enHoustonRestaurants: ClusterPage = {
     tag: 'Frequently asked questions',
     title: 'Your Houston restaurant website, <em>made clear</em>',
     items: [
-      { q: 'How much does a website for a restaurant or food truck cost?', a: `A professional bespoke site with a digital menu starts at ${usd(PRICE_ANCHORS.web)}. The final price depends on the size of your menu, how many photos you prepare, and whether you want orders or reservations over WhatsApp with an assistant. We hand you a clear, written estimate in the free proposal, with no hidden costs.` },
+      { q: 'How much does a website for a restaurant or food truck cost?', a: `A one-page landing page starts at ${usd(PRICE_ANCHORS.webLanding)} and a professional bespoke site with a digital menu at ${usd(PRICE_ANCHORS.web)}. The final price depends on the size of your menu, how many photos you prepare, and whether you want orders or reservations over WhatsApp with an assistant. We hand you a clear, written estimate in the free proposal, with no hidden costs.` },
       { q: 'How do I take orders without paying a commission to Uber Eats or DoorDash?', a: 'Your site includes a button for the customer to build their order and send it straight to you over WhatsApp. The order comes to you, not to an app that keeps 25% to 30% of the sale. You collect the full amount and serve them in their language. It is your direct channel, not a third party\'s.' },
       { q: 'Do you have restaurant clients?', a: 'We will be honest: we have not published a restaurant or food truck case yet. We do have real, verifiable bespoke sites in other fields (with links you can visit), like a booking web app for a salon, an honest parallel to ordering and reserving online. That is why we offer Founding Client slots for restaurants, with special terms.' },
       { q: 'Can I change the menu myself when prices go up?', a: `Yes. We leave your menu easy to update so you can change prices or pull a sold-out dish without reprinting menus or waiting on us. If you would rather we handle it, we can do that too with a maintenance plan (from ${usd(PRICE_ANCHORS.maintenance)} a month). The menu is yours.` },
@@ -137,7 +137,7 @@ const enHoustonRestaurants: ClusterPage = {
     path: '/en/houston/restaurants',
     areaCity: 'Houston',
     areaRegion: 'Texas',
-    priceValue: String(PRICE_ANCHORS.web),
+    priceValue: String(PRICE_ANCHORS.webLanding),
     providerId: HOUSTON_ID,
   },
 };
@@ -147,7 +147,7 @@ const enHoustonContractors: ClusterPage = {
   meta: {
     title: 'Websites for Contractors in Houston | Marcyan',
     description:
-      `Web design and local SEO for Houston contractors: a bilingual site with before-and-after photos, free estimate requests, and AI that catches the calls you miss on the job. From ${usd(PRICE_ANCHORS.web)}. Free proposal.`,
+      `Web design and local SEO for Houston contractors: a bilingual site with before-and-after photos, free estimate requests, and AI that catches the calls you miss on the job. From ${usd(PRICE_ANCHORS.webLanding)}. Free proposal.`,
   },
   path: '/en/houston/contractors',
   breadcrumb: [
@@ -195,8 +195,8 @@ const enHoustonContractors: ClusterPage = {
   },
   pricing: {
     tag: 'Investment',
-    title: `A contractor site, <em>from ${usd(PRICE_ANCHORS.web)}</em>`,
-    price: `${usd(PRICE_ANCHORS.web)}`,
+    title: `A contractor site, <em>from ${usd(PRICE_ANCHORS.webLanding)}</em>`,
+    price: `${usd(PRICE_ANCHORS.webLanding)}`,
     unit: 'one-time project',
     lead: 'Per-project pricing. The price depends on the number of pages, the project gallery, and integrations.',
     features: [
@@ -208,7 +208,7 @@ const enHoustonContractors: ClusterPage = {
       'Ready for Google and AI',
     ],
     cta: { label: 'I want my site', href: '#contacto' },
-    note: `${usd(PRICE_ANCHORS.web)} is the starting point for a professional site. Ongoing local SEO (from ${usd(PRICE_ANCHORS.seoLocal)}/mo) and AI that catches missed calls and answers 24/7 (from ${usd(PRICE_ANCHORS.ia)}) are added based on what you need. We give you a clear scope and price in writing, no surprises.`,
+    note: `${usd(PRICE_ANCHORS.webLanding)} is the starting point: a one-page landing page. A full custom site starts at ${usd(PRICE_ANCHORS.web)}. Ongoing local SEO (from ${usd(PRICE_ANCHORS.seoLocal)}/mo) and AI that catches missed calls and answers 24/7 (from ${usd(PRICE_ANCHORS.iaBasic)}) are added based on what you need. We give you a clear scope and price in writing, no surprises.`,
     tone: 'gold',
   },
   proof: {
@@ -221,7 +221,7 @@ const enHoustonContractors: ClusterPage = {
     tag: 'Frequently asked questions',
     title: 'Your Houston contractor site, <em>made clear</em>',
     items: [
-      { q: 'How much does a website for a contractor cost?', a: `A professional custom site starts at ${usd(PRICE_ANCHORS.web)}. The final price depends on how many pages you need, the size of your before-and-after gallery, and which integrations you want (estimates, AI for calls). We give you a clear, written price in the free proposal, with no hidden costs.` },
+      { q: 'How much does a website for a contractor cost?', a: `A one-page landing page starts at ${usd(PRICE_ANCHORS.webLanding)} and a professional custom site at ${usd(PRICE_ANCHORS.web)}. The final price depends on how many pages you need, the size of your before-and-after gallery, and which integrations you want (estimates, AI for calls). We give you a clear, written price in the free proposal, with no hidden costs.` },
       { q: 'How does it help with the calls I miss on the job?', a: 'We add AI that answers by text the moment you can\'t pick up: it greets the customer, takes their details, and lets them know you\'ll reach out. That way they don\'t call the next contractor. Answering fast is the difference between winning the job or losing it, especially in a trade where you\'re on the job and not next to your phone.' },
       { q: 'Why do I need a site if I\'m already in the directories?', a: 'In directories and classifieds you compete lumped in with everyone else and play by their rules. Your own site shows up on Google when people search "remodeling in Houston," displays your work and your reviews, and prospects come straight to you instead of being split among your competitors.' },
       { q: 'Do you have contractor clients?', a: 'We\'ll be honest: we haven\'t published a roofing or remodeling case yet. We do work with real, verifiable local businesses in Houston, like a landscaper and a junk removal service, with links you can visit. That\'s why we offer Founding Client slots in construction and remodeling, with special terms.' },
@@ -251,7 +251,7 @@ const enHoustonContractors: ClusterPage = {
     path: '/en/houston/contractors',
     areaCity: 'Houston',
     areaRegion: 'Texas',
-    priceValue: String(PRICE_ANCHORS.web),
+    priceValue: String(PRICE_ANCHORS.webLanding),
     providerId: HOUSTON_ID,
   },
 };

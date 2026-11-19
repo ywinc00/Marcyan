@@ -19,7 +19,9 @@
       dlg.showModal();
       pushLayer(titleId);   // los avisos pasan a pintarse dentro de este diálogo
       queueMicrotask(() => {
-        const first = dlg.querySelector('[autofocus], input:not([type=hidden]):not(:disabled), select:not(:disabled), textarea:not(:disabled)')
+        // Un selector de archivo nunca recibe el foco al abrir (en el gasto con recibo
+        // es el de «Repetir foto»): el foco va al primer dato que hay que escribir.
+        const first = dlg.querySelector('[autofocus], input:not([type=hidden]):not([type=file]):not(:disabled), select:not(:disabled), textarea:not(:disabled)')
           || dlg.querySelector('.ui-modal__body button:not(:disabled), .ui-modal__foot button:not(:disabled)');
         first?.focus();
       });

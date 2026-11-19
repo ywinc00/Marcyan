@@ -90,14 +90,21 @@
   let importOpen = $state(false);
   let pendingReview = $state(null);
   let quickExpenseOpen = $state(false);
-  let quickReceipt = $state(false);
+  let receiptPhoto = $state(null);
   let newRecord = $state(false);
   let registerOpen = $state(false);
-  function quickRecibo() { quickReceipt = true; quickExpenseOpen = true; }
+  // «Recibo»: el botón ES el selector de archivo con cámara, así el teléfono abre
+  // la cámara en el mismo toque; con la foto hecha se abre el gasto con el recibo.
+  function quickRecibo(e) {
+    const f = e.currentTarget.files && e.currentTarget.files[0] ? e.currentTarget.files[0] : null;
+    e.currentTarget.value = '';
+    if (!f) return;
+    receiptPhoto = f; quickExpenseOpen = true;
+  }
   function quickMillaje() { newRecord = true; navigate('finanzas', ['registros'], { ver: 'millaje' }); }
   function register(what) {
     registerOpen = false;
-    if (what === 'gasto') { quickReceipt = false; quickExpenseOpen = true; return; }
+    if (what === 'gasto') { receiptPhoto = null; quickExpenseOpen = true; return; }
     if (what === 'factura') { invoiceFormOpen = true; return; }
     newRecord = true; navigate('finanzas', ['registros'], { ver: what });
   }
@@ -414,11 +421,11 @@
 
   <!-- Teléfono: lo que se hace con el móvil en la mano, al alcance del pulgar -->
   <nav class="fin-bar" aria-label="Acciones rápidas de Finanzas">
-    <button type="button" onclick={quickRecibo}><Icon name="camera" size={20} /><span>Recibo</span></button>
+    <label class="fin-bar__cam"><input class="sr-only" type="file" accept="image/*" capture="environment" onchange={quickRecibo} /><Icon name="camera" size={20} /><span>Recibo</span></label>
     <button type="button" onclick={quickMillaje}><Icon name="car" size={20} /><span>Millaje</span></button>
     <button type="button" onclick={() => (registerOpen = true)}><Icon name="plus" size={20} /><span>Registrar</span></button>
   </nav>
-  <ExpenseForm bind:open={quickExpenseOpen} withReceipt={quickReceipt} onsaved={afterMovement} />
+  <ExpenseForm bind:open={quickExpenseOpen} photo={receiptPhoto} onsaved={afterMovement} />
   <ImportDialog bind:open={importOpen} ondone={afterMovement} />
   <Modal bind:open={registerOpen} title="Registrar" size="sm">
     <div class="fin-reg-menu">
@@ -520,10 +527,10 @@
     .fin-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
       padding: 8px max(12px, env(safe-area-inset-left, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-right, 0px));
       background: var(--bg-2); border-top: 1px solid var(--border); }
-    .fin-bar button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 52px; border: 0; border-radius: var(--radius-md);
+    .fin-bar button, .fin-bar__cam { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 52px; border: 0; border-radius: var(--radius-md);
       background: transparent; color: var(--fg-secondary); font: 500 var(--dash-caption)/1.2 var(--font-body); cursor: pointer; }
-    .fin-bar button:active { background: var(--bg-elevated); }
-    .fin-bar button:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; }
+    .fin-bar button:active, .fin-bar__cam:active { background: var(--bg-elevated); }
+    .fin-bar button:focus-visible, .fin-bar__cam:focus-within { outline: 2px solid var(--accent-gold); outline-offset: -2px; }
   }
   /* Móvil estrecho: las cifras de dinero necesitan el ancho entero (en dos
      columnas "$2,300" se cortaba en "$2,3…"). Solo en esta sección. */

@@ -134,12 +134,16 @@
     ];
     const pc = shares(list.map((r) => r.cents), t.out);
     const rows = list.map((r, i) => ({ ...r, pct: pc[i] }));
-    const items = [...data.expenses].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)).map((e) => ({
-      k: e.id, date: e.date, title: e.subscription_name || e.vendor || e.label,
-      sub: [e.subscription_name || e.vendor ? e.label : '', categoryLabel(e.category), e.account || ''].filter((x, i, a) => x && a.indexOf(x) === i).join(' · '),
+    const same = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+    const items = [...data.expenses].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)).map((e) => {
+      const title = e.subscription_name || e.vendor || e.label;
+      return {
+      k: e.id, date: e.date, title,
+      sub: [same(e.label, title) ? '' : e.label, categoryLabel(e.category), e.account || ''].filter((x, i, a) => x && a.indexOf(x) === i).join(' · '),
       noReceipt: e.amount_cents >= 7500 && e.receipt_status === 'none' && !e.subscription_id,
       cents: e.amount_cents,
-    }));
+    };
+    });
     return { rows, items };
   });
   const dayShort = (d) => fmtDay(d, { day: 'numeric', month: 'short' });
@@ -168,7 +172,7 @@
       {/if}
     </div>
     <div class="ui-page-head__actions">
-      <a class="b" href={`/api/admin/finance/books?view=export&month=${month}`} download><Icon name="download" size={16} />Descargar el mes</a>
+      <a class="b mp-desk" href={`/api/admin/finance/books?view=export&month=${month}`} download><Icon name="download" size={16} />Descargar el mes</a>
       {#if state === 'toclose'}<button type="button" class="b b--primary mp-desk" onclick={reviewClose}>Revisar el cierre</button>{/if}
     </div>
   </header>
@@ -241,7 +245,7 @@
               {/if}
               {#if inflow.items.length}
                 <div class="mp-foot">
-                  <button type="button" class="mp-more" aria-expanded={showIn} onclick={() => (showIn = !showIn)}>{showIn ? 'Ocultar' : inflow.items.length === 1 ? 'Ver el cobro' : `Ver los ${inflow.items.length} ${data.refunds.length ? 'movimientos' : 'cobros'}`}</button>
+                  <button type="button" class="mp-more" aria-expanded={showIn} onclick={() => (showIn = !showIn)}>{showIn ? 'Ocultar la lista' : inflow.items.length === 1 ? 'Ver el cobro' : `Ver los ${inflow.items.length} ${data.refunds.length ? 'movimientos' : 'cobros'}`}</button>
                 </div>
               {/if}
             </section>
@@ -266,7 +270,7 @@
                   {#each outflow.rows as r (r.k)}
                     <li class="mp-row mp-row--cat">
                       <span class="mp-who">
-                        <span class="mp-who__t"><span class="mp-name">{r.label}{#if r.subs.length}<span class="mp-logos" aria-hidden="true">{#each r.subs.slice(0, 6) as s (s)}<span class="mp-logo"><BrandLogo name={s} size={16} /></span>{/each}</span>{/if}</span><small>{r.count}{r.cents ? ` · ${r.pct} %` : ''}</small></span>
+                        <span class="mp-who__t"><span class="mp-name">{r.label}</span><small>{r.count}{r.cents ? ` · ${r.pct} %` : ''}{#if r.subs.length}<span class="mp-logos" aria-hidden="true">{#each r.subs.slice(0, 6) as s (s)}<span class="mp-logo"><BrandLogo name={s} size={14} /></span>{/each}</span>{/if}</small></span>
                       </span>
                       <span class="mp-bar" aria-hidden="true">{#if r.cents}<b style:width={`${r.pct}%`}></b>{/if}</span>
                       <span class="mp-amt num">{fmtUsd0(r.cents)}</span>
@@ -289,7 +293,7 @@
               {/if}
               <div class="mp-foot">
                 {#if outflow.items.length}
-                  <button type="button" class="mp-more" aria-expanded={showOut} onclick={() => (showOut = !showOut)}>{showOut ? 'Ocultar' : outflow.items.length === 1 ? 'Ver el gasto' : `Ver los ${outflow.items.length} gastos`}</button>
+                  <button type="button" class="mp-more" aria-expanded={showOut} onclick={() => (showOut = !showOut)}>{showOut ? 'Ocultar la lista' : outflow.items.length === 1 ? 'Ver el gasto' : `Ver los ${outflow.items.length} gastos`}</button>
                 {/if}
                 <a class="mp-link" href={href('finanzas', ['movimientos'], { mes: month })}>Abrir en Movimientos</a>
               </div>
@@ -306,7 +310,7 @@
                   </li>
                 {:else}
                   <li>
-                    <span class="mp-ic mp-ic--ok"><Icon name="check" size={16} /></span>
+                    {#if data.invoiced.count}<span class="mp-ic mp-ic--ok"><Icon name="check" size={16} /></span>{:else}<span class="mp-ic mp-ic--mute" aria-hidden="true">·</span>{/if}
                     <span class="mp-ck mp-ck--mute">{data.invoiced.count ? `Todo lo facturado en ${mName} está cobrado.` : `No se emitió ninguna factura en ${mName}.`}</span>
                   </li>
                 {/each}
@@ -326,6 +330,8 @@
             </section>
           </div>
         </div>
+
+        <p class="mp-dl-ph"><a class="b" href={`/api/admin/finance/books?view=export&month=${month}`} download><Icon name="download" size={16} />Descargar {mName} para el contador</a></p>
 
         <!-- Teléfono: mes anterior, la acción y mes siguiente, al alcance del pulgar -->
         <nav class="mp-bar-ph" aria-label="Moverse entre meses">
@@ -418,7 +424,7 @@
   .mp-who__t, .mp-li__t { display: flex; flex-direction: column; min-width: 0; }
   .mp-name { color: var(--fg-primary); overflow-wrap: anywhere; }
   .mp-who__t small, .mp-li__t small { font-size: var(--dash-caption); color: var(--fg-subtle); overflow-wrap: anywhere; }
-  .mp-logos { display: inline-flex; margin-left: var(--space-2); vertical-align: -3px; }
+  .mp-logos { display: inline-flex; margin-left: var(--space-2); vertical-align: -2px; }
   .mp-logo { display: inline-flex; border-radius: var(--radius-sm); background: var(--bg-card); box-shadow: 0 0 0 2px var(--bg-card); }
   .mp-logo + .mp-logo { margin-left: calc(var(--space-1) * -1); }
   .mp-bar { height: 6px; border-radius: var(--radius-pill); background: var(--bg-elevated); overflow: hidden; }
@@ -451,18 +457,21 @@
   .mp-ck small { color: var(--fg-subtle); font-size: var(--dash-small); }
   .mp-ck--mute { color: var(--fg-secondary); }
 
-  .mp-bar-ph { display: none; }
+  .mp-bar-ph, .mp-dl-ph { display: none; }
 
-  /* Teléfono: la cifra que importa (quedó) a lo ancho, un desglose a la vez y las
-     barras fuera (su parte del total sigue escrita en cada fila). */
-  @container (max-width: 640px) {
-    .mp-l { display: none; }
-    .mp-s { display: inline; }
-    .mp-sub.mp-s { display: block; }
+  /* Poco ancho: la cifra que importa (quedó) a lo ancho y entró y salió debajo. */
+  @container (max-width: 780px) {
     .mp-figs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .mp-fig--net { grid-column: 1 / -1; order: -1; border-bottom: 1px solid var(--border); }
     .mp-fig + .mp-fig { border-left: 0; }
     .mp-fig:nth-child(2) { border-left: 1px solid var(--border); }
+  }
+  /* Teléfono: un desglose a la vez y las barras fuera (su parte del total sigue
+     escrita en cada fila). */
+  @container (max-width: 640px) {
+    .mp-l { display: none; }
+    .mp-s { display: inline; }
+    .mp-sub.mp-s { display: block; }
     .mp-fig { padding: var(--space-3) var(--space-4); }
     .mp-big { font-size: var(--dash-title); }
     .mp-fig--net .mp-big { font-size: var(--dash-kpi); }
@@ -486,5 +495,7 @@
       background: var(--bg-2); border-top: 1px solid var(--border); }
     .mp-bar-ph .b { min-height: 44px; justify-content: center; }
     .mp-bar-ph .is-off { opacity: .35; pointer-events: none; }
+    .mp-dl-ph { display: block; margin: var(--space-4) 0 0; }
+    .mp-dl-ph .b { width: 100%; justify-content: center; min-height: 44px; }
   }
 </style>

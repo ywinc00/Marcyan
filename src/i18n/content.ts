@@ -213,7 +213,7 @@ export const content = {
         needContact: 'Déjanos un email o un teléfono para contestarte.',
         briefLink: 'formulario de proyecto completo',
         // Encargo legal 2026-11-15 §2a (texto de MSA Legales, no suavizar).
-        privacy: { pre: 'Al enviar aceptas nuestra ', link: 'política de privacidad', href: '/privacidad', post: '. Te contestamos por correo o teléfono.' },
+        privacy: { pre: 'Al enviar aceptas nuestra ', link: 'política de privacidad', href: '/privacidad', post: '. Te contestamos por correo, llamada, mensaje o WhatsApp.' },
       },
     },
 
@@ -435,7 +435,7 @@ export const content = {
         emailInvalid: 'Please enter a valid email so we can reach you.',
         needContact: 'Leave us an email or a phone number so we can get back to you.',
         briefLink: 'full project form',
-        privacy: { pre: 'By submitting you accept our ', link: 'privacy policy', href: '/en/privacy', post: '. We reply by email or phone.' },
+        privacy: { pre: 'By submitting you accept our ', link: 'privacy policy', href: '/en/privacy', post: '. We reply by email, call, text or WhatsApp.' },
       },
     },
 

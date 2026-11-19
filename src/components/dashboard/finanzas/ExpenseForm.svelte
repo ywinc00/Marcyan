@@ -10,12 +10,28 @@
   import { centsToInput, EXPENSE_CATEGORIES, categoryLabel } from './fin.js';
   import { loadAccounts, receiptProblem, uploadReceipt, receiptUrl } from './books.js';
 
-  // withReceipt: abierto desde «Recibo» en el teléfono (la foto primero).
-  let { open = $bindable(false), expense = null, onsaved, withReceipt = false } = $props();
+  // photo: la foto que se acaba de hacer con «Recibo» en el teléfono. La cámara
+  // se abre en el mismo toque del botón (un clic programado después lo bloquea
+  // Safari); aquí llega ya hecha y el recibo sale arriba, antes de los datos.
+  let { open = $bindable(false), expense = null, onsaved, photo = null } = $props();
   let accounts = $state([]);
   let file = $state(null);
-  let fileInput = $state(null);
+  let fromCamera = $state(false);
+  let preview = $state('');
   const fileError = $derived(receiptProblem(file));
+  const isImage = $derived(!!file && /^image\/(jpeg|png|webp)$/i.test(file.type || ''));
+  // Vista previa de la foto (se libera al cambiarla o al cerrar).
+  $effect(() => {
+    if (!open || !isImage) { preview = ''; return; }
+    const url = URL.createObjectURL(file);
+    preview = url;
+    return () => URL.revokeObjectURL(url);
+  });
+  function pick(e) {
+    const f = e.currentTarget.files && e.currentTarget.files[0] ? e.currentTarget.files[0] : null;
+    e.currentTarget.value = '';
+    if (f) file = f;
+  }
 
   const editing = $derived(!!expense);
   let form = $state({ label: '', category: '', amount: '', spent_at: todayISO(), vendor: '', notes: '', account_id: '', business_pct: '100' });
@@ -29,14 +45,13 @@
   $effect(() => {
     if (!open) return;
     formError = ''; tried = false;
-    file = null;
+    file = photo || null;
+    fromCamera = !!photo;
     form = expense
       ? { label: expense.label || '', category: expense.category || '', amount: centsToInput(expense.amount_cents), spent_at: dayISO(expense.spent_at), vendor: expense.vendor || '', notes: expense.notes || '', account_id: expense.account_id ? String(expense.account_id) : '', business_pct: String(expense.business_pct ?? 100) }
       : { label: '', category: '', amount: '', spent_at: todayISO(), vendor: '', notes: '', account_id: '', business_pct: '100' };
     loadAccounts().then((a) => { accounts = a.filter((x) => x.active !== false); }).catch(() => { accounts = []; });
   });
-  // Desde «Recibo» en el teléfono se abre directamente la cámara o la galería.
-  $effect(() => { if (open && withReceipt && fileInput) setTimeout(() => fileInput?.click(), 50); });
 
   async function submit(e) {
     e?.preventDefault();
@@ -73,8 +88,30 @@
   }
 </script>
 
-<Modal bind:open title={editing ? 'Editar gasto' : 'Nuevo gasto'}>
+{#snippet receipt()}
+  {#if preview}
+    <div class="xf-photo" class:is-err={!!fileError}>
+      <img src={preview} alt="Foto del recibo" />
+      <div class="xf-photo__side">
+        <span class="xf-photo__ok">{fileError || 'Recibo listo. Se guarda con el gasto.'}</span>
+        <label class="b xf-photo__btn"><input class="sr-only" type="file" accept="image/*" capture="environment" onchange={pick} />Repetir foto</label>
+        <button type="button" class="b xf-photo__btn" onclick={() => { file = null; }}>Quitar</button>
+      </div>
+    </div>
+  {:else}
+    <Field label="Recibo" hint={expense && expense.receipt_status === 'attached' ? 'Ya tiene recibo. Si eliges otro, sustituye al anterior.' : 'Foto o PDF. Desde $75 el contador lo pedirá.'} error={file ? fileError : ''}>
+      {#snippet children(f)}
+        <input class="ui-input xf-file" id={f.id} type="file" accept="image/jpeg,image/png,image/webp,image/heic,.heic,application/pdf"
+          aria-describedby={f.describedby} onchange={pick} />
+      {/snippet}
+    </Field>
+    {#if file}<p class="xf-has">Elegido: {file.name}</p>{/if}
+  {/if}
+{/snippet}
+
+<Modal bind:open title={editing ? 'Editar gasto' : (fromCamera ? 'Gasto con recibo' : 'Nuevo gasto')}>
   <form class="xf" id="fin-expense-form" onsubmit={submit} novalidate>
+    {#if fromCamera}{@render receipt()}{/if}
     <Field label="Concepto" required error={tried && !form.label.trim() ? 'Escribe el concepto del gasto.' : ''}>
       {#snippet children(f)}
         <input class="ui-input" id={f.id} type="text" maxlength="200" placeholder="Renovación de dominio" aria-describedby={f.describedby} bind:value={form.label} />
@@ -111,12 +148,7 @@
         {#snippet children(f)}<input class="ui-input" id={f.id} type="number" inputmode="numeric" min="0" max="100" step="1" aria-describedby={f.describedby} bind:value={form.business_pct} />{/snippet}
       </Field>
     </div>
-    <Field label="Recibo" hint={expense && expense.receipt_status === 'attached' ? 'Ya tiene recibo. Si eliges otro, sustituye al anterior.' : 'Foto o PDF. Desde $75 el contador lo pedirá.'} error={file ? fileError : ''}>
-      {#snippet children(f)}
-        <input class="ui-input xf-file" id={f.id} type="file" accept="image/jpeg,image/png,image/webp,image/heic,.heic,application/pdf"
-          aria-describedby={f.describedby} bind:this={fileInput} onchange={(e) => { file = e.currentTarget.files && e.currentTarget.files[0] ? e.currentTarget.files[0] : null; }} />
-      {/snippet}
-    </Field>
+    {#if !fromCamera}{@render receipt()}{/if}
     {#if expense && expense.receipt_status === 'attached'}<p class="xf-has"><a href={receiptUrl(expense.id)} target="_blank" rel="noopener">Ver el recibo guardado</a></p>{/if}
     <Field label="Notas" hint="Opcional.">
       {#snippet children(f)}<input class="ui-input" id={f.id} type="text" maxlength="1000" aria-describedby={f.describedby} bind:value={form.notes} />{/snippet}
@@ -139,5 +171,13 @@
   .xf-file { padding-block: 8px; height: auto; }
   .xf-has { margin: -6px 0 0; font-size: var(--dash-small); }
   .xf-has a { color: var(--fg-primary); text-underline-offset: 3px; }
+  .xf-photo { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: var(--space-3); align-items: start;
+    padding: var(--space-2); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-elevated); }
+  .xf-photo img { width: 112px; height: 140px; object-fit: cover; border-radius: var(--radius-sm); background: var(--bg-card); display: block; }
+  .xf-photo__side { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); min-width: 0; }
+  .xf-photo__ok { font-size: var(--dash-small); color: var(--fg-secondary); }
+  .xf-photo.is-err .xf-photo__ok { color: var(--color-error); }
+  .xf-photo__btn { min-height: 40px; cursor: pointer; }
+  .xf-photo__btn:focus-within { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
   @media (max-width: 479px) { .xf-grid { grid-template-columns: 1fr; } }
 </style>

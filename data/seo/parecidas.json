@@ -1,23 +1,28 @@
 {
-  "fecha": "2026-11-09",
+  "fecha": "2026-11-16",
   "umbral": 0.8,
   "casiIguales": [
+    {
+      "a": "https://marcyanstudio.com/es/houston/ia-conversacional",
+      "b": "https://marcyanstudio.com/es/miami/ia-conversacional",
+      "parecido": 0.92
+    },
     {
       "a": "https://marcyanstudio.com/en/houston",
       "b": "https://marcyanstudio.com/en/miami",
       "parecido": 0.83
     },
     {
-      "a": "https://marcyanstudio.com/en/pricing",
-      "b": "https://marcyanstudio.com/en/services",
-      "parecido": 0.83
+      "a": "https://marcyanstudio.com/es/houston/ecommerce",
+      "b": "https://marcyanstudio.com/es/miami/ecommerce",
+      "parecido": 0.82
     }
   ],
   "relacionadasSinEnlace": [
     {
       "a": "https://marcyanstudio.com/en/houston/contractors",
       "b": "https://marcyanstudio.com/en/houston/restaurants",
-      "parecido": 0.65
+      "parecido": 0.45
     }
   ]
 }

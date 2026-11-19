@@ -4,8 +4,10 @@
 //   GET ?view=line&year=2026&line=8   → movimientos de esa línea
 //   GET ?view=1099&year=2026          → contratistas y lista de 1099
 //   GET ?view=tax&year=2026           → hoja del trimestral y calendario
+//   GET ?view=month&month=2026-10     → el mes por dentro (cobros, gastos, comparación, pendientes)
 //   GET ?view=close&month=2026-10     → checklist del cierre de ese mes
 //   GET ?view=export&year=2026        → CSV con todos los movimientos del año (para el contador)
+//   GET ?view=export&month=2026-10    → el mismo CSV, solo ese mes
 //   GET ?view=settings                → ajustes de Finanzas
 //   POST { action: 'close' | 'reopen', month }        → cerrar o reabrir un mes
 //   POST { action: 'charges' }                         → generar ya los cargos de suscripciones
@@ -14,7 +16,7 @@ import { requireAdmin } from '../../../lib/auth.mjs';
 import { houstonDate } from '../../../lib/dates.mjs';
 import { rowsToCsv, sendCsv } from '../../../lib/csv.mjs';
 import {
-  BooksError, booksYear, booksYears, scheduleCSummary, contractors1099, estimatedTax,
+  BooksError, booksYear, booksYears, booksMonth, scheduleCSummary, contractors1099, estimatedTax,
   monthChecklist, closeMonth, reopenMonth, ledgerRows, getFinanceSettings, setFinanceSetting,
   generateSubscriptionCharges, scheduleCLine,
 } from '../../../lib/finance-books.mjs';
@@ -51,9 +53,15 @@ export default async function handler(req, res) {
       if (view === 'line') return res.status(200).json({ ok: true, ...(await scheduleCLine(year, q.line)) });
       if (view === '1099') return res.status(200).json({ ok: true, list: await contractors1099(year) });
       if (view === 'tax') return res.status(200).json({ ok: true, tax: await estimatedTax(year) });
+      if (view === 'month') return res.status(200).json({ ok: true, month: await booksMonth(String(q.month || '')) });
       if (view === 'close') return res.status(200).json({ ok: true, checklist: await monthChecklist(String(q.month || '')) });
       if (view === 'settings') return res.status(200).json({ ok: true, settings: await getFinanceSettings() });
       if (view === 'export') {
+        const mo = /^\d{4}-(0[1-9]|1[0-2])$/.test(String(q.month || '')) ? String(q.month) : '';
+        if (mo) {
+          const rows = (await ledgerRows(Number(mo.slice(0, 4)))).filter((r) => String(r.fecha).startsWith(mo));
+          return sendCsv(res, `marcyan-movimientos-${mo}.csv`, ledgerCsv(rows));
+        }
         return sendCsv(res, `marcyan-movimientos-${year}.csv`, ledgerCsv(await ledgerRows(year)));
       }
       return res.status(400).json({ ok: false, error: 'Vista desconocida.' });

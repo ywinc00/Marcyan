@@ -5,6 +5,7 @@
   //         #/finanzas?estado=vencida&q=…&pag=2   filtros de facturas (E-06)
   //         #/finanzas?mes=2026-10&cat=hosting    filtros de gastos
   //         #/finanzas/facturas/INV-004     ficha de la factura
+  //         #/finanzas/mes/2026-10           página del mes (?ver=cierre: con el cierre a la vista)
   // Las reglas de dinero (montos, estados, pagos) son las del servidor:
   // lib/finance-rules.mjs, compartido. Una sola acción primaria por vista
   // (H-07): aquí "Nueva factura"; en la ficha, "Registrar pago".
@@ -28,6 +29,7 @@
   import ExpensesCard from './finanzas/ExpensesCard.svelte';
   import SubscriptionsCard from './finanzas/SubscriptionsCard.svelte';
   import YearBook from './finanzas/YearBook.svelte';
+  import MonthPage from './finanzas/MonthPage.svelte';
   import AgentProposals from './finanzas/AgentProposals.svelte';
   import TaxSheet from './finanzas/TaxSheet.svelte';
   import PendingReview from './finanzas/PendingReview.svelte';
@@ -49,6 +51,7 @@
 
   // ── Ruta ──────────────────────────────────────────────────────
   const detailRef = $derived(route.sub[0] === 'facturas' && route.sub[1] ? route.sub[1] : '');
+  const monthRef = $derived(route.sub[0] === 'mes' && /^\d{4}-(0[1-9]|1[0-2])$/.test(route.sub[1] || '') ? route.sub[1] : '');
   // Pestañas (design/finanzas.md, OK del dueño 2026-11-14): Año es la portada;
   // Impuestos es la hoja del contador. El resumen de arriba se queda en todas.
   const TABS = [
@@ -58,8 +61,9 @@
     { id: 'impuestos', label: 'Impuestos' },
     { id: 'registros', label: 'Registros' },
   ];
-  // Enlaces viejos (#/finanzas?estado=vencida) siguen llevando a Facturas, y los
-  // avisos del cierre (#/finanzas/cierre/AAAA-MM) abren ese mes en el Año.
+  // Enlaces viejos (#/finanzas?estado=vencida) siguen llevando a Facturas; los
+  // avisos del cierre (#/finanzas/cierre/AAAA-MM) y el mes abierto en el Año
+  // (#/finanzas?mes=AAAA-MM) llevan a la página del mes.
   const tab = $derived.by(() => {
     const s = route.sub[0] || '';
     if (s === 'cierre') return '';
@@ -68,7 +72,8 @@
     return '';
   });
   $effect(() => {
-    if (route.sub[0] === 'cierre' && /^\d{4}-\d{2}$/.test(route.sub[1] || '')) navigate('finanzas', [], { mes: route.sub[1] }, { replace: true });
+    if (route.sub[0] === 'cierre' && /^\d{4}-\d{2}$/.test(route.sub[1] || '')) navigate('finanzas', ['mes', route.sub[1]], { ver: 'cierre' }, { replace: true });
+    else if (!route.sub[0] && /^\d{4}-(0[1-9]|1[0-2])$/.test(route.query.mes || '') && !['estado', 'q', 'pag', 'proyecto'].some((k) => route.query[k])) navigate('finanzas', ['mes', route.query.mes], {}, { replace: true });
   });
   let pendingMonth = $state('');
   let taxPending = $state(0);
@@ -90,14 +95,21 @@
   let importOpen = $state(false);
   let pendingReview = $state(null);
   let quickExpenseOpen = $state(false);
-  let quickReceipt = $state(false);
+  let receiptPhoto = $state(null);
   let newRecord = $state(false);
   let registerOpen = $state(false);
-  function quickRecibo() { quickReceipt = true; quickExpenseOpen = true; }
+  // «Recibo»: el botón ES el selector de archivo con cámara, así el teléfono abre
+  // la cámara en el mismo toque; con la foto hecha se abre el gasto con el recibo.
+  function quickRecibo(e) {
+    const f = e.currentTarget.files && e.currentTarget.files[0] ? e.currentTarget.files[0] : null;
+    e.currentTarget.value = '';
+    if (!f) return;
+    receiptPhoto = f; quickExpenseOpen = true;
+  }
   function quickMillaje() { newRecord = true; navigate('finanzas', ['registros'], { ver: 'millaje' }); }
   function register(what) {
     registerOpen = false;
-    if (what === 'gasto') { quickReceipt = false; quickExpenseOpen = true; return; }
+    if (what === 'gasto') { receiptPhoto = null; quickExpenseOpen = true; return; }
     if (what === 'factura') { invoiceFormOpen = true; return; }
     newRecord = true; navigate('finanzas', ['registros'], { ver: what });
   }
@@ -167,7 +179,15 @@
 
   // Lista y resumen se recargan al entrar en la vista o al cambiar filtros.
   $effect(() => { if (!detailRef && tab === 'facturas') { filter; search; page; projectFilter; loadInvoices(); } });
-  $effect(() => { if (!detailRef) loadSummary(); });
+  $effect(() => { if (!detailRef && !monthRef) loadSummary(); });
+  // Cambiar de vista dentro de Finanzas (Año ↔ mes, de un mes a otro, la ficha de
+  // una factura) no cambia de sección: el panel no sube solo, así que se sube aquí.
+  let lastView = null;
+  $effect(() => {
+    const v = monthRef + '|' + detailRef;
+    if (lastView !== null && v !== lastView && untrack(() => route.query.ver) !== 'cierre') window.scrollTo(0, 0);
+    lastView = v;
+  });
   // El buscador refleja la URL (al llegar por enlace o con Atrás). Solo copia
   // si de verdad cambió: la URL guarda el texto recortado y, si se copiara
   // siempre, el espacio que se acaba de escribir desaparecería del campo.
@@ -215,13 +235,15 @@
 <div class="fin">
 {#if detailRef}
   <InvoiceDetail ref={detailRef} {backHref} onclose={() => navigate('finanzas', ['facturas'], listQuery)} />
+{:else if monthRef}
+  <MonthPage month={monthRef} onchanged={loadSummary} />
 {:else}
   <PageHeader title="Finanzas" subtitle="Lo que entra, lo que se debe y lo que sale.">
     {#snippet actions()}
       <button type="button" class="b" onclick={refreshAll} disabled={summaryLoading || invLoading}><Icon name="refresh" size={16} />Actualizar</button>
       {#if tab === '' && pendingMonth}
         <button type="button" class="b" onclick={() => (invoiceFormOpen = true)}>Nueva factura</button>
-        <a class="b b--primary fin-desk" href={href('finanzas', [], { mes: pendingMonth })}>Revisar {monthLong(pendingMonth).split(' ')[0]}</a>
+        <a class="b b--primary fin-desk" href={href('finanzas', ['mes', pendingMonth], { ver: 'cierre' })}>Revisar {monthLong(pendingMonth).split(' ')[0]}</a>
       {:else if tab === 'impuestos'}
         <button type="button" class="b" onclick={() => (invoiceFormOpen = true)}>Nueva factura</button>
         {#if taxPending > 0}
@@ -414,11 +436,11 @@
 
   <!-- Teléfono: lo que se hace con el móvil en la mano, al alcance del pulgar -->
   <nav class="fin-bar" aria-label="Acciones rápidas de Finanzas">
-    <button type="button" onclick={quickRecibo}><Icon name="camera" size={20} /><span>Recibo</span></button>
+    <label class="fin-bar__cam"><input class="sr-only" type="file" accept="image/*" capture="environment" onchange={quickRecibo} /><Icon name="camera" size={20} /><span>Recibo</span></label>
     <button type="button" onclick={quickMillaje}><Icon name="car" size={20} /><span>Millaje</span></button>
     <button type="button" onclick={() => (registerOpen = true)}><Icon name="plus" size={20} /><span>Registrar</span></button>
   </nav>
-  <ExpenseForm bind:open={quickExpenseOpen} withReceipt={quickReceipt} onsaved={afterMovement} />
+  <ExpenseForm bind:open={quickExpenseOpen} photo={receiptPhoto} onsaved={afterMovement} />
   <ImportDialog bind:open={importOpen} ondone={afterMovement} />
   <Modal bind:open={registerOpen} title="Registrar" size="sm">
     <div class="fin-reg-menu">
@@ -520,10 +542,10 @@
     .fin-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
       padding: 8px max(12px, env(safe-area-inset-left, 0px)) calc(8px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-right, 0px));
       background: var(--bg-2); border-top: 1px solid var(--border); }
-    .fin-bar button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 52px; border: 0; border-radius: var(--radius-md);
+    .fin-bar button, .fin-bar__cam { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 52px; border: 0; border-radius: var(--radius-md);
       background: transparent; color: var(--fg-secondary); font: 500 var(--dash-caption)/1.2 var(--font-body); cursor: pointer; }
-    .fin-bar button:active { background: var(--bg-elevated); }
-    .fin-bar button:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; }
+    .fin-bar button:active, .fin-bar__cam:active { background: var(--bg-elevated); }
+    .fin-bar button:focus-visible, .fin-bar__cam:focus-within { outline: 2px solid var(--accent-gold); outline-offset: -2px; }
   }
   /* Móvil estrecho: las cifras de dinero necesitan el ancho entero (en dos
      columnas "$2,300" se cortaba en "$2,3…"). Solo en esta sección. */

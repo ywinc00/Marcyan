@@ -1,0 +1,31 @@
+{
+  "formato": "ficha-rendimiento/1",
+  "nota": "Rendimiento de la ficha de Google por mes, leído del panel Rendimiento (o de la API cuando haya acceso). Lo escribe kit/ficha.mjs; no se edita a mano. Google mezcla aquí lo que viene sin pagar y lo que viene de anuncios de Google, y no se suma a los contactos de la web.",
+  "meses": {
+    "2026-11": {
+      "fuente": "panel",
+      "leidoEl": "2026-11-16T20:52:44.347Z",
+      "parcial": true,
+      "hasta": "2026-11-16",
+      "interacciones": 1,
+      "porTipo": {
+        "llamadas": 0,
+        "chat": 0,
+        "reservas": 0,
+        "web": 1
+      },
+      "porDia": {
+        "interacciones": {
+          "2026-11-07": 1
+        },
+        "llamadas": {},
+        "chat": {},
+        "reservas": {},
+        "web": {
+          "2026-11-07": 1
+        }
+      },
+      "cuadra": true
+    }
+  }
+}

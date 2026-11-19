@@ -1,5 +1,5 @@
 {
-  "fecha": "2026-11-09",
+  "fecha": "2026-11-16",
   "conflictos": [
     {
       "campo": "telefono",
@@ -7,17 +7,17 @@
       "web": "+17869381754",
       "ficha": "(713) 823-9144",
       "otraSede": true,
-      "paginas": 52,
-      "ejemplo": "https://marcyanstudio.com/en"
+      "paginas": 54,
+      "ejemplo": "https://marcyanstudio.com/accesibilidad"
     }
   ],
   "invalidos": [],
   "portadaConNegocio": true,
   "tipos": {
-    "Organization": 52,
-    "City": 234,
-    "ProfessionalService": 104,
-    "PostalAddress": 52,
+    "Organization": 54,
+    "City": 242,
+    "ProfessionalService": 108,
+    "PostalAddress": 54,
     "AboutPage": 2,
     "BreadcrumbList": 46,
     "ListItem": 161,

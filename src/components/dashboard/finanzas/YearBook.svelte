@@ -1,14 +1,13 @@
 <script>
   // Portada de Finanzas (dirección A, elegida por el dueño 2026-11-14): el año
   // como libro de doce filas con lo que entró, lo que salió, lo que quedó, el
-  // mismo mes del año anterior y el estado de cada mes. El mes se abre en su
-  // fila: si está abierto, con su cierre (comprobaciones de la dirección B).
+  // mismo mes del año anterior y el estado de cada mes. Cada mes abre su página
+  // (#/finanzas/mes/AAAA-MM, forma A del 2026-11-18) con su detalle y su cierre.
   // Datos: /api/admin/finance/books (lib/finance-books.mjs).
   import Icon from '../ui/Icon.svelte';
   import ErrorState from '../ui/ErrorState.svelte';
   import LoadingState from '../ui/LoadingState.svelte';
   import StatusChip from '../ui/StatusChip.svelte';
-  import MonthClose from './MonthClose.svelte';
   import { api, errorMessage, isSessionError } from '../lib/api.js';
   import { route, setQuery, href } from '../lib/router.svelte.js';
   import { monthKey } from '../lib/dates.js';
@@ -19,7 +18,6 @@
   const thisMonth = monthKey();
   const thisYear = Number(thisMonth.slice(0, 4));
   const year = $derived(Number(/^\d{4}$/.test(route.query.ano || '') ? route.query.ano : thisYear));
-  const openMonth = $derived(/^\d{4}-\d{2}$/.test(route.query.mes || '') ? route.query.mes : '');
 
   let book = $state(null);
   let prev = $state(null);
@@ -90,7 +88,6 @@
     return rows.filter((r) => r.cents > 0).sort((a, b) => b.cents - a.cents).slice(0, 5);
   });
 
-  function toggle(m) { setQuery({ mes: openMonth === m ? '' : m }); }
   function chipLabel(m) {
     if (!pendingCount || m.month !== toClose) return 'Por cerrar';
     if (pendingCount.blocking) return `Por cerrar: ${pendingCount.blocking} bloquea${pendingCount.blocking === 1 ? '' : 'n'}`;
@@ -101,7 +98,6 @@
     if (m.month === thisMonth) return 'current';
     return 'toclose';
   }
-  function changed() { load(); onchanged?.(); }
   const out = (m) => m.expenses + m.fees + m.refunds;
   const nextDue = $derived(tax && tax.estimate && tax.estimate.ok ? tax.estimate : null);
   const nextLabel = $derived.by(() => {
@@ -124,11 +120,11 @@
     {/if}
   </div>
 
-  {#if toClose && year === thisYear && openMonth !== toClose}
+  {#if toClose && year === thisYear}
     <div class="yb-due">
       <div><b>{monthLong(toClose).split(' ')[0].replace(/^./, (c) => c.toUpperCase())} está por cerrar</b>
         {#if pendingCount}<span>{pendingCount.blocking ? `${pendingCount.blocking} cosa${pendingCount.blocking === 1 ? '' : 's'} lo bloquea${pendingCount.blocking === 1 ? '' : 'n'}` : 'Ya se puede cerrar'}{pendingCount.warnings ? `; ${pendingCount.warnings} aviso${pendingCount.warnings === 1 ? '' : 's'}` : ''}.</span>{/if}</div>
-      <button type="button" class="b b--primary" onclick={() => toggle(toClose)}>Revisar {monthLong(toClose).split(' ')[0]}</button>
+      <a class="b b--primary" href={href('finanzas', ['mes', toClose], { ver: 'cierre' })}>Revisar {monthLong(toClose).split(' ')[0]}</a>
     </div>
   {/if}
   {#if error}
@@ -154,12 +150,11 @@
               {#each months as m (m.month)}
                 {@const st = stateOf(m)}
                 {@const p = prevByMonth[m.month.slice(5, 7)]}
-                {@const isOpen = openMonth === m.month}
-                <tr class="yb-row" class:is-open={isOpen} class:is-flag={st === 'toclose'}>
+                <tr class="yb-row" class:is-flag={st === 'toclose'}>
                   <th scope="row">
-                    <button type="button" class="yb-month" aria-expanded={isOpen} onclick={() => toggle(m.month)}>
+                    <a class="yb-month" href={href('finanzas', ['mes', m.month])}>
                       <span class="yb-mname">{monthLong(m.month).split(' ')[0]}</span><span class="yb-mshort" aria-hidden="true"><span class="yb-mcap">{monthShort(m.month)}</span><span class="yb-mstate" class:is-warn={st === 'toclose'}>{st === 'closed' ? 'Cerrado' : st === 'current' ? 'En curso' : 'Por cerrar'}</span></span>
-                    </button>
+                    </a>
                   </th>
                   <td class="r yb-wide">{fmtUsd0(m.income)}</td>
                   <td class="r yb-wide sec">{fmtUsd0(out(m))}</td>
@@ -174,26 +169,8 @@
                       <StatusChip tone="warning" label={chipLabel(m)} />
                     {/if}
                   </td>
-                  <td class="yb-chev" aria-hidden="true"><span class:is-rot={isOpen}><Icon name="chevron" size={16} /></span></td>
+                  <td class="yb-chev" aria-hidden="true"><span><Icon name="chevron" size={16} /></span></td>
                 </tr>
-                {#if isOpen}
-                  <tr class="yb-detail">
-                    <td colspan={hasPrev ? 7 : 6}>
-                      <div class="yb-split num">
-                        <span>Entró <b>{fmtUsd0(m.income)}</b></span>
-                        <span>Salió <b>{fmtUsd0(out(m))}</b>{#if m.subscriptions}{' '}<span class="sec">(suscripciones {fmtUsd0(m.subscriptions)})</span>{/if}</span>
-                        {#if m.fees}<span>Comisiones <b>{fmtUsd0(m.fees)}</b></span>{/if}
-                        {#if m.refunds}<span>Devoluciones <b>{fmtUsd0(m.refunds)}</b></span>{/if}
-                        <a href={href('finanzas', ['movimientos'], { mes: m.month })}>Ver movimientos</a>
-                      </div>
-                      {#if st !== 'current'}
-                        <MonthClose month={m.month} onchanged={changed} />
-                      {:else}
-                        <p class="yb-note">El mes sigue en curso: se cierra cuando termine.{#if m.pending} Ya hay {m.pending} movimiento{m.pending === 1 ? '' : 's'} importado{m.pending === 1 ? '' : 's'} por revisar.{/if}</p>
-                      {/if}
-                    </td>
-                  </tr>
-                {/if}
               {/each}
             </tbody>
             <tfoot>
@@ -268,23 +245,17 @@
   .yb-t thead th { height: auto; padding: 12px 16px; font: 500 var(--dash-caption)/1.2 var(--font-body); letter-spacing: 0; text-transform: none; font-family: var(--font-mono); color: var(--fg-subtle); border-bottom: 1px solid var(--border); }
   .yb-t .r { text-align: right; }
   .yb-t tbody th { padding: 0; }
-  .yb-month { all: unset; box-sizing: border-box; display: flex; align-items: center; width: 100%; height: 52px; padding: 0 16px; cursor: pointer; color: var(--fg-primary); text-transform: capitalize; }
+  .yb-month { box-sizing: border-box; display: flex; align-items: center; width: 100%; height: 52px; padding: 0 16px; cursor: pointer; color: var(--fg-primary); text-decoration: none; text-transform: capitalize; }
+  .yb-month:hover .yb-mname, .yb-month:hover .yb-mcap { text-decoration: underline; text-underline-offset: 3px; }
   .yb-month:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: -2px; border-radius: 6px; }
   .yb-mshort { display: none; }
   .yb-row:hover td, .yb-row:hover th { background: var(--bg-elevated); }
-  .yb-row.is-open td, .yb-row.is-open th, .yb-detail td { background: var(--bg-elevated); }
   .yb-row.is-flag .yb-mname { font-weight: 600; }
-  .yb-detail td { height: auto; padding: 4px 16px 16px; }
-  .yb-split { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 4px 0 12px; color: var(--fg-secondary); font-size: var(--dash-small); }
-  .yb-split b { color: var(--fg-primary); font-weight: 600; }
-  .yb-split a, .yb-foot a { color: var(--fg-primary); text-underline-offset: 3px; }
-  .yb-note { margin: 0; color: var(--fg-subtle); font-size: var(--dash-small); }
+  .yb-foot a { color: var(--fg-primary); text-underline-offset: 3px; }
   .yb-st { padding-left: 24px !important; }
   .yb-lock { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: var(--radius-pill); background: var(--surface-3); color: var(--fg-secondary); font: 500 var(--dash-caption)/1.4 var(--font-body); }
   .yb-chev { width: 40px; color: var(--fg-subtle); }
-  .yb-chev span { display: inline-flex; transition: transform var(--duration-fast); }
-  .yb-chev .is-rot { transform: rotate(90deg); }
-  @media (prefers-reduced-motion: reduce) { .yb-chev span { transition: none; } }
+  .yb-chev span { display: inline-flex; }
   .yb-tot th, .yb-tot td { font-weight: 600; border-top: 1px solid var(--border-strong); border-bottom: 0; color: var(--fg-primary); }
   .yb-tot th { padding: 0 16px; }
   .yb-diff { font-weight: 500 !important; padding-left: 24px !important; }

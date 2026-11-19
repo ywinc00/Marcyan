@@ -49,8 +49,13 @@ export const PENDIENTES_DE_PLAN = {
   maintenance: 120,
 } as const;
 
+/** Nombre visible de un servicio, tal como lo escribe el catálogo de Ventas. */
+const nombreDe = (id: Parameters<typeof desdeCatalogo>[0]): string =>
+  CATALOGO.proyectos[id].nombre;
+
 export const PRICE_ANCHORS = {
   web: desdeCatalogo('web'),
+  webPagina: desdeCatalogo('webPagina'),
   webLanding: desdeCatalogo('webLanding'),
   webRedesign: desdeCatalogo('webRedesign'),
   ia: desdeCatalogo('ia'),
@@ -127,9 +132,11 @@ export const catalog: CatalogProduct[] = [
     ctaLabel: 'Ver diseño web',
     tone: 'gold',
     tiers: [
-      { key: 'webLanding', name: 'Landing Page', value: PRICE_ANCHORS.webLanding, display: tierDisplay(PRICE_ANCHORS.webLanding), anchor: true,
+      { key: 'webPagina', name: nombreDe('webPagina'), value: PRICE_ANCHORS.webPagina, display: tierDisplay(PRICE_ANCHORS.webPagina), anchor: true,
         blurb: 'Una sola página enfocada en convertir: ideal para una promoción, un servicio o validar tu negocio.', href: '/es/houston/diseno-web' },
-      { key: 'webRedesign', name: 'Rediseño de sitio', value: PRICE_ANCHORS.webRedesign, display: tierDisplay(PRICE_ANCHORS.webRedesign),
+      { key: 'webLanding', name: nombreDe('webLanding'), value: PRICE_ANCHORS.webLanding, display: tierDisplay(PRICE_ANCHORS.webLanding),
+        blurb: 'La misma página, con tu ficha de Google puesta a punto. Juntas salen más baratas que por separado.', href: '/es/houston/diseno-web' },
+      { key: 'webRedesign', name: nombreDe('webRedesign'), value: PRICE_ANCHORS.webRedesign, display: tierDisplay(PRICE_ANCHORS.webRedesign),
         blurb: 'Renovamos tu sitio actual (diseño, velocidad y textos) sin empezar de cero.', href: '/es/houston/diseno-web' },
       { key: 'web', name: 'Sitio a medida completo', value: PRICE_ANCHORS.web, display: tierDisplay(PRICE_ANCHORS.web),
         blurb: 'Varias páginas a medida y bilingües, con SEO base y listo para la IA.', href: '/es/houston/diseno-web' },

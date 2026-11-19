@@ -22,7 +22,7 @@ const pageNav = { ...clusterNav, cta: { label: 'Propuesta gratis', href: '/es#co
   <SiteNav nav={pageNav} lang="es" homeHref="/es" currentPath={Astro.url.pathname} />
 
   <main id="main">
-    <LegalDoc title="Política de Privacidad" updated="7 de noviembre de 2026">
+    <LegalDoc title="Política de Privacidad" updated="18 de noviembre de 2026">
       <h2>1. Quiénes somos</h2>
       <p><strong>Marcyan Studio</strong> es una agencia de diseño web, inteligencia artificial aplicada y SEO para pequeñas y medianas empresas, con cobertura en Houston, TX y Miami, FL. Esta política explica qué datos recopilamos cuando usas nuestro sitio <a href="/es">marcyanstudio.com</a>, para qué los usamos y qué control tienes sobre ellos. Para cualquier consulta sobre tu privacidad, escríbenos a <a href={`mailto:${nap.email}`}>{nap.email}</a>.</p>
 
@@ -31,7 +31,7 @@ const pageNav = { ...clusterNav, cta: { label: 'Propuesta gratis', href: '/es#co
       <ul>
         <li><strong>Datos que nos proporcionas</strong> al completar nuestros formularios (por ejemplo, el formulario de proyecto): nombre, correo electrónico, teléfono, nombre de tu empresa y los detalles del proyecto que decidas compartir.</li>
         <li><strong>Archivos que nos envías</strong> al llenar el brief de proyecto o el kit de arranque: logo, fotos y documentos. Las fotos se reducen a calidad web en tu navegador antes de subirse y, al hacerlo, pierden sus datos internos, como la ubicación GPS. Si una foto no se puede convertir en tu navegador (por ejemplo, algunas HEIC de iPhone abiertas en una computadora), no la subimos: te explicamos junto al archivo cómo enviarla de otra forma. Los logos, los documentos y los videos se guardan tal cual los envías, sin reducirlos ni quitarles sus datos internos.</li>
-        <li><strong>Conversaciones con Marcy</strong>, nuestra asistente, en el chat del sitio, WhatsApp, Instagram o por teléfono: lo que escribes o dices y lo que ella responde, para atenderte y mejorar el servicio. Si nos escribes por WhatsApp o nos llamas, guardamos tu número; si es por Instagram, tu identificador de la cuenta. Las llamadas no se graban: guardamos el texto de lo que se dice. Solo se graba el audio si eliges dejar un recado de voz.</li>
+        <li><strong>Conversaciones con Marcy</strong>, nuestra asistente, en el chat del sitio, WhatsApp, Instagram o por teléfono: lo que escribes o dices y lo que ella responde, para atenderte y mejorar el servicio. Si nos escribes por WhatsApp o nos llamas, guardamos tu número; si es por Instagram, tu identificador de la cuenta. Si nos llamas, Marcy te avisa al empezar de que es una asistente con inteligencia artificial y de que la llamada se transcribe. Guardamos el texto de la llamada; el audio solo se graba si dejas un recado de voz.</li>
         <li><strong>Datos técnicos automáticos</strong>: dirección IP, tipo de navegador y fecha/hora de la solicitud. Los usamos solo por seguridad y para prevenir spam.</li>
       </ul>
       <p>No recopilamos datos sensibles ni información de tarjetas de pago a través del sitio.</p>
@@ -53,14 +53,16 @@ const pageNav = { ...clusterNav, cta: { label: 'Propuesta gratis', href: '/es#co
         <li><strong>Asistente con IA</strong> (Anthropic), que redacta las respuestas de Marcy. No usa tus mensajes para entrenar sus modelos.</li>
         <li><strong>Mensajería y teléfono</strong> (Meta, para WhatsApp e Instagram, y Twilio, para las llamadas), por donde viajan tus mensajes y llamadas si nos contactas por esos canales.</li>
         <li><strong>Almacenamiento de archivos</strong> (Vercel Blob, en modo privado): tus archivos no son públicos ni aparecen en buscadores; solo el equipo de Marcyan puede verlos con su sesión.</li>
+        <li><strong>Google</strong> (Google Analytics para medir visitas; Google Maps y reseñas para mostrar datos de negocios; y Gmail, donde recibimos y organizamos los correos que nos envías).</li>
       </ul>
       <p>También podemos divulgar datos si la ley lo exige o para proteger nuestros derechos.</p>
 
-      <h2>5. Cookies</h2>
-      <p>El sitio público <strong>no utiliza cookies de seguimiento ni de publicidad</strong>. Nuestro panel de administración de uso interno emplea una cookie de sesión estrictamente necesaria para mantener la sesión iniciada de nuestro equipo; esa cookie no se aplica a los visitantes del sitio público.</p>
+      <h2>5. Cookies y medición</h2>
+      <p>Usamos Google Analytics 4 para saber cuántas personas visitan el sitio y qué páginas usan. Google Analytics guarda cookies en tu navegador (por ejemplo <strong>_ga</strong>, que dura hasta 2 años) y recibe datos como tu dirección IP abreviada, el tipo de dispositivo y las páginas que visitas. No usamos cookies de publicidad ni vendemos estos datos. Puedes bloquear Google Analytics con el complemento oficial de Google (<a href="https://tools.google.com/dlpage/gaoptout" rel="noopener">tools.google.com/dlpage/gaoptout</a>) o desde la configuración de tu navegador. Además guardamos en tu navegador un identificador aleatorio, sin tu nombre ni tus datos de contacto, para contar visitas sin duplicarlas. El panel interno de nuestro equipo usa una cookie de sesión necesaria que no afecta a los visitantes.</p>
 
       <h2>6. Cuánto tiempo conservamos tus datos</h2>
       <p>Conservamos los datos de tu solicitud mientras sean necesarios para atenderte y durante el tiempo que exijan nuestras obligaciones legales o contables. Después los eliminamos o anonimizamos. Puedes pedirnos la eliminación de tus datos en cualquier momento.</p>
+      <p><strong>Facturación.</strong> Las facturas, pagos y datos fiscales de clientes se conservan el tiempo que exige la ley fiscal de Estados Unidos (normalmente 7 años).</p>
       <p><strong>Conversaciones con Marcy.</strong> Se borran solas a los 12 meses sin actividad. Si quieres que las borremos antes, escríbenos a <a href={`mailto:${nap.email}`}>{nap.email}</a>.</p>
       <p><strong>Archivos.</strong> Si empiezas a subir archivos y no envías el formulario, se borran solos a las 48 horas. Si quitas un archivo que ya se había subido, lo borramos al recibir el formulario o el kit y no se guarda con tu proyecto. Los archivos de un proyecto se conservan hasta 12 meses después de terminarlo y después se eliminan. Si no llegamos a trabajar juntos, los archivos se conservan hasta 12 meses después de cerrar la solicitud y después se eliminan. Si quieres que los borremos antes, escríbenos a <a href={`mailto:${nap.email}`}>{nap.email}</a> con el nombre de tu negocio o tu folio (por ejemplo, MRC-042); los borramos y te lo confirmamos por correo.</p>
 
@@ -70,16 +72,19 @@ const pageNav = { ...clusterNav, cta: { label: 'Propuesta gratis', href: '/es#co
       <h2>8. Seguridad</h2>
       <p>Aplicamos medidas razonables para proteger tu información. Sin embargo, ninguna transmisión por internet ni sistema de almacenamiento es 100 % seguro, por lo que no podemos garantizar una seguridad absoluta.</p>
 
-      <h2>9. Menores de edad</h2>
+      <h2>9. Si hay un incidente de seguridad</h2>
+      <p>Si alguna vez se ven expuestos tus datos personales, te avisaremos sin demora y dentro de los plazos que exige la ley de tu estado.</p>
+
+      <h2>10. Menores de edad</h2>
       <p>Nuestro sitio y servicios están dirigidos a empresas y personas adultas. No recopilamos a sabiendas datos de menores de edad.</p>
 
-      <h2>10. Cambios en esta política</h2>
+      <h2>11. Cambios en esta política</h2>
       <p>Podemos actualizar esta política para reflejar cambios en nuestras prácticas o en la normativa aplicable. Publicaremos aquí la versión vigente con su fecha de actualización.</p>
 
-      <h2>11. Contacto</h2>
+      <h2>12. Contacto</h2>
       <p>¿Preguntas sobre esta política o sobre tus datos? Escríbenos a <a href={`mailto:${nap.email}`}>{nap.email}</a>.</p>
 
-      <h2>12. Software de terceros</h2>
+      <h2>13. Software de terceros</h2>
       <p>Para convertir en tu navegador las fotos HEIC del iPhone usamos la librería <strong>heic-to</strong> (licencia LGPL-3.0, basada en libheif), sin modificar y solo cuando subes una foto en ese formato. Su código fuente está publicado en <a href="https://github.com/hoppergee/heic-to" rel="noopener">github.com/hoppergee/heic-to</a>.</p>
     </LegalDoc>
   </main>

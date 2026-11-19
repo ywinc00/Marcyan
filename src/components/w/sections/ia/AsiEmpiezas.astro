@@ -27,7 +27,7 @@ const { copy, n, lang = 'es' } = Astro.props;
   <div class="ae__obj">
     <p class="sr-only">{copy.sr}</p>
     <Diferido h={520} hLg={500}>
-      <AltaMarcy lang={lang} canales={['whatsapp', 'web', 'calendario', 'correo', 'llamadas']} />
+      <AltaMarcy lang={lang} horario={copy.horario} canales={['whatsapp', 'web', 'calendario', 'correo', 'llamadas']} />
     </Diferido>
   </div>
 </div>

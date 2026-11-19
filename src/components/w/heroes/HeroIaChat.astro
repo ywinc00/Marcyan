@@ -29,12 +29,14 @@ interface Props {
   link?: Cta;
   respondido?: string;
   lang?: 'es' | 'en';
+  /** Ciudad de la página (ejemplos propios de Miami en la escena). */
+  ciudad?: 'houston' | 'miami';
 }
-const { h1Html, lead, primary, link, respondido, lang = 'es' } = Astro.props;
+const { h1Html, lead, primary, link, respondido, lang = 'es', ciudad = 'houston' } = Astro.props;
 ---
 <div class="hic" data-w-tone="teal">
   {Astro.slots.has('crumbs') && <div class="hic__crumbs"><slot name="crumbs" /></div>}
-  <EscenaDosActos lang={lang} id="dos-actos">
+  <EscenaDosActos lang={lang} ciudad={ciudad} id="dos-actos">
     <Fragment slot="titulo">
       {respondido && (
         <p class="hic__ok" aria-hidden="true">

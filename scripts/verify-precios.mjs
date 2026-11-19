@@ -40,6 +40,11 @@ const PERDONADOS = [
   // Carta y pedido de la maqueta de restaurante: precios inventados de un
   // negocio de ejemplo dentro de una ilustración, no tarifas de Marcyan.
   { patron: /^src\/components\/w\/heroes\/HeroRestaurante\.astro$/, motivo: 'carta de la maqueta de ejemplo' },
+  // Los dos mensuales que el catálogo nuevo no tiene como producto suelto
+  // (SEO local y mantenimiento). Decisión del dueño del 18-nov: se quedan
+  // como están hasta la página de planes. Viven NOMBRADOS en PENDIENTES_DE_PLAN,
+  // no sueltos por el copy, y se van solos cuando esa página entre.
+  { texto: /PENDIENTES_DE_PLAN|Lo sustituirá el plan/, motivo: 'excepción nombrada y fechada en pricing.ts' },
 ];
 
 // Un precio de verdad lleva al menos tres cifras ($150, $1,500). Los `$1`..`$99`

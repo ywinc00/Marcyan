@@ -29,6 +29,26 @@ import type { OfferItem, FaqItem, CrumbItem } from '../lib/schema';
 // (El diagnóstico AEO es GRATIS → no lleva número aquí; se modela como tier free.)
 import { CATALOGO, desde as desdeCatalogo, usd as usdCatalogo } from './catalogo.generado';
 
+/**
+ * Los DOS únicos precios que todavía no salen del catálogo, por decisión del
+ * dueño (2026-11-18).
+ *
+ * El catálogo nuevo no tiene «SEO local mes a mes» ni «mantenimiento» como
+ * productos sueltos: ese trabajo pasó a los planes (Presencia y Base). Hasta
+ * que Diseño rehaga la página de precios alrededor de los cuatro planes
+ * (encargo de Ventas §3), la web sigue enseñando las tarifas de siempre, para
+ * no anunciar planes que aún no se pueden contratar.
+ *
+ * Cuando esa página entre en producción, estas dos líneas desaparecen y sus
+ * valores salen del plan que corresponda.
+ */
+export const PENDIENTES_DE_PLAN = {
+  /** Plan mensual de SEO local de siempre. Lo sustituirá el plan «Presencia». */
+  seoLocal: 600,
+  /** Mantenimiento mensual de siempre. Lo sustituirá el plan «Base». */
+  maintenance: 120,
+} as const;
+
 export const PRICE_ANCHORS = {
   web: desdeCatalogo('web'),
   webLanding: desdeCatalogo('webLanding'),
@@ -39,14 +59,11 @@ export const PRICE_ANCHORS = {
   aeoMonitoring: CATALOGO.anadidos.aeoMonitoring.mensual,
   ecommerce: desdeCatalogo('ecommerce'),
   ecommerceEssential: desdeCatalogo('ecommerceEssential'),
-  // El SEO local mes a mes y el mantenimiento pasaron a ser planes con el
-  // catálogo del 18-nov: «Presencia» (que te encuentren) y «Base» (tu web
-  // segura y al día). Se leen del plan, no de un producto suelto.
-  seoLocal: CATALOGO.planes.presencia.mensual,
+  seoLocal: PENDIENTES_DE_PLAN.seoLocal,
   seoInitial: desdeCatalogo('seoInitial'),
   branding: desdeCatalogo('branding'),
   brandingLogo: desdeCatalogo('brandingLogo'),
-  maintenance: CATALOGO.planes.base.mensual,
+  maintenance: PENDIENTES_DE_PLAN.maintenance,
 } as const;
 
 /** "$1,950" desde 1950. */

@@ -180,6 +180,14 @@
   // Lista y resumen se recargan al entrar en la vista o al cambiar filtros.
   $effect(() => { if (!detailRef && tab === 'facturas') { filter; search; page; projectFilter; loadInvoices(); } });
   $effect(() => { if (!detailRef && !monthRef) loadSummary(); });
+  // Cambiar de vista dentro de Finanzas (Año ↔ mes, de un mes a otro, la ficha de
+  // una factura) no cambia de sección: el panel no sube solo, así que se sube aquí.
+  let lastView = null;
+  $effect(() => {
+    const v = monthRef + '|' + detailRef;
+    if (lastView !== null && v !== lastView && untrack(() => route.query.ver) !== 'cierre') window.scrollTo(0, 0);
+    lastView = v;
+  });
   // El buscador refleja la URL (al llegar por enlace o con Atrás). Solo copia
   // si de verdad cambió: la URL guarda el texto recortado y, si se copiara
   // siempre, el espacio que se acaba de escribir desaparecería del campo.

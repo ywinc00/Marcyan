@@ -84,7 +84,9 @@
     if (!b) return null;
     return Math.round(((a - b) / Math.abs(b)) * 100);
   }
-  const fmtPct = (p) => (p > 0 ? '+' : p < 0 ? '−' : '') + Math.abs(p) + ' %';
+  const fmtPct = (p) => (p > 0 ? '+' : p < 0 ? '−' : '') + Math.abs(p) + ' %';
+  // «Banco (Zelle y transferencias)» → «Banco»: el detalle de la cuenta sobra aquí.
+  const acct = (a) => String(a || '').replace(/\s*\(.*\)\s*$/, '');
   // Partes del total que suman 100 (resto mayor).
   function shares(list, total) {
     if (!total) return list.map(() => 0);
@@ -94,31 +96,37 @@
     return fl;
   }
   const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  const dayShort = (d) => fmtDay(d, { day: 'numeric', month: 'short' });
 
   // ── De dónde entró ───────────────────────────────────────────
   const inflow = $derived.by(() => {
     if (!data) return { rows: [], items: [], n: 0 };
     const meta = new Map();
-    const note = (key, inv, acct) => {
-      const m = meta.get(key) || { invs: [], accts: new Set() };
+    const note = (key, inv, account, date) => {
+      const m = meta.get(key) || { invs: [], accts: new Set(), dates: [] };
       if (inv) m.invs.push(inv);
-      if (acct) m.accts.add(acct);
+      if (account) m.accts.add(acct(account));
+      m.dates.push(date);
       meta.set(key, m);
     };
-    for (const p of data.payments) note(p.client_id ? `c${p.client_id}` : 'sin-cliente', p.invoice_number, p.account);
-    for (const n of data.other_income) note(n.client_id ? `c${n.client_id}` : `i${n.id}`, 'sin factura', n.account);
+    for (const p of data.payments) note(p.client_id ? `c${p.client_id}` : 'sin-cliente', p.invoice_number, p.account, p.date);
+    for (const n of data.other_income) note(n.client_id ? `c${n.client_id}` : `i${n.id}`, 'sin factura', n.account, n.date);
     const pc = shares(data.by_client.map((r) => r.cents), t.income);
     const rows = data.by_client.map((r, i) => {
-      const m = meta.get(r.key) || { invs: [], accts: new Set() };
+      const m = meta.get(r.key) || { invs: [], accts: new Set(), dates: [] };
       const invs = m.invs.length > 2 ? `${m.invs.slice(0, 2).join(', ')} y ${m.invs.length - 2} más` : m.invs.join(', ');
-      return { ...r, pct: pc[i], sub: [invs, [...m.accts].join(', ')].filter(Boolean).join(' · ') };
+      // Un solo cobro del cliente: su fecha va aquí y no hace falta la lista.
+      const when = m.dates.length === 1 ? dayShort(m.dates[0]) : '';
+      return { ...r, pct: pc[i], sub: [when, invs, [...m.accts].join(', ')].filter(Boolean).join(' · ') };
     });
     const items = [
-      ...data.payments.map((p) => ({ k: 'p' + p.id, date: p.date, title: p.client_name || 'Sin cliente', inv: p.invoice_number, sub: [p.account || 'sin decir por dónde', p.fee_cents ? `comisión ${formatUsd(p.fee_cents)}` : ''].filter(Boolean).join(' · '), cents: p.amount_cents })),
-      ...data.other_income.map((n) => ({ k: 'n' + n.id, date: n.date, title: n.client_name || n.label, inv: null, sub: ['sin factura', n.client_name ? n.label : '', n.account || '', n.fee_cents ? `comisión ${formatUsd(n.fee_cents)}` : ''].filter(Boolean).join(' · '), cents: n.amount_cents })),
+      ...data.payments.map((p) => ({ k: 'p' + p.id, date: p.date, title: p.client_name || 'Sin cliente', inv: p.invoice_number, sub: [p.account ? acct(p.account) : 'sin decir por dónde', p.fee_cents ? `comisión ${formatUsd(p.fee_cents)}` : ''].filter(Boolean).join(' · '), cents: p.amount_cents })),
+      ...data.other_income.map((n) => ({ k: 'n' + n.id, date: n.date, title: n.client_name || n.label, inv: null, sub: ['sin factura', n.client_name ? n.label : '', acct(n.account), n.fee_cents ? `comisión ${formatUsd(n.fee_cents)}` : ''].filter(Boolean).join(' · '), cents: n.amount_cents })),
       ...data.refunds.map((r) => ({ k: 'r' + r.id, date: r.date, title: r.client_name || 'Devolución', inv: r.invoice_number, sub: ['devolución', r.reason || ''].filter(Boolean).join(' · '), cents: -r.amount_cents })),
     ].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-    return { rows, items, n: data.payments.length + data.other_income.length };
+    // La lista uno a uno solo si aporta algo: algún cliente con varios cobros o una devolución.
+    const needList = data.refunds.length > 0 || rows.some((r) => r.count > 1);
+    return { rows, items, needList, n: data.payments.length + data.other_income.length };
   });
   const clientsN = $derived(data ? new Set(data.by_client.filter((r) => r.client_id).map((r) => r.client_id)).size : 0);
 
@@ -139,14 +147,13 @@
       const title = e.subscription_name || e.vendor || e.label;
       return {
       k: e.id, date: e.date, title,
-      sub: [same(e.label, title) ? '' : e.label, categoryLabel(e.category), e.account || ''].filter((x, i, a) => x && a.indexOf(x) === i).join(' · '),
+      sub: [same(e.label, title) ? '' : e.label, categoryLabel(e.category), acct(e.account)].filter((x, i, a) => x && a.indexOf(x) === i).join(' · '),
       noReceipt: e.amount_cents >= 7500 && e.receipt_status === 'none' && !e.subscription_id,
       cents: e.amount_cents,
     };
     });
     return { rows, items };
   });
-  const dayShort = (d) => fmtDay(d, { day: 'numeric', month: 'short' });
 </script>
 
 <div class="mp">
@@ -195,7 +202,7 @@
           <div class="mp-fig">
             <span class="mp-cap">Salió</span>
             <span class="mp-big num">{fmtUsd0(t.out)}</span>
-            <span class="mp-sub mp-l">Gastos {fmtUsd0(t.expenses)} · comisiones {fmtUsd0(t.fees)} · devoluciones {fmtUsd0(t.refunds)}</span>
+            <span class="mp-sub mp-l">Gastos {fmtUsd0(t.expenses)} · comisiones {fmtUsd0(t.fees)}{t.refunds ? ` · devoluciones ${fmtUsd0(t.refunds)}` : ''}</span>
             <span class="mp-sub mp-s">Comisiones {fmtUsd0(t.fees)}{t.refunds ? ` · devoluciones ${fmtUsd0(t.refunds)}` : ''}</span>
             {@render cmp(t.out, 'out')}
           </div>
@@ -222,7 +229,7 @@
                     <li class="mp-row">
                       <span class="mp-who">
                         <span class="mp-av" style:background={entityColor(r.client_id, r.name)} aria-hidden="true">{initials(r.name)}</span>
-                        <span class="mp-who__t"><span class="mp-name">{r.name}</span><small>{r.sub}{r.sub ? ' · ' : ''}<span class="num">{r.pct} %</span></small></span>
+                        <span class="mp-who__t"><span class="mp-name">{r.name}</span><small>{r.sub}{r.sub ? ' · ' : ''}<span class="num">{r.pct} %</span></small></span>
                       </span>
                       <span class="mp-bar" aria-hidden="true"><b style:width={`${r.pct}%`}></b></span>
                       <span class="mp-amt num">{fmtUsd0(r.cents)}</span>
@@ -243,7 +250,7 @@
                   {/each}
                 </ul>
               {/if}
-              {#if inflow.items.length}
+              {#if inflow.needList}
                 <div class="mp-foot">
                   <button type="button" class="mp-more" aria-expanded={showIn} onclick={() => (showIn = !showIn)}>{showIn ? 'Ocultar la lista' : inflow.items.length === 1 ? 'Ver el cobro' : `Ver los ${inflow.items.length} ${data.refunds.length ? 'movimientos' : 'cobros'}`}</button>
                 </div>
@@ -260,6 +267,7 @@
                 <MonthClose {month} bind:blocking onchanged={changed} />
               {/if}
             </section>
+            {#if state === 'closed'}{@render bill()}{/if}
           </div>
 
           <div class="mp-col">
@@ -270,7 +278,7 @@
                   {#each outflow.rows as r (r.k)}
                     <li class="mp-row mp-row--cat">
                       <span class="mp-who">
-                        <span class="mp-who__t"><span class="mp-name">{r.label}</span><small>{r.count}{r.cents ? ` · ${r.pct} %` : ''}{#if r.subs.length}<span class="mp-logos" aria-hidden="true">{#each r.subs.slice(0, 6) as s (s)}<span class="mp-logo"><BrandLogo name={s} size={14} /></span>{/each}</span>{/if}</small></span>
+                        <span class="mp-who__t"><span class="mp-name">{r.label}</span><small>{r.count}{r.cents ? ` · ${r.pct} %` : ''}{#if r.subs.length}<span class="mp-logos" aria-hidden="true">{#each r.subs.slice(0, 6) as s (s)}<span class="mp-logo"><BrandLogo name={s} size={16} /></span>{/each}</span>{/if}</small></span>
                       </span>
                       <span class="mp-bar" aria-hidden="true">{#if r.cents}<b style:width={`${r.pct}%`}></b>{/if}</span>
                       <span class="mp-amt num">{fmtUsd0(r.cents)}</span>
@@ -291,6 +299,19 @@
                   {/each}
                 </ul>
               {/if}
+              {#if t.subscriptions || data.estimates.length || (data.mileage && data.mileage.trips)}
+                <ul class="mp-checks">
+                  {#if t.subscriptions}
+                    <li><span class="mp-ic mp-ic--mute" aria-hidden="true">·</span><span class="mp-ck mp-ck--mute">De todo esto, {fmtUsd0(t.subscriptions)} son cargos de suscripciones.</span></li>
+                  {/if}
+                  {#each data.estimates as e, k (k)}
+                    <li><span class="mp-ic mp-ic--mute" aria-hidden="true">≈</span><span class="mp-ck">{e.name}: cargo estimado de {formatUsd(e.amount_cents)} <small>(aún no cuenta; se corrige solo cuando llegue su factura)</small></span></li>
+                  {/each}
+                  {#if data.mileage && data.mileage.trips}
+                    <li><span class="mp-ic mp-ic--mute"><Icon name="car" size={16} /></span><span class="mp-ck">{plural(data.mileage.trips, 'viaje', 'viajes')} en coche, {data.mileage.miles.toLocaleString('en-US', { maximumFractionDigits: 1 })} millas{#if data.mileage.deduction_cents}{' '}<small>(deducible: {fmtUsd0(data.mileage.deduction_cents)})</small>{/if}</span></li>
+                  {/if}
+                </ul>
+              {/if}
               <div class="mp-foot">
                 {#if outflow.items.length}
                   <button type="button" class="mp-more" aria-expanded={showOut} onclick={() => (showOut = !showOut)}>{showOut ? 'Ocultar la lista' : outflow.items.length === 1 ? 'Ver el gasto' : `Ver los ${outflow.items.length} gastos`}</button>
@@ -299,35 +320,7 @@
               </div>
             </section>
 
-            <section class="mp-card mp-bill" aria-labelledby="mp-bill-h">
-              <header class="mp-h"><h2 id="mp-bill-h">Facturado en {mName}</h2><span class="mp-tot num">{data.invoiced.count ? `${plural(data.invoiced.count, 'factura', 'facturas')} · ${fmtUsd0(data.invoiced.cents)}` : ''}</span></header>
-              <ul class="mp-checks">
-                {#each data.invoiced.unpaid as i (i.id)}
-                  <li>
-                    <span class="mp-ic mp-ic--warn"><Icon name="alert" size={16} /></span>
-                    <span class="mp-ck">{i.number} de {i.client_name || 'un cliente'} sin cobrar: <b class="num">{fmtUsd0(i.balance_cents)}</b>{#if i.due_date}{' '}<small>(vence el {fmtDay(i.due_date, { day: 'numeric', month: 'long' })})</small>{/if}</span>
-                    <a class="b b--mini" href={href('finanzas', ['facturas', i.number])}>Ver factura</a>
-                  </li>
-                {:else}
-                  <li>
-                    {#if data.invoiced.count}<span class="mp-ic mp-ic--ok"><Icon name="check" size={16} /></span>{:else}<span class="mp-ic mp-ic--mute" aria-hidden="true">·</span>{/if}
-                    <span class="mp-ck mp-ck--mute">{data.invoiced.count ? `Todo lo facturado en ${mName} está cobrado.` : `No se emitió ninguna factura en ${mName}.`}</span>
-                  </li>
-                {/each}
-                {#each data.estimates as e, k (k)}
-                  <li>
-                    <span class="mp-ic mp-ic--mute" aria-hidden="true">≈</span>
-                    <span class="mp-ck">El cargo de {e.name} ({formatUsd(e.amount_cents)}) es estimado <small>(se corrige solo cuando llegue su factura)</small></span>
-                  </li>
-                {/each}
-                {#if data.mileage && data.mileage.trips}
-                  <li>
-                    <span class="mp-ic mp-ic--mute"><Icon name="car" size={16} /></span>
-                    <span class="mp-ck">{plural(data.mileage.trips, 'viaje', 'viajes')} en coche, {data.mileage.miles.toLocaleString('en-US', { maximumFractionDigits: 1 })} millas{#if data.mileage.deduction_cents}{' '}<small>(deducible: {fmtUsd0(data.mileage.deduction_cents)})</small>{/if}</span>
-                  </li>
-                {/if}
-              </ul>
-            </section>
+            {#if state !== 'closed'}{@render bill()}{/if}
           </div>
         </div>
 
@@ -361,6 +354,26 @@
       {#if d1 !== null}<span class={(outward ? d1 > 0 : d1 < 0) ? 'down' : d1 === 0 ? '' : 'up'}>{fmtPct(d1)}</span> vs <span class="mp-l">{baseLabel}</span><span class="mp-s">{baseShort}</span>{/if}{#if d1 !== null && d2 !== null}{' · '}{/if}{#if d2 !== null}<span class={(outward ? d2 > 0 : d2 < 0) ? 'down' : d2 === 0 ? '' : 'up'}>{fmtPct(d2)}</span> vs {lyLabel}{/if}
     </span>
   {/if}
+{/snippet}
+
+{#snippet bill()}
+            <section class="mp-card mp-bill" aria-labelledby="mp-bill-h">
+              <header class="mp-h"><h2 id="mp-bill-h">Facturado en {mName}</h2><span class="mp-tot num">{data.invoiced.count ? `${plural(data.invoiced.count, 'factura', 'facturas')} · ${fmtUsd0(data.invoiced.cents)}` : ''}</span></header>
+              <ul class="mp-checks">
+                {#each data.invoiced.unpaid as i (i.id)}
+                  <li>
+                    <span class="mp-ic mp-ic--warn"><Icon name="alert" size={16} /></span>
+                    <span class="mp-ck">{i.number} de {i.client_name || 'un cliente'} sin cobrar: <b class="num">{fmtUsd0(i.balance_cents)}</b>{#if i.due_date}{' '}<small>(vence el {fmtDay(i.due_date, { day: 'numeric', month: 'long' })})</small>{/if}</span>
+                    <a class="b b--mini" href={href('finanzas', ['facturas', i.number])}>Ver factura</a>
+                  </li>
+                {:else}
+                  <li>
+                    {#if data.invoiced.count}<span class="mp-ic mp-ic--ok"><Icon name="check" size={16} /></span>{:else}<span class="mp-ic mp-ic--mute" aria-hidden="true">·</span>{/if}
+                    <span class="mp-ck mp-ck--mute">{data.invoiced.count ? `Todo lo facturado en ${mName} está cobrado.` : `No se emitió ninguna factura en ${mName}.`}</span>
+                  </li>
+                {/each}
+              </ul>
+            </section>
 {/snippet}
 
 <style>
@@ -424,9 +437,8 @@
   .mp-who__t, .mp-li__t { display: flex; flex-direction: column; min-width: 0; }
   .mp-name { color: var(--fg-primary); overflow-wrap: anywhere; }
   .mp-who__t small, .mp-li__t small { font-size: var(--dash-caption); color: var(--fg-subtle); overflow-wrap: anywhere; }
-  .mp-logos { display: inline-flex; margin-left: var(--space-2); vertical-align: -2px; }
-  .mp-logo { display: inline-flex; border-radius: var(--radius-sm); background: var(--bg-card); box-shadow: 0 0 0 2px var(--bg-card); }
-  .mp-logo + .mp-logo { margin-left: calc(var(--space-1) * -1); }
+  .mp-logos { display: inline-flex; gap: var(--space-1); margin-left: var(--space-2); vertical-align: -3px; }
+  .mp-logo { display: inline-flex; }
   .mp-bar { height: 6px; border-radius: var(--radius-pill); background: var(--bg-elevated); overflow: hidden; }
   .mp-bar b { display: block; height: 100%; border-radius: var(--radius-pill); background: var(--fg-subtle); }
   .mp-amt { text-align: right; color: var(--fg-primary); white-space: nowrap; }
@@ -480,6 +492,7 @@
     .mp-seg button[aria-pressed='true'] { background: var(--surface-3); color: var(--fg-primary); }
     .mp-seg button:focus-visible { outline: 2px solid var(--accent-gold); outline-offset: 2px; }
     .mp-cols[data-side='in'] .mp-out, .mp-cols[data-side='out'] .mp-in { display: none; }
+    .mp-in .mp-h h2, .mp-out .mp-h h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .mp-row { grid-template-columns: minmax(0, 1fr) auto; padding: var(--space-2) var(--space-3); }
     .mp-bar { display: none; }
     .mp-h, .mp-foot, .mp-checks li { padding-inline: var(--space-3); }

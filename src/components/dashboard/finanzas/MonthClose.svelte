@@ -12,7 +12,8 @@
   import { fmtDay } from '../lib/dates.js';
   import { monthLong } from './fin.js';
 
-  let { month, onchanged } = $props();
+  // blocking: cuántas cosas bloquean el cierre (la página del mes lo enseña arriba).
+  let { month, onchanged, blocking = $bindable(null) } = $props();
 
   let checklist = $state(null);
   let error = $state('');
@@ -25,6 +26,7 @@
   const blockers = $derived(checklist ? checklist.items.filter((i) => i.blocking && i.count > 0) : []);
   const warnings = $derived(checklist ? checklist.items.filter((i) => !i.blocking && i.count > 0) : []);
   const passing = $derived(checklist ? checklist.items.filter((i) => i.count === 0) : []);
+  $effect(() => { blocking = checklist && checklist.status !== 'closed' ? blockers.length : null; });
 
   // Texto llano de cada comprobación (lo que ve el dueño) y su arreglo.
   const TEXT = {
@@ -82,7 +84,7 @@
         {#if checklist.status === 'closed'}
           <div class="mc-row">
             <span class="mc-ic mc-ic--mute"><Icon name="lock" size={18} /></span>
-            <span class="mc-txt">{monthName.charAt(0).toUpperCase() + monthName.slice(1)} está cerrado{#if checklist.closed_at} desde el {fmtDay(checklist.closed_at)}{/if}. Sus cifras ya no cambian.</span>
+            <span class="mc-txt">{monthName.charAt(0).toUpperCase() + monthName.slice(1)} está cerrado{#if checklist.closed_at}{' '}desde el {fmtDay(checklist.closed_at)}{/if}. Sus cifras ya no cambian.</span>
             <button type="button" class="b b--ghost b--mini" onclick={() => (confirmReopen = true)}>Reabrir</button>
           </div>
         {:else}

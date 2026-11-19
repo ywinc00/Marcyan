@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Finanzas, el mes por dentro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Tokens reales de Orbit (src/styles/dashboard.css, 18-nov). Boceto de baja fidelidad: cifras de ejemplo. */
+:root{
+  --bg-base:#1b1b1b;--bg-2:#151515;--bg-card:#202020;--bg-el:#272727;--s3:#2e2e2e;
+  --b:rgba(255,255,255,.08);--bs:rgba(255,255,255,.05);--bst:rgba(255,255,255,.13);
+  --fg:#f2f2f2;--fg2:#a8a8a8;--fg3:#8f8f8f;--fg4:#6a6a6a;--inv:#141414;
+  --acc:#f97316;--acc-line:rgba(249,115,22,.32);--teal:#34d399;--up:#4ade80;--down:#f87171;
+  --warn:#f5b338;--err:#ef4444;--r-sm:6px;--r-md:9px;--r-lg:14px;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#101010;color:var(--fg);font:400 14px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding:40px 32px 80px}
+.num{font-variant-numeric:tabular-nums}
+.intro{margin-bottom:44px;max-width:1100px}
+.intro h1{font-size:22px;font-weight:600;letter-spacing:-.02em;margin-bottom:8px}
+.intro p{color:var(--fg2);margin-bottom:8px}
+.intro p b{color:var(--fg);font-weight:600}
+.intro ul{color:var(--fg2);margin:4px 0 10px 18px}
+.intro li b{color:var(--fg);font-weight:600}
+.note{font-size:13px;color:var(--fg3)}
+.dir{margin-bottom:96px}
+.dir-head{display:flex;gap:14px;align-items:baseline;margin-bottom:10px}
+.tag{font:600 12px/1 Inter;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);border:1px solid var(--acc-line);border-radius:999px;padding:6px 10px}
+.dir-title{font-size:20px;font-weight:600;letter-spacing:-.02em}
+.why{color:var(--fg2);max-width:1100px;margin-bottom:6px}
+.why b{color:var(--fg);font-weight:600}
+.refs{display:flex;gap:16px;margin:14px 0 20px}
+.refs figure{width:300px;background:#fff;border-radius:10px;overflow:hidden;border:1px solid var(--bst)}
+.refs img{display:block;width:100%;height:180px;object-fit:cover;object-position:top}
+.refs figcaption{background:var(--bg-card);color:var(--fg2);font-size:12.5px;padding:8px 10px;line-height:1.4}
+.refs figcaption b{color:var(--fg);font-weight:600}
+.row{display:flex;gap:28px;align-items:flex-start}
+
+/* ── marco del panel ── */
+.app{width:1366px;flex:none;background:var(--bg-base);border:1px solid var(--bst);border-radius:12px;overflow:hidden;display:grid;grid-template-columns:232px 1fr;position:relative}
+.fold{position:absolute;left:0;right:0;top:768px;border-top:1px dashed rgba(249,115,22,.55);pointer-events:none;z-index:5}
+.fold span{position:absolute;right:10px;top:-22px;font:500 11px/1 var(--mono);color:var(--acc);background:var(--bg-base);padding:4px 6px;border-radius:4px}
+.side{background:var(--bg-2);border-right:1px solid var(--b);padding:16px 14px;display:flex;flex-direction:column;gap:2px;min-height:100%}
+.brand{display:flex;gap:10px;align-items:center;font-weight:600;font-size:15px;padding:2px 4px 14px}
+.brand i{width:26px;height:26px;border-radius:8px;background:#2a2a2a;box-shadow:inset 0 0 0 1px var(--b);position:relative}
+.brand i::after{content:"";position:absolute;inset:8px 5px;border-radius:50%;background:var(--acc)}
+.search{display:flex;align-items:center;justify-content:space-between;min-height:36px;padding:0 10px;border-radius:var(--r-md);background:var(--bg-el);color:var(--fg3);font-size:13px;margin-bottom:14px}
+.search kbd{font:400 11px var(--mono);color:var(--fg4)}
+.scap{font:400 12px/1 var(--mono);color:var(--fg3);padding:10px 8px 8px}
+.nav{display:flex;align-items:center;gap:11px;padding:8px 8px;border-radius:var(--r-md);color:var(--fg2);font-size:13.5px}
+.nav i{width:16px;height:16px;border:1.5px solid currentColor;border-radius:4px;opacity:.75}
+.nav.on{background:var(--bg-el);color:var(--fg)}
+.main{min-width:0}
+.bar{display:flex;align-items:center;gap:10px;height:50px;padding:0 24px;border-bottom:1px solid var(--b);font-size:13px}
+.av{width:28px;height:28px;border-radius:50%;background:var(--bg-el);display:grid;place-items:center;font-size:12px;font-weight:600}
+.pg{padding:20px 26px 28px}
+.back{font-size:13px;color:var(--fg2);display:inline-flex;gap:6px;align-items:center;margin-bottom:6px}
+.hd{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.hd h2{font-size:26px;font-weight:600;letter-spacing:-.025em}
+.arw{display:inline-flex;gap:4px}
+.arw span{min-width:36px;height:36px;border-radius:var(--r-md);border:1px solid var(--b);background:var(--bg-card);display:grid;place-items:center;color:var(--fg2);font-size:15px}
+.sp{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:8px 14px;border-radius:var(--r-md);font:600 13px/1.2 Inter;border:1px solid var(--b);background:var(--bg-card);color:var(--fg);white-space:nowrap}
+.btn.pri{background:var(--acc);color:var(--inv);border-color:transparent}
+.btn.sm{min-height:30px;padding:5px 10px;font-size:12.5px}
+.btn.off{color:var(--fg3)}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font:500 12px/1.4 Inter;white-space:nowrap;background:var(--s3);color:var(--fg2)}
+.chip.warn{background:rgba(245,179,56,.14);color:var(--warn)}
+.chip.warn::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--warn)}
+.card{background:var(--bg-card);border:1px solid var(--b);border-radius:var(--r-lg)}
+.cap{font:400 12px/1.2 var(--mono);color:var(--fg3)}
+.ct{font-size:15px;font-weight:600;letter-spacing:-.01em}
+.chd{display:flex;align-items:baseline;gap:10px;padding:13px 16px 6px}
+.sec{color:var(--fg2)}.mut{color:var(--fg3)}
+.up{color:var(--up)}.down{color:var(--down)}
+.lnk{color:var(--fg);text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,.35);font-size:13px}
+table{border-collapse:collapse;width:100%}
+td{padding:0 16px;height:40px;border-top:1px solid var(--bs)}
+td.r{text-align:right}
+td.pc{white-space:nowrap;width:52px;text-align:right;color:var(--fg3)}
+.ava{width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;font:600 10px Inter;color:#fff;flex:none}
+.lg{border-radius:4px;display:inline-block;flex:none;box-shadow:0 0 0 1.5px var(--bg-card)}
+.who{display:flex;align-items:center;gap:10px}
+.trk{height:6px;border-radius:3px;background:var(--bg-el);overflow:hidden;width:110px}
+.trk b{display:block;height:100%;border-radius:3px;background:#8a8a8a}
+.ico{width:18px;height:18px;border-radius:50%;flex:none;display:inline-grid;place-items:center;font:700 11px Inter}
+.ico.x{border:1.5px solid var(--err);color:var(--err)}
+.ico.w{color:var(--warn);font-size:13px}
+.ico.ok{color:var(--teal);font-size:13px}
+.ico.i{border:1.5px solid var(--fg3);color:var(--fg3);font-size:10px}
+.chk{display:flex;align-items:center;gap:12px;padding:0 16px;min-height:38px;border-top:1px solid var(--bs);font-size:13.5px}
+.chk .t{flex:1}
+.chk .t small{color:var(--fg3);font-size:12.5px}
+
+/* ── teléfono ── */
+.phone{width:390px;flex:none;background:var(--bg-base);border:1px solid var(--bst);border-radius:28px;overflow:hidden;position:relative;padding-bottom:76px}
+.ph-top{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--b);background:var(--bg-2);font-size:14px}
+.ph-b{padding:14px 16px 22px}
+.ph-h{display:flex;align-items:center;gap:8px;margin:2px 0 8px}
+.ph-h h3{font-size:22px;font-weight:600;letter-spacing:-.02em}
+.ph-bar{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:auto 1fr auto;gap:10px;padding:12px 16px 16px;background:var(--bg-2);border-top:1px solid var(--b)}
+.ph-bar .btn{min-height:44px}
+.seg{display:flex;background:var(--bg-card);border:1px solid var(--b);border-radius:var(--r-md);padding:3px;gap:2px}
+.seg span{flex:1;text-align:center;padding:9px 6px;border-radius:7px;font-size:13.5px;color:var(--fg2)}
+.seg span.on{background:var(--s3);color:var(--fg)}
+.lrow{display:flex;align-items:center;gap:10px;min-height:50px;border-top:1px solid var(--bs);padding:0 14px}
+.lrow .t{flex:1;min-width:0}
+.lrow .t small{display:block;color:var(--fg3);font-size:12px}
+.pills{display:flex;gap:8px;flex-wrap:nowrap;overflow:hidden}
+.ph-b .pills{-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+.pill{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--b);font-size:13px;color:var(--fg2);white-space:nowrap}
+.pill.on{background:var(--fg);color:var(--inv);border-color:transparent}
+.pill b{font-weight:500;color:inherit;opacity:.7}
+.dayh{display:flex;justify-content:space-between;padding:7px 16px;background:var(--bg-el);font-size:12.5px;color:var(--fg2)}
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <h1>Finanzas: cada mes, por dentro</h1>
+  <p>Hoy, al abrir un mes en el Año solo ves tres cifras y su cierre. La propuesta: <b>pulsar un mes abre su página</b>, con flechas para pasar al anterior y al siguiente. Las dos formas llevan lo mismo dentro:</p>
+  <ul>
+    <li><b>Lo que entró</b>: cada cobro, de quién, de qué factura y por dónde llegó, y lo que entró sin factura.</li>
+    <li><b>Lo que salió</b>: cada gasto con su categoría, las suscripciones con su logo, las comisiones y las devoluciones.</li>
+    <li><b>Cómo quedó</b>: frente al mes anterior y al mismo mes del año pasado.</li>
+    <li><b>El cierre tal como está hoy</b>, con sus siete comprobaciones y sus botones, más lo facturado en el mes que sigue sin cobrar.</li>
+  </ul>
+  <p>Según el mes: <b>en el mes en curso</b> no hay cierre todavía (sale «El mes sigue en curso» y la comparación es con los mismos días del mes anterior); <b>en un mes cerrado</b> sale «Cerrado» con su fecha y el botón para reabrirlo.</p>
+  <p>Lo que eliges es <b>qué ves primero y cómo lo lees</b>. La línea naranja discontinua marca lo que cabe en un portátil sin bajar.</p>
+  <p class="note">Bocetos con los colores, la letra y las piezas reales de Orbit. Las cifras son de ejemplo. Junto a cada forma, las pantallas de otras empresas de las que se toma la idea (nunca sus colores).</p>
+</div>
+
+<!-- ══════════ A ══════════ -->
+<section class="dir">
+  <div class="dir-head"><span class="tag">Forma A</span><span class="dir-title">De dónde vino y a dónde fue</span></div>
+  <p class="why"><b>La idea:</b> el mes se entiende de un vistazo. Arriba, entró, salió y quedó con su comparación. Debajo, de qué clientes vino el dinero y en qué se fue, cada fila con su parte del total, y el cierre al lado. Los movimientos uno a uno se despliegan con «Ver los 4 cobros» y «Ver los 13 gastos». <b>Para quién:</b> si lo que quieres es entender el mes sin repasar cada línea.</p>
+  <div class="refs">
+    <figure><img src="refs/mercury-mes.jpg" alt=""><figcaption><b>Mercury.</b> Se toma: el mes con flechas y «dinero que entra» y «que sale» lado a lado, con sus principales fuentes.</figcaption></figure>
+    <figure><img src="refs/mercury-desglose.jpg" alt=""><figcaption><b>Mercury.</b> Se toma: cada fuente con su parte del total en una barra fina y el monto alineado a la derecha.</figcaption></figure>
+  </div>
+  <div class="row">
+    <div class="app" id="appA"></div>
+    <div class="phone" id="phA"></div>
+  </div>
+</section>
+
+<!-- ══════════ B ══════════ -->
+<section class="dir">
+  <div class="dir-head"><span class="tag">Forma B</span><span class="dir-title">El diario del mes</span></div>
+  <p class="why"><b>La idea:</b> el mes contado día a día. Arriba, los 31 días en un gráfico con la misma escala hacia arriba (lo que entró) y hacia abajo (lo que salió). Debajo, cada movimiento en su día, con las suscripciones juntas en una sola fila, y a la derecha el resumen y el cierre. <b>Para quién:</b> si quieres ver exactamente qué pasó y cuándo, línea a línea.</p>
+  <div class="refs">
+    <figure><img src="refs/monarch-informe.jpg" alt=""><figcaption><b>Monarch.</b> Se toma: gráfico arriba, movimientos debajo y un resumen al lado. No se toman sus barras rojas ni el fondo crema.</figcaption></figure>
+    <figure><img src="refs/monarch-dias.jpg" alt=""><figcaption><b>Monarch.</b> Se toma: los movimientos agrupados por día con el total de cada día a la derecha.</figcaption></figure>
+    <figure><img src="refs/intercom-informe.jpg" alt=""><figcaption><b>Intercom</b> (fuera de finanzas). Se toma: el informe de soporte que pone el ritmo de los días encima de la tabla que lo explica.</figcaption></figure>
+  </div>
+  <div class="row">
+    <div class="app" id="appB"></div>
+    <div class="phone" id="phB"></div>
+  </div>
+</section>
+
+<script>
+// ── Datos de ejemplo (octubre 2026) ─────────────────────────────
+const PAL = ['#5b5bd6','#15803d','#db2777','#0369a1','#e11d48','#0f766e','#7c3aed','#4d7c0f'];
+const ini = (s) => s.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+const ava = (n, i) => `<span class="ava" style="background:${PAL[i % PAL.length]}">${ini(n)}</span>`;
+const usd = (c) => (c < 0 ? '−' : '') + '$' + Math.abs(c).toLocaleString('en-US');
+// Partes que suman 100 (resto mayor).
+function shares(list, total) {
+  const raw = list.map((v) => v / total * 100); const fl = raw.map(Math.floor);
+  let left = 100 - fl.reduce((a, b) => a + b, 0);
+  raw.map((v, i) => [v - fl[i], i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (left > 0) { fl[i]++; left--; } });
+  return fl;
+}
+const COBROS = [
+  { d: '9 oct', who: 'Clínica Dental Bayou', inv: 'INV-016', cta: 'Stripe', fee: 70, amt: 2400, c: 3 },
+  { d: '17 oct', who: 'Lone Star Roofing', inv: 'INV-019', cta: 'Banco', fee: 0, amt: 1800, c: 5 },
+  { d: '3 oct', who: 'Taquería El Sol', inv: 'INV-018', cta: 'Zelle', fee: 0, amt: 1500, c: 2 },
+  { d: '24 oct', who: 'Miami Nails Studio', inv: 'sin factura', cta: 'PayPal', fee: 6, amt: 600, c: 6 },
+];
+const OUT = [
+  { n: 'Contratistas', amt: 900, k: '1 gasto' },
+  { n: 'Publicidad y anuncios', amt: 450, k: '2 gastos' },
+  { n: 'Legal y contable', amt: 250, k: '1 gasto' },
+  { n: 'Oficina y material', amt: 178, k: '1 gasto' },
+  { n: 'Software y suscripciones', amt: 147, k: '6 cargos', subs: true },
+  { n: 'Comidas de trabajo', amt: 85, k: '2 gastos' },
+  { n: 'Comisiones de Stripe y PayPal', amt: 76, k: '2 cobros' },
+  { n: 'Devoluciones', amt: 0, k: 'ninguna' },
+];
+const PCT_IN = shares(COBROS.map((c) => c.amt), 6300);
+const PCT_OUT = shares(OUT.map((c) => c.amt), 2086);
+const SUBLOGOS = ['#000', '#4285f4', '#10a37f', '#ff0000', '#a259ff', '#e8e8e8'];
+const logos = (z = 14) => `<span style="display:inline-flex;vertical-align:-3px">${SUBLOGOS.map((c, i) => `<span class="lg" style="background:${c};width:${z}px;height:${z}px;margin-left:${i ? -4 : 0}px"></span>`).join('')}</span>`;
+// El cierre de hoy, tal cual (siete comprobaciones, problemas primero).
+const CIERRE = [
+  ['x', '4 movimientos importados sin revisar', 'bloquea el cierre', 'Revisar'],
+  ['w', '1 gasto apuntado a mano que ya registra una suscripción', 'no bloquea', 'Elegir uno'],
+  ['w', '3 gastos de $75 o más sin recibo', 'no bloquea', 'Subir recibos'],
+  ['w', '2 cobros sin decir por dónde entró', 'no bloquea', ''],
+  ['ok', 'Cada gasto tiene su categoría', '', ''],
+  ['ok', 'Ningún gasto repetido', '', ''],
+  ['ok', 'Ninguna factura anulada con dinero sin devolver', '', ''],
+];
+const icon = (k) => `<span class="ico ${k}">${k === 'x' ? '×' : k === 'w' ? '!' : k === 'i' ? 'i' : '✓'}</span>`;
+function cierre(title = 'Cierre de octubre') {
+  return `<div class="card"><div class="chd"><span class="ct">${title}</span><span class="sp"></span><span class="chip warn">1 bloquea</span></div>
+  ${CIERRE.map(([k, t, s, a]) => `<div class="chk">${icon(k)}<span class="t">${t}${s ? ` <small>(${s})</small>` : ''}</span>${a ? `<span class="btn sm">${a}</span>` : ''}</div>`).join('')}
+  <div class="chk" style="min-height:48px"><span class="t mut" style="font-size:12.5px">Al cerrarlo, las cifras de octubre quedan fijas y cuentan para los impuestos.</span><span class="btn sm off">Falta 1 para cerrar</span></div></div>`;
+}
+function facturado() {
+  return `<div class="card"><div class="chd"><span class="ct">Facturado en octubre</span><span class="sp"></span><span class="mut num" style="font-size:13px">4 facturas · $6,900</span></div>
+  <div class="chk">${icon('w')}<span class="t">INV-020 de Coral Gables Pilates sin cobrar: <b class="num" style="font-weight:600">$1,200</b> <small>(vence el 15 de noviembre)</small></span><span class="btn sm">Ver factura</span></div>
+  <div class="chk">${icon('i')}<span class="t">El cargo de Vercel ($63) es estimado <small>(se corrige solo cuando llegue su factura)</small></span></div></div>`;
+}
+function side() {
+  const nav = ['Inicio', 'Leads', 'Clientes', 'Marcy', 'Briefs', 'Finanzas', 'Progreso', 'SEO', 'Avisos', 'Ajustes'];
+  return `<aside class="side"><div class="brand"><i></i>Orbit</div><div class="search">Buscar <kbd>Ctrl K</kbd></div><div class="scap">Navegación</div>`
+    + nav.map((n) => `<div class="nav ${n === 'Finanzas' ? 'on' : ''}"><i></i>${n}</div>`).join('') + `</aside>`;
+}
+function head() {
+  return `<div class="bar"><span class="mut">Finanzas</span><span class="mut">›</span><span>Octubre 2026</span><span class="sp"></span><span class="av">D</span><span class="btn sm">Salir</span></div>
+  <div class="pg"><div class="back">‹ Año 2026</div>
+  <div class="hd"><h2>Octubre 2026</h2><span class="arw"><span>‹</span><span>›</span></span><span class="chip warn">Por cerrar: 1 bloquea</span><span class="sp"></span><span class="btn">Descargar el mes</span><span class="btn pri">Revisar el cierre</span></div>`;
+}
+function phHead() {
+  return `<div class="ph-top"><span>☰</span><b style="font-weight:600">Finanzas</b><span class="sp"></span><span class="av">D</span></div><div class="ph-b">
+  <div class="back">‹ Año 2026</div><div class="ph-h"><h3>Octubre 2026</h3></div>
+  <div style="margin:0 0 14px"><span class="chip warn">Por cerrar: 1 bloquea</span></div>`;
+}
+const phBar = `<div class="ph-bar"><span class="btn">‹ Sep</span><span class="btn pri">Revisar el cierre</span><span class="btn">Nov ›</span></div>`;
+const fold = '<div class="fold"><span>1366×768: hasta aquí sin bajar</span></div>';
+
+// ── A ──────────────────────────────────────────────────────────
+function figuresA() {
+  const cell = (lab, val, sub, cmp, first) => `<div style="padding:12px 20px;${first ? '' : 'border-left:1px solid var(--b)'}"><div class="cap">${lab}</div>
+    <div class="num" style="font-size:28px;font-weight:650;letter-spacing:-.02em;margin:3px 0 1px">${val}</div>
+    <div class="sec" style="font-size:13px">${sub}</div><div class="mut" style="font-size:12.5px;margin-top:1px">${cmp}</div></div>`;
+  return `<div class="card" style="display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:14px">
+    ${cell('Entró', '$6,300', '4 cobros de 4 clientes', '<span class="up">+10 %</span> vs septiembre · <span class="up">+27 %</span> vs oct 2025', true)}
+    ${cell('Salió', '$2,086', 'Gastos $2,010 · comisiones $76 · devoluciones $0', '<span class="down">+6 %</span> vs septiembre · <span class="down">+9 %</span> vs oct 2025')}
+    ${cell('Quedó', '$4,214', 'Te quedas 67 de cada 100 dólares', '<span class="up">+11 %</span> vs septiembre · <span class="up">+38 %</span> vs oct 2025')}</div>`;
+}
+function inA() {
+  return `<div class="card"><div class="chd"><span class="ct">De dónde entró</span><span class="sp"></span><span class="mut num" style="font-size:13px">$6,300</span></div>
+  <table><tbody>${COBROS.map((c, i) => `<tr><td style="height:46px;white-space:nowrap"><span class="who">${ava(c.who, c.c)}<span>${c.who}<br><span class="mut" style="font-size:12px">${c.inv} · ${c.cta} · ${PCT_IN[i]} %</span></span></span></td>
+  <td style="width:126px"><div class="trk"><b style="width:${PCT_IN[i]}%"></b></div></td><td class="r num" style="width:84px">${usd(c.amt)}</td></tr>`).join('')}</tbody></table>
+  <div style="padding:11px 16px;border-top:1px solid var(--bs)"><span class="lnk">Ver los 4 cobros</span></div></div>`;
+}
+function outA() {
+  return `<div class="card"><div class="chd"><span class="ct">En qué se fue</span><span class="sp"></span><span class="mut num" style="font-size:13px">$2,086</span></div>
+  <table><tbody>${OUT.map((c, i) => `<tr><td style="white-space:nowrap">${c.n} <span class="mut" style="font-size:12px;margin-left:4px">${c.k}</span>${c.subs ? ' <span style="margin-left:6px">' + logos() + '</span>' : ''}</td>
+  <td style="width:126px">${c.amt ? `<div class="trk"><b style="width:${PCT_OUT[i]}%"></b></div>` : ''}</td><td class="pc num">${c.amt ? PCT_OUT[i] + ' %' : ''}</td><td class="r num" style="width:84px">${usd(c.amt)}</td></tr>`).join('')}</tbody></table>
+  <div style="padding:11px 16px;border-top:1px solid var(--bs)"><span class="lnk">Ver los 13 gastos</span></div></div>`;
+}
+document.getElementById('appA').innerHTML = side() + `<div class="main">${head()}${figuresA()}
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start">
+    <div style="display:grid;gap:14px">${inA()}${cierre()}</div>
+    <div style="display:grid;gap:14px">${outA()}${facturado()}</div></div></div></div>${fold}`;
+document.getElementById('phA').innerHTML = phHead() + `
+  <div class="card" style="padding:14px 16px;margin-bottom:10px"><div class="cap">Quedó</div><div class="num" style="font-size:30px;font-weight:650;letter-spacing:-.02em;margin:4px 0 2px">$4,214</div>
+  <div class="mut" style="font-size:12.5px"><span class="up">+11 %</span> vs septiembre · <span class="up">+38 %</span> vs oct 2025</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;margin-top:12px;border-top:1px solid var(--b);padding-top:10px">
+  <div><div class="cap">Entró</div><div class="num" style="font-size:19px;font-weight:600">$6,300</div></div><div><div class="cap">Salió</div><div class="num" style="font-size:19px;font-weight:600">$2,086</div><div class="mut" style="font-size:12px">con comisiones $76</div></div></div></div>
+  <div class="seg" style="margin:14px 0 10px"><span class="on">De dónde entró</span><span>En qué se fue</span></div>
+  <div class="card">${COBROS.map((c, i) => `<div class="lrow" style="${i ? '' : 'border-top:0'}">${ava(c.who, c.c)}<span class="t">${c.who}<small>${c.inv} · ${PCT_IN[i]} %</small></span><span class="num">${usd(c.amt)}</span></div>`).join('')}<div style="padding:12px 14px;border-top:1px solid var(--bs)"><span class="lnk">Ver los 4 cobros</span></div></div>
+  <div style="margin-top:14px">${cierre()}</div></div>${phBar}`;
+
+// ── B ──────────────────────────────────────────────────────────
+function chartB(w, h, small) {
+  const days = 31, ins = { 3: 1500, 9: 2400, 17: 1800, 24: 600 };
+  const outs = { 1: 63, 6: 300, 8: 20, 10: 15, 12: 45, 14: 900, 18: 178, 20: 150, 21: 250, 25: 20, 26: 40, 28: 14, 30: 15 };
+  const top = 8, mid = top + h * .62, sc = (h * .62) / 2400, bw = (w - 46) / days;
+  let s = `<svg width="${w}" height="${h + (small ? 4 : 20)}" style="display:block"><line x1="40" x2="${w}" y1="${mid}" y2="${mid}" stroke="rgba(255,255,255,.22)"/>`;
+  if (!small) {
+    s += `<line x1="40" x2="${w}" y1="${top}" y2="${top}" stroke="rgba(255,255,255,.06)"/><line x1="40" x2="${w}" y1="${mid + 1000 * sc}" y2="${mid + 1000 * sc}" stroke="rgba(255,255,255,.06)"/>`;
+    s += `<text x="0" y="${top + 4}" fill="#8f8f8f" font-size="10" font-family="JetBrains Mono">+$2.4K</text><text x="0" y="${mid + 4}" fill="#8f8f8f" font-size="10" font-family="JetBrains Mono">$0</text><text x="0" y="${mid + 1000 * sc + 4}" fill="#8f8f8f" font-size="10" font-family="JetBrains Mono">−$1K</text>`;
+  }
+  for (let d = 1; d <= days; d++) {
+    const x = 44 + (d - 1) * bw;
+    if (ins[d]) s += `<rect x="${x}" y="${mid - ins[d] * sc}" width="${bw - 4}" height="${ins[d] * sc}" rx="2" fill="#d4d4d4"/>`;
+    if (outs[d]) s += `<rect x="${x}" y="${mid + 1}" width="${bw - 4}" height="${Math.max(2, outs[d] * sc)}" rx="2" fill="#7a7a7a"/>`;
+    if (!small && (d === 1 || d % 5 === 0)) s += `<text x="${x}" y="${h + 16}" fill="#8f8f8f" font-size="10" font-family="JetBrains Mono">${d}</text>`;
+  }
+  return s + `</svg>`;
+}
+const DAYSB = [
+  ['26 oct, lunes', '−$40', [['Comida con Lone Star Roofing', 'Comidas de trabajo · Tarjeta', '−$40', '#7c7c7c']]],
+  ['24 oct, sábado', '+$594', [['Miami Nails Studio', 'Ingreso sin factura · PayPal (comisión $6)', '+$600', null, 6]]],
+  ['21 oct, miércoles', '−$250', [['Registered Agents Inc.', 'Legal y contable · sin recibo', '−$250', '#7c7c7c']]],
+  ['20 oct, martes', '−$150', [['Meta Ads', 'Publicidad y anuncios · Tarjeta', '−$150', '#0866ff']]],
+  ['18 oct, domingo', '−$178', [['Office Depot', 'Oficina y material · Tarjeta', '−$178', '#cc0000']]],
+  ['17 oct, sábado', '+$1,800', [['Lone Star Roofing', 'INV-019 · Banco', '+$1,800', null, 5]]],
+  ['14 oct, miércoles', '−$900', [['Ana López', 'Contratistas · sin recibo', '−$900', null, 1]]],
+];
+function subsRow(ph) {
+  return `<div class="lrow" style="border-top:0;${ph ? '' : 'padding:0 16px'};background:rgba(255,255,255,.02)">${logos(16)}<span class="t">Suscripciones del mes<small>6 cargos automáticos, del 1 al 30 · Ver los 6</small></span><span class="num" style="color:var(--fg2)">−$147</span></div>`;
+}
+function ledgerB(ph, n = DAYSB.length) {
+  return subsRow(ph) + DAYSB.slice(0, n).map(([d, t, rows]) => `<div class="dayh" style="${ph ? 'padding:7px 14px' : ''}"><span>${d}</span><span class="num">${t}</span></div>`
+    + rows.map(([nm, s, a, lg, c]) => `<div class="lrow" style="border-top:0;${ph ? '' : 'padding:0 16px'}">${lg ? `<span class="lg" style="background:${lg};width:24px;height:24px;border-radius:6px"></span>` : ava(nm, c)}<span class="t">${nm}<small>${s}</small></span><span class="num" style="${a[0] === '+' ? '' : 'color:var(--fg2)'}">${a}</span></div>`).join('')).join('');
+}
+const pillsB = `<div class="pills" style="align-items:center"><span class="pill on">Todo <b>17</b></span><span class="pill">Cobros <b>4</b></span><span class="pill">Gastos <b>13</b></span><span class="pill">Sin recibo <b>3</b></span><span class="sp"></span><span class="chip warn">4 importados sin revisar: aún no cuentan</span></div>`;
+function sumB() {
+  const r = (a, b, s = '') => `<div style="display:flex;justify-content:space-between;padding:6px 0;${s}"><span class="sec">${a}</span><span class="num">${b}</span></div>`;
+  return `<div class="card" style="padding:13px 16px"><div class="ct" style="margin-bottom:4px">Resumen de octubre</div>
+  ${r('Entró', '$6,300')}<div class="mut" style="font-size:12px;margin:-4px 0 2px">4 cobros, uno sin factura</div>${r('Comisiones', '−$76')}${r('Gastos', '−$2,010')}<div class="mut" style="font-size:12px;margin:-4px 0 2px">de ellos, suscripciones $147</div>${r('Devoluciones', '$0')}
+  ${r('<b style="color:var(--fg);font-weight:600">Quedó</b>', '<b style="font-weight:650;font-size:17px">$4,214</b>', 'border-top:1px solid var(--bst);margin-top:4px;padding-top:9px')}
+  <div class="mut" style="font-size:12.5px"><span class="up">+11 %</span> vs septiembre · <span class="up">+38 %</span> vs oct 2025</div>
+  <div style="border-top:1px solid var(--b);margin:10px 0 0;padding-top:8px">${r('Facturado en el mes', '$6,900')}${r('Sin cobrar de eso', '$1,200')}<div class="mut" style="font-size:12px;margin:-4px 0 0">INV-020, Coral Gables Pilates, vence el 15 de noviembre</div></div></div>`;
+}
+document.getElementById('appB').innerHTML = side() + `<div class="main">${head()}
+  <div style="display:grid;grid-template-columns:1fr 330px;gap:14px;align-items:start">
+   <div><div class="card" style="padding:12px 16px 6px;margin-bottom:12px"><div style="display:flex;gap:18px;align-items:baseline;margin-bottom:4px"><span class="ct">Día a día</span><span class="mut" style="font-size:12.5px">arriba lo que entró, abajo lo que salió, misma escala</span></div>${chartB(730, 104)}</div>
+   <div style="margin-bottom:10px">${pillsB}</div><div class="card" style="overflow:hidden">${ledgerB()}</div></div>
+   <div style="display:grid;gap:14px">${sumB()}${cierre()}</div></div></div></div>${fold}`;
+document.getElementById('phB').innerHTML = phHead() + `
+  <div class="card" style="display:grid;grid-template-columns:repeat(3,1fr);padding:12px 14px;margin-bottom:10px">
+   <div><div class="cap">Entró</div><div class="num" style="font-weight:600;font-size:17px">$6,300</div></div><div><div class="cap">Salió</div><div class="num" style="font-weight:600;font-size:17px">$2,086</div></div><div><div class="cap">Quedó</div><div class="num" style="font-weight:600;font-size:17px">$4,214</div></div>
+   <div class="mut" style="grid-column:1/-1;font-size:12px;margin-top:4px">Comisiones $76 · devoluciones $0 · <span class="up">+11 %</span> vs septiembre</div>
+   <div style="grid-column:1/-1;margin-top:8px">${chartB(330, 64, true)}</div></div>
+  <div style="margin:12px 0 10px"><div class="pills"><span class="pill on">Todo <b>17</b></span><span class="pill">Cobros <b>4</b></span><span class="pill">Gastos <b>13</b></span><span class="pill">Sin recibo <b>3</b></span></div></div>
+  <div class="card" style="overflow:hidden">${ledgerB(true, 4)}</div>
+  <div style="margin-top:14px">${cierre()}</div></div>${phBar}`;
+</script>
+</body>
+</html>

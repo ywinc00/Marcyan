@@ -753,11 +753,22 @@ function mesFalso(t, p) {
   if (/review_status = 'pending'/.test(t) && /COUNT/.test(t)) return { rows: [{ expenses: 3, income: 1 }] };
   if (/FROM mileage_trips/.test(t)) return { rows: [] };
   if (/FROM finance_months WHERE month/.test(t)) return { rows: [] };
+  if (/FROM company_expenses x LEFT JOIN subscriptions/.test(t)) return { rows: [{ amount_cents: '6300', name: 'Vercel Pro' }] };
+  if (/make_interval/.test(t)) {
+    assert.deepEqual(p, ['2026-09-01', 18]);
+    if (/FROM payments/.test(t)) return { rows: [{ cents: '300000', fees: '3000' }] };
+    if (/FROM income_entries/.test(t)) return { rows: [{ cents: '0', fees: '0' }] };
+    if (/FROM refunds/.test(t)) return { rows: [{ cents: '0' }] };
+    if (/FROM company_expenses/.test(t)) return { rows: [{ cents: '100000' }] };
+  }
   return { rows: [] };
 }
 await check('mes: totales, comparación, desgloses y pendientes', async () => {
   reset(mesFalso);
-  const r = await books.booksMonth('2026-10');
+  const r = await books.booksMonth('2026-10', { today: '2026-11-18' });
+  assert.equal(r.current, false);
+  assert.equal(r.prev_same_period, null);
+  assert.deepEqual(r.estimates, [{ name: 'Vercel Pro', amount_cents: 6300 }]);
   assert.equal(r.totals.income, 630000);
   assert.equal(r.totals.fees, 7600);
   assert.equal(r.totals.out, 208600);
@@ -782,6 +793,28 @@ await check('mes: totales, comparación, desgloses y pendientes', async () => {
   // Recibo que falta: solo el de 900 (la suscripción y el de 85 con recibo no cuentan).
   assert.equal(r.missing_receipts, 1);
   assert.equal(r.mileage.trips, 0);
+});
+await check('mes en curso: se compara con los mismos días del mes anterior', async () => {
+  reset((t, p) => (/= ANY\(\$1\)/.test(t) ? { rows: [] } : mesFalso(t, p)));
+  const r = await books.booksMonth('2026-10', { today: '2026-10-18' });
+  assert.equal(r.current, true);
+  assert.equal(r.prev_same_period.days, 18);
+  assert.equal(r.prev_same_period.income, 300000);
+  assert.equal(r.prev_same_period.out, 103000);
+  assert.equal(r.prev_same_period.net, 197000);
+});
+await check('mes: el CSV del contador sale solo con ese mes', async () => {
+  reset((t) => (/UNION ALL/.test(t) ? { rows: [
+    { tipo: 'cobro', fecha: '2026-09-30', contraparte: 'A', referencia: 'INV-1', importe: '1000', comision: '0', categoria: '', linea: '1', cuenta: '', recibo: '' },
+    { tipo: 'gasto', fecha: '2026-10-02', contraparte: 'B', referencia: 'Hosting', importe: '-500', comision: '0', categoria: 'hosting', linea: '27b', cuenta: '', recibo: 'none' },
+  ] } : { rows: [] }));
+  const res = fakeRes();
+  await booksH({ method: 'GET', query: { view: 'export', month: '2026-10' }, headers: {} }, res);
+  assert.equal(res.statusCode, 200);
+  const text = String(res.body || res.sent || '');
+  assert.match(res.headers['content-disposition'] || res.headers['Content-Disposition'] || '', /marcyan-movimientos-2026-10\.csv/);
+  assert.match(text, /Hosting/);
+  assert.doesNotMatch(text, /INV-1/);
 });
 await check('mes: la ruta del panel lo sirve y rechaza un mes raro', async () => {
   reset(mesFalso);

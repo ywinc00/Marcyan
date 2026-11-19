@@ -171,10 +171,10 @@
   .xf-file { padding-block: 8px; height: auto; }
   .xf-has { margin: -6px 0 0; font-size: var(--dash-small); }
   .xf-has a { color: var(--fg-primary); text-underline-offset: 3px; }
-  .xf-photo { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 14px; align-items: start;
-    padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-elevated); }
+  .xf-photo { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: var(--space-3); align-items: start;
+    padding: var(--space-2); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-elevated); }
   .xf-photo img { width: 112px; height: 140px; object-fit: cover; border-radius: var(--radius-sm); background: var(--bg-card); display: block; }
-  .xf-photo__side { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-width: 0; }
+  .xf-photo__side { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); min-width: 0; }
   .xf-photo__ok { font-size: var(--dash-small); color: var(--fg-secondary); }
   .xf-photo.is-err .xf-photo__ok { color: var(--color-error); }
   .xf-photo__btn { min-height: 40px; cursor: pointer; }

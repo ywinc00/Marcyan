@@ -91,7 +91,7 @@
             {#if openMonths.length}
               <div class="tx-row"><span class="tx-ic tx-ic--err"><Icon name="close" size={14} /></span>
                 <span class="tx-txt">{openMonths.length === 1 ? `${monthLong(openMonths[0].month).split(' ')[0].replace(/^./, (c) => c.toUpperCase())} sigue abierto` : `${openMonths.length} meses siguen abiertos`}: sus cifras aún pueden cambiar.</span>
-                <a class="b b--mini" href={href('finanzas', [], { mes: openMonths[0].month })}>Ir al cierre</a></div>
+                <a class="b b--mini" href={href('finanzas', ['mes', openMonths[0].month], { ver: 'cierre' })}>Ir al cierre</a></div>
             {/if}
             {#if pendingImported}
               <div class="tx-row"><span class="tx-ic tx-ic--warn"><Icon name="alert" size={16} /></span>

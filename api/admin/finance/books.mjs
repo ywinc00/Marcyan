@@ -7,6 +7,7 @@
 //   GET ?view=month&month=2026-10     → el mes por dentro (cobros, gastos, comparación, pendientes)
 //   GET ?view=close&month=2026-10     → checklist del cierre de ese mes
 //   GET ?view=export&year=2026        → CSV con todos los movimientos del año (para el contador)
+//   GET ?view=export&month=2026-10    → el mismo CSV, solo ese mes
 //   GET ?view=settings                → ajustes de Finanzas
 //   POST { action: 'close' | 'reopen', month }        → cerrar o reabrir un mes
 //   POST { action: 'charges' }                         → generar ya los cargos de suscripciones
@@ -56,6 +57,11 @@ export default async function handler(req, res) {
       if (view === 'close') return res.status(200).json({ ok: true, checklist: await monthChecklist(String(q.month || '')) });
       if (view === 'settings') return res.status(200).json({ ok: true, settings: await getFinanceSettings() });
       if (view === 'export') {
+        const mo = /^\d{4}-(0[1-9]|1[0-2])$/.test(String(q.month || '')) ? String(q.month) : '';
+        if (mo) {
+          const rows = (await ledgerRows(Number(mo.slice(0, 4)))).filter((r) => String(r.fecha).startsWith(mo));
+          return sendCsv(res, `marcyan-movimientos-${mo}.csv`, ledgerCsv(rows));
+        }
         return sendCsv(res, `marcyan-movimientos-${year}.csv`, ledgerCsv(await ledgerRows(year)));
       }
       return res.status(400).json({ ok: false, error: 'Vista desconocida.' });

@@ -11,12 +11,14 @@
 
 import type { CrumbItem, FaqItem, ListLink } from '../lib/schema';
 import type { RelatedLink } from './clusters';
+import { PRICE_ANCHORS } from './pricing';
+import { usd } from './catalogo.generado';
 
 export const serviciosPage = {
   meta: {
     title: 'Services — Web design, AI and SEO in Houston and Miami | Marcyan',
     description:
-      'The complete Marcyan catalog: web design from $400, conversational AI from $500, AI SEO with a free checkup, e-commerce, local SEO, branding and maintenance. Public pricing.',
+      `The complete Marcyan catalog: web design from ${usd(PRICE_ANCHORS.webLanding)}, conversational AI from ${usd(PRICE_ANCHORS.iaBasic)}, AI SEO with a free checkup, e-commerce, local SEO, branding and maintenance. Public pricing.`,
   },
   path: '/en/services',
   breadcrumb: [
@@ -29,12 +31,12 @@ export const serviciosPage = {
     sub: 'Seven services to grow your business in Houston and Miami: web design, conversational AI, AI SEO so assistants can find you, online stores, local SEO, branding and maintenance. Each one starts with an accessible option and grows with what you need.',
     primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See detailed pricing', href: '/en/pricing' },
-    chips: ['7 services, from $150', 'Free AI checkup', 'Public pricing'],
+    chips: [`7 services, from ${usd(PRICE_ANCHORS.brandingLogo)}`, 'Free AI checkup', 'Public pricing'],
     tone: 'gold' as const,
   },
   answer: {
     q: 'What services does Marcyan offer?',
-    a: 'Marcyan offers seven services for small businesses in Houston and Miami: web design (from $400), conversational AI (from $500), AI SEO with a free checkup, online stores (from $900), local SEO (from $300), branding (from $150) and maintenance (from $120 a month). Each one starts with an accessible option and grows with what you need, always with the price in writing.',
+    a: `Marcyan offers seven services for small businesses in Houston and Miami: web design (from ${usd(PRICE_ANCHORS.webLanding)}), conversational AI (from ${usd(PRICE_ANCHORS.iaBasic)}), AI SEO with a free checkup, online stores (from ${usd(PRICE_ANCHORS.ecommerceEssential)}), local SEO (from ${usd(PRICE_ANCHORS.seoInitial)}), branding (from ${usd(PRICE_ANCHORS.brandingLogo)}) and maintenance (from ${usd(PRICE_ANCHORS.maintenance)} a month). Each one starts with an accessible option and grows with what you need, always with the price in writing.`,
   },
   grid: {
     tag: 'The catalog',

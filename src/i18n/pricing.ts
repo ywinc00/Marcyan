@@ -20,28 +20,59 @@
 
 import type { OfferItem, FaqItem, CrumbItem } from '../lib/schema';
 
-// ── Anclas de precio canónicas (USD, numéricas). FUENTE DE VERDAD. ──
+// ── Anclas de precio canónicas (USD, numéricas). ──
+// YA NO SE ESCRIBEN AQUÍ: salen del catálogo de Ventas
+// (_cerebro/ventas/catalogo.json → src/i18n/catalogo.generado.ts).
+// Para cambiar un precio: se cambia en el catálogo y se corre
+// `npm run sync:catalogo`. `npm run check:precios` falla si no coinciden.
 // Espejadas en lib/chat-kb.mjs → PRICES. Guardadas por npm run check:kb.
 // (El diagnóstico AEO es GRATIS → no lleva número aquí; se modela como tier free.)
-export const PRICE_ANCHORS = {
-  web: 1500,
-  webLanding: 400,
-  webRedesign: 500,
-  ia: 900,
-  iaBasic: 500,
-  aeoFoundations: 500,
-  aeoMonitoring: 200,
-  ecommerce: 2900,
-  ecommerceEssential: 900,
+import { CATALOGO, desde as desdeCatalogo, usd as usdCatalogo } from './catalogo.generado';
+
+/**
+ * Los DOS únicos precios que todavía no salen del catálogo, por decisión del
+ * dueño (2026-11-18).
+ *
+ * El catálogo nuevo no tiene «SEO local mes a mes» ni «mantenimiento» como
+ * productos sueltos: ese trabajo pasó a los planes (Presencia y Base). Hasta
+ * que Diseño rehaga la página de precios alrededor de los cuatro planes
+ * (encargo de Ventas §3), la web sigue enseñando las tarifas de siempre, para
+ * no anunciar planes que aún no se pueden contratar.
+ *
+ * Cuando esa página entre en producción, estas dos líneas desaparecen y sus
+ * valores salen del plan que corresponda.
+ */
+export const PENDIENTES_DE_PLAN = {
+  /** Plan mensual de SEO local de siempre. Lo sustituirá el plan «Presencia». */
   seoLocal: 600,
-  seoInitial: 300,
-  branding: 750,
-  brandingLogo: 150,
+  /** Mantenimiento mensual de siempre. Lo sustituirá el plan «Base». */
   maintenance: 120,
 } as const;
 
-/** "$1,500" desde 1500. */
-const usd = (n: number): string => '$' + n.toLocaleString('en-US');
+/** Nombre visible de un servicio, tal como lo escribe el catálogo de Ventas. */
+const nombreDe = (id: Parameters<typeof desdeCatalogo>[0]): string =>
+  CATALOGO.proyectos[id].nombre;
+
+export const PRICE_ANCHORS = {
+  web: desdeCatalogo('web'),
+  webPagina: desdeCatalogo('webPagina'),
+  webLanding: desdeCatalogo('webLanding'),
+  webRedesign: desdeCatalogo('webRedesign'),
+  ia: desdeCatalogo('ia'),
+  iaBasic: desdeCatalogo('iaBasic'),
+  aeoFoundations: desdeCatalogo('aeoFoundations'),
+  aeoMonitoring: CATALOGO.anadidos.aeoMonitoring.mensual,
+  ecommerce: desdeCatalogo('ecommerce'),
+  ecommerceEssential: desdeCatalogo('ecommerceEssential'),
+  seoLocal: PENDIENTES_DE_PLAN.seoLocal,
+  seoInitial: desdeCatalogo('seoInitial'),
+  branding: desdeCatalogo('branding'),
+  brandingLogo: desdeCatalogo('brandingLogo'),
+  maintenance: PENDIENTES_DE_PLAN.maintenance,
+} as const;
+
+/** "$1,950" desde 1950. */
+const usd = usdCatalogo;
 
 // ── Tipos del catálogo ────────────────────────────────────────
 export interface CatalogTier {
@@ -101,9 +132,11 @@ export const catalog: CatalogProduct[] = [
     ctaLabel: 'Ver diseño web',
     tone: 'gold',
     tiers: [
-      { key: 'webLanding', name: 'Landing Page', value: PRICE_ANCHORS.webLanding, display: tierDisplay(PRICE_ANCHORS.webLanding), anchor: true,
+      { key: 'webPagina', name: nombreDe('webPagina'), value: PRICE_ANCHORS.webPagina, display: tierDisplay(PRICE_ANCHORS.webPagina), anchor: true,
         blurb: 'Una sola página enfocada en convertir: ideal para una promoción, un servicio o validar tu negocio.', href: '/es/houston/diseno-web' },
-      { key: 'webRedesign', name: 'Rediseño de sitio', value: PRICE_ANCHORS.webRedesign, display: tierDisplay(PRICE_ANCHORS.webRedesign),
+      { key: 'webLanding', name: nombreDe('webLanding'), value: PRICE_ANCHORS.webLanding, display: tierDisplay(PRICE_ANCHORS.webLanding),
+        blurb: 'La misma página, con tu ficha de Google puesta a punto. Juntas salen más baratas que por separado.', href: '/es/houston/diseno-web' },
+      { key: 'webRedesign', name: nombreDe('webRedesign'), value: PRICE_ANCHORS.webRedesign, display: tierDisplay(PRICE_ANCHORS.webRedesign),
         blurb: 'Renovamos tu sitio actual (diseño, velocidad y textos) sin empezar de cero.', href: '/es/houston/diseno-web' },
       { key: 'web', name: 'Sitio a medida completo', value: PRICE_ANCHORS.web, display: tierDisplay(PRICE_ANCHORS.web),
         blurb: 'Varias páginas a medida y bilingües, con SEO base y listo para la IA.', href: '/es/houston/diseno-web' },
@@ -294,7 +327,7 @@ export const preciosPage = {
   meta: {
     title: 'Precios — Diseño web, IA y SEO en Houston y Miami | Marcyan',
     description:
-      'Precios públicos y claros: diseño web desde $400, IA desde $500, SEO local desde $300 y un diagnóstico de visibilidad en IA gratis. Sin letra pequeña ni costos ocultos.',
+      `Precios públicos y claros: diseño web desde ${usd(PRICE_ANCHORS.webLanding)}, IA desde ${usd(PRICE_ANCHORS.iaBasic)}, SEO local desde ${usd(PRICE_ANCHORS.seoInitial)} y un diagnóstico de visibilidad en IA gratis. Sin letra pequeña ni costos ocultos.`,
   },
   path: '/es/precios',
   breadcrumb: [
@@ -304,15 +337,15 @@ export const preciosPage = {
   hero: {
     kicker: 'Precios públicos',
     h1: 'Precios <em>claros</em>, sin letra pequeña',
-    sub: 'Publicamos todo: desde una landing en $400 hasta el SEO mensual y el mantenimiento, lo que la mayoría de las agencias te esconde hasta tenerte en una llamada de ventas. Así de transparentes somos.',
+    sub: `Publicamos todo: desde una landing en ${usd(PRICE_ANCHORS.webLanding)} hasta el SEO mensual y el mantenimiento, lo que la mayoría de las agencias te esconde hasta tenerte en una llamada de ventas. Así de transparentes somos.`,
     primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver qué incluye cada servicio', href: '#precios' },
-    chips: ['Desde $400 · diagnóstico IA gratis', 'Sin permanencia', 'Propuesta gratis en 24h'],
+    chips: [`Desde ${usd(PRICE_ANCHORS.webLanding)} · diagnóstico IA gratis`, 'Sin permanencia', 'Propuesta gratis en 24h'],
     tone: 'gold' as const,
   },
   answer: {
     q: '¿Cuánto cuesta trabajar con Marcyan?',
-    a: 'Depende del servicio, y por eso lo publicamos todo: una página web va desde $400 (un sitio a medida completo desde $1,500), un asistente con IA desde $500, el SEO local desde $300 y un logo desde $150. Hasta el precio recurrente (SEO mensual y mantenimiento) está publicado, y el diagnóstico de visibilidad en IA es gratis. Cada proyecto tiene un alcance y un precio claros por escrito, sin compromiso.',
+    a: `Depende del servicio, y por eso lo publicamos todo: una página web va desde ${usd(PRICE_ANCHORS.webLanding)} (un sitio a medida completo desde ${usd(PRICE_ANCHORS.web)}), un asistente con IA desde ${usd(PRICE_ANCHORS.iaBasic)}, el SEO local desde ${usd(PRICE_ANCHORS.seoInitial)} y un logo desde ${usd(PRICE_ANCHORS.brandingLogo)}. Hasta el precio recurrente (SEO mensual y mantenimiento) está publicado, y el diagnóstico de visibilidad en IA es gratis. Cada proyecto tiene un alcance y un precio claros por escrito, sin compromiso.`,
   },
   transparency: {
     tag: 'Por qué lo publicamos',

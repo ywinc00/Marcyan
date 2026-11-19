@@ -9,12 +9,14 @@
 
 import type { CrumbItem, FaqItem, ListLink } from '../lib/schema';
 import type { RelatedLink } from './clusters';
+import { PRICE_ANCHORS } from './pricing';
+import { usd } from './catalogo.generado';
 
 export const serviciosPage = {
   meta: {
     title: 'Servicios — Diseño web, IA y SEO en Houston y Miami | Marcyan',
     description:
-      'El catálogo completo de Marcyan: diseño web desde $400, IA conversacional desde $500, SEO para IA con diagnóstico gratis, e-commerce, SEO local, branding y mantenimiento. Precios públicos.',
+      `El catálogo completo de Marcyan: diseño web desde ${usd(PRICE_ANCHORS.webLanding)}, IA conversacional desde ${usd(PRICE_ANCHORS.iaBasic)}, SEO para IA con diagnóstico gratis, e-commerce, SEO local, branding y mantenimiento. Precios públicos.`,
   },
   path: '/es/servicios',
   breadcrumb: [
@@ -27,12 +29,12 @@ export const serviciosPage = {
     sub: 'Siete servicios para hacer crecer tu negocio en Houston y Miami: diseño web, IA, SEO para que te encuentre la IA, tiendas en línea, SEO local, branding y mantenimiento. Cada uno empieza con una opción accesible y crece según lo que necesites.',
     primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver precios', href: '/es/precios' },
-    chips: ['7 servicios, desde $150', 'Diagnóstico de IA gratis', 'Precios públicos'],
+    chips: [`7 servicios, desde ${usd(PRICE_ANCHORS.brandingLogo)}`, 'Diagnóstico de IA gratis', 'Precios públicos'],
     tone: 'gold' as const,
   },
   answer: {
     q: '¿Qué servicios ofrece Marcyan?',
-    a: 'Marcyan ofrece siete servicios para PYMEs en Houston y Miami: diseño web (desde $400), IA conversacional (desde $500), SEO para IA con diagnóstico gratis, tiendas en línea (desde $900), SEO local (desde $300), branding (desde $150) y mantenimiento (desde $120 al mes). Cada uno empieza con una opción accesible y crece según lo que necesites, siempre con precio por escrito.',
+    a: `Marcyan ofrece siete servicios para PYMEs en Houston y Miami: diseño web (desde ${usd(PRICE_ANCHORS.webLanding)}), IA conversacional (desde ${usd(PRICE_ANCHORS.iaBasic)}), SEO para IA con diagnóstico gratis, tiendas en línea (desde ${usd(PRICE_ANCHORS.ecommerceEssential)}), SEO local (desde ${usd(PRICE_ANCHORS.seoInitial)}), branding (desde ${usd(PRICE_ANCHORS.brandingLogo)}) y mantenimiento (desde ${usd(PRICE_ANCHORS.maintenance)} al mes). Cada uno empieza con una opción accesible y crece según lo que necesites, siempre con precio por escrito.`,
   },
   grid: {
     tag: 'El catálogo',

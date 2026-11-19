@@ -12,6 +12,8 @@
 import type { FaqItem, CrumbItem, ListLink } from '../lib/schema';
 import type { RelatedLink } from './clusters';
 import { nap } from './content';
+import { PRICE_ANCHORS } from './pricing';
+import { usd } from './catalogo.generado';
 
 const telHref = 'tel:' + nap.miami.replace(/[^\d+]/g, '');
 
@@ -47,17 +49,17 @@ export const miamiHub = {
     tag: 'Servicios en Miami',
     title: 'Todo para tu negocio, en una <em>sola agencia</em>',
     links: [
-      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: 'Sitios a medida, rápidos y bilingües. Desde $1,500.', icon: 'lucide:layout-template' },
-      { label: 'SEO local en Miami', href: '/es/miami/seo-local', desc: 'Aparece en Google Maps y en la IA. Desde $600/mes.', icon: 'lucide:search' },
-      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: 'Asistentes que contestan WhatsApp y agendan 24/7. Desde $900.', icon: 'lucide:messages-square' },
-      { label: 'Tienda en línea en Miami', href: '/es/miami/ecommerce', desc: 'E-commerce que vende, con pagos y catálogo. Desde $2,900.', icon: 'lucide:shopping-bag' },
+      { label: 'Diseño web en Miami', href: '/es/miami/diseno-web', desc: `Sitios a medida, rápidos y bilingües. Desde ${usd(PRICE_ANCHORS.web)}.`, icon: 'lucide:layout-template' },
+      { label: 'SEO local en Miami', href: '/es/miami/seo-local', desc: `Aparece en Google Maps y en la IA. Desde ${usd(PRICE_ANCHORS.seoLocal)}/mes.`, icon: 'lucide:search' },
+      { label: 'IA conversacional en Miami', href: '/es/miami/ia-conversacional', desc: `Asistentes que contestan WhatsApp y agendan 24/7. Desde ${usd(PRICE_ANCHORS.ia)}.`, icon: 'lucide:messages-square' },
+      { label: 'Tienda en línea en Miami', href: '/es/miami/ecommerce', desc: `E-commerce que vende, con pagos y catálogo. Desde ${usd(PRICE_ANCHORS.ecommerce)}.`, icon: 'lucide:shopping-bag' },
     ] as RelatedLink[],
   },
   barrios: {
     tag: 'Por barrio',
     title: 'Soluciones por <em>barrio</em>',
     links: [
-      { label: 'Doral (Doralzuela)', href: '/es/miami/doral', desc: 'Diseño web, SEO e IA para negocios de Doral. Bilingüe, desde $1,500.', icon: 'lucide:map-pin' },
+      { label: 'Doral (Doralzuela)', href: '/es/miami/doral', desc: `Diseño web, SEO e IA para negocios de Doral. Bilingüe, desde ${usd(PRICE_ANCHORS.web)}.`, icon: 'lucide:map-pin' },
       { label: 'Hialeah', href: '/es/miami/hialeah', desc: 'Web, SEO local e IA en español para negocios de Hialeah.', icon: 'lucide:map-pin' },
     ] as RelatedLink[],
   },
@@ -87,7 +89,7 @@ export const miamiHub = {
       { q: '¿Tienen clientes u oficina en Miami?', a: 'Vamos a ser honestos: estamos comenzando operaciones en Miami, así que todavía no tenemos casos publicados de esta ciudad ni una dirección pública (trabajamos como negocio de área de servicio). Sí tenemos trabajo real y verificable hecho en Houston y Orlando, que con gusto te enseñamos en una llamada. Por eso ofrecemos cupos de Cliente Fundador en Miami.' },
       { q: '¿Trabajan en el español de Miami?', a: 'Sí. Somos un equipo bilingüe enfocado en el mercado hispano de Estados Unidos. En Miami eso significa el español que de verdad se habla aquí, cubano, venezolano, colombiano, y también inglés. Escribimos y posicionamos pensando en cómo habla y busca de verdad tu cliente, no en un español genérico.' },
       { q: '¿Atienden toda el área de Miami?', a: 'Sí. Cubrimos Miami-Dade y su área metropolitana (Doral, Hialeah, Kendall, Coral Gables, Brickell, Aventura y más) como negocio de área de servicio, de forma remota y eficiente. No necesitas ir a una oficina: todo el proceso, de la propuesta a la entrega, lo hacemos en línea y en tu idioma.' },
-      { q: '¿Cuánto cuestan sus servicios en Miami?', a: 'Publicamos nuestros precios de arranque: diseño web desde $1,500, IA desde $900, tienda en línea desde $2,900 y SEO local desde $600 al mes. El precio final depende del alcance, y siempre te lo damos por escrito antes de empezar. Puedes verlos todos en nuestra página de precios.' },
+      { q: '¿Cuánto cuestan sus servicios en Miami?', a: `Publicamos nuestros precios de arranque: diseño web desde ${usd(PRICE_ANCHORS.web)}, IA desde ${usd(PRICE_ANCHORS.ecommerceEssential)}, tienda en línea desde ${usd(PRICE_ANCHORS.ecommerce)} y SEO local desde ${usd(PRICE_ANCHORS.seoLocal)} al mes. El precio final depende del alcance, y siempre te lo damos por escrito antes de empezar. Puedes verlos todos en nuestra página de precios.` },
       { q: '¿Por qué una agencia hispana nueva en Miami y no una ya establecida?', a: 'Porque hablamos tu idioma de verdad, tenemos presencia local real (no somos una operación remota anónima) y trabajamos con honestidad: precios públicos, sin contratos que te aten y sin prometer el «#1». Somos nuevos en Miami, pero con trabajo verificable, y a nuestros Clientes Fundadores les damos dedicación y condiciones especiales.' },
     ] as FaqItem[],
   },

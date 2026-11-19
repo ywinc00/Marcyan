@@ -17,14 +17,41 @@ const contentSrc = await readFile(join(root, 'src/i18n/content.ts'), 'utf8');
 
 const errors = [];
 
-// ── Precios: PRICE_ANCHORS (pricing.ts) ⇄ PRICES (chat-kb.mjs) ──
-// Parsea el bloque `export const PRICE_ANCHORS = { ... } as const;`.
+// ── Precios: catálogo de Ventas ⇄ PRICES (chat-kb.mjs) ──
+// Desde el 18-nov los precios no se escriben en pricing.ts: salen del catálogo
+// (lib/catalogo.generado.mjs). Aquí se arma el mismo mapa de anclas que usa el
+// sitio, con las dos excepciones que el dueño dejó fijas (PENDIENTES_DE_PLAN).
 const block = pricingSrc.match(/export const PRICE_ANCHORS\s*=\s*\{([\s\S]*?)\}\s*as const/);
 if (!block) {
   errors.push('No encontré el bloque `export const PRICE_ANCHORS = { ... } as const` en src/i18n/pricing.ts.');
 } else {
+  const { CATALOGO, desde } = await import('../lib/catalogo.generado.mjs');
+  const pend = {};
+  const pendBlock = pricingSrc.match(/export const PENDIENTES_DE_PLAN\s*=\s*\{([\s\S]*?)\}\s*as const/);
+  if (pendBlock) for (const m of pendBlock[1].matchAll(/(\w+):\s*(\d+)/g)) pend[m[1]] = Number(m[2]);
+
   const anchors = {};
-  for (const m of block[1].matchAll(/(\w+):\s*(\d+)/g)) anchors[m[1]] = Number(m[2]);
+  // Cada clave de PRICE_ANCHORS dice de dónde sale su número.
+  for (const m of block[1].matchAll(/(\w+):\s*([^,\n]+)/g)) {
+    const [, key, expr] = m;
+    try {
+      if (/desdeCatalogo\('([^']+)'\)/.test(expr)) {
+        anchors[key] = desde(expr.match(/desdeCatalogo\('([^']+)'\)/)[1]);
+      } else if (/CATALOGO\.anadidos\.(\w+)\.mensual/.test(expr)) {
+        anchors[key] = CATALOGO.anadidos[expr.match(/CATALOGO\.anadidos\.(\w+)\.mensual/)[1]].mensual;
+      } else if (/CATALOGO\.planes\.(\w+)\.mensual/.test(expr)) {
+        anchors[key] = CATALOGO.planes[expr.match(/CATALOGO\.planes\.(\w+)\.mensual/)[1]].mensual;
+      } else if (/PENDIENTES_DE_PLAN\.(\w+)/.test(expr)) {
+        anchors[key] = pend[expr.match(/PENDIENTES_DE_PLAN\.(\w+)/)[1]];
+      } else if (/^\s*\d+\s*$/.test(expr)) {
+        anchors[key] = Number(expr.trim());
+      } else {
+        errors.push(`No sé de dónde sale el precio '${key}' en pricing.ts: ${expr.trim()}`);
+      }
+    } catch (e) {
+      errors.push(`Fallo resolviendo el precio '${key}': ${e.message}`);
+    }
+  }
 
   const anchorKeys = Object.keys(anchors);
   if (anchorKeys.length === 0) errors.push('PRICE_ANCHORS está vacío o no se pudo parsear.');

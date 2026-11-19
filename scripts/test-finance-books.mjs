@@ -714,6 +714,87 @@ await check('ajustes: el equipo sale con el último acceso de cada correo', asyn
   assert.deepEqual(res.body.team, [{ email: 'prueba@marcyan.test', last_access: null }]);
 });
 
+// ── Un mes por dentro (página del mes, 2026-11-18) ──
+await check('mes: se mueve bien entre años', async () => {
+  assert.equal(books.shiftMonth('2026-01', -1), '2025-12');
+  assert.equal(books.shiftMonth('2026-10', -12), '2025-10');
+  assert.equal(books.shiftMonth('2026-12', 1), '2027-01');
+});
+await check('mes: rechaza un mes que no existe', async () => {
+  reset(() => ({ rows: [] }));
+  await assert.rejects(books.booksMonth('2026-13'), /Mes no válido/);
+  await assert.rejects(books.booksMonth('octubre'), /Mes no válido/);
+});
+function mesFalso(t, p) {
+  if (/GROUP BY 1/.test(t) && /= ANY\(\$1\)/.test(t)) {
+    assert.deepEqual(p[0], ['2026-10', '2026-09', '2025-10']);
+    if (/FROM payments/.test(t)) return { rows: [{ m: '2026-10', cents: '570000', fees: '7000' }, { m: '2026-09', cents: '490000', fees: '6100' }, { m: '2025-10', cents: '460000', fees: '5800' }] };
+    if (/FROM income_entries/.test(t)) return { rows: [{ m: '2026-10', cents: '60000', fees: '600' }, { m: '2026-09', cents: '85000', fees: '0' }] };
+    if (/FROM refunds/.test(t)) return { rows: [] };
+    if (/subscription_id IS NOT NULL/.test(t)) return { rows: [{ m: '2026-10', cents: '14700' }] };
+    if (/FROM company_expenses/.test(t)) return { rows: [{ m: '2026-10', cents: '201000' }, { m: '2026-09', cents: '189800' }] };
+  }
+  if (/FROM payments p LEFT JOIN invoices/.test(t)) return { rows: [
+    { id: 1, paid_at: '2026-10-03', amount_cents: '150000', fee_cents: '0', client_id: 2, invoice_id: 18, invoice_number: 'INV-018', client_name: 'Taquería El Sol', account_name: 'Banco (Zelle y transferencias)' },
+    { id: 2, paid_at: '2026-10-09', amount_cents: '240000', fee_cents: '7000', client_id: 3, invoice_id: 16, invoice_number: 'INV-016', client_name: 'Clínica Dental Bayou', account_name: 'Stripe' },
+    { id: 3, paid_at: '2026-10-17', amount_cents: '180000', fee_cents: '0', client_id: 2, invoice_id: 19, invoice_number: 'INV-019', client_name: 'Taquería El Sol', account_name: null },
+  ] };
+  if (/FROM income_entries n LEFT JOIN/.test(t)) return { rows: [{ id: 7, received_at: '2026-10-24', label: 'Consultoría puntual', category: 'servicios', amount_cents: '60000', fee_cents: '600', client_id: null, client_name: null, account_name: 'PayPal' }] };
+  if (/FROM refunds r LEFT JOIN/.test(t)) return { rows: [] };
+  if (/FROM company_expenses e LEFT JOIN subscriptions/.test(t)) return { rows: [
+    { id: 10, spent_at: '2026-10-14', label: 'Diseño de octubre', vendor: 'Ana López', category: 'contratistas', amount_cents: '90000', business_pct: 100, receipt_status: 'none', subscription_id: null },
+    { id: 11, spent_at: '2026-10-01', label: 'Vercel Pro', vendor: 'Vercel', category: 'software', amount_cents: '6300', business_pct: 100, receipt_status: 'none', subscription_id: 2, subscription_name: 'Vercel Pro' },
+    { id: 12, spent_at: '2026-10-12', label: 'Comida con cliente', vendor: 'Pappasito', category: 'comidas', amount_cents: '8500', business_pct: 100, receipt_status: 'uploaded', subscription_id: null },
+  ] };
+  if (/FROM invoices i LEFT JOIN clients/.test(t)) return { rows: [
+    { id: 19, invoice_number: 'INV-019', amount_cents: '180000', due_date: '2026-10-31', status: 'paid', client_id: 2, client_name: 'Taquería El Sol', paid_cents: '180000' },
+    { id: 20, invoice_number: 'INV-020', amount_cents: '120000', due_date: '2026-11-15', status: 'sent', client_id: 6, client_name: 'Miami Nails Studio', paid_cents: '0' },
+  ] };
+  if (/review_status = 'pending'/.test(t) && /COUNT/.test(t)) return { rows: [{ expenses: 3, income: 1 }] };
+  if (/FROM mileage_trips/.test(t)) return { rows: [] };
+  if (/FROM finance_months WHERE month/.test(t)) return { rows: [] };
+  return { rows: [] };
+}
+await check('mes: totales, comparación, desgloses y pendientes', async () => {
+  reset(mesFalso);
+  const r = await books.booksMonth('2026-10');
+  assert.equal(r.totals.income, 630000);
+  assert.equal(r.totals.fees, 7600);
+  assert.equal(r.totals.out, 208600);
+  assert.equal(r.totals.net, 421400);
+  assert.equal(r.totals.subscriptions, 14700);
+  assert.equal(r.prev.month, '2026-09');
+  assert.equal(r.prev.net, 575000 - 195900);
+  assert.equal(r.last_year.month, '2025-10');
+  assert.equal(r.last_year.income, 460000);
+  assert.equal(r.status, 'open');
+  // Dos cobros de Taquería El Sol se juntan; el ingreso sin cliente va con su concepto.
+  assert.deepEqual(r.by_client.map((c) => [c.name, c.cents, c.count]), [['Taquería El Sol', 330000, 2], ['Clínica Dental Bayou', 240000, 1], ['Consultoría puntual', 60000, 1]]);
+  assert.equal(r.by_category[0].category, 'contratistas');
+  assert.deepEqual(r.by_category.find((c) => c.category === 'software').subscriptions, ['Vercel Pro']);
+  // Comidas al 50 %: deducible la mitad.
+  assert.equal(r.expenses.find((e) => e.id === '12').deductible_cents, 4250);
+  assert.equal(r.payments[2].account, null);
+  assert.equal(r.invoiced.count, 2);
+  assert.equal(r.invoiced.cents, 300000);
+  assert.deepEqual(r.invoiced.unpaid.map((i) => [i.number, i.balance_cents]), [['INV-020', 120000]]);
+  assert.equal(r.pending_review, 4);
+  // Recibo que falta: solo el de 900 (la suscripción y el de 85 con recibo no cuentan).
+  assert.equal(r.missing_receipts, 1);
+  assert.equal(r.mileage.trips, 0);
+});
+await check('mes: la ruta del panel lo sirve y rechaza un mes raro', async () => {
+  reset(mesFalso);
+  let res = fakeRes();
+  await booksH({ method: 'GET', query: { view: 'month', month: '2026-10' }, headers: {} }, res);
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.month.totals.net, 421400);
+  res = fakeRes();
+  await booksH({ method: 'GET', query: { view: 'month', month: '2026-1' }, headers: {} }, res);
+  assert.equal(res.statusCode, 400);
+  assert.match(res.body.error, /Mes no válido/);
+});
+
 if (fails.length) {
   console.error(`✗ ${fails.length} prueba(s) de los libros fallaron:\n - ` + fails.join('\n - '));
   process.exit(1);

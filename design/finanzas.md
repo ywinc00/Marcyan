@@ -90,3 +90,26 @@ Estado: PROPUESTO dentro de la dirección validada (no abre gramática nueva); O
   su coste. En teléfono cada fila se apila (arreglado: la base flexible en columna inflaba el alto).
 - NO tarjeta de «IA» con brillos ni iconos de chispa → SÍ el mismo tono de las demás tarjetas: el agente es
   una fuente más de cosas por revisar, no una función aparte.
+
+## Añadido 2026-11-18 · Página de cada mes
+Estado: PROPUESTO dentro de la dirección validada; el dueño elige forma (bocetos `design/finanzas/mes/bocetos.html`)
+y da el OK final sobre el render. Pedido del dueño: «entrar en enero y ver qué cobré, en qué gasté, el resumen del
+mes y todo lo que sea útil».
+- **Ruta:** `#/finanzas/mes/AAAA-MM`, con flechas al mes anterior y siguiente y vuelta al Año. Pulsar un mes en el
+  Año abre su página; lo que hoy se despliega en la fila (cifras, «Ver movimientos», cierre) vive dentro, sin perder
+  nada (E-75): las siete comprobaciones del cierre tal cual, la nota del mes en curso y «Reabrir» en uno cerrado.
+- **Piezas:** C-06 franja de cifras con procedencia (entró, salió, quedó con su comparación), I-09 ficha de datos
+  (cifras tabulares, filas con su parte del total), E-06 filtros en pastillas (forma B), E-08/E-09/E-10 vacío,
+  carga y error. Presupuesto del acento H-07: naranja solo en «Revisar el cierre».
+- **Forma A** «De dónde vino y a dónde fue» (Mercury, pantallas 7e381265 y aed73dd2): cifras arriba, desglose por
+  cliente y por categoría con barras de su parte del total, cierre y facturado del mes al lado.
+- **Forma B** «El diario del mes» (Monarch f7412fa7 y c7e2b6bd; Intercom 0d71c83b, fuera del nicho): gráfico de 31
+  días con la misma escala arriba y abajo, movimientos por día con las suscripciones en una fila, resumen y cierre
+  a la derecha.
+- Una tercera forma (el mes como informe para el contador) se retiró en la crítica adversarial (5/10): repetía el
+  esqueleto de la A con tablas (E-61).
+- **Teléfono:** barra fija abajo con mes anterior, «Revisar el cierre» y mes siguiente, a 44 px.
+- **Pliegue (E-77):** en 1366×768 caben las cifras, los dos desgloses (A) o el gráfico y los movimientos (B) y lo
+  que bloquea el cierre.
+- NO cuatro KPI sueltos ni una tabla de movimientos sin agrupar → SÍ cifras con su comparación y desgloses que
+  suman 100 %. NO color en las cifras → SÍ blanco, color solo en la comparación pequeña y el estado.

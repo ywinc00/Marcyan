@@ -4,6 +4,7 @@
 //   GET ?view=line&year=2026&line=8   → movimientos de esa línea
 //   GET ?view=1099&year=2026          → contratistas y lista de 1099
 //   GET ?view=tax&year=2026           → hoja del trimestral y calendario
+//   GET ?view=month&month=2026-10     → el mes por dentro (cobros, gastos, comparación, pendientes)
 //   GET ?view=close&month=2026-10     → checklist del cierre de ese mes
 //   GET ?view=export&year=2026        → CSV con todos los movimientos del año (para el contador)
 //   GET ?view=settings                → ajustes de Finanzas
@@ -14,7 +15,7 @@ import { requireAdmin } from '../../../lib/auth.mjs';
 import { houstonDate } from '../../../lib/dates.mjs';
 import { rowsToCsv, sendCsv } from '../../../lib/csv.mjs';
 import {
-  BooksError, booksYear, booksYears, scheduleCSummary, contractors1099, estimatedTax,
+  BooksError, booksYear, booksYears, booksMonth, scheduleCSummary, contractors1099, estimatedTax,
   monthChecklist, closeMonth, reopenMonth, ledgerRows, getFinanceSettings, setFinanceSetting,
   generateSubscriptionCharges, scheduleCLine,
 } from '../../../lib/finance-books.mjs';
@@ -51,6 +52,7 @@ export default async function handler(req, res) {
       if (view === 'line') return res.status(200).json({ ok: true, ...(await scheduleCLine(year, q.line)) });
       if (view === '1099') return res.status(200).json({ ok: true, list: await contractors1099(year) });
       if (view === 'tax') return res.status(200).json({ ok: true, tax: await estimatedTax(year) });
+      if (view === 'month') return res.status(200).json({ ok: true, month: await booksMonth(String(q.month || '')) });
       if (view === 'close') return res.status(200).json({ ok: true, checklist: await monthChecklist(String(q.month || '')) });
       if (view === 'settings') return res.status(200).json({ ok: true, settings: await getFinanceSettings() });
       if (view === 'export') {

@@ -206,7 +206,7 @@ const spec: KindSpec = {
       props: (ctx) => {
         const t = copyOf(ctx);
         const p = ctx.cluster.pricing;
-        const tiers = [tier('diseno-web', 'web'), tier('seo-local', 'seoLocal'), tier('ia-conversacional', 'ia')].map((x) => ({
+        const tiers = [tier('diseno-web', 'webLanding'), tier('diseno-web', 'web'), tier('seo-local', 'seoLocal'), tier('ia-conversacional', 'iaBasic')].map((x) => ({
           label: x.label,
           price: usd(x.value),
           unit: x.monthly ? 'al mes' : 'proyecto',
@@ -252,7 +252,7 @@ const spec: KindSpec = {
       component: FranjaEnPocasPalabras,
       props: (ctx) => {
         const f = T.franja;
-        const web = tier('diseno-web', 'web'), seo = tier('seo-local', 'seoLocal'), ia = tier('ia-conversacional', 'ia');
+        const web = tier('diseno-web', 'webLanding'), seo = tier('seo-local', 'seoInitial'), ia = tier('ia-conversacional', 'iaBasic');
         return {
           q: ctx.cluster.answer.q,
           a: ctx.cluster.answer.a,
@@ -262,7 +262,7 @@ const spec: KindSpec = {
             { title: f.queEs, text: ctx.cluster.service.description, link: { label: f.verQue, href: '#precios' } },
             {
               title: f.desdeTitle,
-              text: f.desde(`Desde ${usd(web.value)}`, `desde ${usd(seo.value)} al mes`, `desde ${usd(ia.value)}`),
+              text: f.desde(`Desde ${usd(web.value)}`, `desde ${usd(seo.value)}`, `desde ${usd(ia.value)}`),
               link: { label: f.verPrecios, href: '/es/precios' },
             },
             { title: f.tiempoTitle, text: f.tiempo, link: { label: f.pedir, href: '#contacto' } },

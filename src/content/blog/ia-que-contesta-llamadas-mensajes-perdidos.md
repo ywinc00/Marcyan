@@ -15,7 +15,7 @@ faq:
   - q: "¿Es seguro que un robot hable con mis clientes?"
     a: "Sí, si está bien hecho. El asistente sigue reglas claras: responde lo que sabe, captura el dato de contacto y, cuando la conversación lo amerita, ofrece pasar a una persona. No inventa precios ni promete lo que tu negocio no ofrece. El cliente siempre puede pedir hablar contigo."
   - q: "¿Cuánto cuesta un asistente con IA?"
-    a: "En Marcyan, un asistente con IA arranca desde 900 dólares como pago único, como servicio gestionado. Las apps por suscripción suelen empezar más baratas al mes, pero suben rápido al añadir funciones de IA y volumen. Aparte va el costo de mensajería de Meta por la API de WhatsApp, que cobra Meta, no la agencia."
+    a: "En Marcyan, un asistente con IA es un pago único, como servicio gestionado, con el precio publicado. Las apps por suscripción suelen empezar más baratas al mes, pero suben rápido al añadir funciones de IA y volumen. Aparte va el costo de mensajería de Meta por la API de WhatsApp, que cobra Meta, no la agencia."
   - q: "¿La IA reemplaza a mi recepcionista o a mi equipo?"
     a: "No es ese el objetivo. La IA cubre lo repetitivo y los horarios en que nadie puede contestar (de noche, fines de semana, o cuando estás ocupado). Tu equipo se queda con lo que requiere una persona: cerrar la venta, atender un caso delicado, dar el toque personal. La IA filtra y prepara; las personas cierran."
   - q: "¿Puede agendar citas sola?"
@@ -64,13 +64,13 @@ Aquí conviene separar dos cosas que suelen confundirse: lo que cuesta el asiste
 
 | Concepto | Rango típico | Quién lo cobra |
 |---|---|---|
-| Asistente con IA (Marcyan) | desde $900, pago único, servicio gestionado | Marcyan |
+| Asistente con IA (Marcyan) | pago único, servicio gestionado, precio público | Marcyan |
 | Apps de chatbot por suscripción | desde ~$19–$50/mes, sube al añadir IA y volumen ([ChatBot](https://www.chatbot.com/pricing/), [Tidio](https://www.tidio.com/blog/chatbot-pricing/)) | El proveedor de la app |
 | Mensajería por la API de WhatsApp | varía por tipo de mensaje y país; varios mensajes son gratis | **Meta**, no la agencia ([Meta](https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing)) |
 
 Un punto honesto sobre WhatsApp: desde julio de 2025 Meta cobra por cada mensaje de plantilla entregado, aunque muchos mensajes (las respuestas dentro de una conversación de servicio, por ejemplo) siguen siendo gratis ([documentación oficial de Meta](https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing)). Ese cobro es de Meta, no nuestro. Lo decimos claro para que no haya sorpresas en tu factura.
 
-Y para ponerlo en perspectiva: las apps de delivery cobran a los restaurantes comisiones que van del **15% al 30% por pedido** ([Rezku](https://rezku.com/blog/third-party-delivery-fees-in-2026-what-doordash-uber-eats-grubhub-really-cost-restaurants/)). Recuperar tus propias llamadas y mensajes, con un canal que es tuyo, suele salir mucho más barato a largo plazo. Si quieres ver los números con calma, tienes el precio del chatbot y la lista completa en [precios](/es/precios).
+Y para ponerlo en perspectiva: las apps de delivery cobran a los restaurantes comisiones que van del **15% al 30% por pedido** ([Rezku](https://rezku.com/blog/third-party-delivery-fees-in-2026-what-doordash-uber-eats-grubhub-really-cost-restaurants/)). Recuperar tus propias llamadas y mensajes, con un canal que es tuyo, suele salir mucho más barato a largo plazo. Si quieres ver los números con calma, tienes el precio del chatbot y el resto de nuestros servicios en [precios](/es/precios).
 
 ## ¿La IA reemplaza a mi equipo?
 

@@ -9,9 +9,10 @@
 // corre `npm run sync:catalogo`. `npm run check:precios` falla si el archivo
 // generado no coincide con el catálogo o si alguien dejó una cifra suelta.
 //
-// SOLO se copia lo que la web enseña (nombres y precios). Las reglas internas
-// del catálogo (piso sobre base, descuentos, cupos, cobro) NO salen de
-// _cerebro: este repo puede ser público.
+// SOLO se copia el bloque `preciosPublicos`: los «desde» que el dueño decidió
+// enseñar (2026-11-19). La lista interna (proyectos, planes, paquetes, añadidos
+// y reglas) NO sale de _cerebro: este repo es público y lo que entra en el sitio
+// acaba en el navegador.
 // ─────────────────────────────────────────────────────────────
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -57,102 +58,93 @@ export function leerCatalogo(ruta = CATALOGO_JSON) {
     );
   }
   const c = JSON.parse(crudo);
-  for (const clave of ['version', 'moneda', 'proyectos', 'planes']) {
+  for (const clave of ['version', 'moneda', 'preciosPublicos']) {
     if (!c[clave]) throw new Error(`El catálogo no trae "${clave}".`);
   }
   if (c.moneda !== 'USD') throw new Error(`Moneda inesperada: ${c.moneda}`);
   return c;
 }
 
-/** Lo que SÍ sale a la web: nombres y precios. Nada de reglas internas. */
+/** Las únicas claves que pueden salir del catálogo hacia el sitio. */
+export const CLAVES_PUBLICAS = ['version', 'moneda', 'vigenteDesde', 'anclas', 'mensuales', 'desdePorCategoria'];
+
+/**
+ * Lo ÚNICO que sale a la web: el bloque `preciosPublicos` del catálogo.
+ *
+ * Decisión del dueño (2026-11-19): lo que se publica son anclas, el precio más
+ * bajo que se acepta cobrar por cada servicio, siempre con «desde». La lista
+ * interna (proyectos, planes, paquetes, añadidos y reglas) es para propuestas,
+ * cotizaciones, Orbit y facturas: NO se copia aquí, porque este repo es público
+ * y lo que entra en el sitio acaba en el navegador.
+ */
 export function proyectarPublico(c) {
-  const proyectos = {};
-  for (const [id, p] of Object.entries(c.proyectos)) {
-    const fila = { nombre: p.nombre };
-    if (typeof p.precio === 'number') fila.precio = p.precio;
-    if (typeof p.desde === 'number') fila.desde = p.desde;
-    if (typeof p.mensual === 'number') fila.mensual = p.mensual;
-    if (typeof p.segundoIdioma === 'number') fila.segundoIdioma = p.segundoIdioma;
-    proyectos[id] = fila;
+  const pp = c.preciosPublicos;
+  if (!pp || typeof pp.anclas !== 'object') throw new Error('El catálogo no trae "preciosPublicos.anclas".');
+
+  const anclas = {};
+  for (const [id, v] of Object.entries(pp.anclas)) {
+    if (typeof v !== 'number' || !(v > 0)) throw new Error(`El precio público "${id}" no es un número válido.`);
+    anclas[id] = v;
   }
 
-  const planes = {};
-  for (const [id, p] of Object.entries(c.planes)) {
-    planes[id] = {
-      nivel: p.nivel,
-      nombre: p.nombre,
-      en: p.en,
-      mensual: p.mensual,
-      frase: p.frase,
-      ...(p.recomendado ? { recomendado: true } : {}),
+  const mensuales = [...(pp.mensuales ?? [])];
+  for (const id of mensuales) {
+    if (!(id in anclas)) throw new Error(`"${id}" está en mensuales pero no en anclas.`);
+  }
+
+  const desdePorCategoria = (pp.desdePorCategoria ?? []).map((cat) => {
+    if (!(cat.ref in anclas)) {
+      throw new Error(`La categoría "${cat.categoria}" apunta a "${cat.ref}", que no es un precio público.`);
+    }
+    return {
+      categoria: cat.categoria,
+      ref: cat.ref,
+      ...(typeof cat.desde === 'number' ? { desde: cat.desde } : {}),
+      ...(typeof cat.desdeMensual === 'number' ? { desdeMensual: cat.desdeMensual } : {}),
     };
-  }
+  });
 
-  const anadidos = {};
-  for (const [id, a] of Object.entries(c.anadidosMensuales ?? {})) {
-    anadidos[id] = { nombre: a.nombre, mensual: a.mensual };
-  }
-
-  const paquetes = (c.paquetes ?? []).map((p) => ({
-    plan: p.plan,
-    proyecto: p.proyecto,
-    orden: p.orden,
-    papel: p.papel,
-  }));
-
-  // El precio de entrada que el dueño quiere ver por servicio en la web, las
-  // fichas y los perfiles. Es lo que manda sobre el «desde» de cada página.
-  const desdePorServicio = (c.desdePorServicio?.servicios ?? []).map((s) => ({
-    servicio: s.servicio,
-    ref: s.ref,
-    ...(typeof s.desde === 'number' ? { desde: s.desde } : {}),
-    ...(typeof s.desdeMensual === 'number' ? { desdeMensual: s.desdeMensual } : {}),
-    ...(typeof s.cuotaMensual === 'number' ? { cuotaMensual: s.cuotaMensual } : {}),
-    ...(s.mensual ? { mensual: s.mensual } : {}),
-  }));
-
-  return { version: c.version, moneda: c.moneda, proyectos, planes, anadidos, paquetes, desdePorServicio };
+  return {
+    version: c.version,
+    moneda: c.moneda,
+    vigenteDesde: pp.vigenteDesde ?? null,
+    anclas,
+    mensuales,
+    desdePorCategoria,
+  };
 }
 
 /** El .ts generado, con el aviso de "no tocar a mano". */
 export function renderizar(publico) {
-  const json = JSON.stringify(publico, null, 2).replace(/\n/g, '\n');
+  const json = JSON.stringify(publico, null, 2);
   return `// ⚠️ GENERADO — no lo edites a mano.
-// Sale de _cerebro/ventas/catalogo.json con \`npm run sync:catalogo\`.
-// Para cambiar un precio: se cambia en el catálogo de Ventas y se vuelve a correr.
+// Sale de _cerebro/ventas/catalogo.json (bloque preciosPublicos) con \`npm run sync:catalogo\`.
+// Son los precios PÚBLICOS: el mínimo que se cobra por cada servicio, siempre con «desde».
+// Para cambiar uno: se cambia en el catálogo de Ventas y se vuelve a correr.
 // \`npm run check:precios\` falla si este archivo y el catálogo no coinciden.
 
 export const CATALOGO = ${json} as const;
 
-export type ProyectoId = keyof typeof CATALOGO.proyectos;
-export type PlanId = keyof typeof CATALOGO.planes;
+export type AnclaId = keyof typeof CATALOGO.anclas;
 
-/** Precio de arranque de un proyecto: su \`desde\` si lo tiene, si no su \`precio\`. */
-export function desde(id: ProyectoId): number {
-  const p = CATALOGO.proyectos[id] as { precio?: number; desde?: number };
-  const v = p.desde ?? p.precio;
-  if (typeof v !== 'number') throw new Error(\`El proyecto "\${id}" no tiene precio.\`);
+/** Precio público de un nivel. En el sitio se enseña siempre con «desde». */
+export function desde(id: AnclaId): number {
+  const v = CATALOGO.anclas[id];
+  if (typeof v !== 'number') throw new Error(\`"\${id}" no es un precio público.\`);
   return v;
 }
 
-/** Cuota mensual de un proyecto (los que la tienen). */
-export function mensualDe(id: ProyectoId): number {
-  const p = CATALOGO.proyectos[id] as { mensual?: number };
-  if (typeof p.mensual !== 'number') throw new Error(\`El proyecto "\${id}" no tiene mensualidad.\`);
-  return p.mensual;
+/** true si ese nivel se cobra mes a mes. */
+export function esMensual(id: AnclaId): boolean {
+  return (CATALOGO.mensuales as readonly string[]).includes(id);
 }
 
-/** Cuota mensual de un plan. */
-export function mensualPlan(id: PlanId): number {
-  return CATALOGO.planes[id].mensual;
-}
-
-/** "$1,950" a partir de 1950. */
+/** "$1,500" a partir de 1500. */
 export function usd(n: number): string {
   return '$' + n.toLocaleString('en-US');
 }
 
-/** "$199/mes" (es) · "$199/mo" (en). */
+/** "$399/mes" (es) · "$399/mo" (en). */
 export function usdMes(n: number, lang: 'es' | 'en' = 'es'): string {
   return usd(n) + (lang === 'en' ? '/mo' : '/mes');
 }
@@ -162,20 +154,24 @@ export function usdMes(n: number, lang: 'es' | 'en' = 'es'): string {
 /** La misma lista, en JavaScript corriente, para el servidor. */
 export function renderizarMjs(publico) {
   return `// ⚠️ GENERADO — no lo edites a mano.
-// Sale de _cerebro/ventas/catalogo.json con \`npm run sync:catalogo\`.
+// Sale de _cerebro/ventas/catalogo.json (bloque preciosPublicos) con \`npm run sync:catalogo\`.
 // Gemelo de src/i18n/catalogo.generado.ts, para lo que corre en el servidor.
 
 export const CATALOGO = ${JSON.stringify(publico, null, 2)};
 
-/** Precio de arranque de un proyecto: su \`desde\` si lo tiene, si no su \`precio\`. */
+/** Precio público de un nivel. Se enseña siempre con «desde». */
 export function desde(id) {
-  const p = CATALOGO.proyectos[id];
-  const v = p && (p.desde ?? p.precio);
-  if (typeof v !== 'number') throw new Error(\`El proyecto "\${id}" no tiene precio.\`);
+  const v = CATALOGO.anclas[id];
+  if (typeof v !== 'number') throw new Error(\`"\${id}" no es un precio público.\`);
   return v;
 }
 
-/** "$1,950" a partir de 1950. */
+/** true si ese nivel se cobra mes a mes. */
+export function esMensual(id) {
+  return CATALOGO.mensuales.includes(id);
+}
+
+/** "$1,500" a partir de 1500. */
 export function usd(n) {
   return '$' + n.toLocaleString('en-US');
 }
@@ -187,14 +183,14 @@ export function sincronizar() {
   const publico = proyectarPublico(c);
   writeFileSync(DESTINO, renderizar(publico), 'utf8');
   writeFileSync(DESTINO_MJS, renderizarMjs(publico), 'utf8');
-  return { version: c.version, destino: DESTINO, proyectos: Object.keys(publico.proyectos).length, planes: Object.keys(publico.planes).length };
+  return { version: c.version, destino: DESTINO, anclas: Object.keys(publico.anclas).length, categorias: publico.desdePorCategoria.length };
 }
 
 if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith('sync-catalogo.mjs')) {
   try {
     const r = sincronizar();
     console.log(`OK → ${r.destino}`);
-    console.log(`   catálogo ${r.version} · ${r.proyectos} proyectos · ${r.planes} planes`);
+    console.log(`   catálogo ${r.version} · ${r.anclas} precios públicos · ${r.categorias} categorías`);
   } catch (e) {
     console.error('FALLO:', e.message);
     process.exit(1);

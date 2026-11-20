@@ -135,7 +135,7 @@ const webFeatures = [
   'Listo para móvil y para la IA',
 ];
 const webPriceNote =
-  `${usd(PRICE_ANCHORS.web)} es el punto de partida para un sitio profesional. Las tiendas en línea (e-commerce) y los proyectos con funciones especiales tienen su propio alcance: te lo detallamos sin compromiso.`;
+  `${usd(PRICE_ANCHORS.webLanding)} es el punto de partida: una landing de una página. Un sitio profesional a medida empieza en ${usd(PRICE_ANCHORS.web)}. Las tiendas en línea (e-commerce) y los proyectos con funciones especiales tienen su propio alcance: te lo detallamos sin compromiso.`;
 
 // ═══════════════════════════════════════════════════════════════
 // 1 · HOUSTON — SEO LOCAL
@@ -195,9 +195,9 @@ const houstonSeo: ClusterPage = {
   },
   pricing: {
     tag: 'Inversión',
-    title: `SEO local, <em>desde ${usd(PRICE_ANCHORS.seoLocal)} al mes</em>`,
-    price: `${usd(PRICE_ANCHORS.seoLocal)}`,
-    unit: '/mes',
+    title: `SEO local, <em>desde ${usd(PRICE_ANCHORS.seoInitial)}</em>`,
+    price: `${usd(PRICE_ANCHORS.seoInitial)}`,
+    unit: 'pago único',
     lead: 'Sin contratos eternos. Empezamos por tu zona más rentable y sumamos zonas según los resultados.',
     features: [
       'Optimización del Perfil de Google de Negocio',
@@ -221,7 +221,7 @@ const houstonSeo: ClusterPage = {
     tag: 'Preguntas frecuentes',
     title: 'SEO local en Houston, sin <em>letra chica</em>',
     items: [
-      { q: '¿Cuánto cuesta el SEO local en Houston?', a: `Desde ${usd(PRICE_ANCHORS.seoLocal)} al mes, sin contratos a largo plazo. Lo que mueve el precio en Houston es cuántas zonas del área quieres cubrir (no es lo mismo solo Katy que Katy, Sugar Land y Pearland) y cuánta competencia hay en tu sector. Te damos el alcance y el precio por escrito en la propuesta gratuita, antes de que decidas.` },
+      { q: '¿Cuánto cuesta el SEO local en Houston?', a: `Desde ${usd(PRICE_ANCHORS.seoInitial)} la puesta a punto inicial (pago único) y desde ${usd(PRICE_ANCHORS.seoLocal)} al mes el trabajo continuo, sin contratos a largo plazo. Lo que mueve el precio en Houston es cuántas zonas del área quieres cubrir (no es lo mismo solo Katy que Katy, Sugar Land y Pearland) y cuánta competencia hay en tu sector. Te damos el alcance y el precio por escrito en la propuesta gratuita, antes de que decidas.` },
       { q: '¿Puedo salir en Katy o en Sugar Land si mi negocio está en otra parte de Houston?', a: 'Sí, si de verdad das servicio allí. Marcamos esas zonas en tu Perfil de Google, creamos una página propia para cada una y conseguimos reseñas de clientes de esas zonas. Lo que no hacemos son direcciones falsas ni oficinas virtuales: Google las detecta y puede suspender tu ficha.' },
       { q: '¿Sirve el SEO local si trabajo a domicilio y no tengo local?', a: 'Sí. Texas Rush Remove trabaja en las casas de sus clientes y ya posiciona en su zona de Houston. En estos negocios tu dirección no se publica: Google se fija en las zonas que cubres, en tus reseñas y en lo que tu web dice de cada zona.' },
       { q: '¿En cuánto tiempo se ven resultados?', a: 'Las primeras señales llegan entre 2 y 8 semanas: más vistas y más llamadas desde tu ficha de Google. Subir en las búsquedas más peleadas de Houston toma de 3 a 6 meses de trabajo constante, y cada zona que ganas se queda sumando.' },
@@ -252,8 +252,7 @@ const houstonSeo: ClusterPage = {
     path: '/es/houston/seo-local',
     areaCity: 'Houston',
     areaRegion: 'Texas',
-    priceValue: String(PRICE_ANCHORS.seoLocal),
-    monthly: true,
+    priceValue: String(PRICE_ANCHORS.seoInitial),
     providerId: HOUSTON_ID,
   },
 };
@@ -286,7 +285,7 @@ const houstonWeb: ClusterPage = {
   },
   answer: {
     q: '¿Cuánto cuesta una página web profesional en Houston?',
-    a: `Un sitio web profesional a medida en Houston empieza alrededor de ${usd(PRICE_ANCHORS.web)} y varía según el número de páginas, las funciones y el contenido. Invertir en buen diseño importa: el 75% de las personas juzga la credibilidad de un negocio por su sitio web, según un estudio de la Universidad de Stanford.`,
+    a: `Una landing de una página en Houston empieza en ${usd(PRICE_ANCHORS.webLanding)} y un sitio web profesional a medida, alrededor de ${usd(PRICE_ANCHORS.web)}, y varía según el número de páginas, las funciones y el contenido. Invertir en buen diseño importa: el 75% de las personas juzga la credibilidad de un negocio por su sitio web, según un estudio de la Universidad de Stanford.`,
     source: 'Universidad de Stanford',
   },
   includes: {
@@ -306,8 +305,8 @@ const houstonWeb: ClusterPage = {
   },
   pricing: {
     tag: 'Inversión',
-    title: `Diseño web, <em>desde ${usd(PRICE_ANCHORS.web)}</em>`,
-    price: `${usd(PRICE_ANCHORS.web)}`,
+    title: `Diseño web, <em>desde ${usd(PRICE_ANCHORS.webLanding)}</em>`,
+    price: `${usd(PRICE_ANCHORS.webLanding)}`,
     unit: 'proyecto único',
     lead: 'Pago por proyecto, sin mensualidades obligatorias. El precio depende del alcance.',
     features: webFeatures,
@@ -325,7 +324,7 @@ const houstonWeb: ClusterPage = {
     tag: 'Preguntas frecuentes',
     title: 'Diseño web en Houston, <em>claro</em>',
     items: [
-      { q: '¿Cuánto cuesta un sitio web en Houston?', a: `Un sitio profesional a medida empieza en ${usd(PRICE_ANCHORS.web)}. El precio final depende de cuántas páginas necesites, qué funciones quieras (reservas, pagos, blog) y si requieres tienda en línea. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.` },
+      { q: '¿Cuánto cuesta un sitio web en Houston?', a: `Una landing de una página empieza en ${usd(PRICE_ANCHORS.webLanding)} y un sitio profesional a medida, en ${usd(PRICE_ANCHORS.web)}. El precio final depende de cuántas páginas necesites, qué funciones quieras (reservas, pagos, blog) y si requieres tienda en línea. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.` },
       { q: '¿En cuánto tiempo está listo mi sitio?', a: 'Un sitio típico de varias páginas toma entre 2 y 4 semanas, según la rapidez con que recibamos tu contenido (textos, fotos, logo) y el número de revisiones. Los proyectos más grandes, como las tiendas en línea, toman más tiempo. Te damos un calendario realista desde el inicio.' },
       { q: '¿Usan plantillas o lo hacen a medida?', a: 'Todo a medida. Diseñamos y programamos cada sitio desde cero alrededor de tu marca, sin plantillas genéricas recicladas. Eso hace que tu sitio sea más rápido, más seguro y verdaderamente tuyo.' },
       { q: '¿El sitio incluye SEO?', a: 'Sí, incluimos SEO técnico base: estructura correcta, velocidad, etiquetas y un formato que Google y los asistentes de IA pueden leer. El posicionamiento local continuo (Google de Negocio, reseñas, contenido mensual) es un servicio aparte de SEO local, si lo necesitas.' },
@@ -357,7 +356,7 @@ const houstonWeb: ClusterPage = {
     path: '/es/houston/diseno-web',
     areaCity: 'Houston',
     areaRegion: 'Texas',
-    priceValue: String(PRICE_ANCHORS.web),
+    priceValue: String(PRICE_ANCHORS.webLanding),
     providerId: HOUSTON_ID,
   },
 };
@@ -393,7 +392,7 @@ const miamiWeb: ClusterPage = {
   },
   answer: {
     q: '¿Cuánto cuesta una página web profesional en Miami?',
-    a: `Un sitio web profesional a medida para un negocio de Miami empieza alrededor de ${usd(PRICE_ANCHORS.web)} y varía según las páginas, las funciones y el contenido. El diseño no es un lujo: el 75% de las personas juzga la credibilidad de un negocio por su sitio web, según un estudio de la Universidad de Stanford.`,
+    a: `Una landing de una página para un negocio de Miami empieza en ${usd(PRICE_ANCHORS.webLanding)} y un sitio web profesional a medida, alrededor de ${usd(PRICE_ANCHORS.web)}, y varía según las páginas, las funciones y el contenido. El diseño no es un lujo: el 75% de las personas juzga la credibilidad de un negocio por su sitio web, según un estudio de la Universidad de Stanford.`,
     source: 'Universidad de Stanford',
   },
   includes: {
@@ -413,8 +412,8 @@ const miamiWeb: ClusterPage = {
   },
   pricing: {
     tag: 'Inversión',
-    title: `Diseño web, <em>desde ${usd(PRICE_ANCHORS.web)}</em>`,
-    price: `${usd(PRICE_ANCHORS.web)}`,
+    title: `Diseño web, <em>desde ${usd(PRICE_ANCHORS.webLanding)}</em>`,
+    price: `${usd(PRICE_ANCHORS.webLanding)}`,
     unit: 'proyecto único',
     lead: 'Pago por proyecto, sin mensualidades obligatorias. El precio depende del alcance.',
     features: webFeatures,
@@ -433,7 +432,7 @@ const miamiWeb: ClusterPage = {
     tag: 'Preguntas frecuentes',
     title: 'Diseño web en Miami, <em>sin rodeos</em>',
     items: [
-      { q: '¿Cuánto cuesta un sitio web en Miami?', a: `Un sitio profesional a medida empieza en ${usd(PRICE_ANCHORS.web)}. El precio final depende de cuántas páginas necesites, qué funciones quieras (reservas, pagos, blog) y si requieres tienda en línea. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.` },
+      { q: '¿Cuánto cuesta un sitio web en Miami?', a: `Una landing de una página empieza en ${usd(PRICE_ANCHORS.webLanding)} y un sitio profesional a medida, en ${usd(PRICE_ANCHORS.web)}. El precio final depende de cuántas páginas necesites, qué funciones quieras (reservas, pagos, blog) y si requieres tienda en línea. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.` },
       { q: '¿Tienen clientes en Miami?', a: 'Seremos honestos: estamos comenzando nuestra operación en Miami, así que todavía no tenemos casos publicados de esta ciudad. Sí tenemos trabajo real y verificable hecho para negocios en Houston y Orlando, con enlaces que puedes visitar. Por eso ofrecemos cupos de Cliente Fundador en Miami, con condiciones especiales.' },
       { q: '¿Qué es un Cliente Fundador?', a: 'Es uno de nuestros primeros clientes en Miami. A cambio de confiar en una agencia joven en esta ciudad, recibes atención prioritaria, condiciones preferentes y te conviertes en uno de nuestros casos de estudio locales. Los cupos son limitados, porque les damos dedicación real.' },
       { q: '¿Usan plantillas o lo hacen a medida?', a: 'Todo a medida. Diseñamos y programamos cada sitio desde cero alrededor de tu marca, sin plantillas genéricas recicladas. Eso hace que tu sitio sea más rápido, más seguro y verdaderamente tuyo.' },
@@ -464,7 +463,7 @@ const miamiWeb: ClusterPage = {
     path: '/es/miami/diseno-web',
     areaCity: 'Miami',
     areaRegion: 'Florida',
-    priceValue: String(PRICE_ANCHORS.web),
+    priceValue: String(PRICE_ANCHORS.webLanding),
     providerId: MIAMI_ID,
   },
 };
@@ -599,7 +598,7 @@ const houstonIa: ClusterPage = {
   meta: {
     title: 'IA conversacional en Houston | Asistente que contesta 24/7 | Marcyan',
     description:
-      `Asistente con IA para negocios en Houston: contesta llamadas y WhatsApp perdidos, agenda citas y atiende en español 24/7. Te lo instalamos y mantenemos. Desde ${usd(PRICE_ANCHORS.ia)}.`,
+      `Asistente con IA para negocios en Houston: contesta llamadas y WhatsApp perdidos, agenda citas y atiende en español 24/7. Te lo instalamos y mantenemos. Desde ${usd(PRICE_ANCHORS.iaBasic)}.`,
   },
   path: '/es/houston/ia-conversacional',
   breadcrumb: [
@@ -723,7 +722,7 @@ const houstonEcommerce: ClusterPage = {
   meta: {
     title: 'Diseño de Tienda en línea en Houston | E-commerce bilingüe | Marcyan',
     description:
-      `Diseño de tienda en línea en Houston para negocios hispanos: catálogo, pagos seguros y bilingüe (Shopify, WooCommerce o a medida). Desde ${usd(PRICE_ANCHORS.ecommerce)}. Propuesta gratis en 24h.`,
+      `Diseño de tienda en línea en Houston para negocios hispanos: catálogo, pagos seguros y bilingüe (Shopify, WooCommerce o a medida). Desde ${usd(PRICE_ANCHORS.ecommerceEssential)}. Propuesta gratis en 24h.`,
   },
   path: '/es/houston/ecommerce',
   breadcrumb: [
@@ -747,7 +746,7 @@ const houstonEcommerce: ClusterPage = {
   // entrega local en un área extensa. Sin tiendas publicadas todavía: prueba adyacente real de Houston.
   answer: {
     q: '¿Cuánto cuesta una tienda en línea en Houston?',
-    a: `Una tienda en línea profesional en Houston empieza en ${usd(PRICE_ANCHORS.ecommerce)} e incluye catálogo, carrito, pagos seguros y versión bilingüe. Lo que más mueve el precio es el número de productos, las funciones que necesites y si hay que mudar una tienda que ya tienes. Y vender en línea ya no es un extra: el comercio electrónico supera el 16% de las ventas minoristas en Estados Unidos, según el U.S. Census Bureau.`,
+    a: `Una tienda en línea en Houston empieza en ${usd(PRICE_ANCHORS.ecommerceEssential)} (tienda esencial, con catálogo, carrito y pagos seguros) y una tienda a medida, bilingüe, en ${usd(PRICE_ANCHORS.ecommerce)}. Lo que más mueve el precio es el número de productos, las funciones que necesites y si hay que mudar una tienda que ya tienes. Y vender en línea ya no es un extra: el comercio electrónico supera el 16% de las ventas minoristas en Estados Unidos, según el U.S. Census Bureau.`,
     source: 'U.S. Census Bureau',
   },
   includes: {
@@ -774,8 +773,8 @@ const houstonEcommerce: ClusterPage = {
   },
   pricing: {
     tag: 'Inversión',
-    title: `Tienda en línea, <em>desde ${usd(PRICE_ANCHORS.ecommerce)}</em>`,
-    price: `${usd(PRICE_ANCHORS.ecommerce)}`,
+    title: `Tienda en línea, <em>desde ${usd(PRICE_ANCHORS.ecommerceEssential)}</em>`,
+    price: `${usd(PRICE_ANCHORS.ecommerceEssential)}`,
     unit: 'proyecto único',
     lead: 'Pago por proyecto. El precio depende del número de productos y de las funciones que necesites.',
     features: [
@@ -787,7 +786,7 @@ const houstonEcommerce: ClusterPage = {
       'Lista para móvil y para la IA',
     ],
     cta: { label: 'Cotizar mi tienda', href: '#contacto' },
-    note: `${usd(PRICE_ANCHORS.ecommerce)} es el punto de partida para una tienda profesional. El precio final depende del número de productos, las funciones (suscripciones, envíos, integraciones) y la migración si ya tienes una tienda. El mantenimiento y la actualización de productos se cotizan aparte, siempre con un precio claro.`,
+    note: `${usd(PRICE_ANCHORS.ecommerceEssential)} es el punto de partida: una tienda esencial, con catálogo simple, carrito y pagos. Una tienda a medida empieza en ${usd(PRICE_ANCHORS.ecommerce)}. El precio final depende del número de productos, las funciones (suscripciones, envíos, integraciones) y la migración si ya tienes una tienda. El mantenimiento y la actualización de productos se cotizan aparte, siempre con un precio claro.`,
     tone: 'gold',
   },
   proof: {
@@ -803,7 +802,7 @@ const houstonEcommerce: ClusterPage = {
     tag: 'Preguntas frecuentes',
     title: 'Tu tienda en línea en Houston, <em>claro</em>',
     items: [
-      { q: '¿Cuánto cuesta hacer una tienda en línea en Houston?', a: `Una tienda profesional a medida empieza en ${usd(PRICE_ANCHORS.ecommerce)}. El precio final depende del número de productos, las funciones (suscripciones, envíos, integraciones) y si hay que migrar una tienda existente. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.` },
+      { q: '¿Cuánto cuesta hacer una tienda en línea en Houston?', a: `Una tienda esencial empieza en ${usd(PRICE_ANCHORS.ecommerceEssential)} y una tienda profesional a medida, en ${usd(PRICE_ANCHORS.ecommerce)}. El precio final depende del número de productos, las funciones (suscripciones, envíos, integraciones) y si hay que migrar una tienda existente. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.` },
       { q: '¿Qué es mejor para mi tienda: Shopify o WooCommerce?', a: 'Depende de tu caso. Shopify es ideal para lanzar rápido y vender simple, sin preocuparte por lo técnico; WooCommerce te da más control y encaja si ya usas WordPress. Para necesidades especiales construimos a medida. Lo elegimos contigo con honestidad, según tu producto y tu presupuesto.' },
       { q: '¿Mi tienda cobra el impuesto de ventas de Texas?', a: 'Sí, la dejamos configurada para cobrarlo. En Texas el impuesto estatal es 6.25% y cada ciudad suma su parte; en Houston el total es 8.25%. Para cobrarlo necesitas el permiso de ventas del Contralor de Texas, que es gratuito, y tu contador confirma qué aplica a tus productos.' },
       { q: '¿Puedo ofrecer entrega local o que recojan en mi negocio?', a: 'Sí. Configuramos zonas de entrega con su precio, o recogida en tu local. En un área tan extensa como Houston sirve para no pagar paquetería en cada pedido y para que el cliente de tu zona reciba antes.' },
@@ -834,7 +833,7 @@ const houstonEcommerce: ClusterPage = {
     path: '/es/houston/ecommerce',
     areaCity: 'Houston',
     areaRegion: 'Texas',
-    priceValue: String(PRICE_ANCHORS.ecommerce),
+    priceValue: String(PRICE_ANCHORS.ecommerceEssential),
     providerId: HOUSTON_ID,
   },
 };
@@ -871,7 +870,7 @@ const houstonBranding: ClusterPage = {
   },
   answer: {
     q: '¿Cuánto cuesta el diseño de logo y marca en Houston?',
-    a: `El diseño de logo y marca en Houston con Marcyan empieza en ${usd(PRICE_ANCHORS.branding)} e incluye logo, paleta de color, tipografías y una guía de uso. La inversión importa: un estudio académico (Lindgaard et al., 2006) halló que la primera impresión visual se forma en apenas 50 milisegundos. Te entregamos una identidad coherente y lista para usar.`,
+    a: `El diseño de logo en Houston con Marcyan empieza en ${usd(PRICE_ANCHORS.brandingLogo)}. La identidad completa, con logo, paleta de color, tipografías y una guía de uso, empieza en ${usd(PRICE_ANCHORS.branding)}. La inversión importa: un estudio académico (Lindgaard et al., 2006) halló que la primera impresión visual se forma en apenas 50 milisegundos. Te entregamos una identidad coherente y lista para usar.`,
     source: 'Lindgaard et al., 2006 · Behaviour & Information Technology',
   },
   includes: {
@@ -976,7 +975,7 @@ const miamiIa: ClusterPage = {
   meta: {
     title: 'IA conversacional en Miami | Asistente que contesta 24/7 | Marcyan',
     description:
-      `Asistente con IA para negocios de Miami: contesta WhatsApp y llamadas perdidas, agenda citas y atiende en español 24/7. Te lo instalamos y mantenemos. Desde ${usd(PRICE_ANCHORS.ia)}.`,
+      `Asistente con IA para negocios de Miami: contesta WhatsApp y llamadas perdidas, agenda citas y atiende en español 24/7. Te lo instalamos y mantenemos. Desde ${usd(PRICE_ANCHORS.iaBasic)}.`,
   },
   path: '/es/miami/ia-conversacional',
   breadcrumb: [
@@ -1143,9 +1142,9 @@ const miamiSeo: ClusterPage = {
   },
   pricing: {
     tag: 'Inversión',
-    title: `SEO local, <em>desde ${usd(PRICE_ANCHORS.seoLocal)} al mes</em>`,
-    price: `${usd(PRICE_ANCHORS.seoLocal)}`,
-    unit: '/mes',
+    title: `SEO local, <em>desde ${usd(PRICE_ANCHORS.seoInitial)}</em>`,
+    price: `${usd(PRICE_ANCHORS.seoInitial)}`,
+    unit: 'pago único',
     lead: 'Sin contratos eternos. Empezamos por el barrio y el idioma donde más te buscan, y crecemos desde ahí.',
     features: [
       'Optimización del Perfil de Google de Negocio',
@@ -1171,7 +1170,7 @@ const miamiSeo: ClusterPage = {
     tag: 'Preguntas frecuentes',
     title: 'SEO local en Miami, sin <em>letra chica</em>',
     items: [
-      { q: '¿Cuánto cuesta el SEO local en Miami?', a: `Desde ${usd(PRICE_ANCHORS.seoLocal)} al mes, sin contratos a largo plazo. En Miami el precio depende sobre todo de dos cosas: cuántos barrios quieres cubrir y si trabajamos tu presencia en español, en inglés o en los dos. Te lo damos por escrito en la propuesta gratuita, antes de que decidas.` },
+      { q: '¿Cuánto cuesta el SEO local en Miami?', a: `Desde ${usd(PRICE_ANCHORS.seoInitial)} la puesta a punto inicial (pago único) y desde ${usd(PRICE_ANCHORS.seoLocal)} al mes el trabajo continuo, sin contratos a largo plazo. En Miami el precio depende sobre todo de dos cosas: cuántos barrios quieres cubrir y si trabajamos tu presencia en español, en inglés o en los dos. Te lo damos por escrito en la propuesta gratuita, antes de que decidas.` },
       { q: '¿Tienen clientes en Miami?', a: 'Todavía no tenemos un caso publicado en Miami, y no te lo vamos a inventar. Nuestro trabajo más cercano es Move Junk Away, en Orlando: le rehicimos el sitio con SEO local y ya posiciona en su zona. También tenemos casos en Houston, y con gusto te los enseñamos en una llamada. Por eso ofrecemos cupos de Cliente Fundador en Miami.' },
       { q: '¿Mi negocio debe salir en español o en inglés?', a: 'En Miami, casi siempre en los dos. La mayoría de la gente habla español en casa, pero muchos servicios se buscan en inglés, como «dentist near me». Preparamos tu ficha y tus páginas para las dos búsquedas, sin traducciones que se noten.' },
       { q: '¿Puedo salir en Doral, Hialeah y Kendall a la vez?', a: 'Sí, si das servicio en esos barrios. Los marcamos como zonas en tu Perfil de Google, creamos una página propia para cada barrio fuerte y pedimos reseñas a clientes de cada uno. Nada de direcciones falsas ni oficinas virtuales: Google las castiga.' },
@@ -1202,8 +1201,7 @@ const miamiSeo: ClusterPage = {
     path: '/es/miami/seo-local',
     areaCity: 'Miami',
     areaRegion: 'Florida',
-    priceValue: String(PRICE_ANCHORS.seoLocal),
-    monthly: true,
+    priceValue: String(PRICE_ANCHORS.seoInitial),
     providerId: MIAMI_ID,
   },
 };
@@ -1212,7 +1210,7 @@ const miamiEcommerce: ClusterPage = {
   meta: {
     title: 'Diseño de Tienda en línea en Miami | E-commerce bilingüe | Marcyan',
     description:
-      `Diseño de tienda en línea en Miami para negocios hispanos: catálogo, pagos seguros y bilingüe (Shopify, WooCommerce o a medida). Desde ${usd(PRICE_ANCHORS.ecommerce)}. Propuesta gratis en 24h.`,
+      `Diseño de tienda en línea en Miami para negocios hispanos: catálogo, pagos seguros y bilingüe (Shopify, WooCommerce o a medida). Desde ${usd(PRICE_ANCHORS.ecommerceEssential)}. Propuesta gratis en 24h.`,
   },
   path: '/es/miami/ecommerce',
   breadcrumb: [
@@ -1236,7 +1234,7 @@ const miamiEcommerce: ClusterPage = {
   // Latinoamérica y la búsqueda real «web para vender en miami». El dato del Census se queda en Houston.
   answer: {
     q: '¿Cuánto cuesta una tienda en línea en Miami?',
-    a: `Una tienda en línea profesional en Miami empieza en ${usd(PRICE_ANCHORS.ecommerce)}, con catálogo, carrito, pagos seguros y versión bilingüe. En Miami conviene pensarla desde el inicio para dos públicos: la comunidad hispana de aquí y el cliente de fuera, de otros estados o de Latinoamérica, que compra en dólares y quiere pagar con tarjeta o PayPal.`,
+    a: `Una tienda en línea en Miami empieza en ${usd(PRICE_ANCHORS.ecommerceEssential)} (tienda esencial, con catálogo, carrito y pagos seguros) y una tienda a medida, bilingüe, en ${usd(PRICE_ANCHORS.ecommerce)}. En Miami conviene pensarla desde el inicio para dos públicos: la comunidad hispana de aquí y el cliente de fuera, de otros estados o de Latinoamérica, que compra en dólares y quiere pagar con tarjeta o PayPal.`,
   },
   includes: {
     tag: 'Qué incluye',
@@ -1262,8 +1260,8 @@ const miamiEcommerce: ClusterPage = {
   },
   pricing: {
     tag: 'Inversión',
-    title: `Tienda en línea, <em>desde ${usd(PRICE_ANCHORS.ecommerce)}</em>`,
-    price: `${usd(PRICE_ANCHORS.ecommerce)}`,
+    title: `Tienda en línea, <em>desde ${usd(PRICE_ANCHORS.ecommerceEssential)}</em>`,
+    price: `${usd(PRICE_ANCHORS.ecommerceEssential)}`,
     unit: 'proyecto único',
     lead: 'Pago por proyecto. Lo que mueve el precio es cuántos productos tienes, en cuántos idiomas los vendes y a dónde envías.',
     features: [
@@ -1275,7 +1273,7 @@ const miamiEcommerce: ClusterPage = {
       'Lista para móvil y para la IA',
     ],
     cta: { label: 'Cotizar mi tienda', href: '#contacto' },
-    note: `${usd(PRICE_ANCHORS.ecommerce)} es el punto de partida. Si vendes fuera de Estados Unidos, usas suscripciones o quieres mudar tu tienda actual, te lo cotizamos aparte y por escrito. El mantenimiento y la carga de productos también tienen su precio claro.`,
+    note: `${usd(PRICE_ANCHORS.ecommerceEssential)} es el punto de partida: una tienda esencial. Una tienda a medida empieza en ${usd(PRICE_ANCHORS.ecommerce)}. Si vendes fuera de Estados Unidos, usas suscripciones o quieres mudar tu tienda actual, te lo cotizamos aparte y por escrito. El mantenimiento y la carga de productos también tienen su precio claro.`,
     tone: 'gold',
   },
   proof: {
@@ -1290,7 +1288,7 @@ const miamiEcommerce: ClusterPage = {
     tag: 'Preguntas frecuentes',
     title: 'Tu tienda en línea en Miami, <em>claro</em>',
     items: [
-      { q: '¿Cuánto cuesta una web para vender en Miami?', a: `Una tienda a medida empieza en ${usd(PRICE_ANCHORS.ecommerce)}. Sube según el número de productos, si la quieres completa en dos idiomas, si envías fuera del país o si hay que mudar una tienda que ya tienes. Te damos el presupuesto por escrito en la propuesta gratuita, sin costos escondidos.` },
+      { q: '¿Cuánto cuesta una web para vender en Miami?', a: `Una tienda esencial empieza en ${usd(PRICE_ANCHORS.ecommerceEssential)} y una tienda a medida, en ${usd(PRICE_ANCHORS.ecommerce)}. Sube según el número de productos, si la quieres completa en dos idiomas, si envías fuera del país o si hay que mudar una tienda que ya tienes. Te damos el presupuesto por escrito en la propuesta gratuita, sin costos escondidos.` },
       { q: '¿Mi tienda cobra el impuesto de ventas de Florida?', a: 'Sí, la dejamos configurada. En Florida el impuesto estatal es 6% y Miami-Dade añade 1%, así que en Miami se cobra 7%. Antes tienes que registrarte con el Florida Department of Revenue, y tu contador confirma qué aplica a tus productos.' },
       { q: '¿Puedo venderle a clientes de Latinoamérica?', a: 'Sí, si tu producto se puede enviar. Activamos pagos con tarjetas de fuera y PayPal, tarifas de envío por país y la tienda en español. Antes de lanzar te avisamos de lo que conviene revisar, como aduanas y devoluciones.' },
       { q: '¿La tienda incluye dominio, hospedaje y certificado de seguridad (SSL)?', a: 'Te orientamos con el dominio, el hospedaje y el certificado SSL para que tu tienda salga en vivo y segura, sin dolores de cabeza. Según la plataforma, algunos van incluidos en su plan; te explicamos con claridad qué se paga y a quién, antes de empezar.' },
@@ -1320,7 +1318,7 @@ const miamiEcommerce: ClusterPage = {
     path: '/es/miami/ecommerce',
     areaCity: 'Miami',
     areaRegion: 'Florida',
-    priceValue: String(PRICE_ANCHORS.ecommerce),
+    priceValue: String(PRICE_ANCHORS.ecommerceEssential),
     providerId: MIAMI_ID,
   },
 };
@@ -1336,7 +1334,7 @@ const houstonBienesRaices: ClusterPage = {
   meta: {
     title: 'Sitios Web para Agentes de Bienes Raíces en Houston | Marcyan',
     description:
-      `Diseño web y SEO para agentes de bienes raíces en Houston: sitio bilingüe con tus propiedades, captación de compradores y vendedores, y SEO local. Desde ${usd(PRICE_ANCHORS.web)}. Propuesta gratis.`,
+      `Diseño web y SEO para agentes de bienes raíces en Houston: sitio bilingüe con tus propiedades, captación de compradores y vendedores, y SEO local. Desde ${usd(PRICE_ANCHORS.webLanding)}. Propuesta gratis.`,
   },
   path: '/es/houston/bienes-raices',
   breadcrumb: [
@@ -1384,8 +1382,8 @@ const houstonBienesRaices: ClusterPage = {
   },
   pricing: {
     tag: 'Inversión',
-    title: `Sitio de bienes raíces, <em>desde ${usd(PRICE_ANCHORS.web)}</em>`,
-    price: `${usd(PRICE_ANCHORS.web)}`,
+    title: `Sitio de bienes raíces, <em>desde ${usd(PRICE_ANCHORS.webLanding)}</em>`,
+    price: `${usd(PRICE_ANCHORS.webLanding)}`,
     unit: 'proyecto único',
     lead: 'Pago por proyecto. El precio depende del número de páginas, las propiedades y las integraciones.',
     features: [
@@ -1397,7 +1395,7 @@ const houstonBienesRaices: ClusterPage = {
       'Listo para Google y la IA',
     ],
     cta: { label: 'Quiero mi sitio', href: '#contacto' },
-    note: `${usd(PRICE_ANCHORS.web)} es el punto de partida de un sitio profesional. El SEO local continuo (desde ${usd(PRICE_ANCHORS.seoLocal)}/mes) y un asistente con IA para responder 24/7 (desde ${usd(PRICE_ANCHORS.ia)}) se suman según lo que necesites. Te damos un alcance y un precio claros por escrito, sin sorpresas.`,
+    note: `${usd(PRICE_ANCHORS.webLanding)} es el punto de partida: una landing de una página. Un sitio profesional a medida empieza en ${usd(PRICE_ANCHORS.web)}. El SEO local continuo (desde ${usd(PRICE_ANCHORS.seoLocal)}/mes) y un asistente con IA para responder 24/7 (desde ${usd(PRICE_ANCHORS.iaBasic)}) se suman según lo que necesites. Te damos un alcance y un precio claros por escrito, sin sorpresas.`,
     tone: 'gold',
   },
   proof: {
@@ -1413,7 +1411,7 @@ const houstonBienesRaices: ClusterPage = {
     tag: 'Preguntas frecuentes',
     title: 'Tu sitio de bienes raíces en Houston, <em>claro</em>',
     items: [
-      { q: '¿Cuánto cuesta un sitio para un agente de bienes raíces?', a: `Un sitio profesional a medida empieza en ${usd(PRICE_ANCHORS.web)}. El precio final depende del número de páginas, cuántas propiedades muestres y qué integraciones necesites. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.` },
+      { q: '¿Cuánto cuesta un sitio para un agente de bienes raíces?', a: `Una landing de una página empieza en ${usd(PRICE_ANCHORS.webLanding)} y un sitio profesional a medida, en ${usd(PRICE_ANCHORS.web)}. El precio final depende del número de páginas, cuántas propiedades muestres y qué integraciones necesites. Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.` },
       { q: '¿Se conecta con el MLS o con un IDX?', a: 'Depende de tu acceso y de las reglas de tu MLS. Donde es posible, integramos o embebemos un feed de propiedades; donde no, montamos tus listados de forma manual o semiautomática. Te decimos con honestidad qué se puede hacer en tu caso antes de empezar, sin prometer integraciones que no existan.' },
       { q: '¿Tienen clientes en bienes raíces?', a: 'Seremos honestos: aún no publicamos un caso de un agente inmobiliario. Sí tenemos sitios a medida reales y verificables en otros rubros (con enlaces que puedes visitar) y nuestro propio sitio como Caso #0. Por eso ofrecemos cupos de Cliente Fundador para agentes, con condiciones especiales.' },
       { q: '¿El sitio capta compradores y vendedores?', a: 'Sí: formularios claros, llamadas a la acción y, si lo sumas, un asistente con IA que responde 24/7. La idea es que ningún interesado se pierda entre mensajes: que cada uno quede registrado y contigo.' },
@@ -1444,7 +1442,7 @@ const houstonBienesRaices: ClusterPage = {
     path: '/es/houston/bienes-raices',
     areaCity: 'Houston',
     areaRegion: 'Texas',
-    priceValue: String(PRICE_ANCHORS.web),
+    priceValue: String(PRICE_ANCHORS.webLanding),
     providerId: HOUSTON_ID,
   },
 };
@@ -1460,7 +1458,7 @@ const houstonContratistas: ClusterPage = {
   meta: {
     title: 'Sitios Web para Contratistas en Houston | Marcyan',
     description:
-      `Diseño web y SEO local para contratistas en Houston: sitio bilingüe con fotos de antes y después, presupuesto gratis, y una IA que rescata las llamadas que pierdes en la obra. Desde ${usd(PRICE_ANCHORS.web)}. Propuesta gratis.`,
+      `Diseño web y SEO local para contratistas en Houston: sitio bilingüe con fotos de antes y después, presupuesto gratis, y una IA que rescata las llamadas que pierdes en la obra. Desde ${usd(PRICE_ANCHORS.webLanding)}. Propuesta gratis.`,
   },
   path: '/es/houston/contratistas',
   breadcrumb: [
@@ -1508,8 +1506,8 @@ const houstonContratistas: ClusterPage = {
   },
   pricing: {
     tag: 'Inversión',
-    title: `Sitio para contratistas, <em>desde ${usd(PRICE_ANCHORS.web)}</em>`,
-    price: `${usd(PRICE_ANCHORS.web)}`,
+    title: `Sitio para contratistas, <em>desde ${usd(PRICE_ANCHORS.webLanding)}</em>`,
+    price: `${usd(PRICE_ANCHORS.webLanding)}`,
     unit: 'proyecto único',
     lead: 'Pago por proyecto. El precio depende del número de páginas, la galería de proyectos y las integraciones.',
     features: [
@@ -1521,7 +1519,7 @@ const houstonContratistas: ClusterPage = {
       'Listo para Google y la IA',
     ],
     cta: { label: 'Quiero mi sitio', href: '#contacto' },
-    note: `${usd(PRICE_ANCHORS.web)} es el punto de partida de un sitio profesional. El SEO local continuo (desde ${usd(PRICE_ANCHORS.seoLocal)}/mes) y una IA que rescata llamadas perdidas y responde 24/7 (desde ${usd(PRICE_ANCHORS.ia)}) se suman según lo que necesites. Te damos un alcance y un precio claros por escrito, sin sorpresas.`,
+    note: `${usd(PRICE_ANCHORS.webLanding)} es el punto de partida: una landing de una página. Un sitio profesional a medida empieza en ${usd(PRICE_ANCHORS.web)}. El SEO local continuo (desde ${usd(PRICE_ANCHORS.seoLocal)}/mes) y una IA que rescata llamadas perdidas y responde 24/7 (desde ${usd(PRICE_ANCHORS.iaBasic)}) se suman según lo que necesites. Te damos un alcance y un precio claros por escrito, sin sorpresas.`,
     tone: 'gold',
   },
   proof: {
@@ -1534,7 +1532,7 @@ const houstonContratistas: ClusterPage = {
     tag: 'Preguntas frecuentes',
     title: 'Tu sitio de contratista en Houston, <em>claro</em>',
     items: [
-      { q: '¿Cuánto cuesta un sitio web para un contratista?', a: `Un sitio profesional a medida empieza en ${usd(PRICE_ANCHORS.web)}. El precio final depende de cuántas páginas necesites, el tamaño de tu galería de antes y después y qué integraciones quieras (presupuestos, IA para llamadas). Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.` },
+      { q: '¿Cuánto cuesta un sitio web para un contratista?', a: `Una landing de una página empieza en ${usd(PRICE_ANCHORS.webLanding)} y un sitio profesional a medida, en ${usd(PRICE_ANCHORS.web)}. El precio final depende de cuántas páginas necesites, el tamaño de tu galería de antes y después y qué integraciones quieras (presupuestos, IA para llamadas). Te entregamos un presupuesto claro y por escrito en la propuesta gratuita, sin costos ocultos.` },
       { q: '¿Cómo me ayuda con las llamadas que pierdo en la obra?', a: 'Sumamos una IA que responde por mensaje al instante cuando no puedes contestar: saluda al cliente, toma sus datos y le dice que ya lo contactarás. Así no llama al siguiente contratista. Responder rápido es la diferencia entre ganar el trabajo o perderlo, sobre todo en un oficio donde estás en la obra y no junto al teléfono.' },
       { q: '¿Para qué quiero un sitio si ya estoy en los directorios?', a: 'En los directorios y clasificados compites mezclado con todos los demás y dependes de sus reglas. Un sitio propio sale en Google cuando buscan «remodelación en Houston», muestra tu trabajo y tus reseñas, y los prospectos llegan directo a ti, no repartidos entre la competencia.' },
       { q: '¿Tienen clientes contratistas?', a: 'Seremos honestos: aún no publicamos un caso de un contratista de techos o remodelación. Sí trabajamos con negocios locales reales y verificables en Houston, como un paisajista y un servicio de junk removal, con enlaces que puedes visitar. Por eso ofrecemos cupos de Cliente Fundador en construcción y remodelación, con condiciones especiales.' },
@@ -1565,7 +1563,7 @@ const houstonContratistas: ClusterPage = {
     path: '/es/houston/contratistas',
     areaCity: 'Houston',
     areaRegion: 'Texas',
-    priceValue: String(PRICE_ANCHORS.web),
+    priceValue: String(PRICE_ANCHORS.webLanding),
     providerId: HOUSTON_ID,
   },
 };
@@ -1580,7 +1578,7 @@ const houstonKaty: ClusterPage = {
   meta: {
     title: 'Diseño web en Katy, TX: páginas web y SEO local | Marcyan',
     description:
-      `Diseño web y SEO local para negocios en Katy, TX: sitio bilingüe, rápido en el celular y posicionado por zona (Cinco Ranch, Mason Rd, Grand Parkway 99). Desde ${usd(PRICE_ANCHORS.web)}. Propuesta gratis.`,
+      `Diseño web y SEO local para negocios en Katy, TX: sitio bilingüe, rápido en el celular y posicionado por zona (Cinco Ranch, Mason Rd, Grand Parkway 99). Desde ${usd(PRICE_ANCHORS.webLanding)}. Propuesta gratis.`,
   },
   path: '/es/houston/katy',
   breadcrumb: [
@@ -1629,8 +1627,8 @@ const houstonKaty: ClusterPage = {
   },
   pricing: {
     tag: 'Inversión',
-    title: `Tu sitio en Katy, <em>desde ${usd(PRICE_ANCHORS.web)}</em>`,
-    price: `${usd(PRICE_ANCHORS.web)}`,
+    title: `Tu sitio en Katy, <em>desde ${usd(PRICE_ANCHORS.webLanding)}</em>`,
+    price: `${usd(PRICE_ANCHORS.webLanding)}`,
     unit: 'proyecto único',
     lead: 'Empezamos por un sitio profesional, bilingüe y a medida. El SEO local y la IA se suman según lo que tu negocio de Katy necesite.',
     features: [
@@ -1642,7 +1640,7 @@ const houstonKaty: ClusterPage = {
       'Orientación con dominio y hospedaje',
     ],
     cta: { label: 'Quiero mi sitio', href: '#contacto' },
-    note: `${usd(PRICE_ANCHORS.web)} es el punto de partida para un sitio profesional. El SEO local (desde ${usd(PRICE_ANCHORS.seoLocal)}/mes) y un asistente con IA (desde ${usd(PRICE_ANCHORS.ia)}) son servicios que se suman según lo que tu negocio necesite. Te lo detallamos por escrito en la propuesta gratuita, sin compromiso.`,
+    note: `${usd(PRICE_ANCHORS.webLanding)} es el punto de partida: una landing de una página. Un sitio profesional a medida empieza en ${usd(PRICE_ANCHORS.web)}. El SEO local (desde ${usd(PRICE_ANCHORS.seoLocal)}/mes) y un asistente con IA (desde ${usd(PRICE_ANCHORS.iaBasic)}) son servicios que se suman según lo que tu negocio necesite. Te lo detallamos por escrito en la propuesta gratuita, sin compromiso.`,
     tone: 'gold',
   },
   proof: {
@@ -1657,7 +1655,7 @@ const houstonKaty: ClusterPage = {
     items: [
       { q: '¿Hacen páginas web específicamente para negocios de Katy?', a: 'Sí. Trabajamos el área metropolitana de Houston, y Katy es parte de ese metro, así que diseñamos tu sitio para que lidere con Katy: tu zona, tus corredores (Mason Rd, FM 1463, Grand Parkway 99) y tus comunidades (Cinco Ranch, Cross Creek Ranch). El cliente de Katy busca por Katy, no por «Houston» genérico.' },
       { q: '¿Tienen clientes en Katy?', a: 'Seremos honestos: nuestro trabajo publicado es del área metro de Houston y lo etiquetamos por su ciudad real (Houston, TX). No vamos a inventarte un cliente «de Katy» que no existe. Katy es parte de ese mismo mercado de Houston que ya atendemos, y tu sitio se construye con copy 100% específico de tu zona.' },
-      { q: '¿Cuánto cuesta una página web en Katy?', a: `Un sitio profesional, bilingüe y a medida empieza en ${usd(PRICE_ANCHORS.web)} (proyecto único). El SEO local va desde ${usd(PRICE_ANCHORS.seoLocal)} al mes y un asistente con IA desde ${usd(PRICE_ANCHORS.ia)}. Armamos el sistema según tu negocio y te damos un precio claro por escrito en la propuesta gratuita.` },
+      { q: '¿Cuánto cuesta una página web en Katy?', a: `Una landing de una página empieza en ${usd(PRICE_ANCHORS.webLanding)} y un sitio profesional, bilingüe y a medida, en ${usd(PRICE_ANCHORS.web)} (proyecto único). El SEO local va desde ${usd(PRICE_ANCHORS.seoLocal)} al mes y un asistente con IA desde ${usd(PRICE_ANCHORS.iaBasic)}. Armamos el sistema según tu negocio y te damos un precio claro por escrito en la propuesta gratuita.` },
       { q: '¿Me garantizan salir #1 en Google en Katy?', a: 'No, y desconfía de quien lo prometa. Nadie controla el algoritmo de Google. Lo que sí hacemos es darte un sitio rápido y bilingüe y un SEO local honesto, estructurado por tu zona y tus corredores, para que tengas la mejor base posible para competir en las búsquedas de Katy.' },
       { q: '¿El sitio funciona en español y en inglés?', a: 'Sí, y en Katy importa: atiendes a familias anglo y a una comunidad hispana que sigue creciendo. Construimos tu sitio en los dos idiomas, escrito para cómo busca de verdad cada cliente, todo en el mismo lugar.' },
       { q: '¿Por qué es tan importante que cargue rápido en el celular?', a: 'Porque ahí se decide. La familia que se acaba de mudar a Cinco Ranch te busca desde el teléfono y compara dos o tres opciones en segundos. Un sitio lento o que se ve mal en móvil pierde a ese cliente antes de que te llame; por eso construimos en HTML ligero que carga al instante.' },
@@ -1682,11 +1680,11 @@ const houstonKaty: ClusterPage = {
     name: 'Diseño web y SEO local en Katy, TX',
     serviceType: 'Diseño web y SEO local para negocios',
     description:
-      `Diseño web a medida y SEO local para negocios en Katy, Texas: sitio bilingüe, rápido en el celular y posicionado por zona (Cinco Ranch, Mason Rd, Grand Parkway 99). Desde ${usd(PRICE_ANCHORS.web)}. Sin promesas de posición.`,
+      `Diseño web a medida y SEO local para negocios en Katy, Texas: sitio bilingüe, rápido en el celular y posicionado por zona (Cinco Ranch, Mason Rd, Grand Parkway 99). Desde ${usd(PRICE_ANCHORS.webLanding)}. Sin promesas de posición.`,
     path: '/es/houston/katy',
     areaCity: 'Houston',
     areaRegion: 'Texas',
-    priceValue: String(PRICE_ANCHORS.web),
+    priceValue: String(PRICE_ANCHORS.webLanding),
     providerId: HOUSTON_ID,
   },
 };
@@ -1695,7 +1693,7 @@ const houstonSugarLand: ClusterPage = {
   meta: {
     title: 'Diseño web en Sugar Land, TX: sitios premium y bilingües | Marcyan',
     description:
-      `Diseño web y SEO local para negocios en Sugar Land (Town Square, First Colony, Fort Bend). Sitio premium, rápido y bilingüe español e inglés. Desde ${usd(PRICE_ANCHORS.web)}. Propuesta gratis.`,
+      `Diseño web y SEO local para negocios en Sugar Land (Town Square, First Colony, Fort Bend). Sitio premium, rápido y bilingüe español e inglés. Desde ${usd(PRICE_ANCHORS.webLanding)}. Propuesta gratis.`,
   },
   path: '/es/houston/sugar-land',
   breadcrumb: [
@@ -1716,7 +1714,7 @@ const houstonSugarLand: ClusterPage = {
   },
   answer: {
     q: '¿Cuánto cuesta un sitio web profesional para un negocio en Sugar Land?',
-    a: `Un sitio profesional a medida en Sugar Land empieza desde ${usd(PRICE_ANCHORS.web)} como proyecto único. Es una inversión que pesa: el 75% de las personas juzga la credibilidad de un negocio por su sitio web, y en un mercado acomodado y profesional como Fort Bend, la primera impresión decide quién recibe la llamada.`,
+    a: `Una landing de una página en Sugar Land empieza en ${usd(PRICE_ANCHORS.webLanding)} y un sitio profesional a medida, desde ${usd(PRICE_ANCHORS.web)} como proyecto único. Es una inversión que pesa: el 75% de las personas juzga la credibilidad de un negocio por su sitio web, y en un mercado acomodado y profesional como Fort Bend, la primera impresión decide quién recibe la llamada.`,
     source: 'Universidad de Stanford',
   },
   includes: {
@@ -1744,8 +1742,8 @@ const houstonSugarLand: ClusterPage = {
   },
   pricing: {
     tag: 'Inversión',
-    title: `Sitio web en Sugar Land, <em>desde ${usd(PRICE_ANCHORS.web)}</em>`,
-    price: `${usd(PRICE_ANCHORS.web)}`,
+    title: `Sitio web en Sugar Land, <em>desde ${usd(PRICE_ANCHORS.webLanding)}</em>`,
+    price: `${usd(PRICE_ANCHORS.webLanding)}`,
     unit: 'proyecto único',
     lead: 'Un solo pago por un sitio premium, a medida y bilingüe, sin mensualidades atadas al diseño.',
     features: [
@@ -1757,7 +1755,7 @@ const houstonSugarLand: ClusterPage = {
       'Listo para móvil y para la IA',
     ],
     cta: { label: 'Propuesta gratis', href: '#contacto' },
-    note: `${usd(PRICE_ANCHORS.web)} es el punto de partida para un sitio profesional. El SEO local (desde ${usd(PRICE_ANCHORS.seoLocal)}/mes) y una IA conversacional (desde ${usd(PRICE_ANCHORS.ecommerceEssential)}) se suman si los necesitas; las tiendas en línea tienen su propio alcance. Te lo detallamos sin compromiso.`,
+    note: `${usd(PRICE_ANCHORS.webLanding)} es el punto de partida: una landing de una página. Un sitio profesional a medida empieza en ${usd(PRICE_ANCHORS.web)}. El SEO local (desde ${usd(PRICE_ANCHORS.seoLocal)}/mes) y una IA conversacional (desde ${usd(PRICE_ANCHORS.iaBasic)}) se suman si los necesitas; las tiendas en línea tienen su propio alcance. Te lo detallamos sin compromiso.`,
     tone: 'gold',
   },
   proof: {
@@ -1770,7 +1768,7 @@ const houstonSugarLand: ClusterPage = {
     tag: 'Preguntas frecuentes',
     title: 'Preguntas frecuentes sobre diseño web en Sugar Land',
     items: [
-      { q: '¿Cuánto cuesta una página web en Sugar Land?', a: `Un sitio profesional a medida empieza desde ${usd(PRICE_ANCHORS.web)} como proyecto único (un solo pago). El precio final depende del número de páginas y las funciones; te enviamos una propuesta clara y sin compromiso antes de empezar.` },
+      { q: '¿Cuánto cuesta una página web en Sugar Land?', a: `Una landing de una página empieza en ${usd(PRICE_ANCHORS.webLanding)} y un sitio profesional a medida, desde ${usd(PRICE_ANCHORS.web)} como proyecto único (un solo pago). El precio final depende del número de páginas y las funciones; te enviamos una propuesta clara y sin compromiso antes de empezar.` },
       { q: '¿Trabajan con negocios fuera del centro de Sugar Land?', a: 'Sí. Atendemos todo Sugar Land y el condado de Fort Bend: Town Square, First Colony, Riverstone, Telfair y zonas cercanas, además del resto del área metropolitana de Houston.' },
       { q: '¿El sitio viene en español y en inglés?', a: 'Sí. Trabajamos el inglés como idioma principal de negocio y el español donde aporta valor real para tu clientela. En un mercado tan multicultural como Sugar Land, esa flexibilidad bilingüe marca la diferencia.' },
       { q: '¿Pueden mejorar mi posición en Google para Sugar Land?', a: 'Optimizamos tu sitio y tu presencia local (Perfil de Google, reseñas, contenido por zona) para que te encuentren. No prometemos el puesto #1: nadie serio puede garantizar una posición exacta en Google, pero sí trabajamos con método y reportes claros.' },
@@ -1797,11 +1795,11 @@ const houstonSugarLand: ClusterPage = {
     name: 'Diseño web y SEO local en Sugar Land',
     serviceType: 'Diseño web y SEO local',
     description:
-      `Diseño web premium a medida y SEO local para negocios de Sugar Land y el condado de Fort Bend: sitio bilingüe español e inglés, rápido en el celular y optimizado por zona (Town Square, First Colony). Desde ${usd(PRICE_ANCHORS.web)}.`,
+      `Diseño web premium a medida y SEO local para negocios de Sugar Land y el condado de Fort Bend: sitio bilingüe español e inglés, rápido en el celular y optimizado por zona (Town Square, First Colony). Desde ${usd(PRICE_ANCHORS.webLanding)}.`,
     path: '/es/houston/sugar-land',
     areaCity: 'Houston',
     areaRegion: 'Texas',
-    priceValue: String(PRICE_ANCHORS.web),
+    priceValue: String(PRICE_ANCHORS.webLanding),
     providerId: HOUSTON_ID,
   },
 };
@@ -1810,7 +1808,7 @@ const miamiDoral: ClusterPage = {
   meta: {
     title: 'Diseño web y SEO en Doral (Doralzuela) | Marcyan',
     description:
-      `Diseño web, SEO local e IA conversacional para negocios de Doral: areperas, panaderías venezolanas, servicios e import/export. Bilingüe y listo para IA. Desde ${usd(PRICE_ANCHORS.web)}. Propuesta gratis.`,
+      `Diseño web, SEO local e IA conversacional para negocios de Doral: areperas, panaderías venezolanas, servicios e import/export. Bilingüe y listo para IA. Desde ${usd(PRICE_ANCHORS.webLanding)}. Propuesta gratis.`,
   },
   path: '/es/miami/doral',
   breadcrumb: [
@@ -1858,8 +1856,8 @@ const miamiDoral: ClusterPage = {
   },
   pricing: {
     tag: 'Inversión',
-    title: `Sitio web profesional, <em>desde ${usd(PRICE_ANCHORS.web)}</em>`,
-    price: `${usd(PRICE_ANCHORS.web)}`,
+    title: `Sitio web profesional, <em>desde ${usd(PRICE_ANCHORS.webLanding)}</em>`,
+    price: `${usd(PRICE_ANCHORS.webLanding)}`,
     unit: 'proyecto único',
     lead: 'Pago por proyecto. La base para que tu negocio de Doral tenga una presencia bilingüe a la altura de su reputación offline.',
     features: [
@@ -1871,7 +1869,7 @@ const miamiDoral: ClusterPage = {
       'Te orientamos con dominio y hospedaje',
     ],
     cta: { label: 'Propuesta gratis', href: '#contacto' },
-    note: `${usd(PRICE_ANCHORS.web)} es el punto de partida para un sitio profesional. El SEO local (desde ${usd(PRICE_ANCHORS.seoLocal)}/mes) y una IA conversacional (desde ${usd(PRICE_ANCHORS.ecommerceEssential)}) se suman según lo que necesites. Las tiendas en línea y las funciones especiales tienen su propio alcance: te lo detallamos sin compromiso.`,
+    note: `${usd(PRICE_ANCHORS.webLanding)} es el punto de partida: una landing de una página. Un sitio profesional a medida empieza en ${usd(PRICE_ANCHORS.web)}. El SEO local (desde ${usd(PRICE_ANCHORS.seoLocal)}/mes) y una IA conversacional (desde ${usd(PRICE_ANCHORS.iaBasic)}) se suman según lo que necesites. Las tiendas en línea y las funciones especiales tienen su propio alcance: te lo detallamos sin compromiso.`,
     tone: 'gold',
   },
   proof: {
@@ -1886,7 +1884,7 @@ const miamiDoral: ClusterPage = {
     tag: 'Preguntas frecuentes',
     title: 'Tu presencia digital en Doral, sin <em>letra chica</em>',
     items: [
-      { q: '¿Cuánto cuesta un sitio web para un negocio en Doral?', a: `Un sitio profesional a medida empieza en ${usd(PRICE_ANCHORS.web)} (pago único). El precio final depende del número de páginas y de las funciones que necesites. El SEO local (desde ${usd(PRICE_ANCHORS.seoLocal)} al mes) y una IA conversacional (desde ${usd(PRICE_ANCHORS.ia)}) se cotizan aparte. Te entregamos un alcance y un precio claros en la propuesta gratuita, antes de que decidas.` },
+      { q: '¿Cuánto cuesta un sitio web para un negocio en Doral?', a: `Una landing de una página empieza en ${usd(PRICE_ANCHORS.webLanding)} y un sitio profesional a medida, en ${usd(PRICE_ANCHORS.web)} (pago único). El precio final depende del número de páginas y de las funciones que necesites. El SEO local (desde ${usd(PRICE_ANCHORS.seoLocal)} al mes) y una IA conversacional (desde ${usd(PRICE_ANCHORS.iaBasic)}) se cotizan aparte. Te entregamos un alcance y un precio claros en la propuesta gratuita, antes de que decidas.` },
       { q: '¿Tienen clientes en Doral o en Miami?', a: 'Seremos honestos: estamos comenzando nuestra operación en Miami, así que todavía no tenemos casos publicados en Doral. Sí tenemos trabajo real y verificable, con enlaces que puedes visitar, para negocios en Houston y Orlando. Por eso ofrecemos cupos de Cliente Fundador en Doral, con condiciones especiales.' },
       { q: '¿El sitio funciona para mi arepera, panadería o restaurante venezolano?', a: 'Sí. Diseñamos para gastronomía: menú claro, fotos que abren apetito, botón de WhatsApp y de pedidos, y SEO local para que aparezcas cuando alguien busca arepas o empanadas en Doral. Escribimos en el español de tu cliente venezolano o colombiano, sin sonar a plantilla genérica en inglés.' },
       { q: '¿Y si tengo una firma de import/export o un servicio profesional cerca de MIA?', a: 'También. Para freight forwarders, agentes aduanales, contadores, abogados de inmigración y clínicas, construimos un sitio bilingüe profesional que da confianza en los corredores EE.UU.-Venezuela/Colombia. Inglés y español desde el inicio, con la estructura para que te encuentren en Google y en los asistentes de IA.' },
@@ -1918,7 +1916,7 @@ const miamiDoral: ClusterPage = {
     path: '/es/miami/doral',
     areaCity: 'Miami',
     areaRegion: 'Florida',
-    priceValue: String(PRICE_ANCHORS.web),
+    priceValue: String(PRICE_ANCHORS.webLanding),
     providerId: MIAMI_ID,
   },
 };
@@ -1927,7 +1925,7 @@ const miamiHialeah: ClusterPage = {
   meta: {
     title: 'Diseño web y SEO en Hialeah | Negocios locales en español | Marcyan',
     description:
-      `Diseño web, SEO local e IA en español para negocios de Hialeah: ventanitas, panaderías, talleres, salones y mercados. Web rápida y bilingüe desde ${usd(PRICE_ANCHORS.web)}. Propuesta gratis.`,
+      `Diseño web, SEO local e IA en español para negocios de Hialeah: ventanitas, panaderías, talleres, salones y mercados. Web rápida y bilingüe desde ${usd(PRICE_ANCHORS.webLanding)}. Propuesta gratis.`,
   },
   path: '/es/miami/hialeah',
   breadcrumb: [
@@ -1975,13 +1973,13 @@ const miamiHialeah: ClusterPage = {
   },
   pricing: {
     tag: 'Inversión',
-    title: `Web para tu negocio en Hialeah, <em>desde ${usd(PRICE_ANCHORS.web)}</em>`,
-    price: `${usd(PRICE_ANCHORS.web)}`,
+    title: `Web para tu negocio en Hialeah, <em>desde ${usd(PRICE_ANCHORS.webLanding)}</em>`,
+    price: `${usd(PRICE_ANCHORS.webLanding)}`,
     unit: 'proyecto único',
     lead: 'Pago por proyecto, sin mensualidades obligatorias. El precio depende del alcance.',
     features: webFeatures,
     cta: { label: 'Propuesta gratis', href: '#contacto' },
-    note: `${usd(PRICE_ANCHORS.web)} es el punto de partida para un sitio profesional. El SEO local (desde ${usd(PRICE_ANCHORS.seoLocal)}/mes) para posicionarte en el barrio y un asistente con IA (desde ${usd(PRICE_ANCHORS.ia)}) para contestar al instante se suman según lo que necesites. Te lo detallamos sin compromiso.`,
+    note: `${usd(PRICE_ANCHORS.webLanding)} es el punto de partida: una landing de una página. Un sitio profesional a medida empieza en ${usd(PRICE_ANCHORS.web)}. El SEO local (desde ${usd(PRICE_ANCHORS.seoLocal)}/mes) para posicionarte en el barrio y un asistente con IA (desde ${usd(PRICE_ANCHORS.iaBasic)}) para contestar al instante se suman según lo que necesites. Te lo detallamos sin compromiso.`,
     tone: 'gold',
   },
   proof: {
@@ -1996,7 +1994,7 @@ const miamiHialeah: ClusterPage = {
     tag: 'Preguntas frecuentes',
     title: 'Tu negocio en Hialeah, <em>sin rodeos</em>',
     items: [
-      { q: '¿Cuánto cuesta una página web para mi negocio en Hialeah?', a: `Un sitio profesional a medida empieza en ${usd(PRICE_ANCHORS.web)}, pago único, sin mensualidades obligatorias. El precio final depende de cuántas páginas necesites y de las funciones (reservas, menú, pagos). Si quieres SEO local para posicionarte en el barrio (desde ${usd(PRICE_ANCHORS.seoLocal)} al mes) o un asistente con IA (desde ${usd(PRICE_ANCHORS.ia)}), se cotizan aparte. Todo claro y por escrito en la propuesta gratuita.` },
+      { q: '¿Cuánto cuesta una página web para mi negocio en Hialeah?', a: `Una landing de una página empieza en ${usd(PRICE_ANCHORS.webLanding)} y un sitio profesional a medida, en ${usd(PRICE_ANCHORS.web)}, pago único, sin mensualidades obligatorias. El precio final depende de cuántas páginas necesites y de las funciones (reservas, menú, pagos). Si quieres SEO local para posicionarte en el barrio (desde ${usd(PRICE_ANCHORS.seoLocal)} al mes) o un asistente con IA (desde ${usd(PRICE_ANCHORS.iaBasic)}), se cotizan aparte. Todo claro y por escrito en la propuesta gratuita.` },
       { q: '¿Tienen clientes en Hialeah o en Miami?', a: 'Seremos honestos: estamos comenzando nuestra operación en Miami, así que todavía no tenemos casos publicados de Hialeah ni de Miami. Sí tenemos trabajo real y verificable hecho para negocios en Houston y Orlando, con enlaces que puedes visitar. Por eso ofrecemos cupos de Cliente Fundador en Hialeah, con condiciones especiales para nuestros primeros casos locales.' },
       { q: '¿La web y la atención son de verdad en español?', a: 'Sí, y es nuestra especialidad. En Hialeah el español es la lengua del negocio, así que todo arranca en español: la web, la ficha de Google y el asistente que contesta. Lo escribimos en el español caribeño que de verdad usan tus clientes, no en una traducción robótica. Sumamos inglés solo donde lo necesitas.' },
       { q: '¿Pueden contestar mi WhatsApp mientras atiendo el mostrador?', a: 'Sí. Un asistente con IA responde por WhatsApp y en tu web al instante, justo cuando estás atendiendo la ventanita o el mostrador y no puedes tomar el teléfono. Así el prospecto que escribe recibe respuesta rápido y no se va con el de al lado. Te decimos con honestidad qué se puede integrar y qué no.' },
@@ -2028,7 +2026,7 @@ const miamiHialeah: ClusterPage = {
     path: '/es/miami/hialeah',
     areaCity: 'Miami',
     areaRegion: 'Florida',
-    priceValue: String(PRICE_ANCHORS.web),
+    priceValue: String(PRICE_ANCHORS.webLanding),
     providerId: MIAMI_ID,
   },
 };

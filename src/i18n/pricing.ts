@@ -21,57 +21,27 @@
 import type { OfferItem, FaqItem, CrumbItem } from '../lib/schema';
 
 // ── Anclas de precio canónicas (USD, numéricas). ──
-// YA NO SE ESCRIBEN AQUÍ: salen del catálogo de Ventas
+// NO SE ESCRIBEN AQUÍ: salen del bloque `preciosPublicos` del catálogo de Ventas
 // (_cerebro/ventas/catalogo.json → src/i18n/catalogo.generado.ts).
 // Para cambiar un precio: se cambia en el catálogo y se corre
 // `npm run sync:catalogo`. `npm run check:precios` falla si no coinciden.
 // Espejadas en lib/chat-kb.mjs → PRICES. Guardadas por npm run check:kb.
 // (El diagnóstico AEO es GRATIS → no lleva número aquí; se modela como tier free.)
-import { CATALOGO, desde as desdeCatalogo, usd as usdCatalogo } from './catalogo.generado';
+//
+// Decisión del dueño (2026-11-19): lo que el sitio enseña son ANCLAS, el precio
+// más bajo que se acepta cobrar por cada servicio, siempre con «desde». La lista
+// interna de Ventas (planes, paquetes, precios por alcance) no se publica.
+//
+// REGLA DEL ANCLA: cuando se nombra una categoría, va primero su precio más
+// bajo (web → webLanding, IA → iaBasic, tienda → ecommerceEssential, marca →
+// brandingLogo, SEO local → seoInitial). El nivel alto (web, ia, ecommerce,
+// branding) solo aparece DESPUÉS, como «el sitio completo empieza en…».
+// `npm run check:precios` falla si una frase lidera con el nivel alto.
+import { CATALOGO, usd as usdCatalogo } from './catalogo.generado';
 
-/**
- * Los DOS únicos precios que todavía no salen del catálogo, por decisión del
- * dueño (2026-11-18).
- *
- * El catálogo nuevo no tiene «SEO local mes a mes» ni «mantenimiento» como
- * productos sueltos: ese trabajo pasó a los planes (Presencia y Base). Hasta
- * que Diseño rehaga la página de precios alrededor de los cuatro planes
- * (encargo de Ventas §3), la web sigue enseñando las tarifas de siempre, para
- * no anunciar planes que aún no se pueden contratar.
- *
- * Cuando esa página entre en producción, estas dos líneas desaparecen y sus
- * valores salen del plan que corresponda.
- */
-export const PENDIENTES_DE_PLAN = {
-  /** Plan mensual de SEO local de siempre. Lo sustituirá el plan «Presencia». */
-  seoLocal: 600,
-  /** Mantenimiento mensual de siempre. Lo sustituirá el plan «Base». */
-  maintenance: 120,
-} as const;
+export const PRICE_ANCHORS = CATALOGO.anclas;
 
-/** Nombre visible de un servicio, tal como lo escribe el catálogo de Ventas. */
-const nombreDe = (id: Parameters<typeof desdeCatalogo>[0]): string =>
-  CATALOGO.proyectos[id].nombre;
-
-export const PRICE_ANCHORS = {
-  web: desdeCatalogo('web'),
-  webPagina: desdeCatalogo('webPagina'),
-  webLanding: desdeCatalogo('webLanding'),
-  webRedesign: desdeCatalogo('webRedesign'),
-  ia: desdeCatalogo('ia'),
-  iaBasic: desdeCatalogo('iaBasic'),
-  aeoFoundations: desdeCatalogo('aeoFoundations'),
-  aeoMonitoring: CATALOGO.anadidos.aeoMonitoring.mensual,
-  ecommerce: desdeCatalogo('ecommerce'),
-  ecommerceEssential: desdeCatalogo('ecommerceEssential'),
-  seoLocal: PENDIENTES_DE_PLAN.seoLocal,
-  seoInitial: desdeCatalogo('seoInitial'),
-  branding: desdeCatalogo('branding'),
-  brandingLogo: desdeCatalogo('brandingLogo'),
-  maintenance: PENDIENTES_DE_PLAN.maintenance,
-} as const;
-
-/** "$1,950" desde 1950. */
+/** "$1,500" desde 1500. */
 const usd = usdCatalogo;
 
 // ── Tipos del catálogo ────────────────────────────────────────
@@ -132,11 +102,9 @@ export const catalog: CatalogProduct[] = [
     ctaLabel: 'Ver diseño web',
     tone: 'gold',
     tiers: [
-      { key: 'webPagina', name: nombreDe('webPagina'), value: PRICE_ANCHORS.webPagina, display: tierDisplay(PRICE_ANCHORS.webPagina), anchor: true,
+      { key: 'webLanding', name: 'Landing Page', value: PRICE_ANCHORS.webLanding, display: tierDisplay(PRICE_ANCHORS.webLanding), anchor: true,
         blurb: 'Una sola página enfocada en convertir: ideal para una promoción, un servicio o validar tu negocio.', href: '/es/houston/diseno-web' },
-      { key: 'webLanding', name: nombreDe('webLanding'), value: PRICE_ANCHORS.webLanding, display: tierDisplay(PRICE_ANCHORS.webLanding),
-        blurb: 'La misma página, con tu ficha de Google puesta a punto. Juntas salen más baratas que por separado.', href: '/es/houston/diseno-web' },
-      { key: 'webRedesign', name: nombreDe('webRedesign'), value: PRICE_ANCHORS.webRedesign, display: tierDisplay(PRICE_ANCHORS.webRedesign),
+      { key: 'webRedesign', name: 'Rediseño de sitio', value: PRICE_ANCHORS.webRedesign, display: tierDisplay(PRICE_ANCHORS.webRedesign),
         blurb: 'Renovamos tu sitio actual (diseño, velocidad y textos) sin empezar de cero.', href: '/es/houston/diseno-web' },
       { key: 'web', name: 'Sitio a medida completo', value: PRICE_ANCHORS.web, display: tierDisplay(PRICE_ANCHORS.web),
         blurb: 'Varias páginas a medida y bilingües, con SEO base y listo para la IA.', href: '/es/houston/diseno-web' },

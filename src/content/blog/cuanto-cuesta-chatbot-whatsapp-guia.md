@@ -7,13 +7,13 @@ heroKicker: "Guía de precios"
 heroBadge: "Chatbot · 2026"
 answer:
   q: "¿Cuánto cuesta un chatbot de WhatsApp para un negocio en Estados Unidos en 2026?"
-  a: "Depende del modelo de cobro. En dólares, las apps por suscripción arrancan cerca de $15 a $40 al mes y suben al activar la IA; un desarrollo a medida cuesta miles de dólares. En Marcyan, el chatbot empieza desde $900 en un pago único. Aparte, Meta cobra por los mensajes enviados con la tarifa de Estados Unidos."
+  a: "Depende del modelo de cobro. En dólares, las apps por suscripción arrancan cerca de $15 a $40 al mes y suben al activar la IA; un desarrollo a medida cuesta miles de dólares. En Marcyan, el chatbot es un pago único como servicio gestionado, con el precio publicado. Aparte, Meta cobra por los mensajes enviados con la tarifa de Estados Unidos."
   source: "Crescendo AI y Meta, 2026"
 faq:
   - q: "¿Cuánto cuesta un chatbot de WhatsApp al mes?"
     a: "Las apps por suscripción arrancan en un rango aproximado de $15 a $40 al mes para planes básicos, pero el precio sube cuando activas las funciones de inteligencia artificial, que muchas veces se cobran como un complemento aparte. A eso se suma el cobro de Meta por los mensajes enviados, que es independiente de la app o la agencia."
   - q: "¿Marcyan cobra una mensualidad por el chatbot?"
-    a: "No. En Marcyan el chatbot empieza desde $900 en un pago único, como servicio gestionado: incluye instalación, entrenamiento con la información de tu negocio y mantenimiento. Lo que no podemos prometer es que no pagues nada más: Meta puede cobrar por los mensajes que envíes a través de la API oficial de WhatsApp, y ese cobro es de Meta, no nuestro."
+    a: "No. En Marcyan el chatbot es un pago único, como servicio gestionado: incluye instalación, entrenamiento con la información de tu negocio y mantenimiento, con el precio publicado. Lo que no podemos prometer es que no pagues nada más: Meta puede cobrar por los mensajes que envíes a través de la API oficial de WhatsApp, y ese cobro es de Meta, no nuestro."
   - q: "¿Por qué Meta cobra por la API de WhatsApp?"
     a: "Porque la API oficial de WhatsApp es un producto de Meta (Meta Business Platform). Desde julio de 2025, Meta cobra principalmente por los mensajes de plantilla que el negocio inicia, con un precio que varía según el tipo de mensaje y el país. Hay mensajes gratuitos dentro de la ventana de atención al cliente y descuentos por volumen. Este cobro existe sin importar quién construya tu chatbot."
   - q: "¿Un chatbot a medida es mejor que una app por suscripción?"
@@ -51,7 +51,7 @@ En el mercado hay básicamente tres modelos, y cada uno cobra distinto:
 |---|---|---|
 | App por suscripción | Mensualidad, sube al añadir IA | desde ~$15–$40/mes |
 | Desarrollo a medida | Proyecto único, hecho desde cero | miles de dólares |
-| Servicio gestionado (Marcyan) | Pago único, instalación + mantenimiento | desde $900 |
+| Servicio gestionado (Marcyan) | Pago único, instalación + mantenimiento | precio público, sin mensualidad |
 
 Las **apps por suscripción** son las más fáciles de empezar, pero la mensualidad nunca termina y, según [Crescendo AI](https://www.crescendo.ai/blog/how-much-do-chatbots-cost), las funciones de inteligencia artificial suelen venderse como un complemento aparte que encarece el plan base. Un **desarrollo a medida** cuesta miles de dólares y conviene para necesidades muy específicas. El **servicio gestionado** es el camino intermedio: pagas una vez y alguien se encarga de instalarlo, entrenarlo y mantenerlo.
 
@@ -67,7 +67,7 @@ Lo decimos claro porque es honesto: **ese cobro es de Meta, no de la agencia.** 
 
 ## ¿Cuánto cobra Marcyan y qué incluye?
 
-Nosotros publicamos el precio de forma abierta: el **chatbot empieza desde $900 en un pago único**, como **servicio gestionado**. Eso significa que no es solo el software: incluye la instalación, el entrenamiento del bot con la información real de tu negocio (tus servicios, tus precios, tus preguntas frecuentes) y el mantenimiento para que siga funcionando.
+Nosotros publicamos el precio de forma abierta: el **chatbot es un pago único**, como **servicio gestionado**, sin mensualidad indefinida. Eso significa que no es solo el software: incluye la instalación, el entrenamiento del bot con la información real de tu negocio (tus servicios, tus precios, tus preguntas frecuentes) y el mantenimiento para que siga funcionando.
 
 La diferencia con una app por suscripción es el modelo: pagas una vez en lugar de una mensualidad indefinida. Puedes ver el precio del chatbot y el resto de nuestros servicios en [precios](/es/precios). Si quieres que te lo dejemos andando en tu negocio, mira [IA conversacional en Houston](/es/houston/ia-conversacional) o [IA conversacional en Miami](/es/miami/ia-conversacional). Y si apenas estás explorando qué puede hacer la IA por un negocio pequeño, empieza por [inteligencia artificial para pymes](/es/ia-para-pymes).
 

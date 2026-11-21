@@ -93,8 +93,13 @@ se copia en otro archivo. Cambiar una es cambiarla ahí, con el texto que dé Le
   Orbit deje corregir o descartar un borrador (aviso de Bases y Estructura, 20-nov).
 - Si Orbit la rechaza (dato no válido, contacto que no existe) se descarta y avisa al dueño; si Orbit está
   caído, se reintenta (hasta 20 veces, luego avisa).
-- Cada cotización distinta con contacto da otro borrador (lo pedido es otra clave). Orbit no tiene aún
-  «sustituir el borrador de la misma conversación»: pedido a Bases y Estructura.
+- Una cotización nueva en la misma conversación sustituye a sus borradores sin enviar
+  (`replaces_prefix: chat:<sid>:`, Orbit PR #98); nunca toca una enviada ni una que el dueño corrigió.
+  Antes del #98 Orbit lo ignora y queda otro borrador: por eso el interruptor sigue apagado.
+- Lo mismo pedido otra vez en menos de 30 días conserva su marca: un borrador que el dueño descartó no
+  vuelve a crearse. Pasado ese plazo (WhatsApp dura meses) es otra venta y la tarea avisa si ya existía.
+- Un proyecto solo «desde» va sin precio al borrador: Orbit lo deja «por confirmar» y no deja enviarlo
+  hasta poner el precio real (PR #98).
 - Pendiente (Orbit fase 2): si quien escribe ya es cliente, saber su plan y ofrecer el siguiente.
 
 ## Cambios

@@ -213,7 +213,9 @@ await check('guardar en la conversación: solo lo pedido, pendiente, sin llamar 
   const { sql, calls } = fakeSql();
   assert.equal(await saveQuote({ sid: 'abc-1', quote: STORED, sqlImpl: sql }), true);
   assert.match(calls[0].text, /SET quote =/);
-  assert.match(calls[0].text, /quote_proposal = NULL/);
+  assert.match(calls[0].text, /quote_proposal = CASE WHEN quote->>'key' = \? AND quote_at > NOW\(\) - INTERVAL '30 days' THEN quote_proposal END/,
+    'lo mismo pedido otra vez conserva su marca (un borrador descartado no vuelve a crearse)');
+  assert.ok(calls[0].values.filter((v) => v === STORED.key).length >= 3);
   assert.equal(calls.length, 1);
   assert.equal(await saveQuote({ sid: 'x y', quote: STORED, sqlImpl: sql }), false);
   assert.equal(await saveQuote({ sid: 'abc-1', quote: { paquetes: true }, sqlImpl: sql }), false, 'sin clave no se guarda');
@@ -237,6 +239,12 @@ await check('pasar a Orbit: contacto con lead_ref y brief con brief_ref, borrado
     assert.equal(x.options.length, 3);
   }
   assert.equal(saved[0].source_ref, `chat:s-1:${STORED.key}`);
+  assert.equal(saved[0].replaces_prefix, 'chat:s-1:');
+  assert.ok(saved[0].source_ref.startsWith(saved[0].replaces_prefix), 'el prefijo es el principio del source_ref (si no, Orbit da 400)');
+  // La web por ciudades (solo «desde») va sin precio: Orbit la deja por confirmar.
+  const ciudades = saved[0].options.flatMap((o) => o.projects).find((p) => p.id === 'webCiudades');
+  assert.deepEqual(ciudades, { id: 'webCiudades' });
+  assert.ok(saved[0].options.flatMap((o) => o.projects).filter((p) => p.id !== 'webCiudades').every((p) => Number.isInteger(p.price_cents)));
   assert.deepEqual(saved[0].options, buildQuote(CAT, STORED).save.options);
   const marks = calls.filter((c) => /SET quote_proposal =/.test(c.text));
   assert.equal(marks.length, 2);

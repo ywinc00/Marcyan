@@ -112,6 +112,11 @@ await advanceLeadStage('LEAD-123', 'diagnosed', { by: 'diagnostic' }); // → { 
   contacto, brief o cliente. Nunca toca una enviada ni un borrador que el dueño ya corrigió. Devuelve
   `replaced: [PROP-…]` y apunta «sustituido» en el historial. Tiene que ser el principio del `source_ref` de la
   nueva (si no, 400 con `field: 'replaces_prefix'`); un reintento con el mismo `source_ref` no sustituye nada.
+- **Aviso del mismo día de un borrador sin contacto** (7d): cuando Marcy o el Diagnóstico dejan un borrador
+  en un brief o en un cliente, `saveProposal` deja un aviso en la bandeja de Orbit y en el móvil (tipo `system`,
+  clave `borrador:<MRC-… o CLI-…>`, uno cada 24 horas por ficha). El aviso lleva a esa ficha y dice el plazo de 24 horas y
+  si falta un precio. Esos borradores no salen en «Para hoy», que solo enseña contactos. Se manda después de guardar y
+  nunca tumba el guardado. Los de un contacto no avisan, porque ya salen en «Para hoy».
 - `brief_ref` (migración 032): la cotización de quien se decidió en el chat y fue directo al brief, sin contacto.
   Se ve en la ficha del brief en Orbit; si ese brief ya es cliente, queda unida también al cliente. Brief y
   contacto no se fusionan.

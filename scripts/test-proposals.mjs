@@ -21,7 +21,7 @@ import {
   priceOption, projectPricing, catalogRules, paysBackWith, addDays, expiryDate, nextFollowUp,
   effectiveStatus, canAutoAdvance, money, rowToProposal, saveProposal, advanceLeadStage,
   sendProposal, editProposal, discardProposal, pendingPriceOf, decideProposal, markFollowUpDone, listProposals, funnelSummary, expireDueProposals,
-  nextStep, pipelineLeads,
+  nextStep, pipelineLeads, draftNotice,
   OPEN_STAGES, LOST_REASONS, PROPOSAL_STATUSES, PROPOSAL_AUTHORS, MIGRATION_029_MSG, NO_CATALOG_MSG,
 } from '../lib/proposals.mjs';
 import { LEAD_STATUSES, LOST_REASONS as LEAD_LOST_REASONS } from '../lib/leads.mjs';
@@ -200,8 +200,8 @@ function fakeDb({ catalog = CAT, leads = {}, clients = [9], briefs = ['MRC-050']
         const l = st.leads[params[0]];
         return one(l ? { ref_id: params[0], ...l } : null);
       }
-      if (/^SELECT id FROM clients WHERE id = \$1/.test(t)) return one(clients.includes(params[0]) ? { id: params[0] } : null);
-      if (/^SELECT project_id FROM briefs WHERE project_id = \$1/.test(t)) return one(briefs.includes(params[0]) ? { project_id: params[0] } : null);
+      if (/^SELECT id(, business_name)? FROM clients WHERE id = \$1/.test(t)) return one(clients.includes(params[0]) ? { id: params[0], business_name: 'Cliente Prueba' } : null);
+      if (/^SELECT project_id(, business_name)? FROM briefs WHERE project_id = \$1/.test(t)) return one(briefs.includes(params[0]) ? { project_id: params[0], business_name: 'Panadería Prueba' } : null);
       if (/^SELECT id FROM clients WHERE source_brief_id = \$1/.test(t)) return one(briefClients[params[0]] ? { id: briefClients[params[0]] } : null);
       if (/^SELECT .* FROM proposals WHERE brief_ref = \$1/.test(t)) {
         const rows = st.proposals.filter((p) => p.brief_ref === params[0]);
@@ -305,7 +305,7 @@ function fakeDb({ catalog = CAT, leads = {}, clients = [9], briefs = ['MRC-050']
   return db;
 }
 const NOW = new Date('2026-11-20T18:00:00Z'); // 20-nov en Houston
-const deps = (db, extra = {}) => ({ connect: async () => db, now: NOW, ...extra });
+const deps = (db, extra = {}) => ({ connect: async () => db, now: NOW, notify: null, ...extra });
 const OPTS3 = [
   { plan: 'dominio', projects: [{ id: 'ciudades', price_cents: 800000 }] },
   { plan: 'crecimiento', projects: ['sitio'] },
@@ -775,6 +775,58 @@ if (realPath && fs.existsSync(realPath)) {
     assert.deepEqual(hits, []);
   });
 }
+
+// ── Aviso del mismo día de un borrador automático sin contacto (Ventas 7d) ──
+const recoge = () => { const vistos = []; const fn = async (n) => { vistos.push(n); }; fn.vistos = vistos; return fn; };
+await check('aviso: un borrador de Marcy en un brief avisa en Orbit con su plazo de 24 horas', async () => {
+  const notify = recoge();
+  const r = await saveProposal({ brief_ref: 'MRC-050', created_by: 'marcy', source_ref: 'chat:a1:1', options: [{ plan: 'crecimiento' }] }, deps(fakeDb(), { notify }));
+  assert.equal(r.created, true);
+  assert.equal(notify.vistos.length, 1);
+  const n = notify.vistos[0];
+  assert.equal(n.key, 'borrador:MRC-050');
+  assert.equal(n.url, '/dashboard#/briefs/MRC-050');
+  assert.equal(n.windowHours, 24);
+  assert.equal(n.title, 'Marcy dejó una cotización sin enviar: Panadería Prueba');
+  assert.match(n.body, new RegExp(`^${r.proposal.ref_id} está en el brief MRC-050 y no sale en «Para hoy»\\. Envíala antes de las `));
+  assert.ok(!/[—–]/.test(n.title + n.body), 'sin guiones largos');
+});
+await check('aviso: si falta un precio, lo dice', async () => {
+  const notify = recoge();
+  await saveProposal({ brief_ref: 'MRC-050', created_by: 'marcy', source_ref: 'chat:a2:1', options: [{ projects: ['ciudades'] }] }, deps(fakeDb(), { notify }));
+  assert.match(notify.vistos[0].body, /Falta el precio real de «[^»]+»\./);
+});
+await check('aviso: un borrador del Diagnóstico en un cliente lleva a la ficha del cliente', async () => {
+  const notify = recoge();
+  await saveProposal({ client_id: 9, created_by: 'diagnostic', source_ref: 'diag-a3', options: [{ plan: 'crecimiento' }] }, deps(fakeDb(), { notify }));
+  assert.equal(notify.vistos[0].key, 'borrador:CLI-9');
+  assert.equal(notify.vistos[0].url, '/dashboard#/clientes/9');
+  assert.equal(notify.vistos[0].title, 'El Diagnóstico dejó una cotización sin enviar: Cliente Prueba');
+});
+await check('aviso: no avisa de lo que ya sale en «Para hoy», de lo que hizo el dueño ni de un reintento', async () => {
+  const notify = recoge();
+  const db = fakeDb({ leads: { 'LEAD-010': { status: 'contacted', converted_client_id: null } } });
+  await saveProposal({ lead_ref: 'LEAD-010', created_by: 'marcy', source_ref: 'conv-a4', options: [{ plan: 'crecimiento' }] }, deps(db, { notify }));
+  await saveProposal({ brief_ref: 'MRC-050', options: [{ plan: 'crecimiento' }] }, deps(db, { notify }));
+  const input = { brief_ref: 'MRC-050', created_by: 'marcy', source_ref: 'chat:a5:1', options: [{ plan: 'crecimiento' }] };
+  await saveProposal(input, deps(db, { notify }));
+  const again = await saveProposal(input, deps(db, { notify }));
+  assert.equal(again.created, false);
+  assert.equal(notify.vistos.length, 1, 'solo el borrador nuevo de Marcy en el brief');
+});
+await check('aviso: si el aviso falla, la propuesta queda guardada igual', async () => {
+  const notify = async () => { throw new Error('sin red'); };
+  const r = await saveProposal({ brief_ref: 'MRC-050', created_by: 'marcy', source_ref: 'chat:a6:1', options: [{ plan: 'crecimiento' }] }, deps(fakeDb(), { notify }));
+  assert.equal(r.created, true);
+});
+await check('aviso (puro): el plazo es 24 horas después, en hora de Houston', () => {
+  const n = draftNotice({ proposal: { ref_id: 'PROP-090', status: 'draft', lead_ref: null, created_at: '2026-11-21T21:05:00Z', options: [] }, author: 'marcy', briefRef: 'MRC-090' });
+  assert.match(n.body, /Envíala antes de las 3:05\s?p\.\s?m\. del domingo, 22 de noviembre\.$/);
+  assert.equal(n.title, 'Marcy dejó una cotización sin enviar');
+  assert.equal(draftNotice({ proposal: { ref_id: 'PROP-091', status: 'draft', lead_ref: 'LEAD-1' }, author: 'marcy', briefRef: 'MRC-1' }), null);
+  assert.equal(draftNotice({ proposal: { ref_id: 'PROP-092', status: 'sent', lead_ref: null }, author: 'marcy', briefRef: 'MRC-1' }), null);
+  assert.equal(draftNotice({ proposal: { ref_id: 'PROP-093', status: 'draft', lead_ref: null }, author: 'orbit', briefRef: 'MRC-1' }), null);
+});
 
 if (fails.length) {
   console.error(`✗ ${fails.length} prueba(s) de propuestas fallaron:`);

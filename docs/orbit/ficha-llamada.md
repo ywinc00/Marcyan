@@ -50,7 +50,9 @@ nada de Finanzas ni importes.
     `diagnostic`) y si lleva un precio por confirmar.
   - `de` dice de quién cuelga: un contacto, un cliente o un brief.
   - `en_para_hoy: false` marca los que Orbit no enseña en «Para hoy»: los de un brief o de un
-    cliente, y los de un contacto que ya tiene otra propuesta enviada. Esos los avisa la rutina.
+    cliente, y los de un contacto que ya tiene otra propuesta enviada. Esos los avisa la rutina
+    y, si son de un brief o un cliente y los hizo Marcy o el Diagnóstico, también un aviso de Orbit
+    el mismo día (`docs/orbit/plan-ventas-orbit.md`).
 - `cifras`: dos periodos, `semana` (la pasada completa, de lunes a domingo) y `mes` (el mes en
   curso hasta hoy). No cuentan los contactos de prueba ni el spam.
   - `contactos_nuevos`: los que llegaron en el periodo.

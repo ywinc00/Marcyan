@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildQuote, quoteKey, saveQuote, attachQuote, retryPendingQuotes, salesCatalog, __resetCatalogCache, planIncludes, CONDICIONES, MARCY_QUOTE_SENT } from '../lib/marcy-quote.mjs';
+import { orbitEnabled, buildQuote, quoteKey, saveQuote, retryPendingQuotes, salesCatalog, __resetCatalogCache, planIncludes, CONDICIONES, MARCY_QUOTE_SENT } from '../lib/marcy-quote.mjs';
 import { QUOTE_TOOL, QUOTE_SERVICES, QUOTE_PLANS, SYSTEM_PROMPT, pricePostFilter } from '../lib/chat-kb.mjs';
 import { quoteToolResult } from '../api/chat.mjs';
 
@@ -104,7 +104,7 @@ await check('cuota del asistente: aparte en Crecimiento, incluida en Dominio', (
 await check('combinación: dos proyectos de pago único, 10 % menos redondeado, nunca bajo el mínimo', () => {
   const q = buildQuote(CAT, { opciones: [{ plan: 'crecimiento', servicios: ['web', 'iaBasic'] }] });
   const o = q.visible.opciones[0];
-  // web 3030 → 2750 (redondeado a 50, sobre el mínimo 2900 = público) → 2900; iaBasic 1110 → 1000 (público 1000).
+  // web 3030 × 0.9 = 2727 → 2750 (hacia arriba), bajo el mínimo 2900 (= público) → 2900; iaBasic 999 → 1000.
   assert.deepEqual(o.servicios.map((s) => s.precio), [2900, 1000]);
   assert.equal(o.descuento_combinacion, 130 + 110);
   assert.equal(o.pago_unico, 3900);
@@ -114,12 +114,26 @@ await check('rebaja solo si se pide, sujeta a aprobación, nunca bajo el mínimo
   assert.equal(buildQuote(CAT, { opciones: [{ servicios: ['webRedesign'] }] }).visible.opciones[0].rebaja, undefined);
   const q = buildQuote(CAT, { opciones: [{ servicios: ['webRedesign'] }, { servicios: ['webCiudades'] }], pedir_rebaja: true });
   const [ciudades, red] = q.visible.opciones;
-  assert.deepEqual(red.rebaja, { pago_unico: 1100, sujeto_a_aprobacion: true }); // 1210 × 0.9 = 1089 → 1100 (mínimo 968 → 1000)
+  assert.deepEqual(red.rebaja, { pago_unico: 1100, sujeto_a_aprobacion: true }); // 1210 × 0.9 = 1089 → 1100 hacia arriba (mínimo 968 → 1000)
   assert.equal(ciudades.rebaja, undefined);
   assert.match(q.save.notes, /sujeta a aprobación/);
 });
-await check('segundo idioma del rediseño', () => {
-  assert.equal(buildQuote(CAT, { opciones: [{ servicios: ['webRedesign'], segundo_idioma: true }] }).visible.opciones[0].pago_unico, 1540);
+await check('el descuento nunca pasa del 10 %: redondeo hacia arriba', () => {
+  const cat = { ...CAT, proyectos: { ...CAT.proyectos, a: { nombre: 'A', precio: 1060 }, b: { nombre: 'B', precio: 2040 } } };
+  const o = buildQuote(cat, { opciones: [{ servicios: ['a', 'b'] }], pedir_rebaja: true }).visible.opciones[0];
+  // a: 954 → 1000 · b: 1836 → 1850. Con Math.round serían 950 y 1850 (a bajaría un 10,4 %).
+  assert.deepEqual(o.servicios.map((x) => x.precio), [1000, 1850]);
+  for (const x of o.servicios) assert.ok(x.precio % 50 === 0);
+});
+await check('segundo idioma del rediseño, y queda escrito en lo que va a Orbit', () => {
+  const q = buildQuote(CAT, { opciones: [{ servicios: ['webRedesign'], segundo_idioma: true }] });
+  assert.equal(q.visible.opciones[0].pago_unico, 1540);
+  assert.match(q.save.notes, /dos idiomas/);
+});
+await check('un añadido cuya lista interna queda bajo su precio público no se cotiza', () => {
+  const cat = { ...CAT, preciosPublicos: { ...CAT.preciosPublicos, anclas: { ...CAT.preciosPublicos.anclas, aeoMonitoring: 60 } } };
+  const o = buildQuote(cat, { opciones: [{ plan: 'presencia', seguimiento_ia: true }] }).visible.opciones[0];
+  assert.equal(o.mensual, 333);
 });
 await check('Seguimiento en IA: solo con los planes que lo admiten', () => {
   const q = buildQuote(CAT, { opciones: [{ plan: 'presencia', seguimiento_ia: true }, { plan: 'dominio', seguimiento_ia: true }] });
@@ -137,8 +151,11 @@ await check('cifras: todas al allowlist del filtro; lo guardado no lleva cifras 
   assert.equal(v.ok, true);
   for (const n of ['7070', '3030', '888', '555', '333', '300']) assert.ok(out.extraAllow.includes(n), n);
   assert.ok(pricePostFilter('La completa sale en $7,070 y $888 al mes.', 'es', out.extraAllow).includes('$7,070'));
-  assert.equal(out.quote.options.length, 3);
-  assert.ok(!('save' in v) && !('figures' in v));
+  assert.equal(out.quote.paquetes, true);
+  assert.equal(out.quote.valor_cliente, 300);
+  assert.ok(out.quote.key);
+  assert.doesNotMatch(JSON.stringify(out.quote), /price_cents|7070|3030|888/, 'lo que se guarda en la conversación no lleva cifras');
+  assert.ok(!('save' in v) && !('figures' in v) && !('stored' in v));
 });
 await check('sin lista (base caída): ok false, sin cifras y sin guardar', () => {
   const out = quoteToolResult({ paquetes: true }, 'es', null);
@@ -146,11 +163,19 @@ await check('sin lista (base caída): ok false, sin cifras y sin guardar', () =>
   assert.deepEqual(out.extraAllow, []);
   assert.equal(out.quote, undefined);
 });
-await check('clave estable: la misma cotización, la misma clave', () => {
-  const a = buildQuote(CAT, { paquetes: true, valor_cliente: 300 }).save;
-  const b = buildQuote(CAT, { paquetes: true, valor_cliente: 300 }).save;
-  assert.equal(quoteKey(a), quoteKey(b));
-  assert.notEqual(quoteKey(a), quoteKey(buildQuote(CAT, { paquetes: true }).save));
+await check('clave estable: lo mismo pedido, la misma clave; la rebaja cambia la clave', () => {
+  const a = buildQuote(CAT, { paquetes: true, valor_cliente: 300 }).stored;
+  const b = buildQuote(CAT, { paquetes: true, valor_cliente: 300 }).stored;
+  assert.equal(a.key, b.key);
+  assert.equal(quoteKey(a), a.key);
+  assert.notEqual(a.key, buildQuote(CAT, { paquetes: true }).stored.key);
+  assert.notEqual(a.key, buildQuote(CAT, { paquetes: true, valor_cliente: 300, pedir_rebaja: true }).stored.key);
+});
+await check('lo guardado vuelve a dar la misma cotización', () => {
+  const q = buildQuote(CAT, { opciones: [{ plan: 'crecimiento', servicios: ['web', 'iaBasic'] }, { servicios: ['webRedesign'], segundo_idioma: true }], valor_cliente: 400, pedir_rebaja: true });
+  const again = buildQuote(CAT, q.stored, { lang: q.stored.lang });
+  assert.deepEqual(again.save, q.save);
+  assert.deepEqual(again.visible, q.visible);
 });
 
 // ── Herramienta y guion ──
@@ -165,85 +190,94 @@ await check('guion: planes por su nombre, completa primero, valor de un cliente 
   for (const t of ['Presencia', 'Crecimiento', 'Dominio', 'PLANES Y PAQUETES', 'cuánto le deja', 'la más completa primero', 'salvo con la web en tres pagos', 'NO ofreces']) assert.ok(SYSTEM_PROMPT.includes(t), t);
 });
 
-// ── Guardar en la conversación y en Orbit ──
-function fakeSql({ leadRef = null, quote = null, noColumn = false, pending = [] } = {}) {
+// ── Guardar en la conversación y pasar a Orbit ──
+function fakeSql({ noColumn = false, pending = [] } = {}) {
   const calls = [];
   const sql = async (strings, ...values) => {
     const text = strings.join('?');
     calls.push({ text, values });
     if (noColumn && /quote/.test(text)) { const e = new Error('column "quote" does not exist'); e.code = '42703'; throw e; }
-    if (/^UPDATE chat_conversations SET quote_proposal/.test(text.trim())) return { rows: [], rowCount: 1 };
-    if (/^UPDATE chat_conversations SET quote =/.test(text.trim())) return { rows: [{ lead_ref: leadRef }], rowCount: 1 };
     if (/quote_proposal IS NULL/.test(text)) return { rows: pending, rowCount: pending.length };
-    if (/SELECT quote FROM chat_conversations/.test(text)) return { rows: quote ? [{ quote }] : [], rowCount: quote ? 1 : 0 };
-    return { rows: [], rowCount: 0 };
+    return { rows: [], rowCount: 1 };
   };
   return { sql, calls };
 }
-const SAVE = buildQuote(CAT, { paquetes: true, valor_cliente: 300 }).save;
+const STORED = buildQuote(CAT, { paquetes: true, valor_cliente: 300 }).stored;
+const okSave = (saved, ref = 'PROP-1') => async (x) => { saved.push(x); return { proposal: { ref_id: ref } }; };
 
-await check('sin contacto todavía: queda en la conversación y no se guarda en Orbit', async () => {
+await check('guardar en la conversación: solo lo pedido, pendiente, sin llamar a Orbit', async () => {
   const { sql, calls } = fakeSql();
-  const saved = [];
-  assert.equal(await saveQuote({ sid: 'abc-1', quote: SAVE, sqlImpl: sql, save: async (x) => { saved.push(x); return { proposal: { ref_id: 'PROP-1' } }; } }), null);
-  assert.equal(saved.length, 0);
-  assert.ok(calls[0].values[0].includes('"recommended_option":1'));
+  assert.equal(await saveQuote({ sid: 'abc-1', quote: STORED, sqlImpl: sql }), true);
+  assert.match(calls[0].text, /SET quote =/);
+  assert.match(calls[0].text, /quote_proposal = NULL/);
+  assert.equal(calls.length, 1);
+  assert.equal(await saveQuote({ sid: 'x y', quote: STORED, sqlImpl: sql }), false);
+  assert.equal(await saveQuote({ sid: 'abc-1', quote: { paquetes: true }, sqlImpl: sql }), false, 'sin clave no se guarda');
 });
-await check('con contacto: borrador en Orbit, de Marcy, con la conversación de origen', async () => {
-  const { sql } = fakeSql({ leadRef: 'LEAD-042' });
-  const saved = [];
-  const ref = await saveQuote({ sid: 'abc-1', quote: SAVE, sqlImpl: sql, save: async (x) => { saved.push(x); return { proposal: { ref_id: 'PROP-7' } }; } });
-  assert.equal(ref, 'PROP-7');
-  assert.equal(saved[0].lead_ref, 'LEAD-042');
-  assert.equal(saved[0].created_by, 'marcy');
-  assert.equal(saved[0].send, false);
-  assert.equal(MARCY_QUOTE_SENT, false, 'decidido el 20-nov: borrador');
-  assert.equal(saved[0].client_value_cents, 30000);
-  assert.match(saved[0].source_ref, /^chat:abc-1:[a-z0-9]+$/);
-});
-await check('el cliente decidido (brief MRC) la recibe con brief_ref; un paso a persona no', async () => {
-  const { sql, calls } = fakeSql({ leadRef: 'MRC-012' });
-  const saved = [];
-  const ref = await saveQuote({ sid: 'abc-1', quote: SAVE, sqlImpl: sql, save: async (x) => { saved.push(x); return { proposal: { ref_id: 'PROP-3' } }; } });
-  assert.equal(ref, 'PROP-3');
-  assert.equal(saved[0].brief_ref, 'MRC-012');
-  assert.equal(saved[0].lead_ref, undefined);
-  assert.ok(calls.some((c) => /SET quote_proposal/.test(c.text) && c.values.includes('PROP-3')), 'anota la propuesta en la conversación');
-  const none = fakeSql({ leadRef: null });
-  const s2 = [];
-  assert.equal(await saveQuote({ sid: 'abc-2', quote: SAVE, sqlImpl: none.sql, save: async (x) => { s2.push(x); } }), null);
-  assert.equal(await attachQuote({ sid: 'abc-2', ref: 'HANDOFF', sqlImpl: none.sql, save: async (x) => { s2.push(x); } }), null);
-  assert.equal(s2.length, 0);
-});
-await check('reintento: las pendientes con contacto o brief entran; si Orbit da 503 siguen pendientes', async () => {
+await check('pasar a Orbit: contacto con lead_ref y brief con brief_ref, borrador de Marcy, precio de la lista de ahora', async () => {
   const pending = [
-    { sid: 's-1', lead_ref: 'LEAD-7', quote: { ...SAVE, key: 'a' } },
-    { sid: 's-2', lead_ref: 'MRC-9', quote: { ...SAVE, key: 'b' } },
+    { sid: 's-1', lead_ref: 'LEAD-042', quote: STORED, quote_tries: 0 },
+    { sid: 's-2', lead_ref: 'MRC-012', quote: STORED, quote_tries: 0 },
   ];
-  const { sql } = fakeSql({ pending });
+  const { sql, calls } = fakeSql({ pending });
   const saved = [];
-  const n = await retryPendingQuotes({ sqlImpl: sql, save: async (x) => {
-    saved.push(x);
-    if (x.brief_ref) { const e = new Error('Falta la migración'); e.status = 503; throw e; }
-    return { proposal: { ref_id: 'PROP-11' } };
-  } });
-  assert.equal(n, 1);
-  assert.deepEqual(saved.map((x) => x.source_ref), ['chat:s-1:a', 'chat:s-2:b']);
-  assert.equal(await retryPendingQuotes({ sqlImpl: fakeSql({ noColumn: true }).sql }), 0);
+  assert.equal(await retryPendingQuotes({ sqlImpl: sql, catalog: CAT, enabled: true, save: okSave(saved, 'PROP-7') }), 2);
+  assert.equal(saved[0].lead_ref, 'LEAD-042');
+  assert.equal(saved[1].brief_ref, 'MRC-012');
+  assert.equal(saved[1].lead_ref, undefined);
+  for (const x of saved) {
+    assert.equal(x.created_by, 'marcy');
+    assert.equal(x.send, MARCY_QUOTE_SENT);
+    assert.equal(x.client_value_cents, 30000);
+    assert.equal(x.recommended_option, 1);
+    assert.equal(x.options.length, 3);
+  }
+  assert.equal(saved[0].source_ref, `chat:s-1:${STORED.key}`);
+  assert.deepEqual(saved[0].options, buildQuote(CAT, STORED).save.options);
+  const marks = calls.filter((c) => /SET quote_proposal =/.test(c.text));
+  assert.equal(marks.length, 2);
+  assert.ok(marks[0].values.includes('PROP-7') && marks[0].values.includes(STORED.key), 'marca solo la cotización que subió');
+  assert.equal(MARCY_QUOTE_SENT, false, 'decidido el 20-nov: borrador');
 });
-await check('al llegar el contacto, la cotización guardada pasa a Orbit con la misma clave', async () => {
-  const { sql } = fakeSql({ quote: { ...SAVE, key: 'k1' } });
+await check('si la lista cambió desde que Marcy cotizó, lo dice en las notas', async () => {
+  const { sql } = fakeSql({ pending: [{ sid: 's-1', lead_ref: 'LEAD-1', quote: { ...STORED, version: 'vieja' }, quote_tries: 0 }] });
   const saved = [];
-  await attachQuote({ sid: 'abc-1', ref: 'LEAD-050', sqlImpl: sql, save: async (x) => { saved.push(x); return { proposal: { ref_id: 'PROP-9' } }; } });
-  assert.equal(saved[0].source_ref, 'chat:abc-1:k1');
-  assert.equal(saved[0].lead_ref, 'LEAD-050');
+  await retryPendingQuotes({ sqlImpl: sql, catalog: CAT, enabled: true, save: okSave(saved) });
+  assert.match(saved[0].notes, /La lista cambió desde que Marcy cotizó \(vieja → prueba-marcy\)/);
 });
-await check('sin la columna nueva o con Orbit caído: no rompe el chat', async () => {
-  const { sql } = fakeSql({ noColumn: true });
-  assert.equal(await saveQuote({ sid: 'abc-1', quote: SAVE, sqlImpl: sql }), null);
-  assert.equal(await attachQuote({ sid: 'abc-1', ref: 'LEAD-1', sqlImpl: sql }), null);
-  const ok = fakeSql({ leadRef: 'LEAD-3' });
-  assert.equal(await saveQuote({ sid: 'abc-1', quote: SAVE, sqlImpl: ok.sql, save: async () => { throw new Error('503'); } }), null);
+await check('Orbit rechaza (400 o 404): se descarta y se avisa; caída (503): suma un intento y sigue', async () => {
+  const pending = [
+    { sid: 's-1', lead_ref: 'LEAD-1', quote: STORED, quote_tries: 0 },
+    { sid: 's-2', lead_ref: 'LEAD-2', quote: STORED, quote_tries: 3 },
+    { sid: 's-3', lead_ref: 'LEAD-3', quote: STORED, quote_tries: 19 },
+  ];
+  const { sql, calls } = fakeSql({ pending });
+  const notes = [];
+  const save = async (x) => {
+    if (x.lead_ref === 'LEAD-1') throw Object.assign(new Error('Contacto no encontrado.'), { status: 404 });
+    throw Object.assign(new Error('Falta la migración'), { status: 503 });
+  };
+  assert.equal(await retryPendingQuotes({ sqlImpl: sql, catalog: CAT, enabled: true, save, notify: async (t, b) => notes.push(t) }), 0);
+  const marks = calls.filter((c) => /SET quote_proposal =/.test(c.text));
+  assert.ok(marks[0].values.includes('descartada'));
+  assert.ok(!marks[1].values.includes('descartada'));
+  assert.equal(notes.length, 2, 'avisa la descartada y la que llega a 20 intentos');
+});
+await check('interruptor apagado (por defecto): nada pasa a Orbit; la cotización queda pendiente', async () => {
+  assert.equal(orbitEnabled({}), false);
+  assert.equal(orbitEnabled({ MARCY_COTIZACION_ORBIT: 'on' }), true);
+  const { sql, calls } = fakeSql({ pending: [{ sid: 's-1', lead_ref: 'LEAD-1', quote: STORED, quote_tries: 0 }] });
+  const saved = [];
+  assert.equal(await retryPendingQuotes({ sqlImpl: sql, catalog: CAT, enabled: false, save: okSave(saved) }), 0);
+  assert.equal(saved.length, 0);
+  assert.equal(calls.length, 0);
+});
+await check('sin la lista o sin la migración: no rompe y no descarta', async () => {
+  const { sql, calls } = fakeSql({ pending: [{ sid: 's-1', lead_ref: 'LEAD-1', quote: STORED, quote_tries: 0 }] });
+  assert.equal(await retryPendingQuotes({ sqlImpl: sql, catalog: null, enabled: true, save: okSave([]), notify: async () => {} }), 0);
+  assert.ok(!calls.some((c) => c.values.includes('descartada')));
+  assert.equal(await retryPendingQuotes({ sqlImpl: fakeSql({ noColumn: true }).sql, catalog: CAT, enabled: true }), 0);
+  assert.equal(await saveQuote({ sid: 'abc-1', quote: STORED, sqlImpl: fakeSql({ noColumn: true }).sql }), false);
 });
 await check('lista de la base: en memoria 10 minutos; si falla, null', async () => {
   __resetCatalogCache();

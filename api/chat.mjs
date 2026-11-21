@@ -428,7 +428,7 @@ export function computeLossToolResult(input) {
 export function quoteToolResult(input, lang = 'es', catalog = null) {
   const q = buildQuote(catalog, input || {}, { lang });
   if (!q.ok) return { content: JSON.stringify({ ok: false, motivo: q.motivo }), extraAllow: [] };
-  return { content: JSON.stringify(q.visible), extraAllow: q.figures.flatMap(priceAllowVariants), quote: q.save };
+  return { content: JSON.stringify(q.visible), extraAllow: q.figures.flatMap(priceAllowVariants), quote: q.stored };
 }
 
 // revisar_sitio — tool_result SOLO con enteros + labels de NUESTRO catálogo
@@ -498,9 +498,13 @@ async function reviewWeb(g, lang) {
 
 // Ejecuta la tool interna pedida y devuelve { content, extraAllow }. Solo UNA por
 // request (cap 1 iteración): la llama el handler con el primer tool_use interno.
-async function runInternalTool(toolUse, { lang, ip, sid }) {
+async function runInternalTool(toolUse, { lang, ip, sid, first = false }) {
   if (toolUse.name === CALC_TOOL.name) return computeLossToolResult(toolUse.input || {});
-  if (toolUse.name === QUOTE_TOOL.name) return quoteToolResult(toolUse.input || {}, lang, await salesCatalog());
+  if (toolUse.name === QUOTE_TOOL.name) {
+    // De entrada, solo el «desde» público (Ventas, 19-nov): en su primera respuesta Marcy no cotiza.
+    if (first) return { content: JSON.stringify({ ok: false, motivo: 'de_entrada', haz: 'Primera respuesta: da el «desde» público y el plan que lo acompaña; para las opciones, pregunta antes cuánto le deja un cliente.' }), extraAllow: [] };
+    return quoteToolResult(toolUse.input || {}, lang, await salesCatalog());
+  }
   if (toolUse.name === SITE_TOOL.name) {
     if (!(await siteReviewAllowed(sid, ip))) return FAIL_RESULT;    // límites primero
     const inp = toolUse.input || {};
@@ -691,7 +695,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
     if (internal) {
       const out = extraInternal && extraInternal.names.has(internal.name)
         ? await extraInternal.run(internal).catch(() => FAIL_RESULT)
-        : await runInternalTool(internal, { lang, ip, sid });
+        : await runInternalTool(internal, { lang, ip, sid, first: !messages.some((m) => m && m.role === 'assistant') });
       extraAllow = [...extraAllow, ...(out.extraAllow || [])];
       if (internal.name === CALC_TOOL.name) lossFigures = out.extraAllow || [];
       if (out.quote) quote = out.quote;

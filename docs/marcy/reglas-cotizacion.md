@@ -23,7 +23,8 @@ Pruebas: `npm run test:cotizar` y la batería `npm run eval:marcy`.
 
 1. **De entrada**, si preguntan por una cosa suelta: su «desde» público y, en una frase, el plan que la
    acompaña (página o web: Presencia o Crecimiento; SEO local: Presencia o Crecimiento; asistente con IA
-   o que la IA te recomiende: Dominio). No recita la lista interna.
+   o que la IA te recomiende: Dominio). No recita la lista interna. En su primera respuesta el servidor no
+   deja cotizar con la lista (`cotizar` devuelve `de_entrada`).
 2. **Antes de la cifra** de un plan o de las opciones, pregunta cuánto le deja un cliente o un trabajo.
 3. **Al cotizar**, tres opciones, la más completa primero:
    - Paquetes de siempre (`paquetes: true`): Dominio con la web de servicios por ciudades, Crecimiento con
@@ -32,18 +33,21 @@ Pruebas: `npm run test:cotizar` y la batería `npm run eval:marcy`.
      ordena de la más completa a la de entrada y marca como recomendada la de Crecimiento (o la del medio).
    - Con lo que le vale un cliente, dice con cuántos clientes al mes se paga lo mensual. Es una cuenta,
      nunca una promesa.
-4. **El cliente decidido** no recibe tres opciones: se cierra con lo que pidió.
+4. **El cliente decidido** (señales de compra) no recibe tres opciones ni la pregunta del valor de un
+   cliente: se cotiza lo que pidió y se cierra en ese turno.
 
 ## Reglas de la lista (las hace cumplir el servidor)
 
 1. **Planes:** se ofrecen Presencia, Crecimiento y Dominio. Base no se ofrece en propuestas.
 2. **Lo mensual** (plan, cuota de los asistentes, Seguimiento en IA) va tal cual la lista: nunca se descuenta.
-   En Dominio, la cuota del asistente con IA va incluida.
+   En Dominio, la cuota del asistente con IA va incluida. Un añadido cuya lista interna queda por debajo de
+   su precio público no se cotiza (pasa hoy con Seguimiento en IA: lo decide Ventas).
 3. **Combinación:** dos o más proyectos de pago único en la misma opción = el descuento de la lista
-   (`reglas.comboDescuentoProyectos`), redondeado (`reglas.redondeoProyectos`).
+   (`reglas.comboDescuentoProyectos`), redondeado hacia arriba (`reglas.redondeoProyectos`): nunca pasa
+   del porcentaje.
 4. **Mínimo:** ningún proyecto baja de su precio público ni del mínimo de la lista (`reglas.pisoSobreBase`).
-5. **Rebaja si el cliente insiste:** solo después de ajustar el alcance, hasta un 10 % más, nunca bajo el
-   mínimo, y siempre «sujeta a aprobación de un representante» (le llega al equipo como contacto). Un
+5. **Rebaja si el cliente insiste:** solo después de ajustar el alcance, hasta un 10 % más (redondeado
+   hacia arriba), nunca bajo el mínimo, y siempre «sujeta a aprobación de un representante» (le llega al equipo como contacto). Un
    servicio «desde» no se rebaja.
 6. **Más alcance** (más páginas, otro idioma, más canales): se cotiza lo que hay y el ajuste va en la
    propuesta escrita. El rediseño en dos idiomas sí se cotiza (`segundoIdioma` de la lista).
@@ -59,16 +63,23 @@ Pruebas: `npm run test:cotizar` y la batería `npm run eval:marcy`.
 
 ## Dónde queda la cotización
 
-- En la conversación (migración 031, columnas `quote`, `quote_at` y `quote_proposal` de
-  `chat_conversations`): los ids de plan, servicio y añadido con el precio que Marcy dijo (en centavos,
-  para que la propuesta sea la misma; la base es privada), la recomendada y lo que le vale un cliente.
+- En la conversación (migración 031 en `chat_conversations`): lo que pidió Marcy, **sin cifras**
+  (paquetes u opciones con sus ids, lo que le vale un cliente, si pidió rebaja, el idioma y la versión de
+  la lista), más su estado: `quote_proposal` (la propuesta de Orbit, «descartada» o vacía = pendiente),
+  `quote_tries` y `quote_error`.
 - En Orbit, como **borrador** (`created_by: 'marcy'`; enviada o no se decide en un solo sitio,
-  `MARCY_QUOTE_SENT` de `lib/marcy-quote.mjs`, hoy borrador por decisión del 20-nov) en cuanto la
-  conversación tiene contacto (`LEAD-…`: al dejar sus datos, al agendar o por WhatsApp e Instagram) o brief
-  (`MRC-…`, el cliente que se decidió; `brief_ref`, desde la migración 032 de Orbit). La envía el dueño
-  desde Orbit. `source_ref` = la conversación más una clave de la cotización: el reintento no duplica.
-- Si no entra (Orbit caído, o un brief antes de la 032), queda pendiente y la tarea de cada 5 minutos
-  (`api/cron/canales`) la reintenta durante 30 días.
+  `MARCY_QUOTE_SENT` de `lib/marcy-quote.mjs`, hoy borrador por decisión del 20-nov), unida al contacto
+  (`LEAD-…`: al dejar sus datos, al agendar o por WhatsApp e Instagram) o al brief (`MRC-…`, el cliente
+  que se decidió; `brief_ref`). La pasa la tarea de cada 5 minutos (`api/cron/canales`), fuera del camino
+  de la respuesta al cliente, con la lista de la base de ese momento: si cambió desde que Marcy cotizó,
+  lo dice en las notas. `source_ref` = la conversación más la clave de lo pedido: el reintento no duplica.
+- **Interruptor:** solo pasa a Orbit con `MARCY_COTIZACION_ORBIT=on` en Vercel. Apagado (hoy), queda
+  pendiente en la conversación y entra sola al encenderlo, si tiene menos de 30 días. Se enciende cuando
+  Orbit deje corregir o descartar un borrador (aviso de Bases y Estructura, 20-nov).
+- Si Orbit la rechaza (dato no válido, contacto que no existe) se descarta y avisa al dueño; si Orbit está
+  caído, se reintenta (hasta 20 veces, luego avisa).
+- Cada cotización distinta con contacto da otro borrador (lo pedido es otra clave). Orbit no tiene aún
+  «sustituir el borrador de la misma conversación»: pedido a Bases y Estructura.
 - Pendiente (Orbit fase 2): si quien escribe ya es cliente, saber su plan y ofrecer el siguiente.
 
 ## Cambios

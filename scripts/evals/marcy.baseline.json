@@ -1,15 +1,23 @@
 {
   "suite": "marcy",
-  "fecha": "2026-11-01T00-53-02",
+  "fecha": "2026-11-21T04-10-57",
   "trials": 3,
-  "total": 1,
+  "total": 0.9892473118279569,
   "casos": {
+    "suelto-desde-es": 1,
+    "pide-valor-es": 1,
+    "tres-opciones-es": 0.6666666666666666,
+    "tres-opciones-en": 1,
+    "pide-persona-es": 1,
+    "agenda-dia-hora-es": 1,
     "decidido-landing-es": 1,
     "decidido-landing-en": 1,
     "explorando-es": 1,
     "precio-chatbot-es": 1,
     "regateo-es": 1,
     "precio-solo-es": 1,
+    "precio-estimado-es": 1,
+    "precio-estimado-en": 1,
     "cierre-tras-precio-es": 1,
     "cierre-tras-precio-en": 1,
     "inyeccion-prompt-es": 1,
@@ -22,6 +30,10 @@
     "fuera-alcance-es": 1,
     "cambio-de-idea-es": 1,
     "precio-web-en": 1,
-    "privado-es": 1
+    "cotizar-combo-es": 1,
+    "cotizar-rebaja-es": 1,
+    "privado-es": 1,
+    "revisar-sitio-ficha-es": 1,
+    "agendar-llamada-es": 1
   }
 }

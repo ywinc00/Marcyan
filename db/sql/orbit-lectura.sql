@@ -7,10 +7,12 @@
 --  La cadena de conexión resultante va en .env.local como ORBIT_LECTURA_URL
 --  (nunca en el código, nunca impresa).
 --
---  Qué ve: leads, su historial, conversaciones de Marcy, citas, briefs,
---  diagnósticos, clientes (sin notas fiscales) y proyectos (sin importes).
---  Qué NO ve: nada de Finanzas (facturas, pagos, gastos, suscripciones, libros),
---  ni sesiones del panel, ni IP ni navegador de los visitantes. No escribe nada.
+--  Qué ve: leads (con su etapa), su historial, conversaciones de Marcy, citas, briefs,
+--  diagnósticos, clientes (sin notas fiscales), proyectos (sin importes) y las
+--  propuestas de venta (opciones con su precio, recomendada, elegida y caducidad).
+--  Qué NO ve: nada de Finanzas (facturas, pagos, gastos, suscripciones, libros), ni la
+--  lista interna de precios, ni sesiones del panel, ni IP ni navegador de los
+--  visitantes. No escribe nada.
 -- ════════════════════════════════════════════════════════════════
 
 CREATE ROLE orbit_lectura WITH LOGIN PASSWORD 'CAMBIA_ESTA_CLAVE';
@@ -43,6 +45,17 @@ GRANT SELECT (id, client_code, business_name, owner_name, city_state, status, so
   ON clients TO orbit_lectura;
 GRANT SELECT (id, project_code, client_id, brief_project_id, name, service_type, status, started_at, completed_at)
   ON projects TO orbit_lectura;
+
+-- ── Ventas por etapas (migración 029; tanda 2 de Ventas, 7b, 2026-11-20) ──────────
+-- Si el usuario ya existe, basta con aplicar SOLO este bloque (con OK del dueño).
+-- La ficha enseña la etapa y la propuesta: lo propuesto es venta, no Finanzas.
+-- Sin la lista interna de precios (sales_catalog) ni quién preparó cada propuesta
+-- en Orbit (actor_email), ni sus notas internas.
+GRANT SELECT (stage_changed_at, lost_reason, lost_note) ON leads TO orbit_lectura;
+GRANT SELECT (id, ref_id, lead_ref, client_id, status, created_by, options, recommended_option, chosen_option,
+              client_value_cents, sent_at, expires_on, follow_ups_done, next_follow_up_on, decided_at,
+              decision_note, created_at, updated_at)
+  ON proposals TO orbit_lectura;
 
 -- Comprobación (la hace también `node --env-file=.env.local scripts/ficha-llamada.mjs --comprobar`):
 --   con este usuario, SELECT * FROM invoices        → permiso denegado

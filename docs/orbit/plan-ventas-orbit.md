@@ -62,15 +62,15 @@ Diagnóstico (etapa «diagnóstico hecho», §5).
 
 ## Para Marcy y el Diagnóstico (fase 1)
 
-Estado: escrito y probado en `feat/orbit-ventas`, **sin publicar**. Se usa solo cuando esté en producción (aviso de
-Bases y Estructura). Código: `lib/proposals.mjs`; pruebas: `npm run test:proposals`.
+Estado: **en producción** desde el 2026-11-20 (PR #95). Código: `lib/proposals.mjs` (lo cambia solo Panel Admin;
+lo que haga falta se pide por Bases y Estructura); pruebas: `npm run test:proposals`.
 
 ```js
 import { saveProposal, advanceLeadStage } from '../lib/proposals.mjs';
 
 // Guardar la cotización (Marcy) o la propuesta del diagnóstico.
 const { proposal, created, lead_status } = await saveProposal({
-  lead_ref: 'LEAD-123',              // o client_id (o los dos)
+  lead_ref: 'LEAD-123',              // o client_id, o brief_ref: 'MRC-045' (al menos uno; brief_ref con la 032)
   created_by: 'marcy',               // 'marcy' | 'diagnostic' | 'orbit'
   source_ref: 'conv-…',              // obligatorio para marcy y diagnostic: el reintento no duplica
   options: [                         // 1 a 3
@@ -95,6 +95,11 @@ await advanceLeadStage('LEAD-123', 'diagnosed', { by: 'diagnostic' }); // → { 
   503 sin la migración 029 o sin el catálogo cargado). Un 400 no se reintenta; un 503 sí, más tarde.
 - `send: true` mueve el contacto a «propuesta enviada» si estaba antes en el embudo; nunca saca a nadie de
   ganado, perdido, archivado, prueba o spam.
+- `send: false` deja un borrador: Orbit le pone el paso «enviar la propuesta» con 24 horas desde que se creó, sale
+  en «Para hoy» y como atrasado si pasa el plazo (tanda 2, petición de ChatBot).
+- `brief_ref` (migración 032): la cotización de quien se decidió en el chat y fue directo al brief, sin contacto.
+  Se ve en la ficha del brief en Orbit; si ese brief ya es cliente, queda unida también al cliente. Brief y
+  contacto no se fusionan.
 
 En Orbit (fusión de las formas 1 y 2, validada el 2026-11-20): Leads abre «En curso» agrupado por etapa, con el
 interruptor «Para hoy»; la ficha lleva el camino de etapas, los seguimientos, la propuesta y «Marcar como perdido».

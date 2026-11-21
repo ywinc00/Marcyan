@@ -12,7 +12,8 @@
   import { toast, toastError } from '../lib/toast.svelte.js';
   import { money, dayLabel, daysBetween, houstonToday, whatsappHref, PROPOSAL_AUTHOR } from './crm.js';
 
-  let { proposal, lead, events = [], converted = false, onchanged, onnew } = $props();
+  // winLabel: el botón con que se pasa a cliente donde se enseña (en Leads o en el brief).
+  let { proposal, lead, events = [], converted = false, onchanged, onnew, winLabel = 'Ganado: pasar a cliente' } = $props();
   // Cuándo se hizo cada seguimiento (del historial del contacto).
   const doneOn = $derived(Object.fromEntries(events.filter((e) => e.event_type === 'follow_up_done' && e.data?.proposal === proposal.ref_id)
     .map((e) => [e.data.step, new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(new Date(e.created_at))])));
@@ -73,7 +74,7 @@
   </Card>
 {/if}
 
-<Card title={`Propuesta del ${dayLabel((p.sent_on || String(p.created_at).slice(0, 10)))}`}>
+<Card title={`Propuesta del ${dayLabel(p.sent_on || houstonToday(new Date(p.created_at)))}`}>
   {#snippet actions()}
     <StatusChip tone={chip.tone} label={chip.label} />
     {#if !open && eff !== 'draft' && onnew}<button type="button" class="b b--mini" onclick={onnew}>Nueva propuesta</button>{/if}
@@ -106,10 +107,10 @@
     <p class="value">Le vale <b class="num">{money(p.client_value_cents)}</b> cada cliente nuevo.</p>
   {/if}
   {#if eff === 'accepted' && !converted}
-    <p class="note">La aceptó. Para empezar, pásalo a cliente con «Ganado: pasar a cliente».</p>
+    <p class="note">La aceptó. Para empezar, pásalo a cliente con «{winLabel}».</p>
   {/if}
   <div class="foot">
-    <span class="who">La preparó {PROPOSAL_AUTHOR[p.created_by] || 'Orbit'}{p.sent_on ? `; enviada el ${dayLabel(p.sent_on)}` : ''}.</span>
+    <span class="who">{PROPOSAL_AUTHOR[p.created_by] || 'La hiciste tú en Orbit'}{p.sent_on ? `; enviada el ${dayLabel(p.sent_on)}` : ''}.</span>
     {#if eff === 'draft'}
       <button type="button" class="b b--mini" disabled={!!busy} onclick={() => act({ action: 'send' }, 'Propuesta marcada como enviada', 'send')}>{busy === 'send' ? 'Guardando…' : 'Marcar como enviada'}</button>
     {:else if open}

@@ -165,8 +165,8 @@ await check('fila → propuesta: números y «se paga con» por opción', () => 
 });
 
 // ── Base falsa en memoria ───────────────────────────────────────
-function fakeDb({ catalog = CAT, leads = {}, clients = [9], proposals = [], failOn = null, failCode = null, today = '2026-11-20' } = {}) {
-  const st = { leads: structuredClone(leads), proposals: structuredClone(proposals), events: [], calls: [], released: false, seq: proposals.length };
+function fakeDb({ catalog = CAT, leads = {}, clients = [9], briefs = ['MRC-050'], briefClients = {}, proposals = [], failOn = null, failCode = null, today = '2026-11-20' } = {}) {
+  const st = { leads: structuredClone(leads), proposals: structuredClone(proposals), events: [], calls: [], inserts: [], released: false, seq: proposals.length };
   const one = (row) => ({ rowCount: row ? 1 : 0, rows: row ? [row] : [] });
   const findP = (ref) => st.proposals.find((p) => p.ref_id === ref);
   const db = {
@@ -187,14 +187,21 @@ function fakeDb({ catalog = CAT, leads = {}, clients = [9], proposals = [], fail
         return one(l ? { ref_id: params[0], ...l } : null);
       }
       if (/^SELECT id FROM clients WHERE id = \$1/.test(t)) return one(clients.includes(params[0]) ? { id: params[0] } : null);
+      if (/^SELECT project_id FROM briefs WHERE project_id = \$1/.test(t)) return one(briefs.includes(params[0]) ? { project_id: params[0] } : null);
+      if (/^SELECT id FROM clients WHERE source_brief_id = \$1/.test(t)) return one(briefClients[params[0]] ? { id: briefClients[params[0]] } : null);
+      if (/^SELECT .* FROM proposals WHERE brief_ref = \$1/.test(t)) {
+        const rows = st.proposals.filter((p) => p.brief_ref === params[0]);
+        return { rowCount: rows.length, rows: [...rows].reverse() };
+      }
       if (/^SELECT next_proposal_id\(\)/.test(t)) return one({ id: 'PROP-' + String(++st.seq).padStart(3, '0') });
       if (/^INSERT INTO proposals/.test(t)) {
-        const [ref, lead_ref, client_id, status, created_by, source_ref, actor_email, catalog_version, options, rec, value, expires, next, notes] = params;
+        st.inserts.push(t);
+        const [ref, lead_ref, client_id, status, created_by, source_ref, actor_email, catalog_version, options, rec, value, expires, next, notes, brief_ref = null] = params;
         if (source_ref && st.proposals.some((p) => p.created_by === created_by && p.source_ref === source_ref)) return one(null);
         const sent = /\$11, NOW\(\)/.test(t);
         const row = {
           id: String(st.proposals.length + 1), ref_id: ref, lead_ref, client_id: client_id == null ? null : String(client_id), status,
-          created_by, source_ref, actor_email, catalog_version, options: JSON.parse(options), recommended_option: rec,
+          created_by, source_ref, actor_email, catalog_version, options: JSON.parse(options), recommended_option: rec, brief_ref,
           chosen_option: null, client_value_cents: value == null ? null : String(value), sent_at: sent ? 'ahora' : null,
           sent_on: sent ? today : null, expires_on: expires, follow_ups_done: 0, next_follow_up_on: next, notes,
         };
@@ -227,7 +234,7 @@ function fakeDb({ catalog = CAT, leads = {}, clients = [9], proposals = [], fail
       if (/^UPDATE proposals SET status = 'expired'/.test(t)) {
         const hit = st.proposals.filter((p) => p.status === 'sent' && p.expires_on < params[0]);
         hit.forEach((p) => { p.status = 'expired'; p.next_follow_up_on = null; });
-        return { rowCount: hit.length, rows: hit.map((p) => ({ ref_id: p.ref_id, lead_ref: p.lead_ref })) };
+        return { rowCount: hit.length, rows: hit.map((p) => ({ ref_id: p.ref_id, lead_ref: p.lead_ref, brief_ref: p.brief_ref || null })) };
       }
       if (/^SELECT status, COUNT\(\*\)::int AS n FROM leads/.test(t)) {
         const m = {};
@@ -344,6 +351,23 @@ await check('guardar: sin la migración 029 → 503', async () => {
   const db = fakeDb({ failOn: /sales_catalog/, failCode: '42P01' });
   await assert.rejects(saveProposal({ lead_ref: 'LEAD-1', options: [{ plan: 'presencia' }] }, deps(db)),
     (e) => e.status === 503 && e.message === MIGRATION_029_MSG);
+});
+await check('guardar (032): la propuesta de un brief, sin contacto; si el brief ya es cliente, va también al cliente', async () => {
+  const db = fakeDb({ briefClients: { 'MRC-050': '9' } });
+  const r = await saveProposal({ brief_ref: 'mrc-050', created_by: 'marcy', source_ref: 'conv-9', options: [{ plan: 'crecimiento' }] }, deps(db));
+  assert.equal(r.created, true);
+  assert.equal(r.proposal.client_id, 9);
+  assert.equal(db.st.proposals[0].brief_ref, 'MRC-050');
+  assert.equal(r.lead_status, null);
+  assert.match(db.st.inserts[0], /notes, brief_ref/);
+  const l = await listProposals({ brief_ref: 'MRC-050' }, deps(db));
+  assert.deepEqual(l.map((p) => p.ref_id), ['PROP-001']);
+  await assert.rejects(saveProposal({ brief_ref: 'MRC-404', options: [{ plan: 'crecimiento' }] }, deps(fakeDb())), (e) => e.status === 404);
+});
+await check('guardar: sin brief, el INSERT no nombra brief_ref (funciona sin la 032)', async () => {
+  const db = fakeDb({ leads: { 'LEAD-060': { status: 'new' } } });
+  await saveProposal({ lead_ref: 'LEAD-060', options: [{ plan: 'presencia' }] }, deps(db));
+  assert.ok(!/brief_ref/.test(db.st.inserts[0]));
 });
 await check('guardar: contacto o cliente que no existen → 404', async () => {
   await assert.rejects(saveProposal({ lead_ref: 'LEAD-999', options: [{ plan: 'presencia' }] }, deps(fakeDb())), (e) => e.status === 404);
@@ -479,6 +503,13 @@ await check('siguiente: sin seguimientos que hacer, espera; vencida, atrasado', 
   assert.equal(nextStep({ status: 'proposal' }, { ...p, status: 'expired', expires_on: '2026-11-15' }, { now: N }).bucket, 'late',
     'la ya marcada como caducada sigue avisando hasta que el dueño decida');
 });
+await check('siguiente: un borrador sin enviar pide enviarlo en 24 horas desde que se creó, y manda sobre lo demás', () => {
+  const draft = { status: 'draft', created_at: at('2026-11-20T10:00:00Z') };
+  assert.deepEqual(nextStep({ status: 'new', created_at: at('2026-11-18T00:00:00Z') }, draft, { now: N }), { kind: 'send_proposal', due: '2026-11-21T10:00:00.000Z', bucket: 'today' });
+  assert.equal(nextStep({ status: 'contacted', created_at: at('2026-11-01T00:00:00Z') }, { ...draft, created_at: at('2026-11-18T10:00:00Z') }, { now: N }).bucket, 'late');
+  assert.equal(nextStep({ status: 'proposal' }, draft, { now: N }).kind, 'send_proposal', 'en «propuesta enviada» sin enviar nada todavía');
+  assert.equal(nextStep({ status: 'converted' }, draft, { now: N }).kind, 'none', 'ganado: no pide nada');
+});
 await check('siguiente: contactado, sin siguiente paso y los días que lleva', () => {
   assert.deepEqual(nextStep({ status: 'contacted', created_at: at('2026-11-01T00:00:00Z'), stage_changed_at: at('2026-11-14T12:00:00Z') }, null, { now: N }),
     { kind: 'none', days: 6, bucket: 'week' });
@@ -493,7 +524,7 @@ await check('en curso: cada contacto con su propuesta viva resumida y su siguien
       return { rowCount: 2, rows: [
         { ref_id: 'LEAD-1', status: 'proposal', created_at: at('2026-11-10T00:00:00Z'), p_ref: 'PROP-1', p_status: 'sent',
           p_options: [{ project_cents: 10, monthly_cents: 20 }, { project_cents: 30, monthly_cents: 40 }], p_rec: 1,
-          p_expires_on: '2026-11-27', p_next: '2026-11-20', p_done: 1, p_sent_on: '2026-11-13' },
+          p_expires_on: '2026-11-27', p_next: '2026-11-20', p_done: 1, p_sent_on: '2026-11-13', p_created_at: at('2026-11-12T00:00:00Z') },
         { ref_id: 'LEAD-2', status: 'new', created_at: at('2026-11-19T10:00:00Z'), p_ref: null },
       ] };
     }
@@ -501,7 +532,7 @@ await check('en curso: cada contacto con su propuesta viva resumida y su siguien
   };
   const rows = await pipelineLeads(deps(db));
   assert.deepEqual(rows[0].proposal, { ref_id: 'PROP-1', status: 'sent', options: 2, project_cents: 30, monthly_cents: 40,
-    expires_on: '2026-11-27', next_follow_up_on: '2026-11-20', follow_ups_done: 1, sent_on: '2026-11-13', effective_status: 'sent' });
+    expires_on: '2026-11-27', next_follow_up_on: '2026-11-20', follow_ups_done: 1, sent_on: '2026-11-13', created_at: at('2026-11-12T00:00:00Z'), effective_status: 'sent' });
   assert.deepEqual(rows[0].next, { kind: 'follow_up', due: '2026-11-20', step: 5, bucket: 'today' });
   assert.equal(rows[1].proposal, null);
   assert.equal(rows[1].next.bucket, 'late');
@@ -509,6 +540,14 @@ await check('en curso: cada contacto con su propuesta viva resumida y su siguien
 });
 
 // ── Estático: la migración y las listas del código ──────────────
+const MIG32 = fs.readFileSync(path.join(ROOT, 'db/migrations/032_propuestas_brief.sql'), 'utf8')
+  .split('\n').filter((l) => !l.trim().startsWith('--')).join('\n');
+await check('032: solo añade la columna del brief, su índice y su relación', () => {
+  assert.match(MIG32, /ADD COLUMN IF NOT EXISTS brief_ref TEXT/);
+  assert.match(MIG32, /REFERENCES briefs\(project_id\) ON DELETE SET NULL/);
+  assert.match(MIG32, /CREATE INDEX IF NOT EXISTS idx_proposals_brief/);
+  assert.ok(!/\bDROP\b|^\s*DELETE\b|^\s*UPDATE\b/im.test(MIG32));
+});
 const MIG = fs.readFileSync(path.join(ROOT, 'db/migrations/029_ventas_embudo.sql'), 'utf8');
 const sqlOnly = MIG.split('\n').filter((l) => !l.trim().startsWith('--')).join('\n');
 const listIn = (re) => [...(sqlOnly.match(re)?.[1] || '').matchAll(/'([a-z_]+)'/g)].map((m) => m[1]);
@@ -561,7 +600,8 @@ if (realPath && fs.existsSync(realPath)) {
       'lib/proposals.mjs', 'db/migrations/029_ventas_embudo.sql', 'docs/orbit/plan-ventas-orbit.md', 'design/ventas.md',
       'scripts/test-proposals.mjs', 'scripts/sync-catalogo-orbit.mjs', 'api/admin/leads/[id].mjs',
     ];
-    files.push('scripts/test-crm.mjs', 'src/components/dashboard/LeadsSection.svelte', 'api/admin/proposals.mjs', 'api/cron/finanzas.mjs');
+    files.push('scripts/test-crm.mjs', 'src/components/dashboard/LeadsSection.svelte', 'api/admin/proposals.mjs', 'api/cron/finanzas.mjs',
+      'scripts/ficha-llamada.mjs', 'scripts/test-ficha-llamada.mjs', 'docs/orbit/ficha-llamada.md', 'db/sql/orbit-lectura.sql');
     for (const dir of ['src/components/dashboard/crm', 'src/components/dashboard/ventas']) {
       const abs = path.join(ROOT, dir);
       if (fs.existsSync(abs)) for (const f of fs.readdirSync(abs)) files.push(dir + '/' + f);

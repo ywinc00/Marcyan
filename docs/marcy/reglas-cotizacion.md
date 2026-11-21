@@ -59,14 +59,16 @@ Pruebas: `npm run test:cotizar` y la batería `npm run eval:marcy`.
 
 ## Dónde queda la cotización
 
-- En la conversación (columna `quote` de `chat_conversations`), con los ids de plan, servicio y añadido,
-  la recomendada y lo que le vale un cliente.
-- En Orbit, como **borrador** (`created_by: 'marcy'`, `send: false`) unido al contacto, en cuanto la
-  conversación tiene un lead (`LEAD-…`): al dejar su contacto, al agendar o por WhatsApp e Instagram. La
-  envía el dueño desde Orbit. `source_ref` = la conversación más una clave de la cotización: el reintento
-  no duplica.
-- El cliente decidido va al brief (`MRC-…`), que Orbit todavía no admite en una propuesta: su cotización
-  queda en la conversación hasta que exista la forma (pedido a Bases y Estructura el 20-nov).
+- En la conversación (migración 031, columnas `quote`, `quote_at` y `quote_proposal` de
+  `chat_conversations`): los ids de plan, servicio y añadido con el precio que Marcy dijo (en centavos,
+  para que la propuesta sea la misma; la base es privada), la recomendada y lo que le vale un cliente.
+- En Orbit, como **borrador** (`created_by: 'marcy'`; enviada o no se decide en un solo sitio,
+  `MARCY_QUOTE_SENT` de `lib/marcy-quote.mjs`, hoy borrador por decisión del 20-nov) en cuanto la
+  conversación tiene contacto (`LEAD-…`: al dejar sus datos, al agendar o por WhatsApp e Instagram) o brief
+  (`MRC-…`, el cliente que se decidió; `brief_ref`, desde la migración 032 de Orbit). La envía el dueño
+  desde Orbit. `source_ref` = la conversación más una clave de la cotización: el reintento no duplica.
+- Si no entra (Orbit caído, o un brief antes de la 032), queda pendiente y la tarea de cada 5 minutos
+  (`api/cron/canales`) la reintenta durante 30 días.
 - Pendiente (Orbit fase 2): si quien escribe ya es cliente, saber su plan y ofrecer el siguiente.
 
 ## Cambios

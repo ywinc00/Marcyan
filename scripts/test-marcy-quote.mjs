@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildQuote, quoteKey, saveQuote, attachQuote, salesCatalog, __resetCatalogCache, planIncludes, CONDICIONES } from '../lib/marcy-quote.mjs';
+import { buildQuote, quoteKey, saveQuote, attachQuote, retryPendingQuotes, salesCatalog, __resetCatalogCache, planIncludes, CONDICIONES, MARCY_QUOTE_SENT } from '../lib/marcy-quote.mjs';
 import { QUOTE_TOOL, QUOTE_SERVICES, QUOTE_PLANS, SYSTEM_PROMPT, pricePostFilter } from '../lib/chat-kb.mjs';
 import { quoteToolResult } from '../api/chat.mjs';
 
@@ -59,7 +59,9 @@ await check('paquetes: tres opciones en el orden de la lista, la completa primer
   assert.deepEqual(o.map((x) => x.recomendada), [false, true, false]);
   assert.deepEqual(o.map((x) => x.pago_unico), [7070, 3030, 1010]);
   assert.deepEqual(o.map((x) => x.mensual), [888, 555, 333]);
-  assert.equal(o[0].servicios[0].desde, true, 'la web por ciudades es un «desde»');
+  assert.equal(o[0].servicios[0].desde, 7070, 'la web por ciudades es un «desde»');
+  assert.equal(o[0].pago_unico_es_desde, true);
+  assert.equal(o[1].pago_unico_es_desde, undefined);
   assert.equal(o[1].nota, CONDICIONES.es.tresPagos, 'la recomendada lleva la web en tres pagos');
   assert.equal(q.save.recommended_option, 1);
 });
@@ -164,13 +166,15 @@ await check('guion: planes por su nombre, completa primero, valor de un cliente 
 });
 
 // ── Guardar en la conversación y en Orbit ──
-function fakeSql({ leadRef = null, quote = null, noColumn = false } = {}) {
+function fakeSql({ leadRef = null, quote = null, noColumn = false, pending = [] } = {}) {
   const calls = [];
   const sql = async (strings, ...values) => {
     const text = strings.join('?');
     calls.push({ text, values });
     if (noColumn && /quote/.test(text)) { const e = new Error('column "quote" does not exist'); e.code = '42703'; throw e; }
-    if (/^UPDATE chat_conversations SET quote/.test(text.trim())) return { rows: [{ lead_ref: leadRef }], rowCount: 1 };
+    if (/^UPDATE chat_conversations SET quote_proposal/.test(text.trim())) return { rows: [], rowCount: 1 };
+    if (/^UPDATE chat_conversations SET quote =/.test(text.trim())) return { rows: [{ lead_ref: leadRef }], rowCount: 1 };
+    if (/quote_proposal IS NULL/.test(text)) return { rows: pending, rowCount: pending.length };
     if (/SELECT quote FROM chat_conversations/.test(text)) return { rows: quote ? [{ quote }] : [], rowCount: quote ? 1 : 0 };
     return { rows: [], rowCount: 0 };
   };
@@ -193,15 +197,39 @@ await check('con contacto: borrador en Orbit, de Marcy, con la conversación de 
   assert.equal(saved[0].lead_ref, 'LEAD-042');
   assert.equal(saved[0].created_by, 'marcy');
   assert.equal(saved[0].send, false);
+  assert.equal(MARCY_QUOTE_SENT, false, 'decidido el 20-nov: borrador');
   assert.equal(saved[0].client_value_cents, 30000);
   assert.match(saved[0].source_ref, /^chat:abc-1:[a-z0-9]+$/);
 });
-await check('un brief (MRC) o un paso a persona no reciben la propuesta', async () => {
-  const { sql } = fakeSql({ leadRef: 'MRC-012' });
+await check('el cliente decidido (brief MRC) la recibe con brief_ref; un paso a persona no', async () => {
+  const { sql, calls } = fakeSql({ leadRef: 'MRC-012' });
   const saved = [];
-  await saveQuote({ sid: 'abc-1', quote: SAVE, sqlImpl: sql, save: async (x) => { saved.push(x); } });
-  assert.equal(await attachQuote({ sid: 'abc-1', ref: 'MRC-012', sqlImpl: sql, save: async (x) => { saved.push(x); } }), null);
-  assert.equal(saved.length, 0);
+  const ref = await saveQuote({ sid: 'abc-1', quote: SAVE, sqlImpl: sql, save: async (x) => { saved.push(x); return { proposal: { ref_id: 'PROP-3' } }; } });
+  assert.equal(ref, 'PROP-3');
+  assert.equal(saved[0].brief_ref, 'MRC-012');
+  assert.equal(saved[0].lead_ref, undefined);
+  assert.ok(calls.some((c) => /SET quote_proposal/.test(c.text) && c.values.includes('PROP-3')), 'anota la propuesta en la conversación');
+  const none = fakeSql({ leadRef: null });
+  const s2 = [];
+  assert.equal(await saveQuote({ sid: 'abc-2', quote: SAVE, sqlImpl: none.sql, save: async (x) => { s2.push(x); } }), null);
+  assert.equal(await attachQuote({ sid: 'abc-2', ref: 'HANDOFF', sqlImpl: none.sql, save: async (x) => { s2.push(x); } }), null);
+  assert.equal(s2.length, 0);
+});
+await check('reintento: las pendientes con contacto o brief entran; si Orbit da 503 siguen pendientes', async () => {
+  const pending = [
+    { sid: 's-1', lead_ref: 'LEAD-7', quote: { ...SAVE, key: 'a' } },
+    { sid: 's-2', lead_ref: 'MRC-9', quote: { ...SAVE, key: 'b' } },
+  ];
+  const { sql } = fakeSql({ pending });
+  const saved = [];
+  const n = await retryPendingQuotes({ sqlImpl: sql, save: async (x) => {
+    saved.push(x);
+    if (x.brief_ref) { const e = new Error('Falta la migración'); e.status = 503; throw e; }
+    return { proposal: { ref_id: 'PROP-11' } };
+  } });
+  assert.equal(n, 1);
+  assert.deepEqual(saved.map((x) => x.source_ref), ['chat:s-1:a', 'chat:s-2:b']);
+  assert.equal(await retryPendingQuotes({ sqlImpl: fakeSql({ noColumn: true }).sql }), 0);
 });
 await check('al llegar el contacto, la cotización guardada pasa a Orbit con la misma clave', async () => {
   const { sql } = fakeSql({ quote: { ...SAVE, key: 'k1' } });

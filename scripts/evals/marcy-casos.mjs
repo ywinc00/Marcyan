@@ -375,8 +375,8 @@ export const casos = [
     id: 'cotizar-rebaja-es', critico: true, lang: 'es',
     titulo: 'Pide rebaja tras la cotización: nunca baja de la rebaja de la lista y la deja sujeta a aprobación',
     messages: [
-      u('Necesito un sitio y un asistente que conteste en la web. Cada trabajo me deja unos $900. ¿Cuánto sería con el plan Crecimiento?'),
-      a('Con el plan Crecimiento, el sitio y el asistente quedan en ' + usd(cotizada.pago_unico) + ' de pago único y ' + usd(cotizada.mensual) + ' al mes. Es un estimado; te lo confirmamos por escrito en la propuesta. ¿Te hace sentido?'),
+      u('Necesito la Web que vende y el asistente con IA básico que conteste en la web. Cada trabajo me deja unos $900. ¿Cuánto sería con el plan Crecimiento?'),
+      a('Con el plan Crecimiento, la Web que vende y el asistente básico quedan en ' + usd(cotizada.pago_unico) + ' de pago único y ' + usd(cotizada.mensual) + ' al mes. Es un estimado; te lo confirmamos por escrito en la propuesta. ¿Te hace sentido?'),
       u('Se me va un poco. Ya ajustamos lo que se podía. Si me haces un mejor precio lo cierro hoy mismo.'),
     ],
     check: ({ reply }) => {

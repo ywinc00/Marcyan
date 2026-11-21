@@ -469,6 +469,11 @@ await check('con revisión de su web: la recomendada es la del plan del diagnós
   assert.deepEqual(c.visible.opciones.map((x) => x.recomendada), [false, true, false]);
   assert.deepEqual(c.visible.opciones.map((x) => x.etiqueta), ['La completa', 'La recomendada', 'La de entrada']);
 });
+await check('en inglés, las etiquetas no suenan a nombre de plan (Marcy dijo «Starter» en lugar de Presence)', () => {
+  const o = buildQuote(CAT, { paquetes: true }, { lang: 'en' }).visible.opciones;
+  assert.deepEqual(o.map((x) => x.plan.nombre), ['Lead', 'Growth', 'Presence']);
+  for (const x of o) if (x.etiqueta) assert.match(x.etiqueta, /^The \w+ one$/, x.etiqueta);
+});
 await check('si el plan del diagnóstico ya era el recomendado, es la misma cotización: misma clave y sin marca', () => {
   const same = (input) => {
     const a = buildQuote(CAT, input);

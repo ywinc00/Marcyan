@@ -34,7 +34,8 @@ export interface DiagCopy {
     signalsLabel: string;
     signals: string[];
     rutaLabel: string;
-    ruta: string;
+    /** Plan del ejemplo (clave del catálogo); nombre y frase salen de lib/planes.generado.mjs. */
+    rutaPlan: 'presencia' | 'crecimiento' | 'dominio';
     rutaNote: string;
     sr: string;
   };
@@ -78,10 +79,10 @@ export const diagCopy: Record<DiagLang, DiagCopy> = {
         'Falta la descripción que Google muestra bajo tu nombre.',
         'No se puede llamar con un toque desde el móvil.',
       ],
-      rutaLabel: 'Ruta sugerida',
-      ruta: 'SEO para IA',
-      rutaNote: 'El área más débil de este ejemplo, por donde conviene empezar.',
-      sr: 'Ejemplo de resultado: puntaje 56 de 100, prioridad media. Web móvil 80, SEO local 55, lectura por IA 30, conversión 50 y reseñas 60. Ruta sugerida: SEO para IA.',
+      rutaLabel: 'Plan recomendado',
+      rutaPlan: 'dominio',
+      rutaNote: 'Lo más flojo de este ejemplo es que la IA pueda leer y citar la web.',
+      sr: 'Ejemplo de resultado: puntaje 56 de 100, prioridad media. Web móvil 80, SEO local 55, lectura por IA 30, conversión 50 y reseñas 60.',
     },
     gratis: {
       label: 'Gratis de verdad',
@@ -125,10 +126,10 @@ export const diagCopy: Record<DiagLang, DiagCopy> = {
         'The description Google shows under your name is missing.',
         'You cannot call with one tap from mobile.',
       ],
-      rutaLabel: 'Suggested path',
-      ruta: 'AI visibility (AEO)',
-      rutaNote: 'The weakest area in this example, and the place to start.',
-      sr: 'Example result: score 56 out of 100, medium priority. Mobile site 80, local SEO 55, AI readability 30, conversion 50 and reviews 60. Suggested path: AI visibility.',
+      rutaLabel: 'Recommended plan',
+      rutaPlan: 'dominio',
+      rutaNote: 'The weakest point in this example is whether AI can read and cite the site.',
+      sr: 'Example result: score 56 out of 100, medium priority. Mobile site 80, local SEO 55, AI readability 30, conversion 50 and reviews 60.',
     },
     gratis: {
       label: 'Free, for real',

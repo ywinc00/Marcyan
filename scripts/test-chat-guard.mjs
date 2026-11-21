@@ -70,6 +70,14 @@ check('sessionId vacío → false', () => assert.equal(validSessionId(''), false
 check('sessionId con espacio → false', () => assert.equal(validSessionId('a b'), false));
 check('sessionId no-string → false', () => assert.equal(validSessionId(123), false));
 check('sessionId > 64 chars → false', () => assert.equal(validSessionId('a'.repeat(65)), false));
+check('sessionId de un canal (WhatsApp, Instagram, teléfono) → false: nadie lee ni escribe una conversación ajena', () => {
+  for (const sid of ['wa-17135550000', 'ig-17841400000000000', 'tel-CA1234567890abcdef', 'Wa-1', 'TEL-x']) assert.equal(validSessionId(sid), false, sid);
+  // Los del widget siguen valiendo: UUID o el respaldo con la hora.
+  assert.equal(validSessionId('6f1c2b0e-9a4d-4c3e-8f7a-2b1d0c9e8a7f'), true);
+  assert.equal(validSessionId('1700000000000k3j2h1g'), true);
+  assert.equal(validSessionId('eval-precio-seo-es-0-2026-11-21T03-00-00'), true, 'la batería');
+  assert.equal(validSessionId('wave-123'), true, 'solo el prefijo exacto de canal');
+});
 
 // ── v2: stripMarkdown ──
 check('strip negrita **x**', () => assert.equal(stripMarkdown('precio **$1,500** hoy'), 'precio $1,500 hoy'));

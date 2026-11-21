@@ -44,7 +44,7 @@ import { fichaForChat } from '../lib/diagnostic-rubric.mjs';
 import { rateLimit as persistLimit, LIMITS as RL, GLOBAL_KEY } from '../lib/ratelimit.mjs';
 // Coste y caché por turno (encargo P2): solo números, import dinámico de la base dentro.
 import { sumUsage, turnCostMicroUsd, usageLogLine, recordUsage } from '../lib/chat-usage.mjs';
-import { recordTurn } from '../lib/chat-log.mjs';
+import { recordTurn, webSid } from '../lib/chat-log.mjs';
 import { isTakenOver, recordVisitorWaiting, ownerTexts, tagOwnerTurns, OWNER_CONTEXT, OWNER_TAG } from '../lib/takeover.mjs';
 
 // Entorno de Vercel. La vista previa usa la MISMA base que producción: sus frenos
@@ -248,8 +248,10 @@ export function validateMessages(raw) {
   return out;
 }
 
+// Lo usan el chat, sus avisos (chat-updates) y el paso a persona (handoff): nunca el id de
+// una conversación de WhatsApp, Instagram o teléfono (lib/chat-log.mjs, webSid).
 export function validSessionId(sid) {
-  return typeof sid === 'string' && /^[\w-]{1,64}$/.test(sid);
+  return webSid(sid);
 }
 
 // Herramientas de SOLO-UI que reconocemos (una acción por turno; default seguro).

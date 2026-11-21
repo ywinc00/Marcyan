@@ -175,7 +175,7 @@ function deps(state, over = {}) {
   return {
     sqlImpl: fakeSql(state),
     takeover: { isTakenOver: async () => !!state.taken, recordVisitorWaiting: async (a) => state.waiting.push(a.text), ownerTexts: async () => [], tagOwnerTurns: (m) => ({ messages: m, tagged: 0 }), OWNER_CONTEXT: '' },
-    chatLog: { recordTurn: async (t) => { state.recorded.push(t); return true; }, linkLead: async () => true },
+    chatLog: { recordTurn: async (t) => { state.recorded.push(t); return true; }, linkLead: async (l) => { (state.linked ||= []).push(l); return true; } },
     notifications: { createNotification: async (x) => { state.notes.push(x); } },
     leads: { createLead: async (l) => { state.leads.push(l); return 'LEAD-1'; } },
     appointments: { takenSlots: async () => [], createAppointment: async (a) => { state.appts.push(a); return { ok: true, id: 1 }; } },
@@ -236,6 +236,7 @@ await aok('captura: lead con el número de WhatsApp, sin pedir formulario', asyn
   await processInbound(ROW, deps(s));
   assert.equal(s.leads[0].phone, '+17135550000');
   assert.equal(s.leads[0].business_name, 'Salón Ana');
+  assert.deepEqual(s.linked.map((l) => [l.sid, l.fromChannel]), [['wa-17135550000', true]], 'el canal une su lead con su propio permiso');
   assert.deepEqual(s.sent, [CH_MSG.es.saved]);
   assert.equal(s.notes[0].type, 'new_lead');
 });

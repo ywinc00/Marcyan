@@ -249,6 +249,9 @@ export function leadEventText(ev) {
     case 'note_updated': return 'Notas actualizadas';
     case 'proposal_created': return `Propuesta ${d.proposal || ''} ${d.sent ? 'enviada' : 'en borrador'}${d.by && BY[d.by] ? `, la preparó ${BY[d.by]}` : ''}`.replace(/\s+/g, ' ');
     case 'proposal_sent': return `Propuesta ${d.proposal || ''} enviada`;
+    case 'proposal_edited': return `Borrador ${d.proposal || ''} corregido`;
+    case 'proposal_replaced': return `Borrador ${d.proposal || ''} sustituido por ${d.new_proposal || 'otro'}${d.by && BY[d.by] ? `, nueva cotización de ${BY[d.by]}` : ''}`;
+    case 'proposal_discarded': return `Borrador ${d.proposal || ''} descartado${d.by && BY[d.by] ? `, lo había preparado ${BY[d.by]}` : ''}`;
     case 'proposal_accepted': return `Propuesta ${d.proposal || ''} aceptada${d.option != null ? `: opción ${Number(d.option) + 1}` : ''}`;
     case 'proposal_rejected': return `Propuesta ${d.proposal || ''} rechazada`;
     case 'proposal_expired': return `Propuesta ${d.proposal || ''} vencida sin respuesta`;
@@ -289,9 +292,10 @@ export function nextStepText(next, { now = new Date() } = {}) {
         ? { long: 'pasó de 24 h', short: '+24 h', tone: 'error', what: 'Contestar' }
         : { long: 'contestar hoy', short: 'hoy', tone: 'warning', what: 'Contestar' };
     case 'send_proposal': {
-      if (next.bucket !== 'late') return { long: 'propuesta hoy', short: 'hoy', tone: 'warning', what: 'Enviar la propuesta' };
+      const what = next.pending_price ? 'Poner precio' : 'Enviar la propuesta';
+      if (next.bucket !== 'late') return { long: 'propuesta hoy', short: 'hoy', tone: 'warning', what };
       const d = next.due ? lateBy(next.due) : 1;
-      return { long: `propuesta, ${d} ${d === 1 ? 'día' : 'días'} tarde`, short: `${d} d tarde`, tone: 'error', what: 'Enviar la propuesta' };
+      return { long: `propuesta, ${d} ${d === 1 ? 'día' : 'días'} tarde`, short: `${d} d tarde`, tone: 'error', what };
     }
     case 'follow_up': {
       const what = next.step ? `Seguimiento del día ${next.step}` : 'Seguimiento';
@@ -364,7 +368,8 @@ export function optionPrice(o) {
   if (!o) return '';
   const p = Number(o.project_cents) || 0;
   const m = Number(o.monthly_cents) || 0;
-  return [p ? money(p) : '', m ? `${money(m)}/mes` : ''].filter(Boolean).join(' + ') || '$0';
+  const from = o.from_price || o.pending ? 'desde ' : '';
+  return [p ? from + money(p) : '', m ? `${money(m)}/mes` : ''].filter(Boolean).join(' + ') || '$0';
 }
 
 export const PROPOSAL_STATUS = {

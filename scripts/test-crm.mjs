@@ -375,6 +375,8 @@ await check('embudo: textos del siguiente paso, largos y cortos', () => {
   const sp = nextStepText({ kind: 'send_proposal', bucket: 'late', due: '2026-11-01T17:00:00Z' }, { now: NOW });
   assert.equal(sp.long, 'propuesta, 19 días tarde');
   assert.equal(sp.short, '19 d tarde');
+  assert.equal(sp.what, 'Enviar la propuesta');
+  assert.equal(nextStepText({ kind: 'send_proposal', bucket: 'today', pending_price: true }, { now: NOW }).what, 'Poner precio');
   assert.equal(nextStepText({ kind: 'follow_up', bucket: 'today', due: '2026-11-20', step: 5 }, { now: NOW }).long, 'seguimiento del día 5');
   assert.equal(nextStepText({ kind: 'follow_up', bucket: 'week', due: '2026-11-21', step: 10 }, { now: NOW }).long, 'seguimiento mañana');
   assert.equal(nextStepText({ kind: 'follow_up', bucket: 'week', due: '2026-11-24', step: 10 }, { now: NOW }).long, 'seguimiento el 24 nov');
@@ -406,6 +408,8 @@ await check('embudo: búsqueda y origen sobre En curso', () => {
   assert.deepEqual(filterPipeline(PIPE, { source: 'contact' }).map((r) => r.ref_id), ['C', 'D']);
   assert.equal(optionPrice({ project_cents: 123400, monthly_cents: 45600 }), '$1,234 + $456/mes');
   assert.equal(optionPrice({ project_cents: 0, monthly_cents: 45600 }), '$456/mes');
+  assert.equal(optionPrice({ project_cents: 123400, monthly_cents: 45600, from_price: true }), 'desde $1,234 + $456/mes', 'solo tiene «desde»');
+  assert.equal(optionPrice({ project_cents: 123400, monthly_cents: 0, pending: true }), 'desde $1,234');
   assert.equal(dayLabel('2026-11-27'), '27 nov');
 });
 await check('textos: historial y etiquetas legibles (nunca códigos crudos)', () => {
@@ -413,6 +417,10 @@ await check('textos: historial y etiquetas legibles (nunca códigos crudos)', ()
   assert.equal(leadEventText({ event_type: 'status_changed', data: { from: 'proposal', to: 'lost', lost_reason: 'price' } }), 'Etapa: Propuesta enviada → Perdido, motivo: precio');
   assert.equal(leadEventText({ event_type: 'status_changed', data: { from: 'new', to: 'diagnosed', by: 'diagnostic' } }), 'Etapa: Nuevo → Diagnóstico hecho (lo movió el diagnóstico)');
   assert.equal(leadEventText({ event_type: 'proposal_created', data: { proposal: 'PROP-004', sent: true, by: 'marcy' } }), 'Propuesta PROP-004 enviada, la preparó Marcy');
+  assert.equal(leadEventText({ event_type: 'proposal_edited', data: { proposal: 'PROP-004' } }), 'Borrador PROP-004 corregido');
+  assert.equal(leadEventText({ event_type: 'proposal_discarded', data: { proposal: 'PROP-004', by: 'diagnostic' } }), 'Borrador PROP-004 descartado, lo había preparado el diagnóstico');
+  assert.equal(leadEventText({ event_type: 'proposal_discarded', data: { proposal: 'PROP-004', by: 'orbit' } }), 'Borrador PROP-004 descartado');
+  assert.equal(leadEventText({ event_type: 'proposal_replaced', data: { proposal: 'PROP-004', by: 'marcy', new_proposal: 'PROP-007' } }), 'Borrador PROP-004 sustituido por PROP-007, nueva cotización de Marcy');
   assert.equal(leadEventText({ event_type: 'proposal_accepted', data: { proposal: 'PROP-004', option: 1 } }), 'Propuesta PROP-004 aceptada: opción 2');
   assert.equal(leadEventText({ event_type: 'converted_to_brief', data: { project_id: 'MRC-020' } }), 'Brief creado MRC-020');
   assert.equal(leadStatus('raro').label, 'Sin estado');

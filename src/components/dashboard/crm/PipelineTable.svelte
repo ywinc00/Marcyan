@@ -69,6 +69,9 @@
         {#if isOpen(g)}
           {#each g.items as lead (lead.ref_id)}
             {@const nt = nextStepText(lead.next, { now })}
+            {@const mobWhat = lead.next?.kind === 'follow_up' && lead.next.step ? `Día ${lead.next.step}` : nt.what}
+            {@const mobTail = lead.proposal ? optionPrice(lead.proposal.project_cents ? { ...lead.proposal, monthly_cents: 0 } : lead.proposal) : view === 'today' ? leadStatus(lead.status).label : ''}
+            {@const mobMonthly = lead.proposal?.project_cents && lead.proposal.monthly_cents ? `+ ${optionPrice({ project_cents: 0, monthly_cents: lead.proposal.monthly_cents })}` : ''}
             {@const src = leadSource(lead.source)}
             <tr>
               {#each cols as c (c)}
@@ -86,7 +89,8 @@
                         <!-- Tableta y portátil estrecho: interés, origen y llegada, bajo el contacto (el correo, en la ficha). -->
                         <span class="c-src">{[lead.interest, src.label, arrival(lead.created_at)].filter(Boolean).join(' · ')}</span>
                         <!-- Teléfono: qué toca y en qué etapa, bajo el nombre. -->
-                        <span class="c-mob">{[lead.next?.kind === 'follow_up' && lead.next.step ? `Día ${lead.next.step}` : nt.what, lead.proposal ? optionPrice(lead.proposal) : view === 'today' ? leadStatus(lead.status).label : ''].filter(Boolean).join(' · ')}</span>
+                        <!-- La cifra del proyecto nunca se corta: primero se acorta el paso y, si aun así no cabe, el mensual se queda en la ficha. -->
+                        <span class="c-mob"><span class="c-mob__what">{mobWhat}</span>{#if mobWhat && mobTail}<span class="c-mob__sep" aria-hidden="true">·</span>{/if}{#if mobTail}<span class="c-mob__tail">{mobTail}</span>{/if}{#if mobMonthly}<span class="c-mob__mo">{mobMonthly}</span>{/if}</span>
                       </span>
                     </a>
                   {:else if c === 'source'}
@@ -102,7 +106,7 @@
                     {#if lead.proposal}
                       <span class="prop">
                         <span class="prop__v">{optionPrice(lead.proposal)}</span>
-                        <span class="dim">{lead.proposal.sent_on ? `enviada el ${dayLabel(lead.proposal.sent_on)}` : 'en borrador'}</span>
+                        <span class="dim">{lead.proposal.sent_on ? `enviada el ${dayLabel(lead.proposal.sent_on)}` : lead.proposal.pending_price ? 'borrador, precio por confirmar' : 'en borrador'}</span>
                       </span>
                     {:else}<span class="none" aria-label="Sin propuesta">—</span>{/if}
                   {:else if c === 'next'}
@@ -205,7 +209,14 @@
     .grp__btn { min-height: 28px; }
     .grp__note { display: none; }
     .c-sub { display: none; }
-    .c-mob { display: block; font-size: var(--dash-caption); color: var(--fg-subtle); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    /* Una sola línea: el paso se acorta hasta unas 3 letras; si aun así no cabe el mensual, baja a una
+       segunda línea que no se ve (sigue en la ficha y en «Propuesto»). La cifra del proyecto nunca se corta,
+       y el paso no crece más que su texto (sin huecos). */
+    .c-mob { display: flex; flex-wrap: wrap; min-width: 0; font-size: var(--dash-caption); line-height: 1.45; max-height: 1.45em; overflow: hidden; color: var(--fg-subtle); margin-top: 2px; white-space: nowrap; }
+    .c-mob__what { flex: 1 1 3em; min-width: 0; max-width: max-content; overflow: hidden; text-overflow: ellipsis; }
+    .c-mob__sep { flex: 0 0 auto; padding-inline: var(--space-1); }
+    .c-mob__tail, .c-mob__mo { flex: 0 0 auto; }
+    .c-mob__mo { padding-left: var(--space-1); }
     .nx-long { display: none; }
     .nx-short { display: inline; }
   }

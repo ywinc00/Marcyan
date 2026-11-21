@@ -769,8 +769,8 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
       const fromR1 = parseToolResponse(r1.content, lang, { updatesAsText }).action;
       if (fromR1) { action = fromR1; if (!text) text = toolOnlyFallback(action, lang); }
     }
-    // Turno con cotizar: una cuota mensual por debajo de 100 también tiene que salir de cotizar.
-    const strict = { strictMonthly: !!(internal && internal.name === QUOTE_TOOL.name) };
+    // Turno con cotizar: también las cifras por debajo de 100 tienen que salir de cotizar o del cliente.
+    const strict = { strictLow: !!(internal && internal.name === QUOTE_TOOL.name) };
     const cortadas = blockedFigures(text || '', extraAllow, strict);
     if (cortadas.length) console.warn('[chat] cifra_cortada=' + cortadas.slice(0, 5).join(',') + ' herramienta=' + (internal ? internal.name : 'ninguna'));
     const rawReply = String(text || M.fallback).split(OWNER_TAG).join('').trim() || M.fallback;

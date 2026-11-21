@@ -364,8 +364,12 @@ await check('añadido pedido y no cotizado: queda dicho (no_cotizado) y en la no
   assert.match(q.save.notes, /pidió Seguimiento en IA, sin cotizar/);
   assert.deepEqual(q.stored.opciones[0].anadidos, ['aeoMonitoring']);
   assert.deepEqual(buildQuote(bajo, q.stored).visible, q.visible, 'al pasar a Orbit sale igual');
-  // Dominio no lo admite: tampoco se cobra, y se dice.
-  assert.deepEqual(buildQuote(CAT, { opciones: [{ plan: 'dominio', seguimiento_ia: true }] }).visible.opciones[0].no_cotizado, ['Seguimiento en IA']);
+  // Dominio no lo admite (ya trae el trabajo de IA): no lo lleva y no dice que va aparte.
+  const dom = buildQuote(CAT, { opciones: [{ plan: 'dominio', seguimiento_ia: true }] });
+  assert.equal(dom.visible.opciones[0].no_cotizado, undefined);
+  assert.doesNotMatch(dom.save.notes, /sin cotizar/);
+  // Sin plan no se puede llevar: se dice.
+  assert.deepEqual(buildQuote(CAT, { opciones: [{ servicios: ['web'], seguimiento_ia: true }] }).visible.opciones[0].no_cotizado, ['Seguimiento en IA']);
   // Cotizado de verdad: sin no_cotizado.
   assert.equal(buildQuote(CAT, { opciones: [{ plan: 'crecimiento', seguimiento_ia: true }] }).visible.opciones[0].no_cotizado, undefined);
 });
@@ -383,6 +387,21 @@ await check('ids con nombre de propiedad interna (constructor, toString) no romp
   assert.equal(q.ok, true);
   assert.deepEqual(q.visible.opciones[0].servicios.map((s) => s.nombre), ['Web que vende']);
   assert.equal(q.visible.opciones[0].plan, null);
+});
+await check('la tarea de 5 min pone precio con la lista recién leída aunque haya otra en memoria', async () => {
+  __resetCatalogCache();
+  await salesCatalog({ sqlImpl: async () => ({ rows: [] }), load: async () => ({ body: { ...CAT, version: 'vieja' } }) });
+  const { sql } = fakeSql({ pending: [{ sid: 's-1', lead_ref: 'LEAD-1', quote: STORED, quote_tries: 0 }] });
+  const saved = [];
+  assert.equal(await retryPendingQuotes({ sqlImpl: sql, enabled: true, save: okSave(saved), load: async () => ({ body: CAT }) }), 1);
+  assert.doesNotMatch(saved[0].notes, /La lista cambió/, 'usó la lista de la base (la misma versión), no la vieja de memoria');
+  __resetCatalogCache();
+});
+await check('los tres pagos van con el contenido: la opción a la medida con el plan y la web del paquete también los lleva', () => {
+  const o = buildQuote(CAT, { opciones: [{ plan: 'crecimiento', servicios: ['web'] }] }).visible.opciones[0];
+  assert.equal(o.nota, CONDICIONES.es.tresPagos);
+  assert.equal(buildQuote(CAT, { opciones: [{ plan: 'presencia', servicios: ['web'] }] }).visible.opciones[0].nota, undefined);
+  assert.equal(buildQuote(CAT, { opciones: [{ servicios: ['web'] }] }).visible.opciones[0].nota, undefined);
 });
 await check('la tarea de 5 min lee la lista de la base, no la de memoria', async () => {
   __resetCatalogCache();
@@ -416,11 +435,12 @@ await check('la frase de la garantía no hace saltar el filtro de marca; un clai
   assert.equal(brandBlocks(CONDICIONES.es.garantia + ' Y garantizamos más clientes.'), true);
 });
 await check('turno con cotizar: una cuota mensual inventada por debajo de 100 se corta; la de cotizar pasa', () => {
-  const strict = { strictMonthly: true };
-  assert.match(pricePostFilter('El asistente lleva una cuota de $45 al mes.', 'es', [], strict), /no me cuadra/);
-  assert.match(pricePostFilter('The assistant is $45/mo.', 'en', [], strict), /doesn.t sound right/);
+  const strict = { strictLow: true };
+  for (const t of ['El asistente lleva una cuota de $45 al mes.', 'El asistente lleva $45 de cuota mensual.', 'Son $45 más al mes.',
+    'Pagas $45 de mensualidad.', 'Lo mensual sube $45.']) assert.match(pricePostFilter(t, 'es', [], strict), /no me cuadra/, t);
+  for (const t of ['The assistant is $45/mo.', 'Add $45 extra per month.', 'The assistant adds $45 in monthly fees.']) assert.match(pricePostFilter(t, 'en', [], strict), /doesn.t sound right/, t);
   assert.equal(pricePostFilter('El asistente lleva $77 al mes.', 'es', ['77'], strict), 'El asistente lleva $77 al mes.');
-  assert.equal(pricePostFilter('Si cada corte te deja $45, se paga solo.', 'es', [], strict), 'Si cada corte te deja $45, se paga solo.');
+  assert.equal(pricePostFilter('Si cada corte te deja $45, se paga solo.', 'es', ['45'], strict), 'Si cada corte te deja $45, se paga solo.', 'la cifra que dijo el cliente pasa');
   assert.equal(pricePostFilter('El asistente lleva una cuota de $45 al mes.', 'es', []), 'El asistente lleva una cuota de $45 al mes.', 'sin cotizar en el turno, la banda baja sigue igual');
 });
 

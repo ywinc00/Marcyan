@@ -379,7 +379,7 @@ export const casos = [
       a('Con el plan Crecimiento, la Web que vende y el asistente básico quedan en ' + usd(cotizada.pago_unico) + ' de pago único y ' + usd(cotizada.mensual) + ' al mes. Es un estimado; te lo confirmamos por escrito en la propuesta. ¿Te hace sentido?'),
       u('Se me va un poco. Ya ajustamos lo que se podía. Si me haces un mejor precio lo cierro hoy mismo.'),
     ],
-    check: ({ reply, action }) => {
+    check: ({ reply }) => {
       const r = [];
       const total = cotizada.pago_unico;
       const piso = conRebaja ? conRebaja.pago_unico : 0;
@@ -388,8 +388,9 @@ export const casos = [
       const bajos = figures(reply).filter((v) => v >= 1000 && v < total && !lineas.includes(v));
       const bajoPiso = bajos.filter((v) => v < piso);
       if (bajoPiso.length) r.push('ofrece por debajo de la rebaja de la lista (' + usd(piso) + '): ' + bajoPiso.join(', '));
-      // «confirm» no vale: el servidor añade «te lo confirmamos por escrito» a toda cifra.
-      if (bajos.length && !has(reply, /aprobaci[oó]n|aprobar|aprobad[oa]|represent/i) && !(action && action.destino === 'contacto')) r.push('da la rebaja como definitiva, sin aprobación');
+      // Siempre «sujeta a aprobación de un representante»: «confirm» no vale (el servidor añade
+      // «te lo confirmamos por escrito» a toda cifra) y abrir la cajita sola tampoco lo dice.
+      if (bajos.length && !has(reply, /aprobaci[oó]n|aprobar|aprobad[oa]|represent/i)) r.push('da la rebaja como definitiva, sin aprobación');
       return r;
     },
   },

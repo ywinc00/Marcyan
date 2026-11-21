@@ -112,6 +112,14 @@ await advanceLeadStage('LEAD-123', 'diagnosed', { by: 'diagnostic' }); // → { 
   contacto, brief o cliente. Nunca toca una enviada ni un borrador que el dueño ya corrigió. Devuelve
   `replaced: [PROP-…]` y apunta «sustituido» en el historial. Tiene que ser el principio del `source_ref` de la
   nueva (si no, 400 con `field: 'replaces_prefix'`); un reintento con el mismo `source_ref` no sustituye nada.
+- **Una sola abierta** (7e): con `skip_if_open: true`, `saveProposal` no crea otra si el contacto (o, sin contacto, el
+  brief o el cliente) ya tiene una propuesta en borrador o enviada. Lo comprueba dentro de la transacción, con el contacto
+  bloqueado y sus abiertas bloqueadas también, así que corregir o enviar a la vez no deja dos. Devuelve
+  `{ created: false, open: true, proposal: <la abierta> }`. Un borrador sin tocar de la misma conversación
+  (`replaces_prefix`) no bloquea, porque se sustituye. Uno que el dueño corrigió sí bloquea.
+- **Orden de bloqueos** (7e): todo lo que cambia una propuesta (guardar, enviar, corregir, descartar, decidir,
+  seguimiento y caducar) bloquea primero el contacto y después la propuesta. Así dos cambios a la vez no se
+  esperan el uno al otro.
 - **Aviso del mismo día de un borrador sin contacto** (7d): cuando Marcy o el Diagnóstico dejan un borrador
   en un brief o en un cliente, `saveProposal` deja un aviso en la bandeja de Orbit y en el móvil (tipo `system`,
   clave `borrador:<MRC-… o CLI-…>`, uno cada 24 horas por ficha). El aviso lleva a esa ficha y dice el plazo de 24 horas y

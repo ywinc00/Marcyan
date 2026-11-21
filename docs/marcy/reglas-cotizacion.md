@@ -80,8 +80,9 @@ se copia en otro archivo. Cambiar una es cambiarla ahí, con el texto que dé Le
 
 - `permanencia` (mes a mes, salvo con la web en tres pagos), `garantia`, `tresPagos` (solo en el paquete
   que lo lleva) y `recuerda` (es un estimado que se confirma por escrito).
-- `anual` (pago del año por adelantado): **pendiente de Legal** (20-nov). Dicha en el chat puede
-  entenderse como 13 meses por el precio de 12; el texto final llega antes de publicar.
+- `anual` (pago del año por adelantado): texto final de Legal (21-nov, §4, con OK del dueño), que
+  dice los meses que se pagan y los que se reciben para que nadie entienda 13 por el precio de 12.
+  Marcy la dice tal cual: nada de «mes de regalo» ni de un descuento en porcentaje.
 - Nada sobre impuestos (pendiente del contador). Los textos en inglés son traducción, sin revisar por Legal.
 
 ## Dónde queda la cotización

@@ -46,7 +46,8 @@ export function seccionVenta(d, ahora = new Date()) {
   out.push('- ' + linea([['Etapa', leadStatus(lead.status).label], ['Desde', fecha(lead.stage_changed_at)]]));
   if (lead.status === 'lost') out.push('- ' + linea([['Motivo', lostReason(lead.lost_reason)?.label], ['Nota', corta(lead.lost_note, 200)]]));
   const props = d.propuestas || [];
-  const viva = props.find((p) => p.status === 'sent' || p.status === 'expired') || null;
+  // La viva: la enviada (o vencida); si no hay, el borrador sin enviar, que también pide plazo.
+  const viva = props.find((p) => p.status === 'sent' || p.status === 'expired') || props.find((p) => p.status === 'draft') || null;
   if (OPEN_STATUSES.includes(lead.status)) {
     const n = nextStep(lead, viva, { now: ahora });
     const t = nextStepText(n, { now: ahora });

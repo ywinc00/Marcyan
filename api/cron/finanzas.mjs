@@ -76,7 +76,8 @@ export default async function handler(req, res) {
           key: `ventas-vencida:${it.ref_id}`,
           title: `Venció sin respuesta la propuesta ${it.ref_id}`,
           body: 'Pasaron 14 días. En su ficha decide si la eligió, si la rechazó o si haces otra.',
-          url: it.lead_ref ? `/dashboard#/leads/${encodeURIComponent(it.lead_ref)}` : '/dashboard#/leads?vista=hoy',
+          url: it.lead_ref ? `/dashboard#/leads/${encodeURIComponent(it.lead_ref)}`
+            : it.brief_ref ? `/dashboard#/briefs/${encodeURIComponent(it.brief_ref)}` : '/dashboard#/leads?vista=hoy',
           windowHours: 24 * 30,
         });
       }

@@ -9,7 +9,8 @@
   import { toast } from '../lib/toast.svelte.js';
   import { money } from './crm.js';
 
-  let { open = $bindable(false), lead = null, onsaved } = $props();
+  // lead: el contacto; brief: el MRC-… de un brief sin contacto (migración 032).
+  let { open = $bindable(false), lead = null, brief = null, onsaved } = $props();
 
   let catalog = $state(null);
   let catError = $state('');
@@ -56,7 +57,8 @@
     busy = true; error = ''; field = '';
     try {
       const body = {
-        lead_ref: lead.ref_id,
+        lead_ref: lead?.ref_id || null,
+        brief_ref: brief || null,
         options: options.map((o) => ({
           plan: o.plan || null,
           projects: o.project ? [{ id: o.project, ...(toCents(o.price) != null ? { price_cents: toCents(o.price) } : {}) }] : [],

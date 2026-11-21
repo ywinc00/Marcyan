@@ -226,6 +226,27 @@ await check('chat: con herramienta interna suma las DOS llamadas; turno siguient
   const [, , , convs, calls, inp, out, cr, cw] = usageRow().vals;
   assert.deepEqual([convs, calls, inp, out, cr, cw], [0, 2, 500, 450, 8000, 8000]);
 });
+// Ventas §4: de entrada solo el «desde»; y sin la lista de la base, cotizar no inventa.
+const toolResultOf = (callIdx) => {
+  const msgs = ai.calls[callIdx].messages;
+  const last = msgs[msgs.length - 1];
+  return JSON.parse(last.content.find((b) => b.type === 'tool_result').content);
+};
+await check('chat: cotizar en la primera respuesta no da cifras de la lista (de entrada, el «desde»)', async () => {
+  ai.queue.push({ content: [{ type: 'tool_use', id: 'q1', name: 'cotizar', input: { paquetes: true } }], usage: usage({}) });
+  ai.queue.push({ content: [{ type: 'text', text: 'Una web arranca desde $400. ¿Cuánto te deja cada trabajo?' }], usage: usage({}) });
+  const r = await call(chat, { sessionId: 'conv-cot-1', messages: [{ role: 'user', content: '¿Cuánto cuesta una web?' }], lang: 'es' });
+  assert.equal(r.code, 200);
+  assert.equal(toolResultOf(1).motivo, 'de_entrada');
+});
+await check('chat: sin la lista de la base, cotizar devuelve ok false y Marcy no inventa', async () => {
+  ai.queue.push({ content: [{ type: 'tool_use', id: 'q2', name: 'cotizar', input: { paquetes: true, valor_cliente: 900 } }], usage: usage({}) });
+  ai.queue.push({ content: [{ type: 'text', text: 'El precio exacto te lo damos por escrito en la propuesta.' }], usage: usage({}) });
+  const r = await call(chat, { sessionId: 'conv-cot-2', messages: [{ role: 'user', content: 'Quiero una web' }, { role: 'assistant', content: '¿Cuánto te deja cada trabajo?' }, { role: 'user', content: 'Unos 900' }], lang: 'es' });
+  assert.equal(r.code, 200);
+  assert.deepEqual(toolResultOf(1), { ok: false, motivo: 'sin_lista' });
+  assert.ok(!db.calls.some((c) => /SET quote =/.test(c.t)), 'sin cotización no se guarda nada');
+});
 await check('chat: sin la tabla de uso el visitante recibe su respuesta igual', async () => {
   db.noUsageTable = true;
   ai.queue.push({ content: [{ type: 'text', text: 'Claro, te ayudo.' }], usage: usage({ input_tokens: 10, output_tokens: 20 }) });

@@ -4,14 +4,14 @@
 //  necesitar la API key ni la red (solo las funciones puras de api/chat.mjs).
 // ════════════════════════════════════════════════════════════════
 import assert from 'node:assert/strict';
-import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, modelRequestOptions, computeLossToolResult, quoteToolResult, buildSiteToolResult, siteReviewAllowed, placesAllowed, chatAllowed, chatGlobalAllowed } from '../api/chat.mjs';
+import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, modelRequestOptions, computeLossToolResult, buildSiteToolResult, sitePlan, siteReviewAllowed, placesAllowed, chatAllowed, chatGlobalAllowed } from '../api/chat.mjs';
+import { recommendPlan, planText } from '../lib/diagnostic-plan.mjs';
 import { memoryStore, LIMITS as RL } from '../lib/ratelimit.mjs';
 import { readFileSync } from 'node:fs';
 import { sumUsage, turnCostMicroUsd, cacheHitRate, summarize, usageLogLine, recordUsage, PRICES_USD_PER_MTOK } from '../lib/chat-usage.mjs';
 import { ALLOWED_MODELS as MODELS_FOR_PRICES } from '../api/chat.mjs';
 import { fichaForChat } from '../lib/diagnostic-rubric.mjs';
 import { brandPostFilter, pricePostFilter, estimateNote, CALC_TOOL, SITE_TOOL, INTERNAL_TOOLS, CHAT_TOOLS, LINK_PAGES, stripEmDash, SYSTEM_PROMPT, QUOTE_TOOL, historyFigures, PRICES, CONTACT_TOOL, blockedFigures } from '../lib/chat-kb.mjs';
-import { quote, SERVICES, SERVICE_KEYS } from '../lib/quote-rules.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 import { ssrfGuard, isBlockedIp } from '../lib/site-fetch.mjs';
 import { analyzeSite } from '../lib/diagnostic-checks.mjs';
@@ -619,6 +619,19 @@ check('doctrina: el chat no importa la base de forma estática (solo frenos y av
     assert.ok(!statics.includes(bad), 'import estático prohibido en el chat: ' + bad);
   }
   assert.ok(!/new Map\(\)/.test(src), 'sin contadores en memoria por instancia');
+  // Transitiva: tampoco a través de lo que importa (p. ej. la cotización trae Orbit y Finanzas).
+  const seen = new Set();
+  const walk = (url) => {
+    if (seen.has(url.href)) return;
+    seen.add(url.href);
+    const text = readFileSync(url, 'utf8');
+    for (const m of text.matchAll(/^import\s.*?from\s+['"]([^'"]+)['"]/gm)) {
+      const spec = m[1];
+      assert.ok(spec !== '@vercel/postgres', 'el chat carga la base al arrancar vía ' + url.pathname.split('/').slice(-2).join('/'));
+      if (spec.startsWith('.')) walk(new URL(spec, url));
+    }
+  };
+  walk(new URL('../api/chat.mjs', import.meta.url));
 });
 
 // ── v7.6: ANTI-FORJADO — el cliente no puede inyectar un tool_result ──
@@ -657,52 +670,7 @@ check('CHAT_TOOLS incluye las 6 (3 UI + 3 internas); INTERNAL_TOOLS = 3', () => 
   assert.ok(INTERNAL_TOOLS.has('calcular_perdida') && INTERNAL_TOOLS.has('revisar_sitio') && INTERNAL_TOOLS.has('cotizar'));
 });
 
-// ── P3: cotizar (reglas del servidor) ──
-check('cotizar: catálogo de reglas = mismas claves que PRICES y que el enum de la herramienta', () => {
-  assert.deepEqual([...SERVICE_KEYS].sort(), Object.keys(PRICES).sort());
-  assert.deepEqual([...QUOTE_TOOL.input_schema.properties.servicios.items.properties.servicio.enum].sort(), Object.keys(PRICES).sort());
-});
-check('cotizar: precio base = precio publicado', () => {
-  for (const k of SERVICE_KEYS) { const q = quote([{ servicio: k }]); assert.equal(q.lineas[0].total, PRICES[k].value, k); }
-});
-check('cotizar: sitio de 8 páginas + asistente con 2 canales (extras, combinación, piso)', () => {
-  const q = quote([{ servicio: 'web', paginas: 8 }, { servicio: 'iaBasic', canales: 2 }]);
-  assert.equal(q.lineas[0].total, 1950);
-  assert.equal(q.lineas[1].total, 750);
-  assert.deepEqual(q.pago_unico, { subtotal: 2700, descuento_combinacion: 250, total: 2450 });
-  assert.equal(q.rebaja, null);
-});
-check('cotizar: rebaja solo si se pide, -10 % redondeada y marcada sujeta a aprobación', () => {
-  const q = quote([{ servicio: 'web', paginas: 8 }, { servicio: 'iaBasic', canales: 2 }], { pedirRebaja: true });
-  assert.deepEqual(q.rebaja, { total_pago_unico: 2200, sujeto_a_aprobacion: true });
-});
-check('cotizar: nunca baja del 85 % de la suma de precios base', () => {
-  const q = quote([{ servicio: 'webLanding' }, { servicio: 'brandingLogo' }], { pedirRebaja: true });
-  const piso = Math.round((400 + 150) * 0.85 / 50) * 50;
-  assert.ok(q.pago_unico.total >= piso && q.rebaja.total_pago_unico >= piso);
-});
-check('cotizar: lo mensual va aparte y no se descuenta', () => {
-  const q = quote([{ servicio: 'web' }, { servicio: 'seoLocal', ubicaciones: 2 }, { servicio: 'maintenance' }]);
-  assert.equal(q.mensual.total, 399 + 200 + 120); // SEO local mensual: 399 desde el 2026-11-19
-  assert.equal(q.pago_unico.descuento_combinacion, 0, 'un solo proyecto de pago único: sin combinación');
-});
-check('cotizar: productos por bloques (tienda esencial con 60 → 2 bloques de 25)', () => {
-  assert.equal(quote([{ servicio: 'ecommerceEssential', productos: 60 }]).lineas[0].total, 900 + 300);
-});
-check('cotizar: entradas basura → ok:false o ignoradas (servicio inventado, negativos, duplicados)', () => {
-  assert.equal(quote([]).ok, false);
-  assert.equal(quote([{ servicio: 'hackeo' }]).ok, false);
-  const q = quote([{ servicio: 'web', paginas: -40 }, { servicio: 'web', paginas: 99 }]);
-  assert.equal(q.lineas.length, 1);
-  assert.equal(q.lineas[0].total, 1500);
-});
-check('cotizar: tool_result sin la lista interna de cifras y con sus cifras en el allowlist', () => {
-  const out = quoteToolResult({ servicios: [{ servicio: 'web', paginas: 8 }, { servicio: 'iaBasic', canales: 2 }] }, 'es');
-  assert.ok(!('cifras' in JSON.parse(out.content)));
-  for (const n of ['1950', '750', '2700', '250', '2450']) assert.ok(out.extraAllow.includes(n), n);
-  assert.ok(pricePostFilter('Todo junto queda en $2,450.', 'es', out.extraAllow).includes('$2,450'));
-  assert.equal(quoteToolResult({}, 'es').content, JSON.stringify({ ok: false }));
-});
+// La cotización (planes y paquetes, lista privada de la base) se prueba en scripts/test-marcy-quote.mjs.
 check('historial: las cifras del cliente y de turnos anteriores se pueden repetir', () => {
   const figs = historyFigures([{ role: 'user', content: 'Tengo $1,000 de presupuesto' }, { role: 'assistant', content: 'Te queda en $2,450.' }]);
   assert.ok(figs.includes('1000') && figs.includes('2450'));
@@ -855,6 +823,36 @@ check('revisar_sitio: sin ficha el resultado no cambia de forma', () => {
   const out = analyzeSite({ html: '<html><head><title>t</title></head><body>hi</body></html>', https: true, hasSite: true });
   const r = JSON.parse(buildSiteToolResult(out, 'es'));
   assert.equal('ficha_google' in r, false); assert.equal(typeof r.scores.total, 'number');
+});
+check('revisar_sitio: recomienda un plan con la regla del diagnóstico, por su nombre y frase, sin cifras', () => {
+  const out = analyzeSite({ html: '<html><head><title>t</title></head><body>hi</body></html>', https: true, hasSite: true });
+  const want = recommendPlan({ scores: out.scores, findings: out.findings }).plan;
+  assert.equal(sitePlan(out), want);
+  const es = JSON.parse(buildSiteToolResult(out, 'es'));
+  assert.deepEqual(es.plan_recomendado, { nombre: planText(want, 'es').name, frase: planText(want, 'es').tagline });
+  assert.equal('recomendado' in es, false, 'ya no un servicio suelto');
+  const en = JSON.parse(buildSiteToolResult(out, 'en'));
+  assert.deepEqual(en.plan_recomendado, { nombre: planText(want, 'en').name }, 'en inglés sin frase (fraseEn sin OK)');
+  assert.doesNotMatch(JSON.stringify(es.plan_recomendado) + JSON.stringify(en.plan_recomendado), /\d/);
+  // Cada frente da su plan: la revisión dice lo mismo que el diagnóstico.
+  const S = (web, seo, ai, conv) => ({ total: 50, web, seo, ai, conv, rep: 50 });
+  assert.equal(sitePlan({ scores: S(80, 80, 80, 20), findings: [] }), 'crecimiento');
+  assert.equal(sitePlan({ scores: S(80, 20, 80, 80), findings: [] }), 'presencia');
+  assert.equal(sitePlan({ scores: S(80, 80, 20, 80), findings: [] }), 'dominio');
+  assert.equal(sitePlan({ scores: S(0, 80, 80, 80), findings: [] }), 'presencia');
+  assert.equal(sitePlan({}), null, 'sin web revisada no hay plan');
+  assert.equal('plan_recomendado' in JSON.parse(buildSiteToolResult({}, 'es')), false);
+});
+check('revisar_sitio: la ciudad que dijo llega al análisis, como en el diagnóstico (mismo plan con la misma web)', () => {
+  const src = readFileSync(new URL('../api/chat.mjs', import.meta.url), 'utf8');
+  assert.match(src, /reviewWeb\(g, lang, city\)/);
+  assert.match(src, /analyzeSite\(\{ html: site\.html, https: !!site\.https, hasSite: true, city: city \|\| '' \}\)/);
+  // Una web que no nombra su ciudad: con la ciudad, «que te encuentren» pasa a ser lo más flojo.
+  const html = '<html><head><title>Limpieza</title><script type="application/ld+json">{"@type":"LocalBusiness","name":"X"}</script></head><body><a href="https://wa.me/17135550000">WhatsApp</a><a href="mailto:a@b.co">correo</a></body></html>';
+  const sin = analyzeSite({ html, https: true, hasSite: true });
+  const con = analyzeSite({ html, https: true, hasSite: true, city: 'Houston' });
+  assert.notEqual(sin.scores.seo, con.scores.seo, 'la ciudad cambia el puntaje de SEO local');
+  assert.equal(sitePlan(con), recommendPlan({ scores: con.scores, findings: con.findings }).plan);
 });
 check('revisar_sitio: acepta nombre y ciudad opcionales; solo la url es obligatoria', () => {
   assert.deepEqual(SITE_TOOL.input_schema.required, ['url']);

@@ -163,7 +163,7 @@ function fakeSql(state) {
   return async (strings, ...vals) => {
     const q = strings.join('?');
     state.queries.push(q);
-    if (/SELECT created_at, user_text, reply, action_type FROM chat_turns/.test(q)) return { rows: state.turns.slice() };
+    if (/SELECT created_at, user_text, reply, action_type, fallback FROM chat_turns/.test(q)) return { rows: state.turns.slice() };
     if (/FROM channel_inbox WHERE channel = \? AND contact = \?/.test(q)) return { rows: state.opt ? [{ status: state.opt }] : [] };
     if (/UPDATE leads SET notes/.test(q)) { state.leadNotes.push(vals[0]); return { rows: [] }; }
     if (/SELECT lang FROM chat_conversations/.test(q)) return { rows: state.lang ? [{ lang: state.lang }] : [] };
@@ -198,6 +198,19 @@ await aok('contesta y registra con su canal', async () => {
   assert.equal(s.calls[0].messages.at(-1).content, 'Hola, quiero una web');
   assert.ok(s.calls[0].extraInternal.names.has('huecos_libres'));
   assert.deepEqual(s.inbox, ['hecho']);
+});
+await aok('el plan de la revisión de su web llega al registro del turno', async () => {
+  const s = fresh();
+  s.turn = { reply: 'Por lo que vi, te encaja el plan Crecimiento.', action: null, tool: 'revisar_sitio', cortadas: [], fallback: false, costMicro: 3, diagPlan: 'crecimiento' };
+  assert.equal(await processInbound(ROW, deps(s)), 'hecho');
+  assert.equal(s.recorded.at(-1).diagPlan, 'crecimiento');
+  const t = fresh();
+  assert.equal(await processInbound(ROW, deps(t)), 'hecho');
+  assert.equal(t.recorded.at(-1).diagPlan, null, 'sin revisión, nada');
+  const v = fresh();
+  v.turn = { ...s.turn, diagPlan: '' };
+  assert.equal(await processInbound(ROW, deps(v)), 'hecho');
+  assert.equal(v.recorded.at(-1).diagPlan, '', 'revisó otra web sin plan: llega vacío para borrar el anterior');
 });
 await aok('si lo lleva el dueño, Marcy calla y avisa', async () => {
   const s = fresh(); s.taken = true;
@@ -277,6 +290,17 @@ await aok('primer mensaje aunque antes escribiera el dueño desde la app', async
   const s = fresh(); s.turns = [{ created_at: new Date().toISOString(), user_text: '', reply: 'Hola, soy Yan', action_type: 'dueno' }];
   await processInbound(ROW, deps(s));
   assert.ok(s.sent[0].startsWith(CH_MSG.es.intro));
+});
+await aok('de entrada Marcy no cotiza: sus textos fijos (nota de voz) no cuentan como respuesta', async () => {
+  const s = fresh(); s.turns = [{ created_at: new Date().toISOString(), user_text: '[audio]', reply: CH_MSG.es.noText, action_type: null, fallback: true }];
+  await processInbound(ROW, deps(s));
+  assert.equal(s.calls[0].first, true);
+  const s2 = fresh();
+  await processInbound(ROW, deps(s2));
+  assert.equal(s2.calls[0].first, false, 'con una respuesta de Marcy antes, ya no es la primera');
+  const s3 = fresh(); s3.turns = [{ created_at: new Date().toISOString(), user_text: '', reply: 'Hola, soy Yan', action_type: 'dueno' }];
+  await processInbound(ROW, deps(s3));
+  assert.equal(s3.calls[0].first, true, 'lo que escribe el dueño no es una respuesta de Marcy');
 });
 await aok('primer mensaje que es un audio: también con el aviso', async () => {
   const s = fresh(); s.turns = [];

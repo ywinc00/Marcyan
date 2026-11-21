@@ -30,6 +30,31 @@ await check('turno: crea o suma la conversación y guarda el turno', async () =>
   assert.ok(calls[1].values.includes('capture') && calls[1].values.includes('contacto') && calls[1].values.includes('cotizar') && calls[1].values.includes('1700'));
   assert.ok(calls[1].values.includes(4211));
 });
+await check('turno: el plan de la revisión se guarda en su conversación; sin la 031 el turno sigue guardado', async () => {
+  const { sql, calls } = fakeSql();
+  assert.equal(await recordTurn({ sid: 'abc-123', env: 'preview', userText: 'revisa mi web', reply: 'Listo.', tool: 'revisar_sitio', diagPlan: 'presencia', sqlImpl: sql }), true);
+  assert.equal(calls.length, 3);
+  assert.match(calls[2].text, /UPDATE chat_conversations SET diag_plan = \?, diag_plan_at = NOW\(\) WHERE sid = \?/);
+  assert.deepEqual(calls[2].values, ['presencia', 'abc-123']);
+  // Revisó otra web y no salió plan (''): borra el de la anterior.
+  const cl = fakeSql();
+  await recordTurn({ sid: 'abc-123', reply: 'ok', diagPlan: '', sqlImpl: cl.sql });
+  assert.equal(cl.calls.length, 3);
+  assert.deepEqual(cl.calls[2].values, [null, 'abc-123']);
+  for (const bad of [null, undefined, 'Presencia', 'x; DROP', 7, 'a'.repeat(21)]) {
+    const f = fakeSql();
+    await recordTurn({ sid: 'abc-123', reply: 'ok', diagPlan: bad, sqlImpl: f.sql });
+    assert.equal(f.calls.length, 2, String(bad));
+  }
+  let n2 = 0;
+  const noCol = async (strings) => {
+    n2++;
+    if (/diag_plan/.test(strings.join('?'))) { const e = new Error('column "diag_plan" does not exist'); e.code = '42703'; throw e; }
+    return { rows: [], rowCount: 1 };
+  };
+  assert.equal(await recordTurn({ sid: 'abc-123', reply: 'ok', diagPlan: 'dominio', sqlImpl: noCol }), true);
+  assert.equal(n2, 3);
+});
 await check('turno: sin id válido o sin respuesta no guarda', async () => {
   const { sql, calls } = fakeSql();
   assert.equal(await recordTurn({ sid: 'x y;--', reply: 'a', sqlImpl: sql }), false);

@@ -10,6 +10,7 @@
 //   node --env-file=.env.local scripts/ficha-llamada.mjs cliente@correo.com
 //   node --env-file=.env.local scripts/ficha-llamada.mjs LEAD-011 --guardar   (a .fichas/, fuera de git)
 //   node --env-file=.env.local scripts/ficha-llamada.mjs --comprobar          (el usuario no escribe ni ve Finanzas)
+//   node --env-file=.env.local scripts/ficha-llamada.mjs --embudo             (lista del embudo en JSON, para la rutina semanal de Ventas)
 //
 // Conecta SOLO con ORBIT_LECTURA_URL: el usuario orbit_lectura de db/sql/orbit-lectura.sql.
 // Si esa conexión no es de ese usuario, no lee nada. La cadena nunca se imprime.
@@ -22,7 +23,7 @@ import {
   leadEventText, leadStatus, leadSource, BRIEF_STATUS, PROJECT_STATUS, OPEN_STATUSES,
   lostReason, dayLabel, houstonToday, nextStepText, optionPrice, money, PROPOSAL_AUTHOR,
 } from '../src/components/dashboard/crm/crm.js';
-import { nextStep, effectiveStatus } from '../lib/proposals.mjs';
+import { nextStep, effectiveStatus, pendingPriceOf, OPEN_STAGES } from '../lib/proposals.mjs';
 
 const USUARIO = 'orbit_lectura';
 const TZ = 'America/Chicago';
@@ -168,6 +169,136 @@ export function armarFicha(d, ahora = new Date()) {
   return out.join('\n');
 }
 
+// ── Lista del embudo (Ventas 7d): JSON estable para la rutina semanal de Ventas ──
+// Cambia `formato` si cambia la forma (no si se añaden avisos): la rutina lo comprueba.
+export const FORMATO_EMBUDO = 'embudo/1';
+const DIA_MS = 86400000;
+const diaNum = (s) => { const [y, m, d] = String(s).slice(0, 10).split('-').map(Number); return Date.UTC(y, m - 1, d); };
+const diasEntre = (a, b) => Math.round((diaNum(b) - diaNum(a)) / DIA_MS);   // b menos a, en días de calendario
+const sumarDias = (s, n) => new Date(diaNum(s) + n * DIA_MS).toISOString().slice(0, 10);
+const iso = (v) => (v == null ? null : new Date(v).toISOString());
+const diaHouston = (v) => (v == null ? null : /^\d{4}-\d{2}-\d{2}$/.test(String(v)) ? String(v) : houstonToday(new Date(v)));
+const DE_PRUEBA = ['test', 'spam'];
+
+/** La semana pasada completa (lunes a domingo) y el mes en curso hasta hoy, en días de Houston. Pura. */
+export function ventanasEmbudo(hoy) {
+  const lunes = sumarDias(hoy, -((new Date(diaNum(hoy)).getUTCDay() + 6) % 7));
+  return { semana: { desde: sumarDias(lunes, -7), hasta: sumarDias(lunes, -1) }, mes: { desde: hoy.slice(0, 8) + '01', hasta: hoy } };
+}
+
+function propuestaEmbudo(p, hoy, viva) {
+  const opts = Array.isArray(p.options) ? p.options : [];
+  const eff = effectiveStatus(p, hoy);
+  return {
+    ref: p.ref_id,
+    estado: eff,
+    creada: iso(p.created_at),
+    creada_por: p.created_by || 'orbit',
+    enviada: p.sent_on || null,
+    caduca: p.expires_on || null,
+    dias_para_caducar: eff === 'sent' && p.expires_on ? diasEntre(hoy, p.expires_on) : null,
+    seguimientos_hechos: Number(p.follow_ups_done) || 0,
+    seguimientos_total: SEGUIMIENTOS.length,
+    proximo_seguimiento: eff === 'sent' ? p.next_follow_up_on || null : null,
+    opcion: opts.length ? nombreOpcion(opts[p.recommended_option ?? 0] || opts[0]) : null,
+    opciones: opts.length,
+    precio_por_confirmar: pendingPriceOf(opts)?.name || null,
+    viva,
+  };
+}
+
+function pasoEmbudo(n, ahora, hoy) {
+  const venceDia = n.due ? diaHouston(n.due) : null;
+  const tarde = n.bucket === 'late';
+  return {
+    tipo: n.kind,
+    texto: nextStepText(n, { now: ahora }).what || '',
+    plazo: n.bucket,
+    vence: n.due ? (String(n.due).length > 10 ? iso(n.due) : n.due) : null,
+    atrasado: tarde,
+    dias_tarde: tarde && venceDia ? Math.max(0, diasEntre(venceDia, hoy)) : 0,
+    ...(n.kind === 'none' ? { dias_sin_paso: Number(n.days) || 0 } : {}),
+    ...(n.pending_price ? { precio_por_confirmar: true } : {}),
+  };
+}
+
+/**
+ * La lista del embudo a partir de lo leído (pura). `d` = { leads, propuestas, borradores,
+ * altas, pasos, diags, movs, permisos }. Nada de Finanzas ni de contacto (correo, teléfono):
+ * para escribir a alguien se pide su ficha.
+ */
+export function armarEmbudo(d, ahora = new Date()) {
+  const hoy = houstonToday(ahora);
+  const v = ventanasEmbudo(hoy);
+  const porLead = new Map();
+  for (const p of d.propuestas || []) {
+    if (!porLead.has(p.lead_ref)) porLead.set(p.lead_ref, []);
+    porLead.get(p.lead_ref).push(p);
+  }
+  // La viva, como en «Para hoy»: la enviada; si no, la vencida; si no, el borrador (la más reciente de cada una).
+  const orden = { sent: 0, expired: 1, draft: 2 };
+  const vivaDe = new Map();
+  const contactos = (d.leads || []).map((l) => {
+    const props = (porLead.get(l.ref_id) || []).slice()
+      .sort((a, b) => (orden[a.status] ?? 3) - (orden[b.status] ?? 3) || new Date(b.created_at) - new Date(a.created_at));
+    const viva = props[0] || null;
+    if (viva) vivaDe.set(l.ref_id, viva.ref_id);
+    const vivaPaso = viva ? { ...viva, pending_price: Boolean(pendingPriceOf(viva.options)) } : null;
+    const desde = l.stage_changed_at || l.created_at;
+    return {
+      ref: l.ref_id,
+      nombre: l.name || null,
+      negocio: l.business_name || null,
+      origen: l.source || null,
+      etapa: l.status,
+      etapa_texto: leadStatus(l.status).label,
+      en_etapa_desde: iso(desde),
+      dias_en_etapa: desde ? Math.max(0, diasEntre(diaHouston(desde), hoy)) : null,
+      creado: iso(l.created_at),
+      siguiente_paso: pasoEmbudo(nextStep(l, vivaPaso, { now: ahora }), ahora, hoy),
+      propuestas: props.map((p, i) => propuestaEmbudo(p, hoy, i === 0)),
+    };
+  });
+  const abiertos = new Set(contactos.map((x) => x.ref));
+  const borradores = (d.borradores || []).map((b) => {
+    const opts = Array.isArray(b.options) ? b.options : [];
+    const horas = Math.max(0, Math.floor((ahora - new Date(b.created_at)) / 3600000));
+    const de = b.lead_ref ? { tipo: 'contacto', ref: b.lead_ref, nombre: b.lead_name || null, negocio: b.lead_business || null }
+      : b.client_id != null ? { tipo: 'cliente', ref: b.client_code || null, nombre: null, negocio: b.client_business || null }
+      : { tipo: 'brief', ref: b.brief_ref || null, nombre: null, negocio: b.brief_business || null };
+    return {
+      ref: b.ref_id,
+      creada: iso(b.created_at),
+      horas,
+      mas_de_24h: horas >= 24,
+      creada_por: b.created_by || 'orbit',
+      opcion: opts.length ? nombreOpcion(opts[b.recommended_option ?? 0] || opts[0]) : null,
+      precio_por_confirmar: pendingPriceOf(opts)?.name || null,
+      de,
+      // «Para hoy» de Orbit solo enseña la propuesta viva de un contacto abierto: lo demás lo avisa la rutina.
+      en_para_hoy: de.tipo === 'contacto' && abiertos.has(b.lead_ref) && vivaDe.get(b.lead_ref) === b.ref_id,
+    };
+  });
+  const cifras = Object.fromEntries(Object.entries(v).map(([k, w]) => {
+    const en = (dia) => Boolean(dia) && dia >= w.desde && dia <= w.hasta;
+    const real = (r) => !DE_PRUEBA.includes(r.lead_status);
+    return [k, {
+      desde: w.desde,
+      hasta: w.hasta,
+      contactos_nuevos: (d.altas || []).filter((r) => en(r.dia) && !DE_PRUEBA.includes(r.status)).length,
+      diagnosticos_hechos: new Set((d.pasos || []).filter((r) => en(r.dia) && real(r)).map((r) => r.lead_ref)).size,
+      diagnosticos_web: (d.diags || []).filter((r) => en(r.dia)).length,
+      propuestas_enviadas: (d.movs || []).filter((r) => en(r.enviada) && real(r)).length,
+      propuestas_aceptadas: (d.movs || []).filter((r) => r.status === 'accepted' && en(r.decidida) && real(r)).length,
+    }];
+  }));
+  const avisos = [];
+  if (d.permisos && d.permisos.brief_ref === false) {
+    avisos.push('El usuario de lectura no ve a qué brief pertenece cada borrador: sale como «brief» sin referencia (falta aplicar el bloque 032 de db/sql/orbit-lectura.sql).');
+  }
+  return { formato: FORMATO_EMBUDO, generado: iso(ahora), zona: TZ, hoy, avisos, contactos, borradores, cifras };
+}
+
 // ── Lectura ─────────────────────────────────────────────────────
 async function conectar() {
   const url = process.env.ORBIT_LECTURA_URL;
@@ -246,6 +377,57 @@ export async function leerLead(c, clave) {
   return { lead, propuestas, propuestasSinPermiso, eventos: eventos.rows, convs: convs.rows, turnos, citas: citas.rows, brief, diag: diag.rows[0] || null, cliente: cli, proyectos };
 }
 
+/** Lo que necesita la lista del embudo, en solo lectura. */
+export async function leerEmbudo(c, ahora = new Date()) {
+  const v = ventanasEmbudo(houstonToday(ahora));
+  const desdeMin = sumarDias(v.semana.desde < v.mes.desde ? v.semana.desde : v.mes.desde, -1);
+  const T = `'${TZ}'`;
+  const leads = (await c.query(
+    `SELECT ref_id, status, source, name, business_name, created_at, updated_at, stage_changed_at
+       FROM leads WHERE status = ANY($1::text[]) ORDER BY created_at`, [OPEN_STAGES])).rows;
+  const refs = leads.map((l) => l.ref_id);
+  const propuestas = refs.length
+    ? (await c.query(
+      `SELECT ${PROPUESTA_COLS}, lead_ref FROM proposals
+        WHERE lead_ref = ANY($1::text[]) AND status IN ('draft', 'sent', 'expired')
+        ORDER BY created_at DESC`, [refs])).rows
+    : [];
+  const borr = (conBrief) => c.query(
+    `SELECT p.ref_id, p.created_by, p.options, p.recommended_option, p.created_at, p.lead_ref, p.client_id,
+            ${conBrief ? 'p.brief_ref, b.business_name AS brief_business,' : ''}
+            l.name AS lead_name, l.business_name AS lead_business, l.status AS lead_status,
+            cl.client_code, cl.business_name AS client_business
+       FROM proposals p
+       LEFT JOIN leads l ON l.ref_id = p.lead_ref
+       LEFT JOIN clients cl ON cl.id = p.client_id
+       ${conBrief ? 'LEFT JOIN briefs b ON b.project_id = p.brief_ref' : ''}
+      WHERE p.status = 'draft' AND (l.status IS NULL OR l.status <> ALL($1::text[]))
+      ORDER BY p.created_at`, [DE_PRUEBA]);
+  let borradores;
+  let briefRef = true;
+  try { borradores = (await borr(true)).rows; }
+  catch (e) { if (!sinPermiso(e)) throw e; briefRef = false; borradores = (await borr(false)).rows; }
+  const [altas, pasos, diags, movs] = await Promise.all([
+    c.query(`SELECT status, to_char(created_at AT TIME ZONE ${T}, 'YYYY-MM-DD') AS dia FROM leads WHERE created_at >= $1::date`, [desdeMin]),
+    c.query(
+      `SELECT e.lead_ref, l.status AS lead_status, to_char(e.created_at AT TIME ZONE ${T}, 'YYYY-MM-DD') AS dia
+         FROM lead_events e LEFT JOIN leads l ON l.ref_id = e.lead_ref
+        WHERE e.event_type = 'status_changed' AND e.data->>'to' = 'diagnosed' AND e.created_at >= $1::date`, [desdeMin]),
+    c.query(`SELECT to_char(created_at AT TIME ZONE ${T}, 'YYYY-MM-DD') AS dia FROM diagnostics WHERE created_at >= $1::date`, [desdeMin]),
+    c.query(
+      `SELECT p.status, l.status AS lead_status,
+              to_char(p.sent_at AT TIME ZONE ${T}, 'YYYY-MM-DD') AS enviada,
+              to_char(p.decided_at AT TIME ZONE ${T}, 'YYYY-MM-DD') AS decidida
+         FROM proposals p LEFT JOIN leads l ON l.ref_id = p.lead_ref
+        WHERE p.sent_at >= $1::date OR p.decided_at >= $1::date`, [desdeMin]),
+  ]);
+  return armarEmbudo({
+    leads, propuestas, borradores,
+    altas: altas.rows, pasos: pasos.rows, diags: diags.rows, movs: movs.rows,
+    permisos: { brief_ref: briefRef },
+  }, ahora);
+}
+
 /** Prueba que el usuario no escribe ni ve Finanzas, IP ni importes. Devuelve las líneas del resultado. */
 export async function comprobar(c) {
   const casos = [
@@ -292,8 +474,12 @@ async function main() {
       process.exitCode = r.ok ? 0 : 1;
       return;
     }
+    if (args.includes('--embudo')) {
+      process.stdout.write(JSON.stringify(await leerEmbudo(c), null, 2) + '\n');
+      return;
+    }
     const clave = args.find((a) => !a.startsWith('--'));
-    if (!clave) { console.error('Uso: node --env-file=.env.local scripts/ficha-llamada.mjs LEAD-XXX | correo [--guardar]'); process.exitCode = 2; return; }
+    if (!clave) { console.error('Uso: node --env-file=.env.local scripts/ficha-llamada.mjs LEAD-XXX | correo [--guardar] · --embudo · --comprobar'); process.exitCode = 2; return; }
     const datos = await leerLead(c, clave);
     if (!datos) { console.error(`No hay ningún lead con «${clave}».`); process.exitCode = 1; return; }
     const md = armarFicha(datos);

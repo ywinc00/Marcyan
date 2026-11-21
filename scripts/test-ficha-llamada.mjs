@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { armarFicha, leerLead, comprobar } from './ficha-llamada.mjs';
+import { armarFicha, leerLead, comprobar, armarEmbudo, leerEmbudo, ventanasEmbudo } from './ficha-llamada.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 let pass = 0;
@@ -145,6 +145,139 @@ await check('el script solo conecta con ORBIT_LECTURA_URL, nunca con la conexió
   assert.ok(!/console\.(log|error)\([^)]*ORBIT_LECTURA_URL\b[^'`"]/.test(src), 'no imprime la cadena');
   const gi = fs.readFileSync(path.join(here, '..', '.gitignore'), 'utf8');
   assert.match(gi, /^\.fichas\/?$/m, '.fichas/ fuera de git');
+});
+
+// ── Lista del embudo (Ventas 7d) ─────────────────────────────────
+// Lunes 23-nov, 9:00 en Houston. Precios inventados.
+const AHORA = new Date('2026-11-23T15:00:00Z');
+const opt = (name, extra = {}) => ({ plan: { name: 'Plan Prueba' }, projects: [{ name, ...extra }], project_cents: 100000, monthly_cents: 10000 });
+const EMBUDO = {
+  leads: [
+    { ref_id: 'LEAD-901', status: 'new', source: 'chat', name: 'Ana Prueba', business_name: 'Café Prueba', email: 'ana@marcyan.test', phone: '(713) 555-0101',
+      created_at: '2026-11-21T15:00:00Z', updated_at: '2026-11-21T15:00:00Z', stage_changed_at: '2026-11-21T15:00:00Z' },
+    { ref_id: 'LEAD-902', status: 'proposal', source: 'contact', name: 'Beto Prueba', business_name: 'Taller Prueba',
+      created_at: '2026-11-10T15:00:00Z', updated_at: '2026-11-18T15:00:00Z', stage_changed_at: '2026-11-18T15:00:00Z' },
+    { ref_id: 'LEAD-903', status: 'diagnosed', source: 'chat', name: 'Caro Prueba', business_name: 'Salón Prueba',
+      created_at: '2026-11-19T15:00:00Z', updated_at: '2026-11-20T15:00:00Z', stage_changed_at: '2026-11-20T15:00:00Z' },
+  ],
+  propuestas: [
+    { ref_id: 'PROP-902', lead_ref: 'LEAD-902', status: 'sent', created_by: 'orbit', options: [opt('Web Prueba')], recommended_option: 0,
+      sent_on: '2026-11-18', expires_on: '2026-11-25', follow_ups_done: 1, next_follow_up_on: '2026-11-23', created_at: '2026-11-18T14:00:00Z' },
+    { ref_id: 'PROP-912', lead_ref: 'LEAD-902', status: 'draft', created_by: 'marcy', options: [opt('Web Otra')], recommended_option: 0,
+      created_at: '2026-11-12T14:00:00Z' },
+    { ref_id: 'PROP-903', lead_ref: 'LEAD-903', status: 'draft', created_by: 'marcy', options: [opt('Reservas Prueba', { pending_price: true })], recommended_option: 0,
+      created_at: '2026-11-22T10:00:00Z' },
+  ],
+  borradores: [
+    { ref_id: 'PROP-912', created_by: 'marcy', options: [opt('Web Otra')], recommended_option: 0, created_at: '2026-11-12T14:00:00Z', lead_ref: 'LEAD-902', lead_name: 'Beto Prueba', lead_business: 'Taller Prueba', lead_status: 'proposal' },
+    { ref_id: 'PROP-903', created_by: 'marcy', options: [opt('Reservas Prueba', { pending_price: true })], recommended_option: 0, created_at: '2026-11-22T10:00:00Z', lead_ref: 'LEAD-903', lead_name: 'Caro Prueba', lead_business: 'Salón Prueba', lead_status: 'diagnosed' },
+    { ref_id: 'PROP-904', created_by: 'marcy', options: [opt('Web Brief')], recommended_option: 0, created_at: '2026-11-23T13:00:00Z', lead_ref: null, client_id: null, brief_ref: 'MRC-904', brief_business: 'Panadería Prueba' },
+    { ref_id: 'PROP-905', created_by: 'orbit', options: [opt('Web Cliente')], recommended_option: 0, created_at: '2026-11-20T13:00:00Z', lead_ref: null, client_id: '5', client_code: 'CLI-005', client_business: 'Cliente Prueba' },
+  ],
+  altas: [{ status: 'new', dia: '2026-11-17' }, { status: 'test', dia: '2026-11-18' }, { status: 'won', dia: '2026-11-05' }, { status: 'new', dia: '2026-10-30' }],
+  pasos: [{ lead_ref: 'LEAD-903', dia: '2026-11-19' }, { lead_ref: 'LEAD-903', dia: '2026-11-20' }, { lead_ref: 'LEAD-999', lead_status: 'test', dia: '2026-11-19' }],
+  diags: [{ dia: '2026-11-16' }, { dia: '2026-11-23' }],
+  movs: [
+    { status: 'sent', enviada: '2026-11-18' },
+    { status: 'accepted', enviada: '2026-11-02', decidida: '2026-11-20' },
+    { status: 'sent', lead_status: 'spam', enviada: '2026-11-19' },
+  ],
+  permisos: { brief_ref: true },
+};
+
+await check('embudo: formato con versión, día de Houston y semana pasada completa', () => {
+  const e = armarEmbudo(EMBUDO, AHORA);
+  assert.equal(e.formato, 'embudo/1');
+  assert.equal(e.hoy, '2026-11-23');
+  assert.equal(e.zona, 'America/Chicago');
+  assert.deepEqual(e.avisos, []);
+  assert.deepEqual(ventanasEmbudo('2026-11-23').semana, { desde: '2026-11-16', hasta: '2026-11-22' });
+  assert.deepEqual(ventanasEmbudo('2026-11-22').semana, { desde: '2026-11-09', hasta: '2026-11-15' }, 'el domingo aún es la semana en curso');
+  assert.deepEqual(ventanasEmbudo('2026-12-01').mes, { desde: '2026-12-01', hasta: '2026-12-01' });
+});
+await check('embudo: cada contacto abierto con su etapa, desde cuándo y su siguiente paso con plazo y retraso', () => {
+  const e = armarEmbudo(EMBUDO, AHORA);
+  const [a, b, c] = e.contactos;
+  assert.equal(a.ref, 'LEAD-901');
+  assert.equal(a.etapa, 'new');
+  assert.equal(a.dias_en_etapa, 2);
+  assert.equal(a.siguiente_paso.tipo, 'reply');
+  assert.equal(a.siguiente_paso.atrasado, true);
+  assert.equal(a.siguiente_paso.dias_tarde, 1);
+  assert.equal(b.siguiente_paso.tipo, 'follow_up');
+  assert.equal(b.siguiente_paso.plazo, 'today');
+  assert.equal(b.siguiente_paso.vence, '2026-11-23');
+  assert.equal(b.siguiente_paso.texto, 'Seguimiento del día 5');
+  assert.equal(c.siguiente_paso.tipo, 'send_proposal');
+  assert.equal(c.siguiente_paso.texto, 'Poner precio');
+  assert.equal(c.siguiente_paso.precio_por_confirmar, true);
+});
+await check('embudo: la propuesta viva primero, con caducidad, seguimientos y si falta el precio', () => {
+  const e = armarEmbudo(EMBUDO, AHORA);
+  const b = e.contactos[1];
+  assert.deepEqual(b.propuestas.map((p) => [p.ref, p.viva]), [['PROP-902', true], ['PROP-912', false]]);
+  const p = b.propuestas[0];
+  assert.equal(p.estado, 'sent');
+  assert.equal(p.enviada, '2026-11-18');
+  assert.equal(p.caduca, '2026-11-25');
+  assert.equal(p.dias_para_caducar, 2);
+  assert.equal(p.seguimientos_hechos, 1);
+  assert.equal(p.seguimientos_total, 3);
+  assert.equal(p.proximo_seguimiento, '2026-11-23');
+  assert.equal(e.contactos[2].propuestas[0].precio_por_confirmar, 'Reservas Prueba');
+});
+await check('embudo: borradores con antigüedad, autor, precio por confirmar y también los de un brief o un cliente', () => {
+  const e = armarEmbudo(EMBUDO, AHORA);
+  const by = Object.fromEntries(e.borradores.map((x) => [x.ref, x]));
+  assert.equal(e.borradores.length, 4);
+  assert.equal(by['PROP-903'].horas, 29);
+  assert.equal(by['PROP-903'].mas_de_24h, true);
+  assert.equal(by['PROP-903'].creada_por, 'marcy');
+  assert.equal(by['PROP-903'].precio_por_confirmar, 'Reservas Prueba');
+  assert.equal(by['PROP-903'].en_para_hoy, true);
+  assert.equal(by['PROP-912'].en_para_hoy, false, 'ese contacto ya tiene una enviada: Orbit no enseña el borrador');
+  assert.deepEqual(by['PROP-904'].de, { tipo: 'brief', ref: 'MRC-904', nombre: null, negocio: 'Panadería Prueba' });
+  assert.equal(by['PROP-904'].mas_de_24h, false);
+  assert.equal(by['PROP-904'].en_para_hoy, false);
+  assert.equal(by['PROP-905'].de.tipo, 'cliente');
+  assert.equal(by['PROP-905'].de.ref, 'CLI-005');
+});
+await check('embudo: cifras de la semana y del mes, sin contactos de prueba ni spam', () => {
+  const { semana, mes } = armarEmbudo(EMBUDO, AHORA).cifras;
+  assert.deepEqual(semana, { desde: '2026-11-16', hasta: '2026-11-22', contactos_nuevos: 1, diagnosticos_hechos: 1, diagnosticos_web: 1, propuestas_enviadas: 1, propuestas_aceptadas: 1 });
+  assert.equal(mes.contactos_nuevos, 2);
+  assert.equal(mes.diagnosticos_web, 2);
+  assert.equal(mes.propuestas_enviadas, 2);
+});
+await check('embudo: ni correos ni teléfonos en la salida', () => {
+  const s = JSON.stringify(armarEmbudo(EMBUDO, AHORA));
+  assert.ok(!/@|555-0101/.test(s), 'sin datos de contacto');
+});
+await check('embudo: sin permiso para ver el brief, sale igual y lo avisa', () => {
+  const sin = { ...EMBUDO, borradores: EMBUDO.borradores.map(({ brief_ref, brief_business, ...b }) => b), permisos: { brief_ref: false } };
+  const e = armarEmbudo(sin, AHORA);
+  assert.equal(e.avisos.length, 1);
+  assert.deepEqual(e.borradores.find((x) => x.ref === 'PROP-904').de, { tipo: 'brief', ref: null, nombre: null, negocio: null });
+});
+await check('leer el embudo: solo SELECT con columnas con nombre; nada de Finanzas, IP, importes ni quién lo preparó', async () => {
+  const vistas = [];
+  const fake = (niegaBrief) => ({ query: async (t) => {
+    vistas.push(t);
+    if (niegaBrief && /brief_ref/.test(t)) { const e = new Error('permission denied'); e.code = '42501'; throw e; }
+    if (/FROM leads WHERE status = ANY/.test(t)) return { rows: EMBUDO.leads };
+    return { rows: [] };
+  } });
+  const e1 = await leerEmbudo(fake(false), AHORA);
+  assert.equal(e1.contactos.length, 3);
+  assert.deepEqual(e1.avisos, []);
+  const e2 = await leerEmbudo(fake(true), AHORA);
+  assert.equal(e2.avisos.length, 1, 'sin el permiso del brief, avisa y no falla');
+  for (const t of vistas) {
+    assert.match(t.trim(), /^SELECT /, 'solo lecturas: ' + t.slice(0, 60));
+    assert.ok(!/SELECT \*|\.\*/.test(t), 'sin SELECT *');
+    assert.ok(!FINANZAS.test(t), 'nada de Finanzas: ' + t.slice(0, 80));
+    assert.ok(!/ip_address|user_agent|agreed_amount_cents|amount_cents|actor_email|sales_catalog|email|phone/.test(t), 'sin IP, importes, autor ni contacto: ' + t.slice(0, 80));
+  }
 });
 
 if (fails.length) {

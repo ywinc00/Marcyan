@@ -24,8 +24,10 @@ interface Props {
   primary: Cta;
   link?: Cta;
   lang?: 'es' | 'en';
+  /** Ciudad de la página: Miami enseña sus propios clientes de ejemplo en la lista de pedidos. */
+  city?: 'houston' | 'miami';
 }
-const { h1Html, chip, eyebrow, lead, primary, link, lang = 'es' } = Astro.props;
+const { h1Html, chip, eyebrow, lead, primary, link, lang = 'es', city = 'houston' } = Astro.props;
 ---
 <section class="w-hero he">
   <div class="w-container he__grid">
@@ -44,7 +46,7 @@ const { h1Html, chip, eyebrow, lead, primary, link, lang = 'es' } = Astro.props;
       </HeroTexto>
     </div>
     <div class="he__obj" data-w-in="obj">
-      <div class="he__campo"><PedidosHoy lang={lang} /></div>
+      <div class="he__campo"><PedidosHoy lang={lang} city={city} /></div>
       <ProductoArte modo="sprite" />
     </div>
   </div>

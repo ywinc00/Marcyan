@@ -214,11 +214,17 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
     lead: 'Tu tienda a medida, en español e inglés, que vende mientras duermes: pagos seguros para tu cliente de Miami y para el que te compra desde fuera.',
     primary: 'Quiero mi tienda',
     link: 'Ver precios',
-    triada,
+    // Texto propio de Miami (encargo de parejas del 15-nov, design/parejas-ciudad-v3.md): vender aquí y fuera,
+    // pagos de fuera y envíos con el costo claro. Houston sigue con entrega local y recogida.
+    triada: [
+      { tone1: 'Vende.', tone2: 'Aquí y fuera.', text: 'Tu catálogo abierto día y noche, para el cliente de Miami y para el que te compra desde otro estado o país.' },
+      { tone1: 'Cobra.', tone2: 'Venga de donde venga.', text: 'Tarjeta y PayPal con pasarelas confiables como Stripe, también tarjetas de fuera. Te guiamos con la cuenta.' },
+      { tone1: 'Envía.', tone2: 'Con el costo claro.', text: 'Cada pedido te llega con aviso, y tu cliente ve antes de pagar cuánto cuesta el envío a su destino.' },
+    ],
     pasos: {
       label: 'Del carrito al pago',
-      title: 'Así te compra tu cliente',
-      lead: 'Tres pasos, desde el celular y en su idioma. Tú recibes el pedido ya pagado.',
+      title: 'Así te compra tu cliente, esté donde esté',
+      lead: 'Tres pasos desde el celular, en español o en inglés, también desde fuera de Florida. Tú recibes el pedido ya pagado.',
       steps: [
         { label: 'Paso 01', title: 'Elige en tu catálogo', text: 'Fotos, variantes y precios claros, en español y en inglés.' },
         { label: 'Paso 02', title: 'Paga seguro', text: 'Con tarjeta o PayPal, también desde fuera. El impuesto de Florida se calcula solo.' },
@@ -258,19 +264,19 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
       sr: 'Ejemplo: tu tienda conectada con pagos (tarjeta, Stripe, PayPal, tarjetas de fuera, cupones), envíos (Miami, otros estados, Latinoamérica) y mensajería (confirmación al cliente, aviso de pedido nuevo, botón de WhatsApp).',
     },
     dia: {
-      tone1: 'Abrir la tienda es el principio.',
-      tone2: 'Lo que cuenta es cada día.',
-      sub: 'Así se ve un día normal con tu tienda funcionando: pedidos, cobros y envíos en orden.',
-      title: 'El día de tu tienda',
+      tone1: 'Tu tienda no cierra.',
+      tone2: 'Y envía a donde te compren.',
+      sub: 'Así se ve un día normal con tu tienda funcionando: pedidos de Miami y de otros estados, cobros y envíos en orden.',
+      title: 'Un día de pedidos y envíos',
       text: 'Los pedidos entran pagados, el inventario se descuenta solo y tu cliente sabe cuándo recibe, aquí o fuera. Tú preparas y envías.',
       rows: [
-        { icon: 'lucide:mail', label: 'Confirmación a Luis M.', chip: 'Enviada', tone: 'pass' },
+        { icon: 'lucide:mail', label: 'Correo a Daniela V.', chip: 'Enviado', tone: 'pass' },
         { icon: 'lucide:package', label: 'Inventario de velas', chip: 'Al día', tone: 'pass' },
-        { icon: 'lucide:shopping-bag', label: 'Pedido de Ana R.', chip: 'Pagado', tone: 'ok' },
+        { icon: 'lucide:shopping-bag', label: 'Pedido de Nueva York', chip: 'Pagado', tone: 'ok' },
         { icon: 'lucide:truck', label: 'Envío dentro de Miami', chip: 'Preparado', tone: 'pass' },
         { icon: 'lucide:globe', label: 'Envío a Latinoamérica', chip: 'En camino', tone: 'pass' },
-        { icon: 'lucide:shopping-bag', label: 'Pedido de Sofía G.', chip: 'Pagado', tone: 'ok' },
-        { icon: 'lucide:tag', label: 'Cupón de bienvenida', chip: 'Usado', tone: 'pass' },
+        { icon: 'lucide:shopping-bag', label: 'Pedido de Andrés P.', chip: 'Pagado', tone: 'ok' },
+        { icon: 'lucide:receipt', label: 'Envío por país', chip: 'Calculado', tone: 'pass' },
       ],
     },
     incluye: {
@@ -291,11 +297,11 @@ export const shopCopy: Record<ShopCity, ShopCopy> = {
     franja,
     hermanas: {
       title: "<span class='w-tone'>Tu tienda vende.</span> Lo demás le trae clientes.",
-      lead: 'Servicios de Marcyan que se conectan con tu tienda.',
+      lead: 'Servicios de Marcyan para tu tienda en Miami.',
       guia: { title: 'Guía de precios de una web', text: 'Cuánto cuesta una página web, con precios reales.' },
       diag: { title: 'Diagnóstico gratis', text: 'Revisa si tu negocio pierde clientes online.' },
       precios: { title: 'Precios', text: 'Todos los precios de entrada, a la vista.' },
     },
-    cierre: { proof: 'Elegimos contigo la plataforma y te guiamos con la cuenta de pagos, paso a paso.', ...warm },
+    cierre: { proof: 'Elegimos contigo la plataforma, la cuenta de pagos y las tarifas de envío, paso a paso.', ...warm },
   },
 };

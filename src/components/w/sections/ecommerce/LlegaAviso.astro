@@ -32,6 +32,11 @@ const ORD: Ord[] = en
   : [{ n: '1042', who: 'Ana R.', first: 'Ana', prod: 'Vela aromática', art: 'vela' },
      { n: '1043', who: 'Luis M.', first: 'Luis', prod: 'Café de olla, 1 kg', art: 'cafe' },
      { n: '1044', who: 'Sofía G.', first: 'Sofía', prod: 'Caja de regalo', art: 'caja' }];
+// Miami (solo en español): sus propios clientes, con las mismas ilustraciones.
+if (!en && miami) ORD.splice(0, ORD.length,
+  { n: '2081', who: 'Daniela V.', first: 'Daniela', prod: 'Vela aromática', art: 'vela' },
+  { n: '2082', who: 'Andrés P.', first: 'Andrés', prod: 'Café cubano, 1 lb', art: 'cafe' },
+  { n: '2083', who: 'Camila R.', first: 'Camila', prod: 'Caja de regalo', art: 'caja' });
 const T = en
   ? { url: 'yourshop.example/thanks', ex: 'Example', nav: ['Shop', 'Coffee', 'Candles'], thanks: (f: string) => `Thank you, ${f}.`,
       paid: (n: string) => `Order #${n} is paid.`, how: miami ? 'Shipping to your address' : 'Pickup today at the shop',

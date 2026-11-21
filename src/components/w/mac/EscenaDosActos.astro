@@ -28,10 +28,12 @@ import { logoReserva, type LogoReservaId } from './mac';
 
 interface Props {
   lang?: 'es' | 'en';
+  /** Ejemplo propio de la página (resumen, formulario, ventanas y filas); Miami no enseña el de Houston (E-65 c). */
+  ejemplo?: EjemploEscena;
   id?: string;
   class?: string;
 }
-const { lang = 'es', id, class: cls } = Astro.props;
+const { lang = 'es', ejemplo, id, class: cls } = Astro.props;
 
 const logoMods = import.meta.glob('../marcas/LogoMarca.astro', { eager: true }) as Record<string, { default: any }>;
 const LogoMarca = Object.values(logoMods)[0]?.default ?? null;
@@ -39,6 +41,7 @@ const uid = 'da' + Math.random().toString(36).slice(2, 8);
 
 type Canal = 'whatsapp' | 'instagram' | 'messenger' | 'form' | 'web' | 'llamada' | 'sms';
 interface Ventana { canal: Canal; x: number; y: number; w: number; quien: string; texto: string; hora: string; extra?: boolean; enLang?: boolean }
+export interface EjemploEscena { resumen: string; pedir: string; campos: string[]; ventanas: Ventana[]; filas: Array<{ canal: Canal; txt: string; est: 'ok' | 'aviso' }> }
 
 const T = {
   es: {
@@ -106,6 +109,8 @@ const T = {
     ] as Array<{ canal: Canal; txt: string; est: 'ok' | 'aviso' }>,
   },
 }[lang];
+// Ejemplo propio de la página (Miami: src/i18n/w/ia-chat.ts, `escena`); sin él, el de siempre.
+if (ejemplo) Object.assign(T, ejemplo);
 const otro = lang === 'es' ? 'en' : 'es';
 
 const MARCA: Partial<Record<Canal, LogoReservaId>> = { whatsapp: 'whatsapp', instagram: 'instagram', messenger: 'messenger' };

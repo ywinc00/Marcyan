@@ -10,7 +10,7 @@
 // caos también son producto (mensajes del cliente) y los avisos, sistema.
 import Ejemplo from './Ejemplo.astro';
 
-interface Mess { text: string; from?: string; time?: string; kind?: 'bubble' | 'notice' }
+interface Mess { text: string; from?: string; time?: string; kind?: 'bubble' | 'notice'; /** Mensaje en inglés dentro de una página en español (o al revés). */ en?: boolean }
 interface Props {
   /** Etiquetas del interruptor, p. ej. ["Sin Marcy", "Con Marcy"]. */
   labels: [string, string];
@@ -54,7 +54,7 @@ const uid = `wd-sc-${id ?? 'x'}`;
             {(m.from || m.time) && (
               <span class="wd-sc__mh">{m.from && <b>{m.from}</b>}{m.time && <span>{m.time}</span>}</span>
             )}
-            <span class="wd-sc__mt">{m.text}</span>
+            <span class="wd-sc__mt" lang={m.en ? (lang === 'es' ? 'en' : 'es') : undefined}>{m.text}</span>
           </li>
         ))}
       </ul>

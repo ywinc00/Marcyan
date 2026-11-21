@@ -18,8 +18,8 @@
 import LogoEjemplo from '../../objetos/ejemplos/LogoEjemplo.astro';
 import ProductoArte, { type ProductoId } from './ProductoArte.astro';
 
-interface Props { lang?: 'es' | 'en'; class?: string }
-const { lang = 'es', class: cls } = Astro.props;
+interface Props { lang?: 'es' | 'en'; city?: 'houston' | 'miami'; class?: string }
+const { lang = 'es', city = 'houston', class: cls } = Astro.props;
 const en = lang === 'en';
 type Row = [ProductoId, string, string];
 const ROWS: Row[] = en
@@ -27,6 +27,10 @@ const ROWS: Row[] = en
      ['taza', 'Clay mug', 'Carlos D.'], ['viaje', 'Travel candle', 'Marta P.'], ['grano', 'Whole bean coffee', 'Jorge T.']]
   : [['vela', 'Vela aromática', 'Ana R.'], ['cafe', 'Café de olla, 1 kg', 'Luis M.'], ['caja', 'Caja de regalo', 'Sofía G.'],
      ['taza', 'Taza de barro', 'Carlos D.'], ['viaje', 'Vela de viaje', 'Marta P.'], ['grano', 'Café en grano, 1 kg', 'Jorge T.']];
+// Miami (solo en español): sus propios clientes y su café, con las mismas ilustraciones.
+if (!en && city === 'miami') ROWS.splice(0, ROWS.length,
+  ['vela', 'Vela aromática', 'Daniela V.'], ['cafe', 'Café cubano, 1 lb', 'Andrés P.'], ['caja', 'Caja de regalo', 'Camila R.'],
+  ['taza', 'Taza de barro', 'Tomás L.'], ['viaje', 'Vela de viaje', 'Isabel M.'], ['grano', 'Café en grano, 1 lb', 'Rafael O.']);
 // Estado inicial (y quieto) de cada fila: 2 = Listo, 1 = Preparando, 0 = Pagado.
 const INI = [2, 1, 1, 0, 0, 0];
 const T = en

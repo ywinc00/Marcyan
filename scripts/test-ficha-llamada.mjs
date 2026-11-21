@@ -35,12 +35,58 @@ const DATOS = {
 await check('la ficha trae lo que pide el encargo y en lenguaje llano', () => {
   const md = armarFicha(DATOS, new Date('2026-11-15T20:00:00Z'));
   for (const t of ['# Ficha de llamada · LEAD-900 · Taller de Prueba', '## Quién es', 'Prefiere WhatsApp.', '## Historial',
-    'Estado: Nuevo → Contactado', '## Conversación con Marcy', 'Vio precio: sí', 'desde $1,500', 'Pidió hablar con una persona: sí',
+    'Etapa: Nuevo → Contactado', '## Conversación con Marcy', 'Vio precio: sí', 'desde $1,500', 'Pidió hablar con una persona: sí',
     '## Citas', '## Brief MRC-900', 'Presupuesto que indicó: $1,000 a $2,500', '## Diagnóstico DIAG-9', '41/100',
     'La web tarda 6 s', '## Ya es cliente · CLI-090', 'PRJ-090 · Web del taller']) {
     assert.ok(md.includes(t), 'falta: ' + t);
   }
   assert.ok(!/ip_address|user_agent|agreed_amount|undefined|null/.test(md), 'nada de sistema ni datos que sobran');
+});
+// ── Etapa y propuesta (tanda 2 de Ventas, 7b). Cifras inventadas: el repo es público. ──
+const PROP = {
+  ref_id: 'PROP-090', status: 'sent', created_by: 'marcy', recommended_option: 1, chosen_option: null, client_value_cents: '12300',
+  sent_on: '2026-11-13', expires_on: '2026-11-27', follow_ups_done: 1, next_follow_up_on: '2026-11-18', decision_note: null,
+  options: [
+    { plan: { id: 'dominio', name: 'Dominio' }, projects: [{ name: 'Web por ciudades' }], project_cents: 123400, monthly_cents: 45600 },
+    { plan: { id: 'crecimiento', name: 'Crecimiento' }, projects: [{ name: 'Web que vende' }], project_cents: 78900, monthly_cents: 32100 },
+  ],
+};
+const EN_VENTA = { ...LEAD, status: 'proposal', stage_changed_at: '2026-11-13T15:00:00Z' };
+await check('venta: etapa, siguiente paso, opciones con la recomendada, caducidad y seguimientos', () => {
+  const md = armarFicha({ ...DATOS, lead: EN_VENTA, propuestas: [PROP, { ...PROP, ref_id: 'PROP-080', status: 'rejected' }] }, new Date('2026-11-20T18:00:00Z'));
+  for (const t of ['## Etapa y propuesta', 'Etapa: Propuesta enviada', 'Desde: 13 nov 2026', 'Siguiente paso: Seguimiento del día 5',
+    '**Propuesta PROP-090**: enviada el 13 nov, vale hasta el 27 nov. La preparó Marcy.', 'Siguiente paso: Seguimiento del día 5 (atrasado)',
+    '- Dominio + Web por ciudades: $1,234 + $456/mes (se paga con 4 clientes nuevos al mes)',
+    '- Crecimiento + Web que vende: $789 + $321/mes (recomendada, se paga con 3 clientes nuevos al mes)',
+    'Le vale $123 cada cliente nuevo.', 'Seguimientos: 1 de 3 hechos; el próximo, el del día 5, toca el 18 nov.', 'Antes: PROP-080 (rechazada).']) {
+    assert.ok(md.includes(t), 'falta: ' + t);
+  }
+  assert.ok(md.indexOf('## Etapa y propuesta') < md.indexOf('## Historial'), 'la venta va arriba, antes del historial');
+  assert.ok(!/undefined|null|NaN/.test(md));
+});
+await check('venta: vencida sin respuesta, aceptada con la elegida y perdido con su motivo', () => {
+  const ahora = new Date('2026-12-01T18:00:00Z');
+  const vencida = armarFicha({ lead: EN_VENTA, propuestas: [PROP], eventos: [], convs: [], turnos: [], citas: [] }, ahora);
+  assert.match(vencida, /enviada el 13 nov, venció el 27 nov sin respuesta/);
+  assert.match(vencida, /Siguiente paso: Decidir la propuesta/);
+  const aceptada = armarFicha({ lead: { ...EN_VENTA, status: 'converted' }, propuestas: [{ ...PROP, status: 'accepted', chosen_option: 0 }], eventos: [], convs: [], turnos: [], citas: [] }, ahora);
+  assert.match(aceptada, /Dominio \+ Web por ciudades: \$1,234 \+ \$456\/mes \(la eligió/);
+  assert.match(aceptada, /enviada el 13 nov, aceptada\./);
+  assert.ok(!/Siguiente paso/.test(aceptada), 'ganado: sin siguiente paso');
+  const perdido = armarFicha({ lead: { ...LEAD, status: 'lost', lost_reason: 'price', lost_note: 'Le pareció caro' }, propuestas: [], eventos: [], convs: [], turnos: [], citas: [] }, ahora);
+  assert.match(perdido, /Motivo: Precio · Nota: Le pareció caro/);
+  assert.match(perdido, /Sin propuesta todavía/);
+});
+await check('venta: sin el permiso nuevo la ficha sale igual y lo dice', async () => {
+  const c = { query: async (t) => {
+    if (/stage_changed_at/.test(t) || /FROM proposals/.test(t)) { const e = new Error('permission denied'); e.code = '42501'; throw e; }
+    if (/FROM leads/.test(t)) return { rowCount: 1, rows: [LEAD] };
+    return { rowCount: 0, rows: [] };
+  } };
+  const d = await leerLead(c, 'LEAD-900');
+  assert.equal(d.lead.ref_id, 'LEAD-900');
+  assert.equal(d.propuestasSinPermiso, true);
+  assert.match(armarFicha(d), /todavía no puede verlas/);
 });
 await check('sin chat ni citas lo dice, no deja secciones vacías', () => {
   const md = armarFicha({ lead: LEAD, eventos: [], convs: [], turnos: [], citas: [] });
@@ -72,7 +118,11 @@ await check('leer un lead: solo SELECT con columnas con nombre; nada de Finanzas
   }
 });
 await check('comprobar: pasa solo si la base niega Finanzas, IP, importes y escribir', async () => {
-  const niega = { query: async (t) => { if (/^(BEGIN|ROLLBACK)/.test(t)) return {}; if (/SELECT ref_id FROM leads/.test(t)) return { rows: [] }; const e = new Error('denied'); e.code = /INSERT/.test(t) ? '25006' : '42501'; throw e; } };
+  const niega = { query: async (t) => {
+    if (/^(BEGIN|ROLLBACK)/.test(t)) return {};
+    if (/^SELECT (ref_id|stage_changed_at, lost_reason) FROM leads/.test(t) || /^SELECT ref_id, options, expires_on FROM proposals/.test(t)) return { rows: [] };
+    const e = new Error('denied'); e.code = /INSERT/.test(t) ? '25006' : '42501'; throw e;
+  } };
   const r1 = await comprobar(niega);
   assert.equal(r1.ok, true, r1.lineas.join(' | '));
   const deja = { query: async (t) => ({ rows: [] }) };

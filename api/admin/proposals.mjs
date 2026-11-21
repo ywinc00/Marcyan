@@ -4,7 +4,8 @@
 //   GET  ?view=catalog         → { catalog }: planes y proyectos con su precio y su mínimo (diálogo de Orbit)
 //   GET  ?lead=LEAD-XXX        → { proposals } de ese contacto (la más reciente primero)
 //   GET  ?client=ID            → { proposals } de ese cliente
-//   POST { lead_ref?, client_id?, options, recommended_option?, client_value_cents?, send?, notes? }
+//   GET  ?brief=MRC-XXX        → { proposals } de ese brief (migración 032)
+//   POST { lead_ref?, client_id?, brief_ref?, options, recommended_option?, client_value_cents?, send?, notes? }
 //        → { proposal, created, lead_status }. Desde Orbit siempre created_by = 'orbit'.
 // Errores: 400 con { field } si un dato no vale; 404; 503 sin la migración 029 o sin catálogo.
 import { requireAdmin } from '../../lib/auth.mjs';
@@ -27,12 +28,13 @@ export default async function handler(req, res) {
       }
       if (q.view === 'catalog') return res.status(200).json({ ok: true, catalog: await orbitCatalog() });
       if (q.lead) return res.status(200).json({ ok: true, proposals: await listProposals({ lead_ref: normRef(q.lead) }) });
+      if (q.brief) return res.status(200).json({ ok: true, proposals: await listProposals({ brief_ref: normRef(q.brief) }) });
       if (q.client) {
         const id = Number(q.client);
         if (!Number.isInteger(id) || id <= 0) return res.status(400).json({ ok: false, error: 'Cliente no válido.' });
         return res.status(200).json({ ok: true, proposals: await listProposals({ client_id: id }) });
       }
-      return res.status(400).json({ ok: false, error: 'Falta view=pipeline, lead o client.' });
+      return res.status(400).json({ ok: false, error: 'Falta view=pipeline, lead, client o brief.' });
     }
 
     if (req.method === 'POST') {
@@ -40,6 +42,7 @@ export default async function handler(req, res) {
       const out = await saveProposal({
         lead_ref: body.lead_ref ? normRef(body.lead_ref) : null,
         client_id: body.client_id ?? null,
+        brief_ref: body.brief_ref ? normRef(body.brief_ref) : null,
         created_by: 'orbit',
         options: body.options,
         recommended_option: body.recommended_option ?? null,

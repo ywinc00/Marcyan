@@ -24,6 +24,8 @@
   import BriefHistory from './BriefHistory.svelte';
   import KitDialog from './KitDialog.svelte';
   import ConvertDialog from './ConvertDialog.svelte';
+  import ProposalCard from '../crm/ProposalCard.svelte';
+  import ProposalDialog from '../crm/ProposalDialog.svelte';
   import { initials, avatarColor } from './avatar.js';
   import {
     STATUSES, statusLabel, statusTone, SOURCE_LABEL, LANG_LABEL,
@@ -67,6 +69,18 @@
     }
   }
   $effect(() => { if (pid) untrack(load); });
+
+  // Propuestas del brief (Ventas, migración 032): las de quien se decidió en el chat sin pasar
+  // por contacto. Sin la 032 la lista viene vacía y el brief se ve como siempre.
+  let proposals = $state([]);
+  let newPropOpen = $state(false);
+  async function loadProposals() {
+    try { proposals = (await api('/api/admin/proposals?brief=' + encodeURIComponent(pid))).proposals || []; }
+    catch (e) { proposals = []; if (e?.status !== 503) console.warn('[briefs] propuestas', e?.message); }
+  }
+  $effect(() => { if (pid) untrack(loadProposals); });
+  const currentProp = $derived(proposals.find((p) => ['sent', 'expired', 'draft'].includes(p.status)) || proposals[0] || null);
+  function onPropChanged() { loadProposals(); history?.reload?.(); }
 
   const kit = $derived(kitState(brief));
   const links = $derived(contactLinks(data));
@@ -403,6 +417,7 @@
         {:else}
           <p class="side__text">Cuando contrate, conviértelo en cliente para facturarle y seguir su proyecto.</p>
           <button class="b full" type="button" onclick={() => (convertOpen = true)}><Icon name="user" size={16} />Convertir en cliente</button>
+          {#if !currentProp}<button class="b b--ghost full" type="button" onclick={() => (newPropOpen = true)}>Nueva propuesta</button>{/if}
         {/if}
       </section>
     </div>
@@ -429,6 +444,10 @@
         </div>
       {/if}
 
+      {#if currentProp}
+        <ProposalCard proposal={currentProp} lead={{ phone: data.whatsapp || data.phone || null }} converted={!!client}
+          winLabel="Convertir en cliente" onchanged={onPropChanged} onnew={client ? null : () => (newPropOpen = true)} />
+      {/if}
       <BriefFields sections={inicial} {edit} bind:draft errors={fieldErrors} />
 
       <BriefFiles {pid} onloaded={(f) => (fileCount = f.length)} onpurged={() => history?.reload()} />
@@ -464,6 +483,7 @@
 
   <KitDialog bind:open={kitOpen} {pid} email={data.email || ''} {lang} {kit} onissued={onKitIssued} />
   <ConvertDialog bind:open={convertOpen} {pid} {data} onconverted={onConverted} />
+  <ProposalDialog bind:open={newPropOpen} brief={pid} onsaved={onPropChanged} />
   <ConfirmDialog bind:open={emailConfirm} title="¿Enviar el correo?" danger={false} confirmLabel="Enviar"
     message={`Se envía "${emailSubject.trim()}" a ${data.email || 'el cliente'}. Queda guardado en el historial.`}
     busy={sendingEmail} onconfirm={sendEmail} />

@@ -372,4 +372,5 @@ export const PROPOSAL_STATUS = {
   accepted: { label: 'Aceptada', tone: 'success' }, rejected: { label: 'Rechazada', tone: 'neutral' },
   expired: { label: 'Vencida', tone: 'error' },
 };
-export const PROPOSAL_AUTHOR = { orbit: 'tú en Orbit', marcy: 'Marcy', diagnostic: 'el diagnóstico' };
+// Quién la preparó, como frase entera (con «tú» el verbo cambia).
+export const PROPOSAL_AUTHOR = { orbit: 'La hiciste tú en Orbit', marcy: 'La preparó Marcy', diagnostic: 'La preparó el diagnóstico' };

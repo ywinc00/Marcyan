@@ -268,6 +268,15 @@ await check('embudo: un borrador sustituible junto a otra abierta del dueño →
     assert.equal(f.calls.save.length, 0);
   }
 });
+await check('embudo: pide a Orbit la regla dentro de su transacción (skip_if_open) y respeta su «ya hay otra abierta»', async () => {
+  // Carrera: el atajo no vio nada, pero dentro de la transacción Orbit encontró otra abierta.
+  const f = fakes();
+  f.deps.save = async (i) => { f.calls.save.push(i); return { created: false, open: true, proposal: { status: 'sent' } }; };
+  const r = await runDiagnosticFunnel({ ref: 'DGN-027', leadRef: 'LEAD-036', plan: 'dominio' }, f.deps);
+  assert.equal(f.calls.save[0].skip_if_open, true);
+  assert.deepEqual(r, { stage: 'moved', draft: 'exists' });
+  assert.equal(f.calls.notify.length, 0, 'no es un fallo: no se avisa');
+});
 await check('isReplaceableDraft: solo borrador del diagnóstico, con folio DGN y sin tocar', () => {
   assert.equal(isReplaceableDraft(diagDraft()), true);
   assert.equal(isReplaceableDraft(diagDraft({ created_at: '2026-11-21T10:00:00.000Z', updated_at: '2026-11-21T10:00:00Z' })), true, 'fechas en texto');

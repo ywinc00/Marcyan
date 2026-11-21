@@ -57,6 +57,11 @@ GRANT SELECT (id, ref_id, lead_ref, client_id, status, created_by, options, reco
               decision_note, created_at, updated_at)
   ON proposals TO orbit_lectura;
 
+-- ── Propuestas unidas a un brief (migración 032; Ventas 7d, 2026-11-21) ──────────
+-- Si el usuario ya existe, basta con aplicar SOLO esta línea (con OK del dueño). La lista del
+-- embudo (`ficha-llamada.mjs --embudo`) dice de qué brief cuelga cada borrador. Solo lectura.
+GRANT SELECT (brief_ref) ON proposals TO orbit_lectura;
+
 -- Comprobación (la hace también `node --env-file=.env.local scripts/ficha-llamada.mjs --comprobar`):
 --   con este usuario, SELECT * FROM invoices        → permiso denegado
 --   con este usuario, INSERT INTO lead_events ...   → transacción de solo lectura

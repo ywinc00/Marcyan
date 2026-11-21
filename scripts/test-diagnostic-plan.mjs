@@ -365,12 +365,13 @@ await check('embudo: sin folio o sin contacto no hace nada', async () => {
   assert.deepEqual(await runDiagnosticFunnel({ ref: '', leadRef: 'LEAD-1', plan: 'dominio' }, f.deps), { stage: 'skipped', draft: 'off' });
   assert.equal(f.calls.advance.length, 0);
 });
-await check('embudo: el borrador sigue apagado hasta el OK del dueño', async () => {
-  assert.equal(DIAGNOSTIC_DRAFTS, false);
+await check('embudo: el borrador está encendido (OK del dueño del 2026-11-21)', async () => {
+  assert.equal(DIAGNOSTIC_DRAFTS, true);
   const f = fakes();
   const r = await runDiagnosticFunnel({ ref: 'DGN-014', leadRef: 'LEAD-024', plan: 'dominio' }, { ...f.deps, drafts: undefined });
-  assert.deepEqual(r, { stage: 'moved', draft: 'off' });
-  assert.equal(f.calls.save.length, 0);
+  assert.deepEqual(r, { stage: 'moved', draft: 'created' });
+  assert.equal(f.calls.save.length, 1);
+  assert.equal(f.calls.save[0].send, false, 'encendido, pero siempre en borrador: lo envía el dueño');
 });
 
 if (fails.length) {

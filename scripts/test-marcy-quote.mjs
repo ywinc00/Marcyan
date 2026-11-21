@@ -511,6 +511,23 @@ await check('pasar a Orbit: la cotización marcada por el diagnóstico entra con
   assert.equal(saved[0].recommended_option, 2);
   assert.equal(saved[0].source_ref, `chat:s-9:${stored.key}`);
 });
+await check('una sola propuesta abierta por ficha: si ya hay una, no entra otra, queda marcada y se avisa', async () => {
+  const { sql, calls } = fakeSql({ pending: [{ sid: 's-4', lead_ref: 'LEAD-4', quote: STORED, quote_tries: 0 }] });
+  const saved = [];
+  const notes = [];
+  const save = async (x) => { saved.push(x); return { proposal: { ref_id: 'PROP-3', status: 'sent' }, created: false, open: true }; };
+  assert.equal(await retryPendingQuotes({ sqlImpl: sql, catalog: CAT, enabled: true, save, notify: async (...a) => { notes.push(a); } }), 0, 'no entró ninguna');
+  assert.equal(saved[0].skip_if_open, true);
+  const mk = calls.find((c) => /SET quote_proposal =/.test(c.text));
+  assert.equal(mk.values[0], 'PROP-3', 'marcada con la abierta: no se reintenta');
+  assert.equal(notes.length, 1);
+  assert.match(notes[0][1], /LEAD-4: ya tiene PROP-3 \(sent\) abierta y no se creó otro borrador/);
+  // Lo normal sigue igual: entra y no avisa.
+  const n2 = [];
+  const f2 = fakeSql({ pending: [{ sid: 's-5', lead_ref: 'LEAD-5', quote: STORED, quote_tries: 0 }] });
+  assert.equal(await retryPendingQuotes({ sqlImpl: f2.sql, catalog: CAT, enabled: true, save: async () => ({ proposal: { ref_id: 'PROP-8', status: 'draft' }, created: true }), notify: async (...a) => { n2.push(a); } }), 1);
+  assert.equal(n2.length, 0);
+});
 await check('plan del diagnóstico de la conversación: se lee de la base y nunca rompe el chat', async () => {
   const calls = [];
   const ok = async (strings, ...values) => { calls.push({ text: strings.join('?'), values }); return { rows: [{ diag_plan: 'dominio' }] }; };

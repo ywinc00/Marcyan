@@ -105,6 +105,10 @@ se copia en otro archivo. Cambiar una es cambiarla ahí, con el texto que dé Le
 - Una cotización nueva en la misma conversación sustituye a sus borradores sin enviar
   (`replaces_prefix: chat:<sid>:`, Orbit PR #98); nunca toca una enviada ni una que el dueño corrigió.
   Antes del #98 Orbit lo ignora y queda otro borrador: por eso el interruptor sigue apagado.
+- **Una sola propuesta abierta por ficha** (`skip_if_open: true`, Orbit PR #102, la misma regla que el
+  Diagnóstico): si el contacto, el brief o el cliente ya tiene una propuesta enviada, o un borrador que el
+  dueño corrigió, no se crea otra. La cotización queda marcada con esa propuesta (no se reintenta) y se
+  avisa al dueño. Una propuesta caducada o cerrada no bloquea. Antes del #102 Orbit lo ignora.
 - Lo mismo pedido otra vez en menos de 30 días conserva su marca: un borrador que el dueño descartó no
   vuelve a crearse. Pasado ese plazo (WhatsApp dura meses) es otra venta y la tarea avisa si ya existía.
 - Un proyecto solo «desde» va sin precio al borrador: Orbit lo deja «por confirmar» y no deja enviarlo

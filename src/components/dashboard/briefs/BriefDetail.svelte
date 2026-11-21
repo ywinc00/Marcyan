@@ -445,8 +445,11 @@
       {/if}
 
       {#if currentProp}
-        <ProposalCard proposal={currentProp} lead={{ phone: data.whatsapp || data.phone || null }} converted={!!client}
-          winLabel="Convertir en cliente" onchanged={onPropChanged} onnew={client ? null : () => (newPropOpen = true)} />
+        <!-- Con su separación, como en la ficha del contacto (seguimientos y propuesta). -->
+        <div class="propbox">
+          <ProposalCard proposal={currentProp} lead={{ phone: data.whatsapp || data.phone || null }} converted={!!client}
+            winLabel="Convertir en cliente" onchanged={onPropChanged} onnew={client ? null : () => (newPropOpen = true)} />
+        </div>
       {/if}
       <BriefFields sections={inicial} {edit} bind:draft errors={fieldErrors} />
 
@@ -525,6 +528,7 @@
   .layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; grid-template-areas: "main ops" "main comms"; grid-template-rows: auto 1fr; gap: 14px var(--space-5); align-items: start; margin-top: var(--space-2); }
   .ops { grid-area: ops; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
   .main { grid-area: main; min-width: 0; }
+  .propbox { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-4); }
   .comms { grid-area: comms; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 
   .side { display: flex; flex-direction: column; gap: var(--space-3); }

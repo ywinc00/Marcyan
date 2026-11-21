@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url';
 import {
   priceOption, projectPricing, catalogRules, paysBackWith, addDays, expiryDate, nextFollowUp,
   effectiveStatus, canAutoAdvance, money, rowToProposal, saveProposal, advanceLeadStage,
-  sendProposal, decideProposal, markFollowUpDone, listProposals, funnelSummary, expireDueProposals,
+  sendProposal, editProposal, discardProposal, pendingPriceOf, decideProposal, markFollowUpDone, listProposals, funnelSummary, expireDueProposals,
   nextStep, pipelineLeads,
   OPEN_STAGES, LOST_REASONS, PROPOSAL_STATUSES, PROPOSAL_AUTHORS, MIGRATION_029_MSG, NO_CATALOG_MSG,
 } from '../lib/proposals.mjs';
@@ -79,10 +79,24 @@ await check('precio: en el mínimo exacto y por encima del interno, sí', () => 
   assert.equal(priceOption(CAT, { projects: [{ id: 'pagina', price_cents: 90000 }] }).project_cents, 90000);
   assert.equal(priceOption(CAT, { projects: [{ id: 'ciudades', price_cents: 900000 }] }).project_cents, 900000);
 });
-await check('precio: un «desde» interno parte de su desde', () => {
+await check('precio: un «desde» interno parte de su desde y nunca baja de él', () => {
   const o = priceOption(CAT, { projects: ['ciudades'] });
   assert.equal(o.projects[0].cents, 707000);
   assert.equal(projectPricing(CAT, 'ciudades').from_price, true);
+  assert.equal(projectPricing(CAT, 'ciudades').floor_cents, 707000, 'el «desde», no el piso sobre la base');
+  assert.throws(() => priceOption(CAT, { projects: [{ id: 'ciudades', price_cents: 706900 }] }),
+    (e) => e.status === 400 && e.extra.field === 'options.0.projects.0' && e.extra.floor_cents === 707000);
+});
+await check('precio: un «desde» sin precio real queda por confirmar; con su precio, no', () => {
+  const o = priceOption(CAT, { plan: 'crecimiento', projects: ['ciudades', 'sitio'] });
+  assert.equal(o.projects[0].pending_price, true);
+  assert.ok(!('pending_price' in o.projects[1]), 'un precio fijo nunca está por confirmar');
+  assert.equal(o.pending, true);
+  assert.deepEqual(pendingPriceOf([{ projects: [] }, o]), { option: 1, project: 0, name: 'Ciudades' });
+  const real = priceOption(CAT, { projects: [{ id: 'ciudades', price_cents: 707000 }] });
+  assert.ok(!real.pending && !real.projects[0].pending_price, 'con precio real, aunque sea el mismo que el «desde»');
+  assert.equal(pendingPriceOf([real]), null);
+  assert.equal(pendingPriceOf(null), null);
 });
 await check('precio: lo mensual no se descuenta', () => {
   assert.throws(() => priceOption(CAT, { plan: 'presencia', monthly_cents: 30000 }), err400('options.0.monthly_cents'));
@@ -204,6 +218,7 @@ function fakeDb({ catalog = CAT, leads = {}, clients = [9], briefs = ['MRC-050']
           created_by, source_ref, actor_email, catalog_version, options: JSON.parse(options), recommended_option: rec, brief_ref,
           chosen_option: null, client_value_cents: value == null ? null : String(value), sent_at: sent ? 'ahora' : null,
           sent_on: sent ? today : null, expires_on: expires, follow_ups_done: 0, next_follow_up_on: next, notes,
+          created_at: 'creada', updated_at: 'creada',
         };
         st.proposals.push(row);
         return one(row);
@@ -215,6 +230,32 @@ function fakeDb({ catalog = CAT, leads = {}, clients = [9], briefs = ['MRC-050']
       if (/^INSERT INTO lead_events/.test(t)) {
         st.events.push({ ref: params[0], type: params[1], data: params[3] ? JSON.parse(params[3]) : null });
         return one(null);
+      }
+      if (/^UPDATE proposals SET options = \$2::jsonb, recommended_option = \$3, client_value_cents = \$4, catalog_version = \$5/.test(t)) {
+        const p = findP(params[0]);
+        Object.assign(p, { options: JSON.parse(params[1]), recommended_option: params[2], client_value_cents: params[3] == null ? null : String(params[3]), catalog_version: params[4], updated_at: 'corregida' });
+        return one(p);
+      }
+      if (/^DELETE FROM proposals WHERE status = 'draft' AND created_by = \$1 AND source_ref LIKE \$2 AND source_ref <> \$3 AND updated_at = created_at AND (lead_ref|brief_ref|client_id) = \$4 RETURNING ref_id$/.test(t)) {
+        const col = t.match(/AND (lead_ref|brief_ref|client_id) = \$4/)[1];
+        let re = '';
+        for (let i = 0; i < params[1].length; i++) {
+          const c = params[1][i];
+          if (c === '\\') re += params[1][++i].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          else if (c === '%') re += '.*';
+          else if (c === '_') re += '.';
+          else re += c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+        const like = new RegExp('^' + re + '$', 's');
+        const hit = st.proposals.filter((p) => p.status === 'draft' && p.created_by === params[0] && like.test(String(p.source_ref || ''))
+          && p.source_ref !== params[2] && p.updated_at === p.created_at && String(p[col]) === String(params[3]));
+        st.proposals = st.proposals.filter((p) => !hit.includes(p));
+        return { rowCount: hit.length, rows: hit.map((p) => ({ ref_id: p.ref_id })) };
+      }
+      if (/^DELETE FROM proposals WHERE ref_id = \$1 AND status = \$2$/.test(t)) {
+        const i = st.proposals.findIndex((p) => p.ref_id === params[0] && p.status === params[1]);
+        if (i >= 0) st.proposals.splice(i, 1);
+        return { rowCount: i >= 0 ? 1 : 0, rows: [] };
       }
       if (/^UPDATE proposals SET status = 'sent'/.test(t)) {
         const p = findP(params[0]);
@@ -407,6 +448,114 @@ await check('enviar: solo un borrador (409)', async () => {
   await assert.rejects(sendProposal('PROP-005', deps(db)), (e) => e.status === 409);
   await assert.rejects(sendProposal('PROP-404', deps(db)), (e) => e.status === 404);
 });
+await check('guardar: con un precio por confirmar no se guarda como enviada (400); en borrador, sí', async () => {
+  const db = fakeDb({ leads: { 'LEAD-070': { status: 'diagnosed', converted_client_id: null } } });
+  await assert.rejects(saveProposal({ lead_ref: 'LEAD-070', options: [{ plan: 'presencia' }, { projects: ['ciudades'] }], send: true }, deps(db)),
+    err400('options.1.projects.0'));
+  assert.equal(db.st.proposals.length, 0);
+  assert.equal(db.st.leads['LEAD-070'].status, 'diagnosed', 'el contacto no avanza');
+  const r = await saveProposal({ lead_ref: 'LEAD-070', created_by: 'marcy', source_ref: 'conv-70', options: [{ projects: ['ciudades'] }] }, deps(db));
+  assert.equal(r.proposal.status, 'draft');
+  assert.equal(r.proposal.options[0].pending, true);
+});
+await check('sustituir: una cotización nueva de la misma conversación sustituye al borrador anterior sin enviar', async () => {
+  const db = fakeDb({ leads: { 'LEAD-080': { status: 'contacted', converted_client_id: null } } });
+  const a = await saveProposal({ lead_ref: 'LEAD-080', created_by: 'marcy', source_ref: 'chat:s1:a', replaces_prefix: 'chat:s1:', options: [{ plan: 'presencia' }] }, deps(db));
+  assert.deepEqual(a.replaced, [], 'la primera no sustituye nada');
+  const b = await saveProposal({ lead_ref: 'LEAD-080', created_by: 'marcy', source_ref: 'chat:s1:b', replaces_prefix: 'chat:s1:', options: [{ plan: 'crecimiento' }] }, deps(db));
+  assert.deepEqual(b.replaced, [a.proposal.ref_id]);
+  assert.deepEqual(db.st.proposals.map((p) => p.ref_id), [b.proposal.ref_id]);
+  assert.deepEqual(db.st.events.filter((e) => e.type === 'proposal_replaced'),
+    [{ ref: 'LEAD-080', type: 'proposal_replaced', data: { proposal: a.proposal.ref_id, by: 'marcy', new_proposal: b.proposal.ref_id } }]);
+  const again = await saveProposal({ lead_ref: 'LEAD-080', created_by: 'marcy', source_ref: 'chat:s1:b', replaces_prefix: 'chat:s1:', options: [{ plan: 'crecimiento' }] }, deps(db));
+  assert.equal(again.created, false, 'un reintento devuelve la misma y no sustituye nada');
+  assert.equal(db.st.proposals.length, 1);
+});
+await check('sustituir: nunca toca una enviada, una que el dueño corrigió, otra conversación, otro contacto ni otro autor', async () => {
+  const base = { status: 'draft', created_by: 'marcy', lead_ref: 'LEAD-081', options: [], created_at: 'creada', updated_at: 'creada' };
+  const db = fakeDb({ leads: { 'LEAD-081': { status: 'contacted', converted_client_id: null } }, proposals: [
+    { ...base, ref_id: 'PROP-001', source_ref: 'chat:s1:a', status: 'sent' },
+    { ...base, ref_id: 'PROP-002', source_ref: 'chat:s1:b', updated_at: 'corregida' },
+    { ...base, ref_id: 'PROP-003', source_ref: 'chat:s2:a' },
+    { ...base, ref_id: 'PROP-004', source_ref: 'chat:s1:c', lead_ref: 'LEAD-999' },
+    { ...base, ref_id: 'PROP-005', source_ref: 'chat:s1:d', created_by: 'diagnostic' },
+    { ...base, ref_id: 'PROP-006', source_ref: 'chat:s1x:e' },
+    { ...base, ref_id: 'PROP-007', source_ref: 'chat:s1:f' },
+  ] });
+  const r = await saveProposal({ lead_ref: 'LEAD-081', created_by: 'marcy', source_ref: 'chat:s1:z', replaces_prefix: 'chat:s1:', options: [{ plan: 'presencia' }] }, deps(db));
+  assert.deepEqual(r.replaced, ['PROP-007']);
+  assert.deepEqual(db.st.proposals.map((p) => p.ref_id), ['PROP-001', 'PROP-002', 'PROP-003', 'PROP-004', 'PROP-005', 'PROP-006', r.proposal.ref_id]);
+});
+await check('sustituir: también en un brief; y el principio tiene que ser el del source_ref (400)', async () => {
+  const db = fakeDb({ proposals: [{ ref_id: 'PROP-001', status: 'draft', created_by: 'marcy', source_ref: 'chat:s9:a', brief_ref: 'MRC-050', options: [], created_at: 'creada', updated_at: 'creada' }] });
+  const r = await saveProposal({ brief_ref: 'MRC-050', created_by: 'marcy', source_ref: 'chat:s9:b', replaces_prefix: 'chat:s9:', options: [{ plan: 'presencia' }] }, deps(db));
+  assert.deepEqual(r.replaced, ['PROP-001']);
+  for (const p of ['chat:s8:', 'chat:s9:b', 'ch', '']) {
+    if (p === '') { assert.ok(!('replaced' in (await saveProposal({ brief_ref: 'MRC-050', created_by: 'marcy', source_ref: 'chat:s9:c', replaces_prefix: p, options: [{ plan: 'presencia' }] }, deps(db))))); continue; }
+    await assert.rejects(saveProposal({ brief_ref: 'MRC-050', created_by: 'marcy', source_ref: 'chat:s9:b', replaces_prefix: p, options: [{ plan: 'presencia' }] }, deps(db)), err400('replaces_prefix'));
+  }
+});
+await check('sustituir: los comodines del principio no se cuelan en la búsqueda', async () => {
+  const base = { status: 'draft', created_by: 'marcy', lead_ref: 'LEAD-082', options: [], created_at: 'creada', updated_at: 'creada' };
+  const db = fakeDb({ leads: { 'LEAD-082': { status: 'contacted', converted_client_id: null } }, proposals: [
+    { ...base, ref_id: 'PROP-001', source_ref: 'chat:sAB:a' },
+    { ...base, ref_id: 'PROP-002', source_ref: 'chat:s_%:a' },
+  ] });
+  const r = await saveProposal({ lead_ref: 'LEAD-082', created_by: 'marcy', source_ref: 'chat:s_%:b', replaces_prefix: 'chat:s_%:', options: [{ plan: 'presencia' }] }, deps(db));
+  assert.deepEqual(r.replaced, ['PROP-002'], '«_» y «%» del principio cuentan como letras');
+});
+const PENDING = { ...DRAFT, ref_id: 'PROP-006', lead_ref: 'LEAD-031', created_by: 'marcy', created_at: '2026-11-20T10:00:00Z',
+  options: [{ projects: [{ id: 'ciudades', name: 'Ciudades', cents: 707000, pending_price: true }], project_cents: 707000, monthly_cents: 0, pending: true }] };
+await check('enviar: con un precio por confirmar no se envía (409) y el contacto no se mueve', async () => {
+  const db = fakeDb({ leads: { 'LEAD-031': { status: 'diagnosed' } }, proposals: [PENDING] });
+  await assert.rejects(sendProposal('PROP-006', deps(db)), (e) => e.status === 409 && e.extra?.reason === 'pending_price' && /«Ciudades»/.test(e.message));
+  assert.equal(db.st.proposals[0].status, 'draft');
+  assert.equal(db.st.leads['LEAD-031'].status, 'diagnosed');
+  assert.equal(db.st.events.length, 0);
+});
+await check('corregir: el borrador toma las opciones nuevas con los precios de hoy, se apunta, y ya se puede enviar', async () => {
+  const db = fakeDb({ leads: { 'LEAD-031': { status: 'diagnosed' } }, proposals: [PENDING] });
+  const r = await editProposal('PROP-006', { options: [{ plan: 'dominio', projects: [{ id: 'ciudades', price_cents: 800000 }] }, { plan: 'crecimiento', projects: ['sitio'] }],
+    recommended_option: 1, client_value_cents: 15000 }, deps(db, { actorEmail: 'yo@x' }));
+  assert.equal(r.proposal.status, 'draft');
+  assert.equal(r.proposal.options.length, 2);
+  assert.equal(r.proposal.options[0].project_cents, 800000);
+  assert.ok(!r.proposal.options[0].pending);
+  assert.equal(r.proposal.recommended_option, 1);
+  assert.equal(r.proposal.client_value_cents, 15000);
+  assert.equal(r.proposal.catalog_version, CAT.version);
+  assert.deepEqual(db.st.events, [{ ref: 'LEAD-031', type: 'proposal_edited', data: { proposal: 'PROP-006' } }]);
+  assert.equal((await sendProposal('PROP-006', deps(db))).proposal.status, 'sent');
+});
+await check('corregir: Orbit puede ofrecer cualquier plan, sin bajar del mínimo', async () => {
+  const db = fakeDb({ proposals: [PENDING] });
+  assert.equal((await editProposal('PROP-006', { options: [{ plan: 'base' }] }, deps(db))).proposal.options[0].monthly_cents, 11100);
+  await assert.rejects(editProposal('PROP-006', { options: [{ projects: [{ id: 'pagina', price_cents: 89999 }] }] }, deps(db)), err400('options.0.projects.0'));
+});
+await check('corregir: solo un borrador (409); sin opciones (400); no existe (404)', async () => {
+  const db = fakeDb({ proposals: [{ ...PENDING, status: 'sent' }] });
+  await assert.rejects(editProposal('PROP-006', { options: [{ plan: 'presencia' }] }, deps(db)), (e) => e.status === 409);
+  await assert.rejects(editProposal('PROP-006', { options: [] }, deps(db)), err400('options'));
+  await assert.rejects(editProposal('PROP-006', { options: [{ plan: 'presencia' }], recommended_option: 3 }, deps(db)), err400('recommended_option'));
+  await assert.rejects(editProposal('PROP-404', { options: [{ plan: 'presencia' }] }, deps(db)), (e) => e.status === 404);
+});
+await check('descartar: el borrador se borra y queda en el historial; una enviada no (409)', async () => {
+  const db = fakeDb({ leads: { 'LEAD-031': { status: 'diagnosed' } }, proposals: [PENDING] });
+  assert.deepEqual(await discardProposal('PROP-006', deps(db)), { discarded: 'PROP-006' });
+  assert.equal(db.st.proposals.length, 0);
+  assert.deepEqual(db.st.events, [{ ref: 'LEAD-031', type: 'proposal_discarded', data: { proposal: 'PROP-006', by: 'marcy' } }]);
+  assert.equal(db.st.leads['LEAD-031'].status, 'diagnosed', 'el contacto se queda en su etapa');
+  const db2 = fakeDb({ proposals: [{ ...PENDING, status: 'sent' }] });
+  await assert.rejects(discardProposal('PROP-006', deps(db2)), (e) => e.status === 409);
+  assert.equal(db2.st.proposals.length, 1);
+  await assert.rejects(discardProposal('PROP-404', deps(db2)), (e) => e.status === 404);
+});
+await check('descartar: el de un brief, sin contacto, también (y sin historial de contacto)', async () => {
+  const db = fakeDb({ proposals: [{ ...PENDING, lead_ref: null, brief_ref: 'MRC-050' }] });
+  await discardProposal('PROP-006', deps(db));
+  assert.equal(db.st.proposals.length, 0);
+  assert.equal(db.st.events.length, 0);
+});
 await check('decidir: aceptada pide qué opción eligió (con dos o más)', async () => {
   const db = fakeDb({ proposals: [{ ...DRAFT, status: 'sent' }] });
   await assert.rejects(decideProposal('PROP-005', { status: 'accepted' }, deps(db)), err400('chosen_option'));
@@ -509,6 +658,13 @@ await check('siguiente: un borrador sin enviar pide enviarlo en 24 horas desde q
   assert.equal(nextStep({ status: 'contacted', created_at: at('2026-11-01T00:00:00Z') }, { ...draft, created_at: at('2026-11-18T10:00:00Z') }, { now: N }).bucket, 'late');
   assert.equal(nextStep({ status: 'proposal' }, draft, { now: N }).kind, 'send_proposal', 'en «propuesta enviada» sin enviar nada todavía');
   assert.equal(nextStep({ status: 'converted' }, draft, { now: N }).kind, 'none', 'ganado: no pide nada');
+});
+await check('siguiente: un borrador con un precio por confirmar pide primero el precio', () => {
+  const draft = { status: 'draft', created_at: at('2026-11-20T10:00:00Z'), options: [{ projects: [{ name: 'Ciudades', pending_price: true }] }] };
+  assert.equal(nextStep({ status: 'diagnosed' }, draft, { now: N }).pending_price, true);
+  assert.equal(nextStep({ status: 'diagnosed' }, { status: 'draft', created_at: draft.created_at, options: 1, pending_price: true }, { now: N }).pending_price, true,
+    'con el resumen del embudo (sin opciones)');
+  assert.ok(!('pending_price' in nextStep({ status: 'diagnosed' }, { ...draft, options: [{ projects: [{ name: 'Sitio' }] }] }, { now: N })));
 });
 await check('siguiente: contactado, sin siguiente paso y los días que lleva', () => {
   assert.deepEqual(nextStep({ status: 'contacted', created_at: at('2026-11-01T00:00:00Z'), stage_changed_at: at('2026-11-14T12:00:00Z') }, null, { now: N }),

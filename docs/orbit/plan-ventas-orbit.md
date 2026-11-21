@@ -97,6 +97,21 @@ await advanceLeadStage('LEAD-123', 'diagnosed', { by: 'diagnostic' }); // → { 
   ganado, perdido, archivado, prueba o spam.
 - `send: false` deja un borrador: Orbit le pone el paso «enviar la propuesta» con 24 horas desde que se creó, sale
   en «Para hoy» y como atrasado si pasa el plazo (tanda 2, petición de ChatBot).
+- Un servicio que en el catálogo solo tiene «desde» (`desde` sin `precio`, como `webCiudades` o `reservas`) y
+  llega sin `price_cents` queda **por confirmar** (`pending_price` en el servicio y `pending` en la opción): se
+  guarda como borrador, pero `send: true` da 400 (`extra.field` = `options.i.projects.j`) y Orbit no deja
+  marcarla como enviada hasta que el dueño pone el precio real. Marcy y el Diagnóstico pueden dejarlo así: un
+  «desde» nunca es una cotización. El precio real nunca baja de ese «desde» (`reglas.proyectoSoloDesde`), y «se paga
+  con N clientes» se cuenta solo con lo mensual.
+- El dueño corrige o descarta un borrador en Orbit (`editProposal(ref, { options, recommended_option?,
+  client_value_cents? })` y `discardProposal(ref)`, solo en borrador; 409 si ya se envió). Corregir vuelve a
+  preciar con el catálogo de hoy; descartar borra el borrador y lo apunta en el historial del contacto. Un borrador
+  descartado deja libre su `source_ref`: si Marcy o el Diagnóstico vuelven a llamar con el mismo, se crea uno nuevo.
+- **Varias cotizaciones en la misma conversación** (tanda 2, 7c): `replaces_prefix` (p. ej. `chat:<sid>:`) hace que
+  la nueva sustituya a los borradores sin enviar cuyo `source_ref` empieza igual, del mismo autor y del mismo
+  contacto, brief o cliente. Nunca toca una enviada ni un borrador que el dueño ya corrigió. Devuelve
+  `replaced: [PROP-…]` y apunta «sustituido» en el historial. Tiene que ser el principio del `source_ref` de la
+  nueva (si no, 400 con `field: 'replaces_prefix'`); un reintento con el mismo `source_ref` no sustituye nada.
 - `brief_ref` (migración 032): la cotización de quien se decidió en el chat y fue directo al brief, sin contacto.
   Se ve en la ficha del brief en Orbit; si ese brief ya es cliente, queda unida también al cliente. Brief y
   contacto no se fusionan.

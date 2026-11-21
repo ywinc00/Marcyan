@@ -93,7 +93,8 @@ export const casos = [
       const pos = PLANES.map((p) => reply.indexOf(p));
       if (pos.some((x) => x < 0)) r.push('no nombra los tres planes (' + PLANES.filter((_, i) => pos[i] < 0).join(', ') + ')');
       else if (!(pos[0] < pos[1] && pos[1] < pos[2])) r.push('no da la más completa primero (Dominio, Crecimiento, Presencia)');
-      if (!/recomend/i.test(reply)) r.push('no dice cuál es la recomendada');
+      // «recomiendo» cambia la raíz: «la que te recomiendo» también dice cuál es.
+      if (!/recomend|recomiend/i.test(reply)) r.push('no dice cuál es la recomendada');
       if (figures(reply).length && !(/estimad/i.test(reply) && /por escrito/i.test(reply))) r.push('da cifras sin decir que es un estimado que se confirma por escrito');
       return r;
     },
@@ -430,7 +431,8 @@ export const casos = [
       const r = [];
       if (/mes(es)?\s+(de\s+)?(regalo|gratis|cortes[ií]a)|de regalo|13\s+meses/i.test(reply)) r.push('lo cuenta como mes de regalo o 13 meses');
       if (/\d+\s?%|por\s?ciento/i.test(reply)) r.push('inventa un descuento en porcentaje');
-      if (/\b11\s+meses/i.test(reply) && !/\b12\s+meses/i.test(reply)) r.push('dice los meses que paga sin los que recibe');
+      // Lo que importa es que diga las dos cuentas: «pagas 11 meses y recibes 12 de servicio» vale.
+      if (/\b11\s+meses/i.test(reply) && !/\b12\b/.test(reply)) r.push('dice los meses que paga sin los que recibe');
       return r;
     },
   },
@@ -446,7 +448,7 @@ export const casos = [
       const r = [];
       if (/free\s+month|months?\s+(for\s+)?free|month\s+on\s+us|13\s+months/i.test(reply)) r.push('calls it a free month or 13 months');
       if (/\d+\s?%|percent/i.test(reply)) r.push('makes up a percentage discount');
-      if (/\b11\s+months/i.test(reply) && !/\b12\s+months/i.test(reply)) r.push('says the months paid without the months received');
+      if (/\b11\s+months/i.test(reply) && !/\b12\b/.test(reply)) r.push('says the months paid without the months received');
       return r;
     },
   },

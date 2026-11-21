@@ -11,7 +11,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { orbitEnabled, buildQuote, quoteKey, saveQuote, retryPendingQuotes, salesCatalog, __resetCatalogCache, planIncludes, CONDICIONES, MARCY_QUOTE_SENT } from '../lib/marcy-quote.mjs';
+import { orbitEnabled, buildQuote, quoteKey, saveQuote, retryPendingQuotes, salesCatalog, __resetCatalogCache, planIncludes, CONDICIONES, MARCY_QUOTE_SENT, diagPlanFor } from '../lib/marcy-quote.mjs';
 import { QUOTE_TOOL, QUOTE_SERVICES, QUOTE_PLANS, SYSTEM_PROMPT, pricePostFilter } from '../lib/chat-kb.mjs';
 import { quoteToolResult } from '../api/chat.mjs';
 
@@ -450,6 +450,64 @@ await check('turno con cotizar: una cuota mensual inventada por debajo de 100 se
   assert.equal(pricePostFilter('El asistente lleva $77 al mes.', 'es', ['77'], strict), 'El asistente lleva $77 al mes.');
   assert.equal(pricePostFilter('Si cada corte te deja $45, se paga solo.', 'es', ['45'], strict), 'Si cada corte te deja $45, se paga solo.', 'la cifra que dijo el cliente pasa');
   assert.equal(pricePostFilter('El asistente lleva una cuota de $45 al mes.', 'es', []), 'El asistente lleva una cuota de $45 al mes.', 'sin cotizar en el turno, la banda baja sigue igual');
+});
+
+// ── El plan del diagnóstico marca la recomendada (como lib/diagnostic-funnel.mjs) ──
+await check('con revisión de su web: la recomendada es la del plan del diagnóstico, una sola y en el mismo orden', () => {
+  const q = buildQuote(CAT, { paquetes: true }, { planDiagnostico: 'presencia' });
+  const o = q.visible.opciones;
+  assert.deepEqual(o.map((x) => x.plan.nombre), ['Dominio', 'Crecimiento', 'Presencia'], 'el orden no cambia: la completa primero');
+  assert.deepEqual(o.map((x) => x.recomendada), [false, false, true]);
+  assert.deepEqual(o.map((x) => x.etiqueta), ['La completa', null, 'La recomendada'], 'Crecimiento deja de llevar la etiqueta');
+  assert.equal(q.save.recommended_option, 2);
+  assert.deepEqual(q.save.options.map((x) => x.label), ['La completa', null, 'La recomendada']);
+  assert.equal(q.stored.plan_diagnostico, 'presencia');
+  assert.notEqual(q.stored.key, buildQuote(CAT, { paquetes: true }).stored.key, 'otra recomendada es otra cotización');
+  const d = buildQuote(CAT, { paquetes: true }, { planDiagnostico: 'dominio' }).visible.opciones;
+  assert.deepEqual(d.map((x) => x.etiqueta), ['La recomendada', null, 'La de entrada']);
+  const c = buildQuote(CAT, { paquetes: true }, { planDiagnostico: 'crecimiento' });
+  assert.deepEqual(c.visible.opciones.map((x) => x.recomendada), [false, true, false]);
+  assert.deepEqual(c.visible.opciones.map((x) => x.etiqueta), ['La completa', 'La recomendada', 'La de entrada']);
+});
+await check('plan del diagnóstico no válido o sin opción con ese plan: vale la regla de siempre y la clave no cambia', () => {
+  const base = buildQuote(CAT, { paquetes: true });
+  for (const bad of ['base', 'toString', '__proto__', 'nada', 7, '']) {
+    const q = buildQuote(CAT, { paquetes: true }, { planDiagnostico: bad });
+    assert.deepEqual(q.visible.opciones.map((x) => x.recomendada), [false, true, false], String(bad));
+    assert.equal(q.stored.key, base.stored.key, String(bad));
+    assert.equal('plan_diagnostico' in q.stored, false, String(bad));
+  }
+  // A la medida sin opción de ese plan: la del medio, como siempre.
+  const m = buildQuote(CAT, { opciones: [{ plan: 'dominio', servicios: ['web'] }, { plan: 'crecimiento', servicios: ['web'] }] }, { planDiagnostico: 'presencia' });
+  assert.equal(m.save.recommended_option, 1);
+  assert.equal('plan_diagnostico' in m.stored, false);
+});
+await check('cotizar: el plan del diagnóstico lo pone el servidor, nunca el modelo', async () => {
+  const fromModel = JSON.parse((await quoteToolResult({ paquetes: true, plan_diagnostico: 'presencia' }, 'es', CAT)).content);
+  assert.deepEqual(fromModel.opciones.map((x) => x.recomendada), [false, true, false], 'lo que mande el modelo se ignora');
+  const out = await quoteToolResult({ paquetes: true }, 'es', CAT, 'dominio');
+  assert.deepEqual(JSON.parse(out.content).opciones.map((x) => x.recomendada), [true, false, false]);
+  assert.equal(out.quote.plan_diagnostico, 'dominio');
+});
+await check('pasar a Orbit: la cotización marcada por el diagnóstico entra con la misma recomendada', async () => {
+  const stored = buildQuote(CAT, { paquetes: true, valor_cliente: 300 }, { planDiagnostico: 'presencia' }).stored;
+  const { sql } = fakeSql({ pending: [{ sid: 's-9', lead_ref: 'LEAD-9', quote: stored, quote_tries: 0 }] });
+  const saved = [];
+  assert.equal(await retryPendingQuotes({ sqlImpl: sql, catalog: CAT, enabled: true, save: okSave(saved) }), 1);
+  assert.equal(saved[0].recommended_option, 2);
+  assert.equal(saved[0].source_ref, `chat:s-9:${stored.key}`);
+});
+await check('plan del diagnóstico de la conversación: se lee de la base y nunca rompe el chat', async () => {
+  const calls = [];
+  const ok = async (strings, ...values) => { calls.push({ text: strings.join('?'), values }); return { rows: [{ diag_plan: 'dominio' }] }; };
+  assert.equal(await diagPlanFor('abc-1', { sqlImpl: ok }), 'dominio');
+  assert.match(calls[0].text, /SELECT diag_plan FROM chat_conversations WHERE sid = \?/);
+  assert.deepEqual(calls[0].values, ['abc-1']);
+  assert.equal(await diagPlanFor('x y;--', { sqlImpl: ok }), null, 'sid no válido: ni pregunta');
+  assert.equal(calls.length, 1);
+  assert.equal(await diagPlanFor('abc-1', { sqlImpl: async () => { const e = new Error('column "diag_plan" does not exist'); e.code = '42703'; throw e; } }), null, 'sin la 031');
+  assert.equal(await diagPlanFor('abc-1', { sqlImpl: async () => ({ rows: [] }) }), null);
+  assert.equal(await diagPlanFor('abc-1', { sqlImpl: async () => ({ rows: [{ diag_plan: 'Dominio; DROP' }] }) }), null);
 });
 
 const realPath = process.env.MARCYAN_CATALOGO || findCatalog();

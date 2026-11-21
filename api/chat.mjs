@@ -34,7 +34,9 @@ import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 // ⚠️ NUNCA importar api/diagnostic.mjs desde aquí (arrastra @vercel/postgres y rompe
 // la doctrina cero-Postgres del chat). Solo estos dos módulos puros.
 import { ssrfGuard, fetchSite } from '../lib/site-fetch.mjs';
-import { analyzeSite, recommendService, findContactHref, mergeContactSignals } from '../lib/diagnostic-checks.mjs';
+import { analyzeSite, findContactHref, mergeContactSignals } from '../lib/diagnostic-checks.mjs';
+// El plan que recomienda la revisión: la misma regla que el diagnóstico (Ventas §5). Sin base.
+import { recommendPlan, planText } from '../lib/diagnostic-plan.mjs';
 import { measurePlace } from '../lib/diagnostic-measure.mjs';
 import { fichaForChat } from '../lib/diagnostic-rubric.mjs';
 // Frenos guardados (cuenta compartida entre instancias). Solo cuenta: el
@@ -426,9 +428,12 @@ export function computeLossToolResult(input) {
 // filtro de precios sin redondeos (un redondeo abriría la puerta a una cifra inventada).
 // `quote` es lo que pide, sin cifras: se guarda en la conversación y pasa a Orbit.
 const exactAllow = (v) => (Number.isInteger(v) ? [String(v)] : [String(Math.round(v)), String(Math.round(v * 100))]);
-export async function quoteToolResult(input, lang = 'es', catalog = null) {
+// planDiagnostico: el plan que recomendó revisar_sitio en ESTA conversación (lo pone el
+// servidor, nunca el modelo): su opción sale como la recomendada, como en el diagnóstico.
+export async function quoteToolResult(input, lang = 'es', catalog = null, planDiagnostico = null) {
   const { buildQuote } = await import('../lib/marcy-quote.mjs');
-  const q = buildQuote(catalog, input || {}, { lang });
+  const { plan_diagnostico: _ignorado, ...pedido } = input && typeof input === 'object' ? input : {};
+  const q = buildQuote(catalog, pedido, { lang, planDiagnostico });
   if (!q.ok) return { content: JSON.stringify({ ok: false, motivo: q.motivo }), extraAllow: [] };
   return { content: JSON.stringify(q.visible), extraAllow: q.figures.flatMap(exactAllow), quote: q.stored };
 }
@@ -436,14 +441,20 @@ export async function quoteToolResult(input, lang = 'es', catalog = null) {
 // revisar_sitio — tool_result SOLO con enteros + labels de NUESTRO catálogo
 // (lib/diagnostic-checks.mjs). REGLA DE ORO: JAMÁS title/meta/texto del sitio ajeno.
 // Puro y testeable (recibe el output ya calculado de analyzeSite).
+// El plan que recomienda la revisión (lib/diagnostic-plan.mjs): null si la web no se revisó.
+export function sitePlan({ scores, findings } = {}) {
+  return scores ? recommendPlan({ scores, findings }).plan : null;
+}
+
 export function buildSiteToolResult({ scores, findings } = {}, lang = 'es', ficha = null) {
   const en = lang === 'en';
   const out = { ok: true };
   if (scores) {
-    const rec = recommendService({ scores });
     out.scores = { total: scores.total, web: scores.web, seo: scores.seo, ai: scores.ai, conv: scores.conv, rep: scores.rep };
     out.hallazgos = (findings || []).slice(0, 5).map((f) => ({ id: f.id, texto: en ? f.en : f.es, impacto: en ? f.impact_en : f.impact_es }));
-    out.recomendado = en ? rec.service_en : rec.service_es;
+    // Un plan por su nombre y su frase, sin cifras. En inglés solo el nombre (fraseEn sin OK).
+    const p = planText(sitePlan({ scores, findings }), lang);
+    if (p) out.plan_recomendado = p.tagline ? { nombre: p.name, frase: p.tagline } : { nombre: p.name };
   } else {
     out.web = 'sin_revisar'; // nuestro acceso falló: no afirmar que su web está caída
   }
@@ -469,7 +480,7 @@ async function reviewSite(url, lang, { name, city } = {}) {
   if (!g.ok) return FAIL_RESULT; // bloqueada (IP privada/host interno/esquema) → sin revelar motivo
   const [web, ficha] = await Promise.all([reviewWeb(g, lang), reviewListing({ name, city, url: g.url, lang })]);
   if (!web && !ficha) return FAIL_RESULT;
-  return { content: buildSiteToolResult(web || {}, lang, ficha), extraAllow: [] };
+  return { content: buildSiteToolResult(web || {}, lang, ficha), extraAllow: [], diagPlan: sitePlan(web || {}) };
 }
 
 async function reviewWeb(g, lang) {
@@ -505,8 +516,9 @@ async function runInternalTool(toolUse, { lang, ip, sid, first = false }) {
   if (toolUse.name === QUOTE_TOOL.name) {
     // De entrada, solo el «desde» público (Ventas, 19-nov): en su primera respuesta Marcy no cotiza.
     if (first) return { content: JSON.stringify({ ok: false, motivo: 'de_entrada', haz: 'Primera respuesta: da el «desde» público y el plan que lo acompaña; para las opciones, pregunta antes cuánto le deja un cliente.' }), extraAllow: [] };
-    const { salesCatalog } = await import('../lib/marcy-quote.mjs');
-    return quoteToolResult(toolUse.input || {}, lang, await salesCatalog());
+    const { salesCatalog, diagPlanFor } = await import('../lib/marcy-quote.mjs');
+    const [catalog, diag] = await Promise.all([salesCatalog(), diagPlanFor(sid)]);
+    return quoteToolResult(toolUse.input || {}, lang, catalog, diag);
   }
   if (toolUse.name === SITE_TOOL.name) {
     if (!(await siteReviewAllowed(sid, ip))) return FAIL_RESULT;    // límites primero
@@ -626,7 +638,7 @@ export default async function handler(req, res) {
 
 ${dateCtx}` : dateCtx, tools: [...CHAT_TOOLS, ch.SLOTS_TOOL], extraInternal: webSlots });
     // Orbit (migración 018): el turno tal como lo vio el visitante, para el historial y la vista en vivo.
-    await recordTurn({ sid, env: chatEnv(), lang, userText: lastUserText(messages), reply: t.reply, action: t.action, tool: t.tool, cortadas: t.cortadas, fallback: t.fallback, costMicro: t.costMicro, quote: t.quote });
+    await recordTurn({ sid, env: chatEnv(), lang, userText: lastUserText(messages), reply: t.reply, action: t.action, tool: t.tool, cortadas: t.cortadas, fallback: t.fallback, costMicro: t.costMicro, quote: t.quote, diagPlan: t.diagPlan });
     return res.status(200).json(t.action ? { reply: t.reply, action: t.action } : { reply: t.reply });
   } catch (err) {
     // Nunca filtrar el error del SDK al cliente; detalle solo en logs del servidor.
@@ -690,6 +702,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
     let extraAllow = historyFigures(messages);
     let lossFigures = [];   // cifras de calcular_perdida: pérdidas del cliente, no precios (estimateNote)
     let quote = null;       // cotización de cotizar, para guardarla en Orbit (lib/marcy-quote.mjs)
+    let diagPlan = null;    // plan que recomendó revisar_sitio, para que cotizar lo marque después
 
     // ¿Pidió una herramienta INTERNA (cómputo/revisión)? Ejecútala server-side y haz UNA
     // 2ª llamada (cap 1 iteración). El visitante no ve estas tools ni sus resultados.
@@ -704,6 +717,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
       extraAllow = [...extraAllow, ...(out.extraAllow || [])];
       if (internal.name === CALC_TOOL.name) lossFigures = out.extraAllow || [];
       if (out.quote) quote = out.quote;
+      if (out.diagPlan) diagPlan = out.diagPlan;
       // La API exige un tool_result por CADA tool_use del turno 1. Solo el interno
       // ejecutado lleva resultado real; cualquier OTRA tool del mismo turno (raro, contra
       // el prompt): si es de UI la honramos vía RESCATE abajo (ok:true = "mostrada"), si es
@@ -789,7 +803,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
     await recordUsage({ model, env: chatEnv(), firstTurn, u: usage, costMicro });
 
     // La cotización solo se guarda si el cliente la vio (el filtro no cortó la respuesta).
-    return { reply, action, tool: internal ? [internal.name, ...extraTools].join('+').slice(0, 40) : null, cortadas, fallback, empty: !text, toolOnly: !!(action && text === toolOnlyFallback(action, lang)), costMicro, model, quote: fallback || brandHit ? null : quote };
+    return { reply, action, tool: internal ? [internal.name, ...extraTools].join('+').slice(0, 40) : null, cortadas, fallback, empty: !text, toolOnly: !!(action && text === toolOnlyFallback(action, lang)), costMicro, model, quote: fallback || brandHit ? null : quote, diagPlan };
   }
 }
 

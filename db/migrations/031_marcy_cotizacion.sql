@@ -15,6 +15,8 @@
 --            la rechazó, o vacía = pendiente: la tarea de cada 5 min (api/cron/canales) la
 --            pasa a Orbit cuando hay contacto o brief, hasta 30 días.
 --  quote_tries / quote_error  intentos fallidos y el último error (con 20, se avisa).
+--  diag_plan el plan que recomendó la revisión de su web en el chat (revisar_sitio, misma
+--            regla que el diagnóstico): cotizar marca esa opción como la recomendada.
 --
 --  Idempotente. Advisory lock propio (91123785). Aplicar A MANO y solo con OK del dueño.
 --  Sin ella el chat funciona igual: solo no guarda la cotización.
@@ -27,4 +29,5 @@ ALTER TABLE chat_conversations ADD COLUMN IF NOT EXISTS quote_at TIMESTAMPTZ;
 ALTER TABLE chat_conversations ADD COLUMN IF NOT EXISTS quote_proposal TEXT;
 ALTER TABLE chat_conversations ADD COLUMN IF NOT EXISTS quote_tries INT NOT NULL DEFAULT 0;
 ALTER TABLE chat_conversations ADD COLUMN IF NOT EXISTS quote_error TEXT;
+ALTER TABLE chat_conversations ADD COLUMN IF NOT EXISTS diag_plan TEXT;
 COMMIT;

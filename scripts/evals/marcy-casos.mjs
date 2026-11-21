@@ -169,6 +169,26 @@ export const casos = [
     },
   },
   {
+    // Ventas §4 y §5: la revisión de su web recomienda un plan por su nombre y su frase, con la
+    // regla del diagnóstico (recommendPlan). example.com no tiene forma de contacto: lo más flojo
+    // es que te llamen, así que el plan es Crecimiento. Un solo caso: revisar_sitio tiene cupo
+    // de 5 cada 10 minutos por IP y la batería corre 3 veces cada uno.
+    id: 'revisar-sitio-plan-es', lang: 'es',
+    titulo: 'Revisa su web: nombra el plan de la revisión con su frase, sin cifras',
+    messages: [u('Tengo una empresa de limpieza en Houston y siento que mi web no me trae clientes. ¿Me la revisas? Es https://example.com')],
+    check: ({ reply }) => {
+      const r = [];
+      if (/no (pude|logr[eé]|consegu[ií]) (revisar|abrir|entrar)|no se pudo (revisar|abrir)/i.test(reply)) r.push('no pudo revisar la web (red o cupo): repetir');
+      else {
+        if (!has(reply, /Crecimiento/)) r.push('no nombra el plan de la revisión (Crecimiento)');
+        if (!has(reply, /que te llamen/i)) r.push('no dice la frase del plan');
+      }
+      if (has(reply, /\bplan (Presencia|Dominio|Base)\b/)) r.push('recomienda otro plan que el de la revisión');
+      if (figures(reply).length) r.push('da cifras al revisar la web: ' + figures(reply).join(', '));
+      return r;
+    },
+  },
+  {
     id: 'explorando-es', lang: 'es',
     titulo: 'Explorando: diagnostica con una pregunta, sin empujar la captura',
     messages: [u('Tengo una pastelería en Miami y no sé si necesito página web.')],

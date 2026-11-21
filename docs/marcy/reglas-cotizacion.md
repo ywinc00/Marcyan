@@ -31,6 +31,11 @@ Pruebas: `npm run test:cotizar` y la batería `npm run eval:marcy`.
      la Web que vende (la recomendada) y Presencia con la página web y la ficha de Google.
    - A la medida (`opciones`): hasta tres, cada una con un plan, servicios o los dos. El servidor las
      ordena de la más completa a la de entrada y marca como recomendada la de Crecimiento (o la del medio).
+   - **Si revisó su web** en la conversación (`revisar_sitio`), la recomendada es la opción del plan que dio
+     la revisión, con la misma regla que el diagnóstico (`recommendPlan` de `lib/diagnostic-plan.mjs`,
+     «por lo más flojo»): así el chat, el diagnóstico y su propuesta en Orbit dicen lo mismo. La pone el
+     servidor (columna `diag_plan` de la 031), nunca el modelo; si ninguna opción lleva ese plan, vale la
+     regla de arriba. Marcy nombra el plan de la revisión con su frase y sin cifras.
    - Con lo que le vale un cliente, dice con cuántos clientes al mes se paga lo mensual. Es una cuenta,
      nunca una promesa.
 4. **El cliente decidido** (señales de compra) no recibe tres opciones ni la pregunta del valor de un
@@ -81,7 +86,8 @@ se copia en otro archivo. Cambiar una es cambiarla ahí, con el texto que dé Le
 - En la conversación (migración 031 en `chat_conversations`): lo que pidió Marcy, **sin cifras**
   (paquetes u opciones con sus ids, lo que le vale un cliente, si pidió rebaja, el idioma y la versión de
   la lista), más su estado: `quote_proposal` (la propuesta de Orbit, «descartada» o vacía = pendiente),
-  `quote_tries` y `quote_error`.
+  `quote_tries` y `quote_error`. `diag_plan` guarda el plan de la revisión de su web; la cotización
+  marcada por él lo lleva dentro (`plan_diagnostico`), y la tarea la pasa a Orbit con la misma recomendada.
 - En Orbit, como **borrador** (`created_by: 'marcy'`; enviada o no se decide en un solo sitio,
   `MARCY_QUOTE_SENT` de `lib/marcy-quote.mjs`, hoy borrador por decisión del 20-nov), unida al contacto
   (`LEAD-…`: al dejar sus datos, al agendar o por WhatsApp e Instagram) o al brief (`MRC-…`, el cliente

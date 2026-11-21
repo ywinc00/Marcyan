@@ -199,6 +199,15 @@ await aok('contesta y registra con su canal', async () => {
   assert.ok(s.calls[0].extraInternal.names.has('huecos_libres'));
   assert.deepEqual(s.inbox, ['hecho']);
 });
+await aok('el plan de la revisión de su web llega al registro del turno', async () => {
+  const s = fresh();
+  s.turn = { reply: 'Por lo que vi, te encaja el plan Crecimiento.', action: null, tool: 'revisar_sitio', cortadas: [], fallback: false, costMicro: 3, diagPlan: 'crecimiento' };
+  assert.equal(await processInbound(ROW, deps(s)), 'hecho');
+  assert.equal(s.recorded.at(-1).diagPlan, 'crecimiento');
+  const t = fresh();
+  assert.equal(await processInbound(ROW, deps(t)), 'hecho');
+  assert.equal(t.recorded.at(-1).diagPlan, null, 'sin revisión, nada');
+});
 await aok('si lo lleva el dueño, Marcy calla y avisa', async () => {
   const s = fresh(); s.taken = true;
   assert.equal(await processInbound(ROW, deps(s)), 'hecho');

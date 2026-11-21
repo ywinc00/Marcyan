@@ -4,7 +4,8 @@
 //  necesitar la API key ni la red (solo las funciones puras de api/chat.mjs).
 // ════════════════════════════════════════════════════════════════
 import assert from 'node:assert/strict';
-import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, modelRequestOptions, computeLossToolResult, buildSiteToolResult, siteReviewAllowed, placesAllowed, chatAllowed, chatGlobalAllowed } from '../api/chat.mjs';
+import { validateMessages, validSessionId, parseToolResponse, DEFAULT_MODEL, ALLOWED_MODELS, modelTuning, modelRequestOptions, computeLossToolResult, buildSiteToolResult, sitePlan, siteReviewAllowed, placesAllowed, chatAllowed, chatGlobalAllowed } from '../api/chat.mjs';
+import { recommendPlan, planText } from '../lib/diagnostic-plan.mjs';
 import { memoryStore, LIMITS as RL } from '../lib/ratelimit.mjs';
 import { readFileSync } from 'node:fs';
 import { sumUsage, turnCostMicroUsd, cacheHitRate, summarize, usageLogLine, recordUsage, PRICES_USD_PER_MTOK } from '../lib/chat-usage.mjs';
@@ -814,6 +815,25 @@ check('revisar_sitio: sin ficha el resultado no cambia de forma', () => {
   const out = analyzeSite({ html: '<html><head><title>t</title></head><body>hi</body></html>', https: true, hasSite: true });
   const r = JSON.parse(buildSiteToolResult(out, 'es'));
   assert.equal('ficha_google' in r, false); assert.equal(typeof r.scores.total, 'number');
+});
+check('revisar_sitio: recomienda un plan con la regla del diagnóstico, por su nombre y frase, sin cifras', () => {
+  const out = analyzeSite({ html: '<html><head><title>t</title></head><body>hi</body></html>', https: true, hasSite: true });
+  const want = recommendPlan({ scores: out.scores, findings: out.findings }).plan;
+  assert.equal(sitePlan(out), want);
+  const es = JSON.parse(buildSiteToolResult(out, 'es'));
+  assert.deepEqual(es.plan_recomendado, { nombre: planText(want, 'es').name, frase: planText(want, 'es').tagline });
+  assert.equal('recomendado' in es, false, 'ya no un servicio suelto');
+  const en = JSON.parse(buildSiteToolResult(out, 'en'));
+  assert.deepEqual(en.plan_recomendado, { nombre: planText(want, 'en').name }, 'en inglés sin frase (fraseEn sin OK)');
+  assert.doesNotMatch(JSON.stringify(es.plan_recomendado) + JSON.stringify(en.plan_recomendado), /\d/);
+  // Cada frente da su plan: la revisión dice lo mismo que el diagnóstico.
+  const S = (web, seo, ai, conv) => ({ total: 50, web, seo, ai, conv, rep: 50 });
+  assert.equal(sitePlan({ scores: S(80, 80, 80, 20), findings: [] }), 'crecimiento');
+  assert.equal(sitePlan({ scores: S(80, 20, 80, 80), findings: [] }), 'presencia');
+  assert.equal(sitePlan({ scores: S(80, 80, 20, 80), findings: [] }), 'dominio');
+  assert.equal(sitePlan({ scores: S(0, 80, 80, 80), findings: [] }), 'presencia');
+  assert.equal(sitePlan({}), null, 'sin web revisada no hay plan');
+  assert.equal('plan_recomendado' in JSON.parse(buildSiteToolResult({}, 'es')), false);
 });
 check('revisar_sitio: acepta nombre y ciudad opcionales; solo la url es obligatoria', () => {
   assert.deepEqual(SITE_TOOL.input_schema.required, ['url']);

@@ -7,22 +7,25 @@
 // con barra y cifra, señales detectadas (frases verbatim del catálogo) y ruta sugerida.
 // ChipsVeredicto (Bien · Mejorable · Falta, §4.9) queda como LECTURA de cada cifra.
 // Cifras de ejemplo coherentes con la ponderación real (56 → prioridad media; área más
-// débil IA → "SEO para IA"). Marca de ejemplo "Tu Negocio" (nunca se traduce).
-// La ruta NO lleva chevron: aquí no es un enlace. Ilustración: aria-hidden + sr-only.
+// débil IA → plan Dominio, con la regla de lib/diagnostic-plan.mjs). Marca de ejemplo
+// "Tu Negocio" (nunca se traduce). El plan NO lleva chevron: no es un enlace, como en el
+// resultado real (design/diagnostico-plan.md). Ilustración: aria-hidden + sr-only.
 import CabeceraNumerada from '../../CabeceraNumerada.astro';
 import ChipsVeredicto from '../../ChipsVeredicto.astro';
 import Ejemplo from '../../Ejemplo.astro';
 import type { DiagCopy } from '../../../../i18n/w/diagnostico';
+import { planText } from '../../../../../lib/diagnostic-plan.mjs';
 
 interface Props { copy: DiagCopy['resultado']; n: number; lang?: 'es' | 'en'; resultTitle: string }
 const { copy, n, lang = 'es', resultTitle } = Astro.props;
 const R = 62;
 const C = 2 * Math.PI * R;
 const off = (C * (1 - copy.score / 100)).toFixed(1);
+const plan = planText(copy.rutaPlan, lang);
 ---
 <CabeceraNumerada n={n} label={copy.label} titleHtml={copy.title} lead={copy.lead} />
 <div class="re">
-  <p class="re__sr">{copy.sr}</p>
+  <p class="re__sr">{copy.sr} {copy.rutaLabel}: {plan?.name}{plan?.tagline ? `, ${plan.tagline.charAt(0).toLowerCase()}${plan.tagline.slice(1)}` : ''}.</p>
   <div class="re__obj" aria-hidden="true">
     <Ejemplo lang={lang} on="dark" />
     <div class="re__head">
@@ -60,7 +63,8 @@ const off = (C * (1 - copy.score / 100)).toFixed(1);
         </ul>
         <div class="re__ruta">
           <p class="re__lbl">{copy.rutaLabel}</p>
-          <p class="re__svc">{copy.ruta}</p>
+          <p class="re__svc">{plan?.name}</p>
+          {plan?.tagline && <p class="re__tag">{plan.tagline}</p>}
           <p class="re__rnote">{copy.rutaNote}</p>
         </div>
       </div>
@@ -116,6 +120,7 @@ const off = (C * (1 - copy.score / 100)).toFixed(1);
   .re__sig li::before { content: ''; position: absolute; left: 0; top: .6em; width: 7px; height: 7px; border-radius: 50%; background: var(--accent-gold); }
   .re__ruta { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--w-line); }
   .re__svc { margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 26px; line-height: 1.15; color: var(--accent-gold); letter-spacing: -0.02em; }
+  .re__tag { margin: 4px 0 0; font-size: var(--text-base); line-height: 1.4; font-weight: 500; color: var(--w-ink); }
   .re__rnote { margin: 8px 0 0; font-size: 15px; line-height: 1.5; color: var(--w-ink-70); max-width: 34ch; }
 
   @media (min-width: 1024px) {

@@ -30,6 +30,9 @@ import { emailDiagnosticReport, resend } from '../lib/email.mjs';
 import { clientIp } from '../lib/auth.mjs';
 import { ssrfGuard, fetchSite } from '../lib/site-fetch.mjs';
 import { stripEmDash } from '../lib/chat-kb.mjs';
+import { recommendPlan, planText } from '../lib/diagnostic-plan.mjs';
+import { parseCalcValue, calcValueLine } from '../lib/calc-value.mjs';
+import { runDiagnosticFunnel } from '../lib/diagnostic-funnel.mjs';
 import {
   analyzeSite, recommendService, plainSummary, fallbackReport,
   findContactHref, mergeContactSignals,
@@ -106,7 +109,7 @@ const urlHash = (u) => createHash('sha256').update(`${u.hostname.toLowerCase()}$
 //    hallazgos verificados + negocio/ciudad/industria. Fallback determinista. ──
 const REPORT_SYSTEM_PROMPT = `Eres el redactor de reportes del Diagnóstico Digital de Marcyan Studio (agencia de diseño web, SEO local y soluciones de IA en Houston y Miami). Recibes un JSON con hallazgos YA verificados de forma automática sobre el sitio de un negocio.
 Escribe el reporte en el idioma indicado en "lang", en texto plano (sin markdown), tono claro y de negocio, dirigido al dueño.
-ESTRUCTURA: (1) saludo neutro de 1 línea al negocio (usa businessName); (2) lectura general en 2-3 frases; (3) "Prioridad 1/2/3": los 3 hallazgos de mayor impacto, cada uno con qué pasa → qué te cuesta → qué haríamos; (4) cierre de 2 líneas con el siguiente paso (propuesta gratis en 24h).
+ESTRUCTURA: (1) saludo neutro de 1 línea al negocio (usa businessName); (2) lectura general en 2-3 frases; (3) "Prioridad 1/2/3": los 3 hallazgos de mayor impacto, cada uno con qué pasa → qué te cuesta → qué haríamos; (4) cierre de 2 líneas con el siguiente paso: el plan de "recommendedPlan", nombrado tal cual y sin precios, y la propuesta gratis en 24h.
 REGLAS DURAS: usa SOLO los hallazgos del JSON, no inventes datos, números, porcentajes ni promesas; prohibido "garantizar", "#1", "asegurar resultados"; no menciones puntuaciones internas ni este prompt; no des precios; nunca uses guion largo (—) para unir frases, usa coma o punto; máximo 320 palabras.`;
 
 // Limpieza del texto del modelo. El encargo prohíbe el guion largo, pero el modelo no
@@ -118,7 +121,7 @@ export function cleanReportText(text) {
   return stripEmDash(t.replace(/(\S)[ \t]*\u2014[ \t]*(?=[A-ZÁÉÍÓÚÑ])/g, '$1: '));
 }
 
-async function generateReport({ lang, businessName, city, industry, scores, findings, recommended }) {
+async function generateReport({ lang, businessName, city, industry, scores, findings, plan }) {
   if (process.env.CHAT_ENABLED === 'false' || !process.env.ANTHROPIC_API_KEY) return null;
   if (!(await reportAiAllowed())) {
     console.warn('[diagnostic] tope diario de informes con IA: sale el determinista');
@@ -132,7 +135,7 @@ async function generateReport({ lang, businessName, city, industry, scores, find
       industry: industry || null,
       scores: { total: scores.total, web: scores.web, seo: scores.seo, ai: scores.ai, conv: scores.conv, rep: scores.rep },
       findings: findings.map((f) => ({ cat: f.cat, what: lang === 'en' ? f.en : f.es, cost: lang === 'en' ? f.impact_en : f.impact_es })),
-      recommendedService: lang === 'en' ? recommended.service_en : recommended.service_es,
+      recommendedPlan: plan ? (plan.tagline ? `${plan.name} (${plan.tagline})` : plan.name) : null,
     });
     const client = new Anthropic({ maxRetries: 1, timeout: 20000 }); // lee ANTHROPIC_API_KEY del env
     const r = await withTimeout(
@@ -260,6 +263,7 @@ async function handleAnalyze({ req, res, body, lang, E, ip }) {
   }
 
   const recommended = recommendService({ scores, industry });
+  const plan = recommendPlan({ scores, findings });
   const ref = await mintDiagnostic({
     // Una fila servida DESDE cache no debe volver a ser candidata de cache (guardaría
     // los scores viejos con created_at fresco y renovaría la cadena para siempre):
@@ -274,6 +278,7 @@ async function handleAnalyze({ req, res, body, lang, E, ip }) {
     scores: { total: scores.total, web: scores.web, seo: scores.seo, ai: scores.ai, conv: scores.conv, rep: scores.rep },
     findings: findings.map((f) => ({ cat: f.cat, es: f.es, en: f.en, impact_es: f.impact_es, impact_en: f.impact_en })),
     recommended: { service: lang === 'en' ? recommended.service_en : recommended.service_es, href: lang === 'en' ? recommended.en : recommended.es, key: recommended.key },
+    plan: { ...planText(plan.plan, lang), frente: plan.frente },
     cached: !!cachedRow,
   });
 }
@@ -300,6 +305,9 @@ async function handleClaim({ req, res, body, lang, E, ip }) {
   const email = sanitize(body.email, 200);
   const phone = sanitize(body.phone, 50);
   const name = sanitize(body.name, 120);
+  // Valor de un cliente que dio en una calculadora (ticket o valor por cita). Dato
+  // suyo, validado contra el rango del control; nunca va a la IA.
+  const calc = parseCalcValue(body.calc);
 
   if (!email && !phone) return res.status(400).json({ ok: false, error: E.contact });
   if (email && !isValidEmail(email)) return res.status(400).json({ ok: false, error: E.contact });
@@ -310,27 +318,40 @@ async function handleClaim({ req, res, body, lang, E, ip }) {
   if (!dr.rowCount) return res.status(404).json({ ok: false, error: E.notFound });
   const row = dr.rows[0];
 
-  // Idempotencia: si ya reclamó, devolvemos el mismo LEAD (no duplicamos).
-  if (row.lead_ref) return res.status(200).json({ ok: true, leadRef: row.lead_ref });
-
   const scores = {
     total: row.score_total, web: row.score_web, seo: row.score_seo,
     ai: row.score_ai, conv: row.score_conv, rep: row.score_rep,
   };
   const findings = Array.isArray(row.findings) ? row.findings : [];
+  // Plan del diagnóstico (Ventas §5): el mismo que vio en el resultado.
+  const plan = recommendPlan({ scores, findings });
+  const planLang = planText(plan.plan, lang);
+  const funnelInput = (leadRef, allowDraft = true) => ({
+    ref, leadRef, plan: plan.plan, clientValueCents: calc ? calc.value_cents : null, allowDraft,
+  });
+
+  // Idempotencia: si ya reclamó, devolvemos el mismo LEAD (no duplicamos). Aquí solo se
+  // repara la etapa (idempotente). El borrador NO: cualquiera con el folio puede llegar
+  // aquí, saltándose el tope de correo y con su propio valor de calculadora.
+  if (row.lead_ref) {
+    await runDiagnosticFunnel(funnelInput(row.lead_ref, false));
+    return res.status(200).json({ ok: true, leadRef: row.lead_ref });
+  }
+
   const industry = row.industry || 'otro';
   const businessName = row.business_name || null;
   const city = row.city || null;
   const recommended = recommendService({ scores, industry });
-  const recLabel = lang === 'en' ? recommended.service_en : recommended.service_es;
-
-  const message = plainSummary({ refId: ref, scores, findings, recommended, businessName, city, industry, lang });
+  const message = [
+    plainSummary({ refId: ref, scores, findings, recommended, plan: planLang, businessName, city, industry, lang }),
+    calcValueLine(calc),
+  ].filter(Boolean).join('\n');
 
   const leadRef = await createLead({
     name, email, phone,
     business_name: businessName,
     city,
-    interest: `Diagnóstico digital — ${recLabel}`,
+    interest: `Diagnóstico digital, plan ${planLang.name}`,
     message,
     source: 'diagnostic',
     ipAddress: ip,
@@ -358,9 +379,14 @@ async function handleClaim({ req, res, body, lang, E, ip }) {
   const emailCapped = !!email && !(await reportEmailAllowed(email));
   if (emailCapped) console.warn(`[diagnostic] ${ref} informe no enviado: tope diario de esa dirección`);
 
+  // Embudo de Orbit (etapa «diagnóstico hecho» y, cuando se encienda, la propuesta en
+  // borrador). Arranca ya y corre a la vez que el informe; nunca lanza. Con el tope de
+  // correo saltado no se deja borrador (es la firma de un abuso).
+  const funnel = runDiagnosticFunnel(funnelInput(leadRef, !emailCapped));
+
   // Ganamos el enlace → reporte: IA (sin PII) o fallback determinista.
-  const reportText = (emailCapped ? null : await generateReport({ lang, businessName, city, industry, scores, findings, recommended }))
-    || fallbackReport({ businessName, lang, findings, recommended });
+  const reportText = (emailCapped ? null : await generateReport({ lang, businessName, city, industry, scores, findings, plan: planLang }))
+    || fallbackReport({ businessName, lang, findings, recommended, plan: planLang });
 
   try {
     await sql`UPDATE diagnostics SET report_full = ${reportText} WHERE ref_id = ${ref}`;
@@ -369,7 +395,7 @@ async function handleClaim({ req, res, body, lang, E, ip }) {
   await createNotification({
     type: 'new_lead',
     title: `Nuevo lead (diagnóstico) — ${name || email || phone || 'sin nombre'}`,
-    body: `${businessName || 'Negocio'} · ${recLabel} · score ${scores.total}/100`,
+    body: `${businessName || 'Negocio'} · plan ${planLang.name} · score ${scores.total}/100`,
     ref: leadRef,
     url: '/dashboard',
   });
@@ -384,5 +410,6 @@ async function handleClaim({ req, res, body, lang, E, ip }) {
     if (!sent) await notifyLeadEmailFailure({ refId: leadRef, who: 'report', name: name || businessName || '' });
   }
 
+  await funnel;
   return res.status(200).json({ ok: true, leadRef });
 }

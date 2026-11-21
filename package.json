@@ -11,7 +11,7 @@
     "astro": "astro",
     "check:kb": "node scripts/verify-chat-kb.mjs",
     "test:chat": "node scripts/test-chat-guard.mjs",
-    "test:diag": "node scripts/test-diagnostic.mjs",
+    "test:diag": "node scripts/test-diagnostic.mjs && node scripts/test-diagnostic-plan.mjs",
     "test:diag-medicion": "node scripts/test-diagnostic-measure.mjs",
     "test:marcy-log": "node scripts/test-chat-log.mjs",
     "test:citas": "node scripts/test-appointments.mjs",
@@ -43,6 +43,7 @@
     "eval:marcy": "node scripts/evals/run.mjs marcy",
     "costes:chat": "node --env-file=.env.local scripts/chat-costes.mjs",
     "sync:catalogo": "node scripts/sync-catalogo.mjs",
+    "sync:planes": "node scripts/sync-planes.mjs",
     "sync:catalogo-orbit": "node --env-file=.env.local scripts/sync-catalogo-orbit.mjs",
     "check:precios": "node scripts/verify-precios.mjs"
   },

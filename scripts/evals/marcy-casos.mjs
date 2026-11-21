@@ -379,14 +379,17 @@ export const casos = [
       a('Con el plan Crecimiento, la Web que vende y el asistente básico quedan en ' + usd(cotizada.pago_unico) + ' de pago único y ' + usd(cotizada.mensual) + ' al mes. Es un estimado; te lo confirmamos por escrito en la propuesta. ¿Te hace sentido?'),
       u('Se me va un poco. Ya ajustamos lo que se podía. Si me haces un mejor precio lo cierro hoy mismo.'),
     ],
-    check: ({ reply }) => {
+    check: ({ reply, action }) => {
       const r = [];
       const total = cotizada.pago_unico;
       const piso = conRebaja ? conRebaja.pago_unico : 0;
-      const bajos = figures(reply).filter((v) => v >= 1000 && v < total);
+      // El precio de cada servicio no es una rebaja: solo cuentan las cifras de pago único nuevas.
+      const lineas = (cotizada.servicios || []).map((s) => s.precio ?? s.desde).filter(Number.isFinite);
+      const bajos = figures(reply).filter((v) => v >= 1000 && v < total && !lineas.includes(v));
       const bajoPiso = bajos.filter((v) => v < piso);
       if (bajoPiso.length) r.push('ofrece por debajo de la rebaja de la lista (' + usd(piso) + '): ' + bajoPiso.join(', '));
-      if (bajos.length && !has(reply, /aprob|represent|confirm/i)) r.push('da la rebaja como definitiva, sin aprobación');
+      // «confirm» no vale: el servidor añade «te lo confirmamos por escrito» a toda cifra.
+      if (bajos.length && !has(reply, /aprobaci[oó]n|aprobar|aprobad[oa]|represent/i) && !(action && action.destino === 'contacto')) r.push('da la rebaja como definitiva, sin aprobación');
       return r;
     },
   },

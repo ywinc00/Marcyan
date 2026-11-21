@@ -28,8 +28,7 @@
 //     límite de gasto mensual en la consola de Anthropic.
 // ════════════════════════════════════════════════════════════════
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, estimateNote, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL, QUOTE_TOOL, historyFigures, blockedFigures } from '../lib/chat-kb.mjs';
-import { buildQuote, salesCatalog } from '../lib/marcy-quote.mjs';
+import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, brandBlocks, pricePostFilter, estimateNote, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL, QUOTE_TOOL, historyFigures, blockedFigures } from '../lib/chat-kb.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 // SSRF + descarga endurecida (SIN Postgres) y motor determinista del diagnóstico.
 // ⚠️ NUNCA importar api/diagnostic.mjs desde aquí (arrastra @vercel/postgres y rompe
@@ -421,14 +420,17 @@ export function computeLossToolResult(input) {
   return FAIL_RESULT; // modo ausente/inválido o faltan los números esenciales → no computa
 }
 
-// cotizar — puro y testeable. Las opciones y sus precios salen de la lista PRIVADA de
-// Ventas (la de Orbit, en la base) con lib/marcy-quote.mjs; Marcy solo repite las cifras
-// devueltas (van al allowlist dinámico del filtro de precios). `quote` es lo que se
-// guarda en Orbit cuando la conversación tenga contacto.
-export function quoteToolResult(input, lang = 'es', catalog = null) {
+// cotizar — testeable. Las opciones y sus precios salen de la lista PRIVADA de Ventas (la
+// de Orbit, en la base) con lib/marcy-quote.mjs, que se carga solo aquí (el chat no carga
+// la base al arrancar). Marcy repite las cifras devueltas EXACTAS: van al allowlist del
+// filtro de precios sin redondeos (un redondeo abriría la puerta a una cifra inventada).
+// `quote` es lo que pide, sin cifras: se guarda en la conversación y pasa a Orbit.
+const exactAllow = (v) => (Number.isInteger(v) ? [String(v)] : [String(Math.round(v)), String(Math.round(v * 100))]);
+export async function quoteToolResult(input, lang = 'es', catalog = null) {
+  const { buildQuote } = await import('../lib/marcy-quote.mjs');
   const q = buildQuote(catalog, input || {}, { lang });
   if (!q.ok) return { content: JSON.stringify({ ok: false, motivo: q.motivo }), extraAllow: [] };
-  return { content: JSON.stringify(q.visible), extraAllow: q.figures.flatMap(priceAllowVariants), quote: q.stored };
+  return { content: JSON.stringify(q.visible), extraAllow: q.figures.flatMap(exactAllow), quote: q.stored };
 }
 
 // revisar_sitio — tool_result SOLO con enteros + labels de NUESTRO catálogo
@@ -503,6 +505,7 @@ async function runInternalTool(toolUse, { lang, ip, sid, first = false }) {
   if (toolUse.name === QUOTE_TOOL.name) {
     // De entrada, solo el «desde» público (Ventas, 19-nov): en su primera respuesta Marcy no cotiza.
     if (first) return { content: JSON.stringify({ ok: false, motivo: 'de_entrada', haz: 'Primera respuesta: da el «desde» público y el plan que lo acompaña; para las opciones, pregunta antes cuánto le deja un cliente.' }), extraAllow: [] };
+    const { salesCatalog } = await import('../lib/marcy-quote.mjs');
     return quoteToolResult(toolUse.input || {}, lang, await salesCatalog());
   }
   if (toolUse.name === SITE_TOOL.name) {
@@ -641,7 +644,9 @@ ${dateCtx}` : dateCtx, tools: [...CHAT_TOOLS, ch.SLOTS_TOOL], extraInternal: web
 // la marca de caché (canal, dueño); `tools` y `extraInternal` los pone el canal
 // (p. ej. agendar por texto en WhatsApp). Cuenta el coste del día (P2); el
 // registro del turno lo hace quien llama, con su canal.
-export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraContext = null, tools = CHAT_TOOLS, extraInternal = null }) {
+// first: ¿es la primera respuesta de Marcy? (de entrada no cotiza). Los canales lo pasan
+// sin contar sus textos fijos; la web lo deduce del historial.
+export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraContext = null, tools = CHAT_TOOLS, extraInternal = null, first = null }) {
   const M = MESSAGES[lang] || MESSAGES.es;
   const model = ALLOWED_MODELS.has(process.env.CHAT_MODEL) ? process.env.CHAT_MODEL : DEFAULT_MODEL;
   const isInternal = (name) => INTERNAL_TOOLS.has(name) || !!(extraInternal && extraInternal.names.has(name));
@@ -695,7 +700,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
     if (internal) {
       const out = extraInternal && extraInternal.names.has(internal.name)
         ? await extraInternal.run(internal).catch(() => FAIL_RESULT)
-        : await runInternalTool(internal, { lang, ip, sid, first: !messages.some((m) => m && m.role === 'assistant') });
+        : await runInternalTool(internal, { lang, ip, sid, first: typeof first === 'boolean' ? first : !messages.some((m) => m && m.role === 'assistant') });
       extraAllow = [...extraAllow, ...(out.extraAllow || [])];
       if (internal.name === CALC_TOOL.name) lossFigures = out.extraAllow || [];
       if (out.quote) quote = out.quote;
@@ -764,11 +769,15 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
       const fromR1 = parseToolResponse(r1.content, lang, { updatesAsText }).action;
       if (fromR1) { action = fromR1; if (!text) text = toolOnlyFallback(action, lang); }
     }
-    const cortadas = blockedFigures(text || '', extraAllow);
+    // Turno con cotizar: una cuota mensual por debajo de 100 también tiene que salir de cotizar.
+    const strict = { strictMonthly: !!(internal && internal.name === QUOTE_TOOL.name) };
+    const cortadas = blockedFigures(text || '', extraAllow, strict);
     if (cortadas.length) console.warn('[chat] cifra_cortada=' + cortadas.slice(0, 5).join(',') + ' herramienta=' + (internal ? internal.name : 'ninguna'));
-    let reply = brandPostFilter(String(text || M.fallback).split(OWNER_TAG).join('').trim() || M.fallback, lang);   // honestidad de marca (y nunca la marca del dueño)
+    const rawReply = String(text || M.fallback).split(OWNER_TAG).join('').trim() || M.fallback;
+    const brandHit = brandBlocks(rawReply);                   // el cliente no ve la cotización: no se guarda
+    let reply = brandPostFilter(rawReply, lang);              // honestidad de marca (y nunca la marca del dueño)
     const beforePrice = reply;
-    reply = pricePostFilter(reply, lang, extraAllow);          // cifras fuera del allowlist (+ las computadas)
+    reply = pricePostFilter(reply, lang, extraAllow, strict);  // cifras fuera del allowlist (+ las computadas)
     const fallback = !text || reply !== beforePrice;
     if (!fallback) reply = estimateNote(reply, lang, lossFigures); // todo precio o plazo, como estimado (legal §3c)
 
@@ -780,7 +789,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
     await recordUsage({ model, env: chatEnv(), firstTurn, u: usage, costMicro });
 
     // La cotización solo se guarda si el cliente la vio (el filtro no cortó la respuesta).
-    return { reply, action, tool: internal ? [internal.name, ...extraTools].join('+').slice(0, 40) : null, cortadas, fallback, empty: !text, toolOnly: !!(action && text === toolOnlyFallback(action, lang)), costMicro, model, quote: fallback ? null : quote };
+    return { reply, action, tool: internal ? [internal.name, ...extraTools].join('+').slice(0, 40) : null, cortadas, fallback, empty: !text, toolOnly: !!(action && text === toolOnlyFallback(action, lang)), costMicro, model, quote: fallback || brandHit ? null : quote };
   }
 }
 

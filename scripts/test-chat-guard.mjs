@@ -610,6 +610,19 @@ check('doctrina: el chat no importa la base de forma estática (solo frenos y av
     assert.ok(!statics.includes(bad), 'import estático prohibido en el chat: ' + bad);
   }
   assert.ok(!/new Map\(\)/.test(src), 'sin contadores en memoria por instancia');
+  // Transitiva: tampoco a través de lo que importa (p. ej. la cotización trae Orbit y Finanzas).
+  const seen = new Set();
+  const walk = (url) => {
+    if (seen.has(url.href)) return;
+    seen.add(url.href);
+    const text = readFileSync(url, 'utf8');
+    for (const m of text.matchAll(/^import\s.*?from\s+['"]([^'"]+)['"]/gm)) {
+      const spec = m[1];
+      assert.ok(spec !== '@vercel/postgres', 'el chat carga la base al arrancar vía ' + url.pathname.split('/').slice(-2).join('/'));
+      if (spec.startsWith('.')) walk(new URL(spec, url));
+    }
+  };
+  walk(new URL('../api/chat.mjs', import.meta.url));
 });
 
 // ── v7.6: ANTI-FORJADO — el cliente no puede inyectar un tool_result ──

@@ -33,6 +33,7 @@ const CAT = {
     iaBasic: { nombre: 'Asistente con IA básico', precio: 1110, mensual: 77 },
     ia: { nombre: 'Asistente con IA completo', precio: 2020, mensual: 133 },
     brandingLogo: { nombre: 'Logo', precio: 505 },
+    seoInitial: { nombre: 'SEO inicial', precio: 606 },
   },
   planes: {
     base: { nivel: 1, nombre: 'Base', en: 'Base', mensual: 111, enPropuestas: false, frase: 'Tu web segura' },
@@ -145,20 +146,23 @@ await check('qué incluye un plan, en frases', () => {
   assert.ok(planIncludes(CAT.planes.dominio).some((t) => /cuota mensual del asistente/.test(t)));
   assert.ok(planIncludes(CAT.planes.crecimiento, 'en').some((t) => /every week/.test(t)));
 });
-await check('cifras: todas al allowlist del filtro; lo guardado no lleva cifras de más', () => {
-  const out = quoteToolResult({ paquetes: true, valor_cliente: 300 }, 'es', CAT);
+await check('cifras: todas al allowlist del filtro; lo guardado no lleva cifras de más', async () => {
+  const out = await quoteToolResult({ paquetes: true, valor_cliente: 300 }, 'es', CAT);
   const v = JSON.parse(out.content);
   assert.equal(v.ok, true);
   for (const n of ['7070', '3030', '888', '555', '333', '300']) assert.ok(out.extraAllow.includes(n), n);
   assert.ok(pricePostFilter('La completa sale en $7,070 y $888 al mes.', 'es', out.extraAllow).includes('$7,070'));
+  // Exactas, sin redondeos: un redondeo dejaría pasar una cifra inventada.
+  for (const n of ['7000', '3000', '900', '1000']) assert.ok(!out.extraAllow.includes(n), 'sin redondeo ' + n);
+  assert.doesNotMatch(pricePostFilter('Te la dejo en $3,000.', 'es', out.extraAllow), /\$3,000/);
   assert.equal(out.quote.paquetes, true);
   assert.equal(out.quote.valor_cliente, 300);
   assert.ok(out.quote.key);
   assert.doesNotMatch(JSON.stringify(out.quote), /price_cents|7070|3030|888/, 'lo que se guarda en la conversación no lleva cifras');
   assert.ok(!('save' in v) && !('figures' in v) && !('stored' in v));
 });
-await check('sin lista (base caída): ok false, sin cifras y sin guardar', () => {
-  const out = quoteToolResult({ paquetes: true }, 'es', null);
+await check('sin lista (base caída): ok false, sin cifras y sin guardar', async () => {
+  const out = await quoteToolResult({ paquetes: true }, 'es', null);
   assert.deepEqual(JSON.parse(out.content), { ok: false, motivo: 'sin_lista' });
   assert.deepEqual(out.extraAllow, []);
   assert.equal(out.quote, undefined);
@@ -306,6 +310,120 @@ function findCatalog() {
   }
   return null;
 }
+await check('en inglés el plan va sin frase (fraseEn sin el OK del dueño); en español, con ella', () => {
+  const es = buildQuote(CAT, { paquetes: true }).visible.opciones.filter((o) => o.plan);
+  const en = buildQuote(CAT, { paquetes: true }, { lang: 'en' }).visible.opciones.filter((o) => o.plan);
+  assert.ok(es.length && es.every((o) => typeof o.plan.frase === 'string'));
+  assert.ok(en.length && en.every((o) => !('frase' in o.plan)));
+  assert.doesNotMatch(JSON.stringify(en), /fraseEn/);
+});
+await check('proyecto solo «desde»: por confirmar en el borrador y fuera de «se paga con»', () => {
+  const con = buildQuote(CAT, { opciones: [{ plan: 'dominio', servicios: ['webCiudades'] }], valor_cliente: 300 });
+  const sin = buildQuote(CAT, { opciones: [{ plan: 'dominio' }], valor_cliente: 300 });
+  const o = con.visible.opciones[0];
+  assert.equal(o.pago_unico_es_desde, true);
+  assert.ok('desde' in o.servicios[0] && !('precio' in o.servicios[0]));
+  assert.equal(o.se_paga_con_clientes_al_mes, sin.visible.opciones[0].se_paga_con_clientes_al_mes);
+  assert.match(con.save.notes, /Precio por confirmar \(solo «desde»\): Web de servicios por ciudades/);
+  assert.doesNotMatch(sin.save.notes, /por confirmar/);
+});
+await check('cada frase legal vive en un solo sitio (lib/condiciones-legales.mjs)', () => {
+  const frases = Object.values(CONDICIONES).flatMap((c) => Object.values(c));
+  const skip = new Set(['node_modules', '.git', '.vercel', 'dist', '.astro', '.claude']);
+  const hits = [];
+  const walk = (d) => {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      if (skip.has(e.name)) continue;
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (/\.(mjs|js|ts|astro|md|json)$/.test(e.name) && path.relative(ROOT, p) !== path.join('lib', 'condiciones-legales.mjs')) {
+        const t = fs.readFileSync(p, 'utf8');
+        for (const f of frases) if (t.includes(f)) hits.push(`${path.relative(ROOT, p)}: ${f.slice(0, 40)}`);
+      }
+    }
+  };
+  for (const d of ['lib', 'api', 'src', 'docs']) if (fs.existsSync(path.join(ROOT, d))) walk(path.join(ROOT, d));
+  assert.ok(SYSTEM_PROMPT.includes(CONDICIONES.es.permanencia), 'el guion la toma de ahí');
+  assert.ok(!SYSTEM_PROMPT.includes(CONDICIONES.es.tresPagos), 'los tres pagos solo en la nota del paquete que los lleva');
+  assert.deepEqual(hits, []);
+});
+
+await check('dos opciones que quedan iguales se juntan en una', () => {
+  const q = buildQuote(CAT, { opciones: [{ plan: 'crecimiento', servicios: ['web'] }, { plan: 'crecimiento', servicios: ['web', 'diagnostico'] }, { plan: 'presencia', servicios: ['webLanding'] }] });
+  assert.equal(q.visible.opciones.length, 2);
+  assert.equal(q.save.options.length, 2);
+  assert.equal(q.stored.opciones.length, 2);
+  assert.equal(buildQuote(CAT, { opciones: [{ plan: 'crecimiento' }, { plan: 'crecimiento' }, { plan: 'crecimiento' }] }).visible.opciones.length, 1);
+});
+await check('añadido pedido y no cotizado: queda dicho (no_cotizado) y en la nota del borrador', () => {
+  const bajo = { ...CAT, preciosPublicos: { ...CAT.preciosPublicos, anclas: { ...CAT.preciosPublicos.anclas, aeoMonitoring: 60 } } };
+  const q = buildQuote(bajo, { opciones: [{ plan: 'crecimiento', servicios: ['web'], seguimiento_ia: true }] });
+  const o = q.visible.opciones[0];
+  assert.deepEqual(o.no_cotizado, ['Seguimiento en IA']);
+  assert.equal(o.mensual, 555);
+  assert.match(q.save.notes, /pidió Seguimiento en IA, sin cotizar/);
+  assert.deepEqual(q.stored.opciones[0].anadidos, ['aeoMonitoring']);
+  assert.deepEqual(buildQuote(bajo, q.stored).visible, q.visible, 'al pasar a Orbit sale igual');
+  // Dominio no lo admite: tampoco se cobra, y se dice.
+  assert.deepEqual(buildQuote(CAT, { opciones: [{ plan: 'dominio', seguimiento_ia: true }] }).visible.opciones[0].no_cotizado, ['Seguimiento en IA']);
+  // Cotizado de verdad: sin no_cotizado.
+  assert.equal(buildQuote(CAT, { opciones: [{ plan: 'crecimiento', seguimiento_ia: true }] }).visible.opciones[0].no_cotizado, undefined);
+});
+await check('con un plan, el SEO inicial va incluido y no se cobra; sin plan, sí', () => {
+  const con = buildQuote(CAT, { opciones: [{ plan: 'presencia', servicios: ['seoInitial', 'webLanding'] }] });
+  const o = con.visible.opciones[0];
+  assert.equal(o.pago_unico, 1010);
+  assert.deepEqual(o.incluido_en_el_plan, ['SEO inicial']);
+  assert.ok(!o.servicios.some((s) => s.nombre === 'SEO inicial'));
+  assert.deepEqual(buildQuote(CAT, con.stored).visible, con.visible);
+  assert.equal(buildQuote(CAT, { opciones: [{ servicios: ['seoInitial'] }] }).visible.opciones[0].pago_unico, 606);
+});
+await check('ids con nombre de propiedad interna (constructor, toString) no rompen la cotización', () => {
+  const q = buildQuote(CAT, { opciones: [{ plan: 'constructor', servicios: ['web', 'toString', '__proto__'] }] });
+  assert.equal(q.ok, true);
+  assert.deepEqual(q.visible.opciones[0].servicios.map((s) => s.nombre), ['Web que vende']);
+  assert.equal(q.visible.opciones[0].plan, null);
+});
+await check('la tarea de 5 min lee la lista de la base, no la de memoria', async () => {
+  __resetCatalogCache();
+  const vieja = { ...CAT, version: 'vieja' };
+  await salesCatalog({ sqlImpl: async () => ({ rows: [] }), load: async () => ({ body: vieja }), now: 1000 });
+  assert.equal((await salesCatalog({ load: async () => ({ body: CAT }), now: 2000 })).version, 'vieja', 'el chat usa la de memoria');
+  assert.equal((await salesCatalog({ sqlImpl: async () => ({ rows: [] }), load: async () => ({ body: CAT }), now: 3000, fresh: true })).version, 'prueba-marcy');
+  __resetCatalogCache();
+});
+await check('lo mismo pedido que ya tenía una propuesta enviada: no se duplica y se avisa', async () => {
+  const { sql, calls } = fakeSql({ pending: [{ sid: 'wa-1', lead_ref: 'LEAD-9', quote: STORED, quote_tries: 0 }] });
+  const notes = [];
+  const save = async () => ({ proposal: { ref_id: 'PROP-3', status: 'sent' }, created: false });
+  assert.equal(await retryPendingQuotes({ sqlImpl: sql, catalog: CAT, enabled: true, save, notify: async (t, b) => notes.push(b) }), 1);
+  assert.equal(notes.length, 1);
+  assert.match(notes[0], /PROP-3 \(sent\)/);
+  assert.ok(calls.some((c) => /SET quote_proposal =/.test(c.text) && c.values.includes('PROP-3')));
+  const notes2 = [];
+  const { sql: sql2 } = fakeSql({ pending: [{ sid: 'web-1', lead_ref: 'LEAD-9', quote: STORED, quote_tries: 0 }] });
+  await retryPendingQuotes({ sqlImpl: sql2, catalog: CAT, enabled: true, save: async () => ({ proposal: { ref_id: 'PROP-4', status: 'draft' }, created: false }), notify: async (t, b) => notes2.push(b) });
+  assert.equal(notes2.length, 0, 'un reintento que encuentra su borrador no avisa');
+});
+await check('la frase de la garantía no hace saltar el filtro de marca; un claim de verdad, sí', async () => {
+  const { brandBlocks, brandPostFilter } = await import('../lib/chat-kb.mjs');
+  const es = 'Con Crecimiento quedan en $3,030 y $555 al mes. ' + CONDICIONES.es.garantia;
+  assert.equal(brandBlocks(es), false);
+  assert.equal(brandPostFilter(es), es);
+  assert.equal(brandBlocks('Growth works. ' + CONDICIONES.en.garantia.replace("'", '’')), false);
+  assert.equal(brandBlocks('garantizamos el trabajo, no el resultado'), false);
+  assert.equal(brandBlocks('Te garantizamos la primera página de Google.'), true);
+  assert.equal(brandBlocks(CONDICIONES.es.garantia + ' Y garantizamos más clientes.'), true);
+});
+await check('turno con cotizar: una cuota mensual inventada por debajo de 100 se corta; la de cotizar pasa', () => {
+  const strict = { strictMonthly: true };
+  assert.match(pricePostFilter('El asistente lleva una cuota de $45 al mes.', 'es', [], strict), /no me cuadra/);
+  assert.match(pricePostFilter('The assistant is $45/mo.', 'en', [], strict), /doesn.t sound right/);
+  assert.equal(pricePostFilter('El asistente lleva $77 al mes.', 'es', ['77'], strict), 'El asistente lleva $77 al mes.');
+  assert.equal(pricePostFilter('Si cada corte te deja $45, se paga solo.', 'es', [], strict), 'Si cada corte te deja $45, se paga solo.');
+  assert.equal(pricePostFilter('El asistente lleva una cuota de $45 al mes.', 'es', []), 'El asistente lleva una cuota de $45 al mes.', 'sin cotizar en el turno, la banda baja sigue igual');
+});
+
 const realPath = process.env.MARCYAN_CATALOGO || findCatalog();
 if (realPath && fs.existsSync(realPath)) {
   await check('fuga: ninguna cifra interna en los archivos de Marcy', () => {

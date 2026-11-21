@@ -41,25 +41,40 @@ Pruebas: `npm run test:cotizar` y la batería `npm run eval:marcy`.
 1. **Planes:** se ofrecen Presencia, Crecimiento y Dominio. Base no se ofrece en propuestas.
 2. **Lo mensual** (plan, cuota de los asistentes, Seguimiento en IA) va tal cual la lista: nunca se descuenta.
    En Dominio, la cuota del asistente con IA va incluida. Un añadido cuya lista interna queda por debajo de
-   su precio público no se cotiza (pasa hoy con Seguimiento en IA: lo decide Ventas).
+   su precio público, o que el plan no admite, no se cotiza: la opción lo trae en `no_cotizado`, Marcy no
+   lo promete ni lo suma, y la nota del borrador dice que lo pidió.
 3. **Combinación:** dos o más proyectos de pago único en la misma opción = el descuento de la lista
    (`reglas.comboDescuentoProyectos`), redondeado hacia arriba (`reglas.redondeoProyectos`): nunca pasa
    del porcentaje.
 4. **Mínimo:** ningún proyecto baja de su precio público ni del mínimo de la lista (`reglas.pisoSobreBase`).
+   Con un plan, el SEO inicial va incluido (nota de la lista): no se cobra y sale en `incluido_en_el_plan`.
+   Dos opciones que quedan iguales se juntan en una.
 5. **Rebaja si el cliente insiste:** solo después de ajustar el alcance, hasta un 10 % más (redondeado
    hacia arriba), nunca bajo el mínimo, y siempre «sujeta a aprobación de un representante» (le llega al equipo como contacto). Un
    servicio «desde» no se rebaja.
 6. **Más alcance** (más páginas, otro idioma, más canales): se cotiza lo que hay y el ajuste va en la
    propuesta escrita. El rediseño en dos idiomas sí se cotiza (`segundoIdioma` de la lista).
 7. **Todo precio o plazo** va como estimado que se confirma por escrito en la propuesta (Legal, 15-nov).
+8. **Proyecto solo «desde»** (`reglas.proyectoSoloDesde`; hoy la web de servicios por ciudades y las
+   reservas): no tiene precio cerrado. En el chat se dice «desde», nunca como precio final. En el borrador
+   va con su «desde» interno y la nota «Precio por confirmar»; la marca y el bloqueo de envío hasta que el
+   dueño ponga el precio real los pone Orbit (pedido a Panel Admin). «Se paga con N clientes» cuenta solo
+   lo mensual.
+9. **Nombres de plan** (`usoDePrecios.nombresDePlanes`): fuera de una cotización, el nombre del plan y su
+   frase, nunca sus cifras. Al cotizar, las cifras como estimado. En inglés, el plan va sin frase: las
+   frases en inglés (`fraseEn`) están sin el OK del dueño.
 
-## Condiciones que puede decir (Legal, `05-condiciones-comerciales.md`, tal cual)
+## Condiciones que puede decir
 
-- «Mes a mes, sin permanencia, salvo con la web en tres pagos.»
-- «Si un mes no hacemos lo que dice tu plan, ese mes no se cobra. Garantizamos el trabajo, no el resultado.»
-- «Paga el año por adelantado y tienes un mes de regalo.»
-- «Tu web en 3 pagos sin recargo si eliges 6 meses de plan.» (solo en el paquete que lo lleva)
-- Nada sobre impuestos (pendiente del contador). Los textos en inglés son traducción de Marcy, sin revisar por Legal.
+Las frases cortas de Legal (`05-condiciones-comerciales.md`), tal cual, viven en un solo sitio:
+`lib/condiciones-legales.mjs`. Las importan el guion y la cotización, y `test:cotizar` falla si alguna
+se copia en otro archivo. Cambiar una es cambiarla ahí, con el texto que dé Legal.
+
+- `permanencia` (mes a mes, salvo con la web en tres pagos), `garantia`, `tresPagos` (solo en el paquete
+  que lo lleva) y `recuerda` (es un estimado que se confirma por escrito).
+- `anual` (pago del año por adelantado): **pendiente de Legal** (20-nov). Dicha en el chat puede
+  entenderse como 13 meses por el precio de 12; el texto final llega antes de publicar.
+- Nada sobre impuestos (pendiente del contador). Los textos en inglés son traducción, sin revisar por Legal.
 
 ## Dónde queda la cotización
 

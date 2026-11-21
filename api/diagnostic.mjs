@@ -330,10 +330,11 @@ async function handleClaim({ req, res, body, lang, E, ip }) {
     ref, leadRef, plan: plan.plan, clientValueCents: calc ? calc.value_cents : null, allowDraft,
   });
 
-  // Idempotencia: si ya reclamó, devolvemos el mismo LEAD (no duplicamos). El embudo se
-  // repite aquí a propósito: es idempotente y repara un reclamo que se cortó a medias.
+  // Idempotencia: si ya reclamó, devolvemos el mismo LEAD (no duplicamos). Aquí solo se
+  // repara la etapa (idempotente). El borrador NO: cualquiera con el folio puede llegar
+  // aquí, saltándose el tope de correo y con su propio valor de calculadora.
   if (row.lead_ref) {
-    await runDiagnosticFunnel(funnelInput(row.lead_ref));
+    await runDiagnosticFunnel(funnelInput(row.lead_ref, false));
     return res.status(200).json({ ok: true, leadRef: row.lead_ref });
   }
 

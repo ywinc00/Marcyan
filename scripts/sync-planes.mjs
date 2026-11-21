@@ -23,7 +23,9 @@ import { leerCatalogo } from './sync-catalogo.mjs';
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const DESTINO_PLANES = resolve(RAIZ, 'lib/planes.generado.mjs');
 
-const CAMPOS = ['nombre', 'en', 'frase', 'frase_en'];
+// `fraseEn` (frase en inglés) todavía no: es propuesta de Ventas a falta del OK del dueño.
+// Cuando Bases y Estructura la confirme, se añade aquí y planText() la usa sola.
+const CAMPOS = ['nombre', 'en', 'frase'];
 
 /** Planes recomendables, ordenados por nivel, solo con sus textos. */
 export function proyectarPlanes(c) {

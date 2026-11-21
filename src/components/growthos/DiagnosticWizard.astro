@@ -329,7 +329,7 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
   .dgw__rec-svc { color: var(--accent-gold); font-weight: 600; }
   .dgw__rec-tag { color: var(--fg-primary); font-weight: 400; }
   .dgw__rec-tag:not(:empty)::before { content: ' · '; color: var(--w-ink-60); }
-  .dgw__rec-why { flex-basis: 100%; color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
+  .dgw__rec-why { flex-basis: 100%; }
 
   /* Puente a Marcy: tarjeta hermana de .dgw__rec, en teal (el color de Marcy). */
   .dgw__marcy { display: flex; align-items: center; gap: var(--space-3); width: 100%; text-align: left;
@@ -438,11 +438,16 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
   .dgw__marcy-lbl { font-size: 15px; }
   .dgw__flist :global(li) { font-size: 15px; line-height: 1.45; color: var(--w-ink-80); }
   .dgw__marcy-sub { font-size: 14px; line-height: 1.4; color: var(--w-ink-70); }
+  /* auditoria-ignorar: mismo tamaño que sus hermanas de este bloque de contraste (revisión 2 del resultado); ink-70 da 6,3:1 sobre el oro de la tarjeta */
+  .dgw__rec-why { font-size: 14px; line-height: 1.45; color: var(--w-ink-70); }
   .dgw__disclaimer { font-size: 14px; line-height: 1.5; color: var(--w-ink-70); }
   .dgw__claimsub { font-size: 14px; line-height: 1.5; color: var(--w-ink-80); }
 
   @media (max-width: 599px) {
     .dgw__row2 { grid-template-columns: 1fr; }
+    /* La frase del plan no se parte por la mitad: va entera en su línea. */
+    .dgw__rec-tag { display: block; }
+    .dgw__rec-tag:not(:empty)::before { content: none; }
     .dgw__rgrid { grid-template-columns: 1fr; gap: var(--space-5); }
   }
   @media (prefers-reduced-motion: reduce) {

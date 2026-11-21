@@ -126,7 +126,11 @@ await check('parseCalcValue acepta el ticket y el valor por cita dentro de su ra
 await check('parseCalcValue rechaza lo raro sin recortar', () => {
   for (const bad of [null, 'x', {}, { type: 'calls' }, { type: 'calls', value_cents: 35000.5 },
     { type: 'calls', value_cents: CALC_RANGES.calls.max * 100 + 1 }, { type: 'appt', value_cents: 100 },
-    { type: 'otra', value_cents: 5000 }, { type: 'calls', value_cents: 'abc' }]) {
+    { type: 'otra', value_cents: 5000 }, { type: 'calls', value_cents: 'abc' },
+    // Nombres heredados de Object y un arreglo: no pueden colarse con cualquier cifra.
+    JSON.parse('{"type":"constructor","value_cents":-999999999}'), JSON.parse('{"type":"__proto__","value_cents":1}'),
+    JSON.parse('{"type":"toString","value_cents":1e300}'), JSON.parse('{"type":["calls"],"value_cents":500000}'),
+    { type: 'calls', value_cents: 1e300 }, { type: 'calls', value_cents: [35000] }]) {
     assert.equal(parseCalcValue(bad), null, JSON.stringify(bad));
   }
 });
@@ -212,8 +216,20 @@ await check('embudo: un fallo no lanza, avisa sin cifras y sigue con lo demás',
   const r = await runDiagnosticFunnel({ ref: 'DGN-013', leadRef: 'LEAD-023', plan: 'dominio' }, f.deps);
   assert.deepEqual(r, { stage: 'error', draft: 'error' });
   assert.equal(f.calls.notify.length, 2);
-  assert.equal(f.calls.notify[0].key, 'diag-funnel:503');
+  assert.equal(f.calls.notify[0].key, 'diag-funnel:503', 'el 503 afecta a todos: un aviso al día');
+  assert.equal(f.calls.notify[1].key, 'diag-funnel:LEAD-023', 'el resto, uno por contacto');
   for (const n of f.calls.notify) assert.ok(!/\$|\d{3,}/.test(n.title + (n.body || '').replace(/LEAD-\d+|DGN-\d+|029/g, '')), n.body);
+});
+await check('embudo: contacto borrado en Orbit (404) = sin aviso y sin borrador', async () => {
+  const f = fakes({ advErr: Object.assign(new Error('Contacto no encontrado.'), { status: 404 }) });
+  const r = await runDiagnosticFunnel({ ref: 'DGN-015', leadRef: 'LEAD-025', plan: 'dominio' }, f.deps);
+  assert.deepEqual(r, { stage: 'error', draft: 'off' });
+  assert.equal(f.calls.notify.length, 0);
+  assert.equal(f.calls.save.length, 0);
+});
+await check('reclamo repetido: solo repara la etapa, nunca deja borrador', () => {
+  const src = readFileSync(resolve(RAIZ, 'api/diagnostic.mjs'), 'utf8');
+  assert.match(src, /if \(row\.lead_ref\) \{\s*await runDiagnosticFunnel\(funnelInput\(row\.lead_ref, false\)\)/);
 });
 await check('embudo: sin folio o sin contacto no hace nada', async () => {
   const f = fakes();

@@ -81,7 +81,7 @@ export const diagCopy: Record<DiagLang, DiagCopy> = {
       ],
       rutaLabel: 'Plan recomendado',
       rutaPlan: 'dominio',
-      rutaNote: 'El área más débil de este ejemplo, por donde conviene empezar.',
+      rutaNote: 'Lo más flojo de este ejemplo es que la IA pueda leer y citar la web.',
       sr: 'Ejemplo de resultado: puntaje 56 de 100, prioridad media. Web móvil 80, SEO local 55, lectura por IA 30, conversión 50 y reseñas 60.',
     },
     gratis: {
@@ -128,7 +128,7 @@ export const diagCopy: Record<DiagLang, DiagCopy> = {
       ],
       rutaLabel: 'Recommended plan',
       rutaPlan: 'dominio',
-      rutaNote: 'The weakest area in this example, and the place to start.',
+      rutaNote: 'The weakest point in this example is whether AI can read and cite the site.',
       sr: 'Example result: score 56 out of 100, medium priority. Mobile site 80, local SEO 55, AI readability 30, conversion 50 and reviews 60.',
     },
     gratis: {

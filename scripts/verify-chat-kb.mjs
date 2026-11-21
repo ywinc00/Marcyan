@@ -1,8 +1,8 @@
 // ════════════════════════════════════════════════════════════════
 //  scripts/verify-chat-kb.mjs  ·  npm run check:kb
 //  Guarda de DRIFT: las anclas de precio del bot (lib/chat-kb.mjs → PRICES)
-//  deben coincidir EXACTAMENTE con la fuente de verdad del sitio
-//  (src/i18n/pricing.ts → PRICE_ANCHORS), y el NAP con src/i18n/content.ts.
+//  y las del sitio (src/i18n/pricing.ts → PRICE_ANCHORS) deben ser EXACTAMENTE
+//  los precios públicos del catálogo de Ventas, y el NAP el de src/i18n/content.ts.
 //  Sale != 0 si hay desincronización → protege la directiva de honestidad
 //  (el bot solo cita precios que el sitio publica, y viceversa).
 // ════════════════════════════════════════════════════════════════
@@ -17,28 +17,39 @@ const contentSrc = await readFile(join(root, 'src/i18n/content.ts'), 'utf8');
 
 const errors = [];
 
-// ── Precios: PRICE_ANCHORS (pricing.ts) ⇄ PRICES (chat-kb.mjs) ──
-// Parsea el bloque `export const PRICE_ANCHORS = { ... } as const;`.
-const block = pricingSrc.match(/export const PRICE_ANCHORS\s*=\s*\{([\s\S]*?)\}\s*as const/);
-if (!block) {
-  errors.push('No encontré el bloque `export const PRICE_ANCHORS = { ... } as const` en src/i18n/pricing.ts.');
-} else {
-  const anchors = {};
-  for (const m of block[1].matchAll(/(\w+):\s*(\d+)/g)) anchors[m[1]] = Number(m[2]);
+// ── Precios: precios públicos del catálogo ⇄ sitio ⇄ PRICES (chat-kb.mjs) ──
+// El sitio y Marcy leen la MISMA lista: el bloque preciosPublicos del catálogo
+// de Ventas (lib/catalogo.generado.mjs). Aquí se comprueba que ninguno de los
+// dos se haya salido de ella.
+const { CATALOGO } = await import('../lib/catalogo.generado.mjs');
+const anchors = CATALOGO.anclas;
 
-  const anchorKeys = Object.keys(anchors);
-  if (anchorKeys.length === 0) errors.push('PRICE_ANCHORS está vacío o no se pudo parsear.');
+// 1 · El sitio no define precios propios: PRICE_ANCHORS ES la lista pública.
+if (!/export const PRICE_ANCHORS\s*=\s*CATALOGO\.anclas\s*;/.test(pricingSrc)) {
+  errors.push('src/i18n/pricing.ts ya no dice `export const PRICE_ANCHORS = CATALOGO.anclas;`. Los precios del sitio tienen que salir de la lista pública, sin cifras propias.');
+}
 
-  // Toda ancla del sitio debe existir en el bot con el MISMO valor.
-  for (const [key, val] of Object.entries(anchors)) {
-    const got = PRICES[key] && PRICES[key].value;
-    if (got === undefined) errors.push(`Falta en chat-kb PRICES la clave '${key}' (pricing.ts=${val}).`);
-    else if (got !== val) errors.push(`Precio desincronizado '${key}': pricing.ts=${val} vs chat-kb=${got}.`);
+// 2 · Marcy y el sitio no pueden ver nada de la lista interna.
+for (const clave of Object.keys(CATALOGO)) {
+  if (!['version', 'moneda', 'vigenteDesde', 'anclas', 'mensuales', 'desdePorCategoria'].includes(clave)) {
+    errors.push(`La lista generada trae "${clave}", que no es un dato público. Solo sale preciosPublicos.`);
   }
-  // Todo precio del bot debe estar respaldado por una ancla del sitio.
-  for (const key of Object.keys(PRICES)) {
-    if (!(key in anchors)) errors.push(`chat-kb PRICES tiene '${key}' sin ancla en pricing.ts (precio no respaldado).`);
+}
+
+if (Object.keys(anchors).length === 0) errors.push('La lista de precios públicos está vacía.');
+
+// 3 · Toda ancla pública debe existir en el bot con el MISMO valor y la misma periodicidad.
+for (const [key, val] of Object.entries(anchors)) {
+  const got = PRICES[key];
+  if (!got) errors.push(`Falta en chat-kb PRICES la clave '${key}' (público=${val}).`);
+  else {
+    if (got.value !== val) errors.push(`Precio desincronizado '${key}': público=${val} vs chat-kb=${got.value}.`);
+    if (Boolean(got.monthly) !== CATALOGO.mensuales.includes(key)) errors.push(`'${key}': el bot y la lista pública no coinciden en si es mensual.`);
   }
+}
+// 4 · Todo precio del bot debe estar respaldado por un precio público.
+for (const key of Object.keys(PRICES)) {
+  if (!(key in anchors)) errors.push(`chat-kb PRICES tiene '${key}', que no es un precio público.`);
 }
 
 // ── NAP (la 1ª aparición de cada campo es la del objeto nap, arriba del archivo) ──

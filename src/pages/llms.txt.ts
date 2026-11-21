@@ -1,4 +1,19 @@
-# Marcyan Studio
+// ─────────────────────────────────────────────────────────────
+// /llms.txt — resumen del sitio para los asistentes de IA.
+//
+// Antes era un archivo fijo en public/ con los precios escritos a mano, que se
+// quedaban viejos cada vez que cambiaba una tarifa. Ahora se genera: los
+// precios salen del catálogo de Ventas (src/i18n/catalogo.generado.ts) y el
+// resto del texto vive aquí.
+// ─────────────────────────────────────────────────────────────
+
+import type { APIRoute } from 'astro';
+import { PRICE_ANCHORS } from '../i18n/pricing';
+import { usd } from '../i18n/catalogo.generado';
+
+const p = PRICE_ANCHORS;
+
+const cuerpo = `# Marcyan Studio
 
 > Agencia de diseño web, inteligencia artificial aplicada y SEO para pequeñas y medianas empresas (PYMEs) hispanas en Estados Unidos. Atendemos a negocios en Houston, TX y Miami, FL, en español e inglés. / Bilingual web design, applied AI, and SEO studio for small businesses in Houston, TX and Miami, FL.
 
@@ -6,13 +21,13 @@ Marcyan Studio pone la inteligencia artificial a trabajar para tu negocio: sitio
 
 ## Servicios y precio de arranque (USD, se cotiza cada proyecto)
 
-- Diseño web: landing desde $400, rediseño desde $500, sitio completo desde $1,500.
-- SEO local (Google y Maps): arranque desde $300, plan completo desde $600.
-- SEO para IA (que ChatGPT, Gemini, Perplexity y Claude te recomienden): diagnóstico gratis, bases desde $500, seguimiento desde $200 al mes.
-- Asistentes de IA (WhatsApp, web, Instagram, llamadas): básico desde $500, completo desde $900.
-- Tienda en línea: esencial desde $900, completa desde $2,900.
-- Branding: logo desde $150, identidad completa desde $750.
-- Mantenimiento: desde $120 al mes.
+- Diseño web: landing desde ${usd(p.webLanding)}, rediseño desde ${usd(p.webRedesign)}, sitio completo desde ${usd(p.web)}.
+- SEO local (Google y Maps): arranque desde ${usd(p.seoInitial)}, plan mensual desde ${usd(p.seoLocal)} al mes.
+- SEO para IA (que ChatGPT, Gemini, Perplexity y Claude te recomienden): diagnóstico gratis, bases desde ${usd(p.aeoFoundations)}, seguimiento desde ${usd(p.aeoMonitoring)} al mes.
+- Asistentes de IA (WhatsApp, web, Instagram, llamadas): básico desde ${usd(p.iaBasic)}, completo desde ${usd(p.ia)}.
+- Tienda en línea: esencial desde ${usd(p.ecommerceEssential)}, completa desde ${usd(p.ecommerce)}.
+- Branding: logo desde ${usd(p.brandingLogo)}, identidad completa desde ${usd(p.branding)}.
+- Mantenimiento: desde ${usd(p.maintenance)} al mes.
 
 ## Houston, TX · 713-823-9144
 
@@ -58,3 +73,12 @@ Marcyan Studio pone la inteligencia artificial a trabajar para tu negocio: sitio
 - Email: contact@marcyanstudio.com
 - Houston: 713-823-9144 (llamada y WhatsApp) · Miami: 786-938-1754
 - [Formulario de contacto](https://marcyanstudio.com/es#contacto)
+`;
+
+export const GET: APIRoute = () =>
+  new Response(cuerpo, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600',
+    },
+  });

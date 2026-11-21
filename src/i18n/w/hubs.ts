@@ -30,21 +30,21 @@ export const DOMINIOS: Record<string, string> = { trr: 'texasrushremove.com', mj
 
 const PRECIO: Record<Lang, Record<IconoId, string>> = {
   es: {
-    'diseno-web': `desde ${usd(PRICE_ANCHORS.web)}`,
-    'ia-conversacional': `desde ${usd(PRICE_ANCHORS.ia)}`,
+    'diseno-web': `desde ${usd(PRICE_ANCHORS.webLanding)}`,
+    'ia-conversacional': `desde ${usd(PRICE_ANCHORS.iaBasic)}`,
     'seo-ia': 'Diagnóstico gratis',
-    ecommerce: `desde ${usd(PRICE_ANCHORS.ecommerce)}`,
-    'seo-local': `desde ${usd(PRICE_ANCHORS.seoLocal)}/mes`,
-    branding: `desde ${usd(PRICE_ANCHORS.branding)}`,
+    ecommerce: `desde ${usd(PRICE_ANCHORS.ecommerceEssential)}`,
+    'seo-local': `desde ${usd(PRICE_ANCHORS.seoInitial)}`,
+    branding: `desde ${usd(PRICE_ANCHORS.brandingLogo)}`,
     mantenimiento: `desde ${usd(PRICE_ANCHORS.maintenance)}/mes`,
   },
   en: {
-    'diseno-web': `from ${usd(PRICE_ANCHORS.web)}`,
-    'ia-conversacional': `from ${usd(PRICE_ANCHORS.ia)}`,
+    'diseno-web': `from ${usd(PRICE_ANCHORS.webLanding)}`,
+    'ia-conversacional': `from ${usd(PRICE_ANCHORS.iaBasic)}`,
     'seo-ia': 'Free diagnostic',
-    ecommerce: `from ${usd(PRICE_ANCHORS.ecommerce)}`,
-    'seo-local': `from ${usd(PRICE_ANCHORS.seoLocal)}/mo`,
-    branding: `from ${usd(PRICE_ANCHORS.branding)}`,
+    ecommerce: `from ${usd(PRICE_ANCHORS.ecommerceEssential)}`,
+    'seo-local': `from ${usd(PRICE_ANCHORS.seoInitial)}`,
+    branding: `from ${usd(PRICE_ANCHORS.brandingLogo)}`,
     mantenimiento: `from ${usd(PRICE_ANCHORS.maintenance)}/mo`,
   },
 };

@@ -39,7 +39,9 @@
     "test:brief-files": "node --experimental-test-module-mocks --no-warnings scripts/test-brief-files.mjs",
     "test:evals": "node scripts/test-evals.mjs",
     "eval:marcy": "node scripts/evals/run.mjs marcy",
-    "costes:chat": "node --env-file=.env.local scripts/chat-costes.mjs"
+    "costes:chat": "node --env-file=.env.local scripts/chat-costes.mjs",
+    "sync:catalogo": "node scripts/sync-catalogo.mjs",
+    "check:precios": "node scripts/verify-precios.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

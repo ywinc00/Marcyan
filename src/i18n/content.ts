@@ -4,6 +4,9 @@
 // Cada página /es/ /en/ importa su locale; los componentes son presentacionales.
 // (EN se añade al hacer el espejo /en/; por ahora el slice trabaja en ES.)
 // ─────────────────────────────────────────────────────────────
+import { PRICE_ANCHORS } from './pricing';
+import { usd } from './catalogo.generado';
+
 
 export type Locale = 'es' | 'en';
 
@@ -72,19 +75,19 @@ export const content = {
       // Teaser: lidera con el ancla baja de cada producto. Precios espejo de
       // src/i18n/pricing.ts (PRICE_ANCHORS); el catálogo completo vive en /es/servicios.
       items: [
-        { n: '01', icon: 'lucide:layout-template', title: 'Diseño web', price: 'desde $400', href: '/es/houston/diseno-web',
+        { n: '01', icon: 'lucide:layout-template', title: 'Diseño web', price: `desde ${usd(PRICE_ANCHORS.webLanding)}`, href: '/es/houston/diseno-web',
           desc: 'Sitios de alto impacto a medida: desde una landing que convierte hasta un sitio completo, rápido y bilingüe, listo para Google y la IA.' },
-        { n: '02', icon: 'lucide:messages-square', title: 'IA conversacional', price: 'desde $500', href: '/es/ia-para-pymes',
+        { n: '02', icon: 'lucide:messages-square', title: 'IA conversacional', price: `desde ${usd(PRICE_ANCHORS.iaBasic)}`, href: '/es/ia-para-pymes',
           desc: 'Asistentes que atienden a tus clientes, responden preguntas y captan prospectos las 24 horas, en español e integrados a tu sitio.' },
         { n: '03', icon: 'marcyan-ai', title: 'SEO para IA', price: 'Diagnóstico gratis', href: '/es/houston/seo-para-ia',
           desc: 'Que ChatGPT, Gemini y Meta AI te recomienden a ti cuando alguien busca lo que ofreces. Empieza con un diagnóstico de visibilidad gratis.' },
-        { n: '04', icon: 'lucide:shopping-bag', title: 'E-commerce y tiendas', price: 'desde $900', href: '/es/houston/ecommerce',
+        { n: '04', icon: 'lucide:shopping-bag', title: 'E-commerce y tiendas', price: `desde ${usd(PRICE_ANCHORS.ecommerceEssential)}`, href: '/es/houston/ecommerce',
           desc: 'Tiendas en línea para vender de verdad: catálogo, carrito y pagos seguros, en experiencia bilingüe, desde una tienda esencial hasta una a medida.' },
-        { n: '05', icon: 'lucide:search', title: 'SEO local', price: 'desde $300', href: '/es/houston/seo-local',
+        { n: '05', icon: 'lucide:search', title: 'SEO local', price: `desde ${usd(PRICE_ANCHORS.seoInitial)}`, href: '/es/houston/seo-local',
           desc: 'Aparece cuando tus clientes buscan en Google y en Maps. Optimizamos tu Perfil de Google, tu sitio y tus reseñas, una sola vez o mes a mes.' },
-        { n: '06', icon: 'lucide:palette', title: 'Branding e identidad', price: 'desde $150', href: '/es/houston/branding',
+        { n: '06', icon: 'lucide:palette', title: 'Branding e identidad', price: `desde ${usd(PRICE_ANCHORS.brandingLogo)}`, href: '/es/houston/branding',
           desc: 'Desde solo tu logo hasta una identidad completa: paleta, tipografías y guía de uso, hecha a la medida de tu negocio.' },
-        { n: '07', icon: 'lucide:wrench', title: 'Mantenimiento continuo', price: 'desde $120/mes', href: '#contacto',
+        { n: '07', icon: 'lucide:wrench', title: 'Mantenimiento continuo', price: `desde ${usd(PRICE_ANCHORS.maintenance)}/mes`, href: '#contacto',
           desc: 'Mantenemos tu sitio sano: disponibilidad, seguridad, respaldos periódicos y soporte bilingüe en Houston y Miami.' },
       ] as ServiceItem[],
     },
@@ -305,19 +308,19 @@ export const content = {
       cta: { label: 'See all services', href: '/en/services' },
       // Teaser: leads with each product's low anchor. Mirror of src/i18n/pricing.ts.
       items: [
-        { n: '01', icon: 'lucide:layout-template', title: 'Web Design', price: 'from $400', href: '/en/houston#servicios',
+        { n: '01', icon: 'lucide:layout-template', title: 'Web Design', price: `from ${usd(PRICE_ANCHORS.webLanding)}`, href: '/en/houston#servicios',
           desc: 'High-impact custom sites: from a landing page that converts to a complete, fast, bilingual site, ready for Google and AI.' },
-        { n: '02', icon: 'lucide:messages-square', title: 'Conversational AI', price: 'from $500', href: '/en/ai-for-small-business',
+        { n: '02', icon: 'lucide:messages-square', title: 'Conversational AI', price: `from ${usd(PRICE_ANCHORS.iaBasic)}`, href: '/en/ai-for-small-business',
           desc: 'Assistants that serve your customers, answer questions, and capture leads around the clock, in their language and built into your site.' },
         { n: '03', icon: 'marcyan-ai', title: 'AI SEO', price: 'Free audit', href: '/en/checkup',
           desc: 'Get recommended by ChatGPT, Gemini, and Meta AI when people search for what you offer. Starts with a free AI-visibility audit.' },
-        { n: '04', icon: 'lucide:shopping-bag', title: 'E-Commerce & Stores', price: 'from $900', href: '/en/houston#servicios',
+        { n: '04', icon: 'lucide:shopping-bag', title: 'E-Commerce & Stores', price: `from ${usd(PRICE_ANCHORS.ecommerceEssential)}`, href: '/en/houston#servicios',
           desc: 'Online stores built to actually sell: catalog, cart, and secure payments, in a bilingual experience, from an essential store to a custom one.' },
-        { n: '05', icon: 'lucide:search', title: 'Local SEO', price: 'from $300', href: '/en/houston#servicios',
+        { n: '05', icon: 'lucide:search', title: 'Local SEO', price: `from ${usd(PRICE_ANCHORS.seoInitial)}`, href: '/en/houston#servicios',
           desc: 'Show up when your customers search on Google and Maps. We optimize your Google Business Profile, your site, and your reviews, one-time or monthly.' },
-        { n: '06', icon: 'lucide:palette', title: 'Branding & Identity', price: 'from $150', href: '/en/houston#servicios',
+        { n: '06', icon: 'lucide:palette', title: 'Branding & Identity', price: `from ${usd(PRICE_ANCHORS.brandingLogo)}`, href: '/en/houston#servicios',
           desc: 'From just your logo to a full identity: palette, typography, and usage guide, made to measure for your business.' },
-        { n: '07', icon: 'lucide:wrench', title: 'Continuous Maintenance', price: 'from $120/mo', href: '#contacto',
+        { n: '07', icon: 'lucide:wrench', title: 'Continuous Maintenance', price: `from ${usd(PRICE_ANCHORS.maintenance)}/mo`, href: '#contacto',
           desc: 'We keep your site healthy: uptime, security, regular backups, and bilingual support in Houston and Miami.' },
       ] as ServiceItem[],
     },

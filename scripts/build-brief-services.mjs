@@ -22,21 +22,33 @@ import crypto from 'node:crypto';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const PRICING_ES = join(root, 'src/i18n/pricing.ts');
 const PRICING_EN = join(root, 'src/i18n/pricing.en.ts');
+const CATALOGO_TS = join(root, 'src/i18n/catalogo.generado.ts');
 export const OUT_FILE = join(root, 'lib/brief-services.generated.mjs');
 
 async function loadCatalogs() {
-  const es = await import(pathToFileURL(PRICING_ES).href);
-  // pricing.en.ts → temporal con el import de './pricing' apuntando al archivo real.
-  const enSrc = (await readFile(PRICING_EN, 'utf8'))
-    .replace(/from\s+'\.\/pricing'/g, `from '${pathToFileURL(PRICING_ES).href}'`)
-    .replace(/from\s+'\.\.\/lib\/schema'/g, `from '${pathToFileURL(join(root, 'src/lib/schema.ts')).href}'`);
-  const tmp = join(tmpdir(), `mrc-pricing-en-${crypto.randomBytes(6).toString('hex')}.ts`);
-  await writeFile(tmp, enSrc, 'utf8');
+  // Node quita los tipos de un .ts al importarlo, pero no resuelve imports sin
+  // extensión. pricing.ts importa './catalogo.generado' (la lista pública de
+  // precios) y pricing.en.ts importa './pricing': los dos se copian a un
+  // temporal con esas rutas resueltas a su archivo real.
+  const sufijo = crypto.randomBytes(6).toString('hex');
+  const tmpEs = join(tmpdir(), `mrc-pricing-es-${sufijo}.ts`);
+  const tmpEn = join(tmpdir(), `mrc-pricing-en-${sufijo}.ts`);
+  const resolver = (src) =>
+    src
+      .replace(/from\s+'\.\/catalogo\.generado'/g, `from '${pathToFileURL(CATALOGO_TS).href}'`)
+      .replace(/from\s+'\.\.\/lib\/schema'/g, `from '${pathToFileURL(join(root, 'src/lib/schema.ts')).href}'`);
+  const esSrc = resolver(await readFile(PRICING_ES, 'utf8'));
+  const enSrc = resolver(await readFile(PRICING_EN, 'utf8'))
+    .replace(/from\s+'\.\/pricing'/g, `from '${pathToFileURL(tmpEs).href}'`);
+  await writeFile(tmpEs, esSrc, 'utf8');
+  await writeFile(tmpEn, enSrc, 'utf8');
   try {
-    const en = await import(pathToFileURL(tmp).href);
+    const es = await import(pathToFileURL(tmpEs).href);
+    const en = await import(pathToFileURL(tmpEn).href);
     return { es, en };
   } finally {
-    await unlink(tmp).catch(() => {});
+    await unlink(tmpEs).catch(() => {});
+    await unlink(tmpEn).catch(() => {});
   }
 }
 

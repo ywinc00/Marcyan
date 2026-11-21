@@ -11,11 +11,10 @@ import type { FaqItem, CrumbItem, ListLink } from '../lib/schema';
 import type { RelatedLink } from './clusters';
 import { PRICE_ANCHORS } from './pricing';
 import { nap } from './content';
+import { usd } from './catalogo.generado';
 
 // Formato display de las cifras canónicas. Las CIFRAS salen SIEMPRE de
 // PRICE_ANCHORS (fuente única, guardada por check:kb); aquí solo se formatean
-// (pricing.ts no exporta su usd() y está vetado tocarlo).
-const usd = (n: number): string => '$' + n.toLocaleString('en-US');
 
 // href de marcado directo derivado del NAP real (fuente única en content.ts).
 const telHref = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
@@ -23,7 +22,7 @@ const telHref = 'tel:' + nap.houston.replace(/[^\d+]/g, '');
 // Cadena canónica de precios del hero — coherente con el FAQ de esta misma
 // página. OJO: SEO local mensual = seoLocal ($600/mes); seoInitial ($300) es
 // pago único y está PROHIBIDO mostrarlo como mensualidad.
-const priceChain = `Web desde ${usd(PRICE_ANCHORS.web)} · Landing desde ${usd(PRICE_ANCHORS.webLanding)} · SEO desde ${usd(PRICE_ANCHORS.seoLocal)}/mes`;
+const priceChain = `Web desde ${usd(PRICE_ANCHORS.webLanding)} · IA desde ${usd(PRICE_ANCHORS.iaBasic)} · SEO local desde ${usd(PRICE_ANCHORS.seoInitial)}`;
 
 export const houstonHub = {
   meta: {
@@ -70,12 +69,12 @@ export const houstonHub = {
     tag: 'Servicios en Houston',
     title: 'Todo para tu negocio, en una <em>sola agencia</em>',
     links: [
-      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Sitios a medida, rápidos y bilingües, listos para Google y la IA.', icon: 'lucide:layout-template', price: `desde ${usd(PRICE_ANCHORS.web)}` },
-      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Asistentes que contestan, agendan y captan prospectos 24/7, en español.', icon: 'lucide:messages-square', price: `desde ${usd(PRICE_ANCHORS.ia)}` },
-      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Aparece en Google Maps y en la IA.', icon: 'lucide:search', price: `desde ${usd(PRICE_ANCHORS.seoLocal)}/mes` },
+      { label: 'Diseño web en Houston', href: '/es/houston/diseno-web', desc: 'Sitios a medida, rápidos y bilingües, listos para Google y la IA.', icon: 'lucide:layout-template', price: `desde ${usd(PRICE_ANCHORS.webLanding)}` },
+      { label: 'IA conversacional en Houston', href: '/es/houston/ia-conversacional', desc: 'Asistentes que contestan, agendan y captan prospectos 24/7, en español.', icon: 'lucide:messages-square', price: `desde ${usd(PRICE_ANCHORS.iaBasic)}` },
+      { label: 'SEO local en Houston', href: '/es/houston/seo-local', desc: 'Aparece en Google Maps y en la IA.', icon: 'lucide:search', price: `desde ${usd(PRICE_ANCHORS.seoInitial)}` },
       { label: 'SEO para IA en Houston', href: '/es/houston/seo-para-ia', desc: 'Que ChatGPT y Gemini te recomienden.', icon: 'marcyan-ai', price: 'Diagnóstico gratis' },
-      { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'E-commerce que vende, con pagos y catálogo.', icon: 'lucide:shopping-bag', price: `desde ${usd(PRICE_ANCHORS.ecommerce)}` },
-      { label: 'Branding e identidad en Houston', href: '/es/houston/branding', desc: 'Logo, colores y tipografía con criterio experto.', icon: 'lucide:palette', price: `desde ${usd(PRICE_ANCHORS.branding)}` },
+      { label: 'Tienda en línea en Houston', href: '/es/houston/ecommerce', desc: 'E-commerce que vende, con pagos y catálogo.', icon: 'lucide:shopping-bag', price: `desde ${usd(PRICE_ANCHORS.ecommerceEssential)}` },
+      { label: 'Branding e identidad en Houston', href: '/es/houston/branding', desc: 'Logo, colores y tipografía con criterio experto.', icon: 'lucide:palette', price: `desde ${usd(PRICE_ANCHORS.brandingLogo)}` },
     ] as RelatedLink[],
   },
   // Directorio por industria: índice denso — subs mono de 3-6 palabras derivadas
@@ -137,7 +136,7 @@ export const houstonHub = {
       { q: '¿Tienen oficina en Houston?', a: 'Trabajamos como negocio de área de servicio: cubrimos Houston y toda su área metropolitana de forma remota y eficiente, sin una dirección pública. No necesitas ir a una oficina. Todo el proceso, de la propuesta a la entrega, lo hacemos en línea y en tu idioma.' },
       { q: '¿Trabajan en español e inglés?', a: 'Sí. Somos un equipo bilingüe enfocado en el mercado hispano de Estados Unidos. Diseñamos, escribimos y posicionamos en español e inglés, porque en Houston tus clientes buscan en ambos idiomas.' },
       { q: '¿Atienden solo a Houston o también el área metropolitana?', a: 'Cubrimos Houston y toda su área metropolitana (Katy, Sugar Land, The Woodlands, Pearland y más). Al ser negocio de área de servicio, podemos atenderte en las zonas donde realmente operas, sin necesidad de una dirección pública.' },
-      { q: '¿Cuánto cuestan sus servicios en Houston?', a: 'Publicamos nuestros precios de arranque: diseño web desde $1,500, IA desde $900, tienda en línea desde $2,900 y SEO local desde $600 al mes. El precio final depende del alcance, y siempre te lo damos por escrito antes de empezar. Puedes verlos todos en nuestra página de precios.' },
+      { q: '¿Cuánto cuestan sus servicios en Houston?', a: `Publicamos nuestros precios de arranque: diseño web desde ${usd(PRICE_ANCHORS.webLanding)}, asistente con IA desde ${usd(PRICE_ANCHORS.iaBasic)}, tienda en línea desde ${usd(PRICE_ANCHORS.ecommerceEssential)} y SEO local desde ${usd(PRICE_ANCHORS.seoInitial)} (el trabajo mensual, desde ${usd(PRICE_ANCHORS.seoLocal)} al mes). El precio final depende del alcance, y siempre te lo damos por escrito antes de empezar. Puedes verlos todos en nuestra página de precios.` },
       { q: '¿Por qué una agencia hispana local y no una grande?', a: 'Porque hablamos tu idioma, conocemos a tu cliente hispano y te damos atención cercana, con precios públicos y sin contratos que te aten. Reunimos algo que pocos ofrecen en conjunto: diseño web, IA conversacional y SEO, todo bilingüe y bajo un mismo equipo.' },
     ] as FaqItem[],
   },

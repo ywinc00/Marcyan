@@ -20,28 +20,29 @@
 
 import type { OfferItem, FaqItem, CrumbItem } from '../lib/schema';
 
-// ── Anclas de precio canónicas (USD, numéricas). FUENTE DE VERDAD. ──
+// ── Anclas de precio canónicas (USD, numéricas). ──
+// NO SE ESCRIBEN AQUÍ: salen del bloque `preciosPublicos` del catálogo de Ventas
+// (_cerebro/ventas/catalogo.json → src/i18n/catalogo.generado.ts).
+// Para cambiar un precio: se cambia en el catálogo y se corre
+// `npm run sync:catalogo`. `npm run check:precios` falla si no coinciden.
 // Espejadas en lib/chat-kb.mjs → PRICES. Guardadas por npm run check:kb.
 // (El diagnóstico AEO es GRATIS → no lleva número aquí; se modela como tier free.)
-export const PRICE_ANCHORS = {
-  web: 1500,
-  webLanding: 400,
-  webRedesign: 500,
-  ia: 900,
-  iaBasic: 500,
-  aeoFoundations: 500,
-  aeoMonitoring: 200,
-  ecommerce: 2900,
-  ecommerceEssential: 900,
-  seoLocal: 600,
-  seoInitial: 300,
-  branding: 750,
-  brandingLogo: 150,
-  maintenance: 120,
-} as const;
+//
+// Decisión del dueño (2026-11-19): lo que el sitio enseña son ANCLAS, el precio
+// más bajo que se acepta cobrar por cada servicio, siempre con «desde». La lista
+// interna de Ventas (planes, paquetes, precios por alcance) no se publica.
+//
+// REGLA DEL ANCLA: cuando se nombra una categoría, va primero su precio más
+// bajo (web → webLanding, IA → iaBasic, tienda → ecommerceEssential, marca →
+// brandingLogo, SEO local → seoInitial). El nivel alto (web, ia, ecommerce,
+// branding) solo aparece DESPUÉS, como «el sitio completo empieza en…».
+// `npm run check:precios` falla si una frase lidera con el nivel alto.
+import { CATALOGO, usd as usdCatalogo } from './catalogo.generado';
+
+export const PRICE_ANCHORS = CATALOGO.anclas;
 
 /** "$1,500" desde 1500. */
-const usd = (n: number): string => '$' + n.toLocaleString('en-US');
+const usd = usdCatalogo;
 
 // ── Tipos del catálogo ────────────────────────────────────────
 export interface CatalogTier {
@@ -294,7 +295,7 @@ export const preciosPage = {
   meta: {
     title: 'Precios — Diseño web, IA y SEO en Houston y Miami | Marcyan',
     description:
-      'Precios públicos y claros: diseño web desde $400, IA desde $500, SEO local desde $300 y un diagnóstico de visibilidad en IA gratis. Sin letra pequeña ni costos ocultos.',
+      `Precios públicos y claros: diseño web desde ${usd(PRICE_ANCHORS.webLanding)}, IA desde ${usd(PRICE_ANCHORS.iaBasic)}, SEO local desde ${usd(PRICE_ANCHORS.seoInitial)} y un diagnóstico de visibilidad en IA gratis. Sin letra pequeña ni costos ocultos.`,
   },
   path: '/es/precios',
   breadcrumb: [
@@ -304,15 +305,15 @@ export const preciosPage = {
   hero: {
     kicker: 'Precios públicos',
     h1: 'Precios <em>claros</em>, sin letra pequeña',
-    sub: 'Publicamos todo: desde una landing en $400 hasta el SEO mensual y el mantenimiento, lo que la mayoría de las agencias te esconde hasta tenerte en una llamada de ventas. Así de transparentes somos.',
+    sub: `Publicamos todo: desde una landing en ${usd(PRICE_ANCHORS.webLanding)} hasta el SEO mensual y el mantenimiento, lo que la mayoría de las agencias te esconde hasta tenerte en una llamada de ventas. Así de transparentes somos.`,
     primary: { label: 'Propuesta gratis', href: '#contacto' },
     secondary: { label: 'Ver qué incluye cada servicio', href: '#precios' },
-    chips: ['Desde $400 · diagnóstico IA gratis', 'Sin permanencia', 'Propuesta gratis en 24h'],
+    chips: [`Desde ${usd(PRICE_ANCHORS.webLanding)} · diagnóstico IA gratis`, 'Sin permanencia', 'Propuesta gratis en 24h'],
     tone: 'gold' as const,
   },
   answer: {
     q: '¿Cuánto cuesta trabajar con Marcyan?',
-    a: 'Depende del servicio, y por eso lo publicamos todo: una página web va desde $400 (un sitio a medida completo desde $1,500), un asistente con IA desde $500, el SEO local desde $300 y un logo desde $150. Hasta el precio recurrente (SEO mensual y mantenimiento) está publicado, y el diagnóstico de visibilidad en IA es gratis. Cada proyecto tiene un alcance y un precio claros por escrito, sin compromiso.',
+    a: `Depende del servicio, y por eso lo publicamos todo: una página web va desde ${usd(PRICE_ANCHORS.webLanding)} (un sitio a medida completo desde ${usd(PRICE_ANCHORS.web)}), un asistente con IA desde ${usd(PRICE_ANCHORS.iaBasic)}, el SEO local desde ${usd(PRICE_ANCHORS.seoInitial)} y un logo desde ${usd(PRICE_ANCHORS.brandingLogo)}. Hasta el precio recurrente (SEO mensual y mantenimiento) está publicado, y el diagnóstico de visibilidad en IA es gratis. Cada proyecto tiene un alcance y un precio claros por escrito, sin compromiso.`,
   },
   transparency: {
     tag: 'Por qué lo publicamos',

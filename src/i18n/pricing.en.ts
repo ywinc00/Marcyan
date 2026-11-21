@@ -218,7 +218,7 @@ export const preciosPage = {
   meta: {
     title: 'Pricing — Web design, AI and SEO in Houston and Miami | Marcyan',
     description:
-      'Public, clear pricing: web design from $400, AI from $500, local SEO from $300 and a free AI visibility checkup. No fine print, no hidden costs.',
+      `Public, clear pricing: web design from ${usd(PRICE_ANCHORS.webLanding)}, AI from ${usd(PRICE_ANCHORS.iaBasic)}, local SEO from ${usd(PRICE_ANCHORS.seoInitial)} and a free AI visibility checkup. No fine print, no hidden costs.`,
   },
   path: '/en/pricing',
   breadcrumb: [
@@ -228,15 +228,15 @@ export const preciosPage = {
   hero: {
     kicker: 'Public pricing',
     h1: '<em>Clear</em> pricing, no fine print',
-    sub: 'We publish it all: from a $400 landing page to monthly SEO and maintenance, the very things most agencies hide until they get you on a call. That is how transparent we are.',
+    sub: `We publish it all: from a ${usd(PRICE_ANCHORS.webLanding)} landing page to monthly SEO and maintenance, the very things most agencies hide until they get you on a call. That is how transparent we are.`,
     primary: { label: 'Get my free proposal', href: '#contacto' },
     secondary: { label: 'See what each service includes', href: '#precios' },
-    chips: ['From $400 · free AI checkup', 'No long-term contracts', 'Free proposal in 24h'],
+    chips: [`From ${usd(PRICE_ANCHORS.webLanding)} · free AI checkup`, 'No long-term contracts', 'Free proposal in 24h'],
     tone: 'gold' as const,
   },
   answer: {
     q: 'How much does it cost to work with Marcyan?',
-    a: 'It depends on the service, which is exactly why we publish it all: a website starts from $400 (a complete custom site from $1,500), an AI assistant from $500, local SEO from $300 and a logo from $150. Even the recurring pricing (monthly SEO and maintenance) is published, and the AI visibility checkup is free. Every project gets a clear scope and price in writing, with no commitment.',
+    a: `It depends on the service, which is exactly why we publish it all: a website starts from ${usd(PRICE_ANCHORS.webLanding)} (a complete custom site from ${usd(PRICE_ANCHORS.web)}), an AI assistant from ${usd(PRICE_ANCHORS.iaBasic)}, local SEO from ${usd(PRICE_ANCHORS.seoInitial)} and a logo from ${usd(PRICE_ANCHORS.brandingLogo)}. Even the recurring pricing (monthly SEO and maintenance) is published, and the AI visibility checkup is free. Every project gets a clear scope and price in writing, with no commitment.`,
   },
   transparency: {
     tag: 'Why we publish it',

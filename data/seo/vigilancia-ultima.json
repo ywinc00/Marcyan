@@ -1,16 +1,16 @@
 {
   "cliente": "marcyan",
-  "fecha": "2026-11-18",
+  "fecha": "2026-11-20",
   "primeraEjecucion": false,
   "sitemap": 54,
   "inspeccion": true,
-  "indexadas": 28,
+  "indexadas": 25,
   "inspeccionadas": 54,
   "porEstado": {
-    "Submitted and indexed": 28,
-    "Crawled - currently not indexed": 22,
+    "Submitted and indexed": 25,
+    "Crawled - currently not indexed": 25,
     "Alternate page with proper canonical tag": 2,
-    "URL is unknown to Google": 2
+    "Discovered - currently not indexed": 2
   },
   "porGrupo": {
     "home·en": {
@@ -31,7 +31,7 @@
     },
     "herramientas·en": {
       "total": 2,
-      "indexadas": 1
+      "indexadas": 0
     },
     "ciudades·en": {
       "total": 2,
@@ -55,7 +55,7 @@
     },
     "otras·es": {
       "total": 6,
-      "indexadas": 3
+      "indexadas": 2
     },
     "herramientas·es": {
       "total": 2,
@@ -71,16 +71,16 @@
     },
     "servicios·es": {
       "total": 2,
-      "indexadas": 1
+      "indexadas": 0
     },
     "precios·es": {
       "total": 1,
       "indexadas": 1
     }
   },
-  "sinRastreoReciente": 10,
+  "sinRastreoReciente": 7,
   "sinEnlacesInternosVistosPorGoogle": [],
-  "certificadoDias": 57,
+  "certificadoDias": 55,
   "medicion": {
     "idsEnSitio": {
       "G-4GJPX4PTRV": 54
@@ -114,11 +114,11 @@
   },
   "pulso": {
     "evento": "generate_lead",
-    "sesionesUltimos3Dias": 11,
-    "sesionesDiaHabitual": 9.3,
+    "sesionesUltimos3Dias": 3,
+    "sesionesDiaHabitual": 9.5,
     "contactosSemanaHabitual": 0.1,
-    "diasSinContactos": 4,
-    "probabilidadAzar": 0.9345
+    "diasSinContactos": 6,
+    "probabilidadAzar": 0.9001
   },
   "lectoresIa": {
     "bloqueadosPorRobots": {},
@@ -151,27 +151,35 @@
   "alertas": {
     "alta": [
       {
-        "fecha": "2026-11-18",
+        "fecha": "2026-11-20",
         "cliente": "marcyan",
         "nivel": "alta",
         "tipo": "indexacion",
         "detalle": "Salió del índice: Crawled - currently not indexed",
-        "url": "https://marcyanstudio.com/es/miami/doral"
+        "url": "https://marcyanstudio.com/es/ciudades"
       }
     ],
     "media": [
       {
-        "fecha": "2026-11-18",
+        "fecha": "2026-11-20",
+        "cliente": "marcyan",
+        "nivel": "media",
+        "tipo": "gsc",
+        "detalle": "URL Inspection falló en 8 URLs",
+        "url": null
+      },
+      {
+        "fecha": "2026-11-20",
         "cliente": "marcyan",
         "nivel": "media",
         "tipo": "rastreo",
-        "detalle": "10 páginas indexadas llevan más de 30 días sin visita de Google",
+        "detalle": "7 páginas indexadas llevan más de 30 días sin visita de Google",
         "url": null
       }
     ],
     "info": [
       {
-        "fecha": "2026-11-18",
+        "fecha": "2026-11-20",
         "cliente": "marcyan",
         "nivel": "info",
         "tipo": "google",
@@ -182,15 +190,23 @@
   },
   "alertasNuevas": [
     {
-      "fecha": "2026-11-18",
+      "fecha": "2026-11-20",
+      "cliente": "marcyan",
+      "nivel": "media",
+      "tipo": "gsc",
+      "detalle": "URL Inspection falló en 8 URLs",
+      "url": null
+    },
+    {
+      "fecha": "2026-11-20",
       "cliente": "marcyan",
       "nivel": "alta",
       "tipo": "indexacion",
       "detalle": "Salió del índice: Crawled - currently not indexed",
-      "url": "https://marcyanstudio.com/es/miami/doral"
+      "url": "https://marcyanstudio.com/es/ciudades"
     }
   ],
   "pedirIndexacion": [],
-  "colaPendiente": 35,
+  "colaPendiente": 37,
   "gscUi": "https://search.google.com/search-console?resource_id=sc-domain%3Amarcyanstudio.com"
 }

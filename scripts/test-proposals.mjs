@@ -196,6 +196,20 @@ function fakeDb({ catalog = CAT, leads = {}, clients = [9], briefs = ['MRC-050']
         return one(st.proposals.find((p) => p.created_by === params[0] && p.source_ref === params[1]));
       }
       if (/^SELECT .* FROM proposals WHERE ref_id = \$1 FOR UPDATE/.test(t)) return one(findP(params[0]));
+      if (/^SELECT lead_ref FROM proposals WHERE ref_id = \$1$/.test(t)) { const p = findP(params[0]); return one(p ? { lead_ref: p.lead_ref ?? null } : null); }
+      if (/^SELECT .* FROM proposals WHERE (lead_ref|brief_ref|client_id) = \$1 AND status IN \('draft', 'sent'\) ORDER BY created_at FOR UPDATE$/.test(t)) {
+        const col = t.match(/WHERE (lead_ref|brief_ref|client_id) = \$1/)[1];
+        const rows = st.proposals.filter((p) => String(p[col]) === String(params[0]) && ['draft', 'sent'].includes(p.status));
+        return { rowCount: rows.length, rows };
+      }
+      if (/^SELECT DISTINCT lead_ref FROM proposals WHERE status = 'sent' AND expires_on < \$1::date/.test(t)) {
+        const refs = [...new Set(st.proposals.filter((p) => p.status === 'sent' && p.expires_on < params[0] && p.lead_ref).map((p) => p.lead_ref))];
+        return { rowCount: refs.length, rows: refs.map((lead_ref) => ({ lead_ref })) };
+      }
+      if (/^SELECT ref_id FROM leads WHERE ref_id = ANY\(\$1::text\[\]\) ORDER BY ref_id FOR UPDATE$/.test(t)) {
+        const rows = params[0].filter((r) => st.leads[r]).sort().map((ref_id) => ({ ref_id }));
+        return { rowCount: rows.length, rows };
+      }
       if (/^SELECT .* FROM leads WHERE ref_id = \$1/.test(t)) {
         const l = st.leads[params[0]];
         return one(l ? { ref_id: params[0], ...l } : null);
@@ -826,6 +840,88 @@ await check('aviso (puro): el plazo es 24 horas después, en hora de Houston', (
   assert.equal(draftNotice({ proposal: { ref_id: 'PROP-091', status: 'draft', lead_ref: 'LEAD-1' }, author: 'marcy', briefRef: 'MRC-1' }), null);
   assert.equal(draftNotice({ proposal: { ref_id: 'PROP-092', status: 'sent', lead_ref: null }, author: 'marcy', briefRef: 'MRC-1' }), null);
   assert.equal(draftNotice({ proposal: { ref_id: 'PROP-093', status: 'draft', lead_ref: null }, author: 'orbit', briefRef: 'MRC-1' }), null);
+});
+
+// ── Una sola abierta por contacto, dentro de la transacción (7e) ──
+const P = (o) => ({ ref_id: 'PROP-100', lead_ref: 'LEAD-090', status: 'draft', created_by: 'orbit', source_ref: null, options: [], created_at: 'creada', updated_at: 'creada', ...o });
+const L90 = () => ({ 'LEAD-090': { status: 'diagnosed', converted_client_id: null } });
+const DIAG = { lead_ref: 'LEAD-090', created_by: 'diagnostic', source_ref: 'diag-90', options: [{ plan: 'crecimiento' }], skip_if_open: true };
+await check('skip_if_open: con una enviada o un borrador del contacto, no crea otra y devuelve la abierta', async () => {
+  for (const abierta of [P({ status: 'sent', sent_on: '2026-11-18', expires_on: '2026-12-02' }), P({ status: 'draft' })]) {
+    const db = fakeDb({ leads: L90(), proposals: [abierta] });
+    const r = await saveProposal(DIAG, deps(db));
+    assert.equal(r.created, false);
+    assert.equal(r.open, true);
+    assert.equal(r.proposal.ref_id, 'PROP-100');
+    assert.equal(db.st.inserts.length, 0, 'sin insertar');
+    assert.equal(db.st.events.length, 0, 'sin historial');
+  }
+});
+await check('skip_if_open: si las que tiene están cerradas (rechazada, aceptada o vencida), crea', async () => {
+  const db = fakeDb({ leads: L90(), proposals: [P({ status: 'rejected' }), P({ ref_id: 'PROP-101', status: 'expired' }), P({ ref_id: 'PROP-102', status: 'accepted' })] });
+  const r = await saveProposal(DIAG, deps(db));
+  assert.equal(r.created, true);
+});
+await check('skip_if_open: el borrador sin tocar de la misma conversación no bloquea (se sustituye); uno corregido sí', async () => {
+  const marcy = { lead_ref: 'LEAD-090', created_by: 'marcy', source_ref: 'chat:s90:b', replaces_prefix: 'chat:s90:', options: [{ plan: 'crecimiento' }], skip_if_open: true };
+  const db = fakeDb({ leads: L90(), proposals: [P({ created_by: 'marcy', source_ref: 'chat:s90:a' })] });
+  const r = await saveProposal(marcy, deps(db));
+  assert.equal(r.created, true);
+  assert.deepEqual(r.replaced, ['PROP-100']);
+  const db2 = fakeDb({ leads: L90(), proposals: [P({ created_by: 'marcy', source_ref: 'chat:s90:a', updated_at: 'corregida' })] });
+  const r2 = await saveProposal(marcy, deps(db2));
+  assert.equal(r2.created, false, 'el que corrigió el dueño es suyo');
+});
+await check('skip_if_open: comprueba con el contacto bloqueado y bloquea sus abiertas antes de guardar', async () => {
+  const db = fakeDb({ leads: L90(), proposals: [] });
+  await saveProposal(DIAG, deps(db));
+  const c = db.st.calls;
+  const lead = c.findIndex((t) => /FROM leads WHERE ref_id = \$1 FOR UPDATE/.test(t));
+  const open = c.findIndex((t) => /FROM proposals WHERE lead_ref = \$1 AND status IN \('draft', 'sent'\) ORDER BY created_at FOR UPDATE/.test(t));
+  const ins = c.findIndex((t) => /^INSERT INTO proposals/.test(t));
+  assert.ok(lead >= 0 && open > lead && ins > open, 'contacto, luego sus abiertas, luego guardar');
+  // Sin la opción, nada cambia: no se miran las abiertas.
+  const db2 = fakeDb({ leads: L90(), proposals: [P({ status: 'sent' })] });
+  const r2 = await saveProposal({ ...DIAG, skip_if_open: false }, deps(db2));
+  assert.equal(r2.created, true);
+  assert.ok(!db2.st.calls.some((t) => /status IN \('draft', 'sent'\) ORDER BY created_at FOR UPDATE/.test(t)));
+});
+await check('skip_if_open: en un brief bloquea el brief y mira las abiertas del brief', async () => {
+  const db = fakeDb({ proposals: [P({ lead_ref: null, brief_ref: 'MRC-050', status: 'sent' })] });
+  const r = await saveProposal({ brief_ref: 'MRC-050', created_by: 'marcy', source_ref: 'chat:b1:1', options: [{ plan: 'crecimiento' }], skip_if_open: true }, deps(db));
+  assert.equal(r.created, false);
+  assert.ok(db.st.calls.some((t) => /FROM briefs WHERE project_id = \$1 FOR UPDATE/.test(t)));
+});
+await check('orden de bloqueos: enviar, corregir, descartar, decidir y seguimiento bloquean primero el contacto', async () => {
+  const casos = [
+    ['enviar', (d) => sendProposal('PROP-100', d), P({})],
+    ['corregir', (d) => editProposal('PROP-100', { options: [{ plan: 'presencia' }] }, d), P({})],
+    ['descartar', (d) => discardProposal('PROP-100', d), P({})],
+    ['decidir', (d) => decideProposal('PROP-100', { status: 'rejected' }, d), P({ status: 'sent' })],
+    ['seguimiento', (d) => markFollowUpDone('PROP-100', d), P({ status: 'sent', sent_on: '2026-11-18' })],
+  ];
+  for (const [nombre, fn, row] of casos) {
+    const db = fakeDb({ leads: L90(), proposals: [row] });
+    await fn(deps(db));
+    const c = db.st.calls;
+    const lead = c.findIndex((t) => /FROM leads WHERE ref_id = \$1 FOR UPDATE/.test(t));
+    const prop = c.findIndex((t) => /FROM proposals WHERE ref_id = \$1 FOR UPDATE/.test(t));
+    assert.ok(lead >= 0 && prop > lead, nombre + ': primero el contacto');
+    assert.equal(c.filter((t) => /FROM leads WHERE ref_id = \$1 FOR UPDATE/.test(t)).length, 1, nombre + ': el contacto, una vez');
+  }
+  // Sin contacto (un brief), solo la propuesta.
+  const db = fakeDb({ proposals: [P({ lead_ref: null, brief_ref: 'MRC-050' })] });
+  await sendProposal('PROP-100', deps(db));
+  assert.ok(!db.st.calls.some((t) => /FROM leads/.test(t)));
+});
+await check('orden de bloqueos: al caducar, primero los contactos (en orden) y luego las propuestas', async () => {
+  const db = fakeDb({ leads: L90(), proposals: [P({ status: 'sent', expires_on: '2026-11-01' })] });
+  const r = await expireDueProposals(deps(db));
+  assert.deepEqual(r.expired, ['PROP-100']);
+  const c = db.st.calls;
+  const lk = c.findIndex((t) => /FROM leads WHERE ref_id = ANY\(\$1::text\[\]\) ORDER BY ref_id FOR UPDATE/.test(t));
+  const up = c.findIndex((t) => /^UPDATE proposals SET status = 'expired'/.test(t));
+  assert.ok(lk >= 0 && up > lk);
 });
 
 if (fails.length) {

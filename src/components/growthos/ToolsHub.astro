@@ -289,6 +289,7 @@ const cards = [
 
 <script>
   import { track } from '../../lib/track.js';
+  import { saveCalc } from '../../lib/calc-context.js';
   import { computeMissedCalls, computeNoShows, WEEKS_PER_MONTH } from '../../../lib/tools-formulas.mjs';
 
   const lang = document.documentElement.lang === 'en' ? 'en' : 'es';
@@ -363,6 +364,9 @@ const cards = [
         fill(input);
         breakdown();
         animateTo(compute());
+        // Ventas §5: el valor de un trabajo del visitante (solo si él movió ese control)
+        // viaja con su reclamo del diagnóstico hasta la propuesta.
+        if (input.dataset.role === 'ticket' || input.dataset.role === 'apptValue') saveCalc(type, Number(input.value));
         if (!started) { started = true; track('calculator_started', { type }); }
         clearTimeout(doneTimer);
         doneTimer = setTimeout(() => track('calculator_completed', { type, loss_bucket: bucket(compute()) }), 700);

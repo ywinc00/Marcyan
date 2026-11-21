@@ -29,7 +29,7 @@ const scoreLabel = lang === 'en' ? 'Score' : 'Puntaje';
 const ctaTitle = lang === 'en' ? 'Prefer to talk now?' : '¿Prefieres hablar ahora?';
 const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
 ---
-<section class="dgw" id="diagnostico-form" data-dgw data-lang={lang} aria-label={t.h1.replace(/<[^>]+>/g, '')}>
+<section class="dgw" id="diagnostico-form" data-dgw data-lang={lang} data-plan-why={JSON.stringify(t.planWhy)} aria-label={t.h1.replace(/<[^>]+>/g, '')}>
   <div class="dgw__wrap">
     <div class="dgw__stage">
 
@@ -137,11 +137,13 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
           <ul class="dgw__flist" data-findings></ul>
         </div>
 
-        <a class="dgw__rec" data-rec href="#" hidden data-track="tool_cta_clicked">
+        <!-- Plan recomendado (Ventas §5): informa, no enlaza. La única acción de la vista es
+             el botón dorado del formulario de abajo (D-10; design/diagnostico-plan.md). -->
+        <div class="dgw__rec" data-rec hidden>
           <span class="dgw__rec-lbl">{t.recommendedLabel}</span>
-          <span class="dgw__rec-svc" data-rec-svc></span>
-          <Icon name="lucide:arrow-right" />
-        </a>
+          <span class="dgw__rec-svc"><span data-rec-plan></span><span class="dgw__rec-tag" data-rec-tag></span></span>
+          <span class="dgw__rec-why" data-rec-why></span>
+        </div>
 
         <!-- Puente al chat: cumple la promesa del teaser "Marcy te lo explica en el chat".
              Dispara `mrc:ask` con el resultado (puntaje + señales del catálogo, sin PII);
@@ -319,15 +321,15 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
   .dgw__flist :global(li:last-child) { border-bottom: 0; padding-bottom: 0; }
   .dgw__flist :global(svg) { width: 18px; height: 18px; color: var(--accent-gold); margin-top: 1px; flex-shrink: 0; }
 
-  .dgw__rec { display: flex; align-items: center; gap: var(--space-3); text-decoration: none;
+  .dgw__rec { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: var(--space-3); row-gap: var(--space-2);
     padding: var(--space-4) var(--space-5); margin-bottom: var(--space-5);
-    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-md);
-    transition: box-shadow var(--duration-base) var(--ease); }
-  .dgw__rec:hover { box-shadow: var(--shadow-gold); }
+    background: var(--accent-gold-dim); border: 1px solid var(--accent-gold-line); border-radius: var(--radius-md); }
   .dgw__rec-lbl { font-family: var(--font-mono); font-size: var(--text-xs); letter-spacing: var(--tracking-wide);
                   text-transform: uppercase; color: var(--w-ink-60); }
   .dgw__rec-svc { color: var(--accent-gold); font-weight: 600; }
-  .dgw__rec svg { width: 18px; height: 18px; color: var(--accent-gold); margin-left: auto; }
+  .dgw__rec-tag { color: var(--fg-primary); font-weight: 400; }
+  .dgw__rec-tag:not(:empty)::before { content: ' · '; color: var(--w-ink-60); }
+  .dgw__rec-why { flex-basis: 100%; color: var(--fg-secondary); font-size: var(--text-sm); line-height: var(--leading-normal); }
 
   /* Puente a Marcy: tarjeta hermana de .dgw__rec, en teal (el color de Marcy). */
   .dgw__marcy { display: flex; align-items: center; gap: var(--space-3); width: 100%; text-align: left;
@@ -450,12 +452,14 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
 
 <script>
   import { track } from '../../lib/track.js';
+  import { readCalc } from '../../lib/calc-context.js';
 
   const root = document.querySelector('[data-dgw]');
   if (root) initWizard(root);
 
   function initWizard(root) {
     const lang = root.dataset.lang === 'en' ? 'en' : 'es';
+    const PLAN_WHY = (() => { try { return JSON.parse(root.dataset.planWhy || '{}'); } catch { return {}; } })();
     const ERR = {
       es: { net: 'No pudimos completar el análisis. Revisa tu conexión e inténtalo de nuevo.',
             rate: 'Hiciste varios análisis seguidos. Espera unos minutos e inténtalo otra vez.',
@@ -608,12 +612,16 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
         li.querySelector('span').textContent = text;
         ul.appendChild(li);
       });
-      // Ruta sugerida.
+      // Plan recomendado (nombre y frase del catálogo, sin precio) y su porqué.
       const rec = root.querySelector('[data-rec]');
-      if (data.recommended && data.recommended.href) {
-        rec.href = data.recommended.href;
-        root.querySelector('[data-rec-svc]').textContent = data.recommended.service || '';
+      const plan = data.plan;
+      if (plan && plan.name) {
+        root.querySelector('[data-rec-plan]').textContent = plan.name;
+        root.querySelector('[data-rec-tag]').textContent = plan.tagline || '';
+        root.querySelector('[data-rec-why]').textContent = (PLAN_WHY && PLAN_WHY[plan.frente]) || '';
         rec.hidden = false;
+      } else {
+        rec.hidden = true;
       }
       showView('result');
       // Dispara el count-up del anillo.
@@ -671,7 +679,7 @@ const contactLabel = lang === 'en' ? 'Contact form' : 'Formulario de contacto';
         const r = await fetch('/api/diagnostic', {
           method: 'POST', headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
-            action: 'claim', ref, lang, sid: sid(), website_hp: '',
+            action: 'claim', ref, lang, sid: sid(), website_hp: '', calc: readCalc(),
             name: (fd.get('name') || '').toString().trim(), email, phone,
           }),
         });

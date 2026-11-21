@@ -11,7 +11,8 @@ import { analyzeSite, fallbackReport, plainSummary, recommendService } from '../
 import { recommendPlan, planText, PLAN_OK_THRESHOLD } from '../lib/diagnostic-plan.mjs';
 import { PLANES } from '../lib/planes.generado.mjs';
 import { parseCalcValue, calcValueLine, CALC_RANGES } from '../lib/calc-value.mjs';
-import { optionsFromCatalog, runDiagnosticFunnel, DIAGNOSTIC_DRAFTS } from '../lib/diagnostic-funnel.mjs';
+import { optionsFromCatalog, runDiagnosticFunnel, DIAGNOSTIC_DRAFTS, DIAGNOSTIC_PREFIX, isReplaceableDraft } from '../lib/diagnostic-funnel.mjs';
+import { saveProposal, priceOption } from '../lib/proposals.mjs';
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 let pass = 0;
@@ -154,8 +155,14 @@ await check('plainSummary y fallbackReport nombran el plan, sin servicio suelto'
 });
 
 // ── Embudo de Orbit ──
+// Catálogo de juguete con la forma del de Ventas (cifras inventadas de 1 a 4, ninguna real):
+// pC solo trae «desde», como los proyectos que Orbit deja «por confirmar».
 const CAT = {
-  planes: { base: { enPropuestas: false }, presencia: { enPropuestas: true }, crecimiento: { enPropuestas: true }, dominio: { enPropuestas: true } },
+  planes: {
+    base: { nombre: 'B', mensual: 1, enPropuestas: false }, presencia: { nombre: 'P', mensual: 2, enPropuestas: true },
+    crecimiento: { nombre: 'C', mensual: 3, enPropuestas: true }, dominio: { nombre: 'D', mensual: 4, enPropuestas: true },
+  },
+  proyectos: { pA: { nombre: 'A', precio: 1 }, pB: { nombre: 'B', precio: 2 }, pC: { nombre: 'C', desde: 3 } },
   paquetes: [
     { plan: 'presencia', proyecto: 'pA', orden: 3, papel: 'entrada' },
     { plan: 'dominio', proyecto: 'pC', orden: 1, papel: 'ancla' },
@@ -180,7 +187,8 @@ function fakes({ existing = [], saveErr = null, advErr = null } = {}) {
       advance: async (...a) => { calls.advance.push(a); if (advErr) throw advErr; return { moved: true }; },
       list: async () => existing,
       catalog: async () => ({ body: CAT }),
-      save: async (i) => { calls.save.push(i); if (saveErr) throw saveErr; return { created: true }; },
+      // Como saveProposal: con replaces_prefix devuelve siempre `replaced` (vacío si no había nada).
+      save: async (i) => { calls.save.push(i); if (saveErr) throw saveErr; return { created: true, ...(i.replaces_prefix ? { replaced: [] } : {}) }; },
       notify: async (n) => { calls.notify.push(n); },
     },
   };
@@ -204,6 +212,127 @@ await check('embudo: no crea otra propuesta si el contacto ya tiene una abierta'
   assert.equal(r.draft, 'exists');
   assert.equal(f.calls.save.length, 0);
 });
+// Borradores que ya tiene el contacto (como los devuelve listProposals: created_at y updated_at).
+const T0 = new Date('2026-11-21T10:00:00Z');
+const T1 = new Date('2026-11-21T11:30:00Z');
+const diagDraft = (extra = {}) => ({ status: 'draft', created_by: 'diagnostic', source_ref: 'DGN-020', created_at: T0, updated_at: T0, ...extra });
+
+await check('embudo: pide a Orbit sustituir los borradores del diagnóstico con su folio (replaces_prefix válido)', async () => {
+  // Fijado a mano: los folios son DGN-001…DGN-999 y siguen en DGN-1000 (009_growth_os.sql).
+  assert.equal(DIAGNOSTIC_PREFIX, 'DGN-');
+  for (const ref of ['DGN-001', 'DGN-099', 'DGN-100', 'DGN-999', 'DGN-1000']) {
+    const f = fakes();
+    await runDiagnosticFunnel({ ref, leadRef: 'LEAD-030', plan: 'dominio' }, f.deps);
+    const s = f.calls.save[0];
+    assert.equal(s.replaces_prefix, 'DGN-', ref);
+    // La misma regla que valida saveProposal: principio del source_ref, 3 letras o más y distinto.
+    assert.ok(s.replaces_prefix.length >= 3 && s.source_ref.startsWith(s.replaces_prefix) && s.source_ref !== s.replaces_prefix, ref);
+  }
+});
+await check('embudo: el mismo contacto repite el diagnóstico → el borrador nuevo sustituye al anterior sin tocar', async () => {
+  const f = fakes({ existing: [diagDraft()] });
+  f.deps.save = async (i) => { f.calls.save.push(i); return { created: true, replaced: ['PRP-007'] }; };
+  const r = await runDiagnosticFunnel({ ref: 'DGN-021', leadRef: 'LEAD-030', plan: 'presencia' }, f.deps);
+  assert.deepEqual(r, { stage: 'moved', draft: 'replaced' });
+  assert.equal(f.calls.save.length, 1);
+});
+await check('embudo: un borrador del diagnóstico que el dueño ya corrigió es suyo → no se crea otro', async () => {
+  const f = fakes({ existing: [diagDraft({ updated_at: T1 })] });
+  const r = await runDiagnosticFunnel({ ref: 'DGN-022', leadRef: 'LEAD-031', plan: 'dominio' }, f.deps);
+  assert.equal(r.draft, 'exists');
+  assert.equal(f.calls.save.length, 0);
+});
+await check('embudo: un borrador de Orbit o de Marcy, o una enviada, bloquean; las cerradas no', async () => {
+  for (const p of [
+    { status: 'draft', created_by: 'orbit', source_ref: null, created_at: T0, updated_at: T0 },
+    { status: 'draft', created_by: 'marcy', source_ref: 'chat:abc:1', created_at: T0, updated_at: T0 },
+    diagDraft({ status: 'sent' }),
+  ]) {
+    const f = fakes({ existing: [p] });
+    const r = await runDiagnosticFunnel({ ref: 'DGN-023', leadRef: 'LEAD-032', plan: 'dominio' }, f.deps);
+    assert.equal(r.draft, 'exists', JSON.stringify(p));
+    assert.equal(f.calls.save.length, 0);
+  }
+  for (const status of ['accepted', 'rejected', 'expired']) {
+    const f = fakes({ existing: [diagDraft({ status })] });
+    const r = await runDiagnosticFunnel({ ref: 'DGN-024', leadRef: 'LEAD-033', plan: 'dominio' }, f.deps);
+    assert.equal(r.draft, 'created', status);
+  }
+});
+await check('embudo: un borrador sustituible junto a otra abierta del dueño → no se crea nada (en cualquier orden)', async () => {
+  const otra = { status: 'sent', created_by: 'orbit', source_ref: null, created_at: T1, updated_at: T1 };
+  for (const existing of [[diagDraft(), otra], [otra, diagDraft()]]) {
+    const f = fakes({ existing });
+    const r = await runDiagnosticFunnel({ ref: 'DGN-026', leadRef: 'LEAD-035', plan: 'dominio' }, f.deps);
+    assert.equal(r.draft, 'exists');
+    assert.equal(f.calls.save.length, 0);
+  }
+});
+await check('embudo: pide a Orbit la regla dentro de su transacción (skip_if_open) y respeta su «ya hay otra abierta»', async () => {
+  // Carrera: el atajo no vio nada, pero dentro de la transacción Orbit encontró otra abierta.
+  const f = fakes();
+  f.deps.save = async (i) => { f.calls.save.push(i); return { created: false, open: true, proposal: { status: 'sent' } }; };
+  const r = await runDiagnosticFunnel({ ref: 'DGN-027', leadRef: 'LEAD-036', plan: 'dominio' }, f.deps);
+  assert.equal(f.calls.save[0].skip_if_open, true);
+  assert.deepEqual(r, { stage: 'moved', draft: 'exists' });
+  assert.equal(f.calls.notify.length, 0, 'no es un fallo: no se avisa');
+});
+await check('isReplaceableDraft: solo borrador del diagnóstico, con folio DGN y sin tocar', () => {
+  assert.equal(isReplaceableDraft(diagDraft()), true);
+  assert.equal(isReplaceableDraft(diagDraft({ created_at: '2026-11-21T10:00:00.000Z', updated_at: '2026-11-21T10:00:00Z' })), true, 'fechas en texto');
+  assert.equal(isReplaceableDraft(diagDraft({ updated_at: T1 })), false);
+  assert.equal(isReplaceableDraft(diagDraft({ source_ref: 'chat:x' })), false);
+  assert.equal(isReplaceableDraft(diagDraft({ created_by: 'marcy' })), false);
+  assert.equal(isReplaceableDraft(diagDraft({ created_at: null, updated_at: null })), false, 'sin fechas no se da por intacto');
+  assert.equal(isReplaceableDraft(null), false);
+});
+await check('contrato con Orbit: saveProposal acepta lo que manda el embudo (sin precios ni cifras propias)', async () => {
+  const f = fakes();
+  await runDiagnosticFunnel({ ref: 'DGN-025', leadRef: 'LEAD-034', plan: 'crecimiento', clientValueCents: 120000 }, f.deps);
+  const input = f.calls.save[0];
+  for (const o of input.options) {
+    assert.deepEqual(Object.keys(o).sort(), ['plan', 'projects']);
+    for (const p of o.projects) assert.deepEqual(Object.keys(p), ['id'], 'solo el proyecto: el precio lo pone Orbit o queda «por confirmar»');
+  }
+  // saveProposal real con una base de juguete: deja pasar la validación, el catálogo y los precios
+  // de cada opción (priceOption) y se corta al ir a buscar el contacto. Si llega ahí, lo aceptó.
+  const SENTINEL = new Error('opciones aceptadas');
+  const seen = [];
+  const fakeDb = {
+    query: async (t) => {
+      seen.push(t.trim().split(/\s+/).slice(0, 2).join(' '));
+      if (/^(BEGIN|ROLLBACK)/.test(t)) return { rows: [], rowCount: 0 };
+      if (/FROM proposals WHERE created_by/.test(t)) return { rows: [], rowCount: 0 };
+      if (/FROM sales_catalog/.test(t)) return { rows: [{ version: 'juguete', body: CAT }], rowCount: 1 };
+      throw SENTINEL;
+    },
+    release() {},
+  };
+  await assert.rejects(saveProposal(input, { connect: async () => fakeDb }), (e) => e === SENTINEL);
+  assert.ok(seen.some((s) => /^SELECT version/.test(s)), 'llegó a leer el catálogo');
+  // Y opción a opción: el proyecto con solo «desde» queda «por confirmar», sin cifra nuestra.
+  const priced = input.options.map((o, i) => priceOption(CAT, o, { author: 'diagnostic', index: i }));
+  assert.deepEqual(priced.map((p) => !!p.pending), [true, false, false]);
+  // Un paquete que apunte a un proyecto que no existe lo rechaza Orbit: esta prueba lo vería.
+  const roto = { ...CAT, paquetes: [{ plan: 'dominio', proyecto: 'noExiste', orden: 1 }] };
+  assert.throws(() => priceOption(roto, optionsFromCatalog(roto, 'dominio').options[0], { author: 'diagnostic' }));
+});
+await check('contrato con el catálogo real (si está en este equipo): Orbit acepta los paquetes del diagnóstico', async () => {
+  let cat = null;
+  try {
+    const { CATALOGO_JSON } = await import('./sync-catalogo.mjs');
+    cat = JSON.parse(readFileSync(CATALOGO_JSON, 'utf8'));
+  } catch { /* sin catálogo privado en este equipo */ }
+  assert.ok(cat || !process.env.MARCYAN_EXIGIR_CATALOGO, 'no encontré el catálogo');
+  if (!cat) return;
+  for (const plan of ['presencia', 'crecimiento', 'dominio', null]) {
+    const built = optionsFromCatalog(cat, plan);
+    assert.ok(built && built.options.length, `sin paquetes para ${plan}`);
+    // Sin mostrar cifras: solo si Orbit lo acepta o no.
+    built.options.forEach((o, i) => assert.doesNotThrow(() => priceOption(cat, o, { author: 'diagnostic', index: i }), `${plan}: opción ${i} (${o.plan})`));
+  }
+});
+
 await check('embudo: con el tope de correo saltado no deja borrador', async () => {
   const f = fakes();
   const r = await runDiagnosticFunnel({ ref: 'DGN-012', leadRef: 'LEAD-022', plan: 'presencia', allowDraft: false }, f.deps);
@@ -236,12 +365,13 @@ await check('embudo: sin folio o sin contacto no hace nada', async () => {
   assert.deepEqual(await runDiagnosticFunnel({ ref: '', leadRef: 'LEAD-1', plan: 'dominio' }, f.deps), { stage: 'skipped', draft: 'off' });
   assert.equal(f.calls.advance.length, 0);
 });
-await check('embudo: el borrador está apagado hasta que Orbit deje editarlo', async () => {
-  assert.equal(DIAGNOSTIC_DRAFTS, false);
+await check('embudo: el borrador está encendido (OK del dueño del 2026-11-21)', async () => {
+  assert.equal(DIAGNOSTIC_DRAFTS, true);
   const f = fakes();
   const r = await runDiagnosticFunnel({ ref: 'DGN-014', leadRef: 'LEAD-024', plan: 'dominio' }, { ...f.deps, drafts: undefined });
-  assert.deepEqual(r, { stage: 'moved', draft: 'off' });
-  assert.equal(f.calls.save.length, 0);
+  assert.deepEqual(r, { stage: 'moved', draft: 'created' });
+  assert.equal(f.calls.save.length, 1);
+  assert.equal(f.calls.save[0].send, false, 'encendido, pero siempre en borrador: lo envía el dueño');
 });
 
 if (fails.length) {

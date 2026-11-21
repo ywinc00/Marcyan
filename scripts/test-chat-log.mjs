@@ -1,6 +1,6 @@
 // Pruebas del registro de conversaciones de Marcy para Orbit (sin base: sql simulado).
 import assert from 'node:assert/strict';
-import { recordTurn, linkLead, deleteConversation, deriveOutcome, failurePoint, summarize, funnel, LIVE_MS, IDLE_MS } from '../lib/chat-log.mjs';
+import { recordTurn, linkLead, webSid, deleteConversation, deriveOutcome, failurePoint, summarize, funnel, LIVE_MS, IDLE_MS } from '../lib/chat-log.mjs';
 import { applyFilter, funnelSteps, motivosOrdenados, recorrido, leadHref, usd } from '../src/components/dashboard/lib/marcy.js';
 import { lastUserText } from '../api/chat.mjs';
 import { ownerUpdates, markOwnerTyping } from '../lib/takeover.mjs';
@@ -51,6 +51,17 @@ await check('lead: tipos válidos y un paso a persona no pisa un lead', async ()
   assert.equal(await linkLead({ sid: 'abc', ref: null, kind: 'otro', sqlImpl: sql }), false);
   assert.equal(await linkLead({ sid: undefined, ref: 'LEAD-1', kind: 'lead', sqlImpl: sql }), false);
   assert.match(calls[0].text, /lead_kind IS NULL/);
+});
+await check('lead: una ruta pública no une un lead a una conversación de WhatsApp, Instagram o teléfono', async () => {
+  const { sql, calls } = fakeSql();
+  for (const sid of ['wa-17135550000', 'ig-123456', 'tel-CA9f', 'WA-17135550000']) {
+    assert.equal(await linkLead({ sid, ref: 'LEAD-1', kind: 'lead', sqlImpl: sql }), false, sid);
+  }
+  assert.equal(calls.length, 0, 'ni siquiera pregunta a la base');
+  assert.equal(await linkLead({ sid: 'wa-17135550000', ref: 'LEAD-1', kind: 'lead', fromChannel: true, sqlImpl: sql }), true, 'el canal sí');
+  assert.equal(await linkLead({ sid: '6f1c2b0e-9a4d-4c3e-8f7a-2b1d0c9e8a7f', ref: 'LEAD-2', kind: 'lead', sqlImpl: sql }), true, 'el widget (UUID) sí');
+  assert.equal(webSid('wa-1'), false);
+  assert.equal(webSid('1700000000000abc123'), true, 'el id de respaldo del widget');
 });
 
 await check('resultado: lead o brief = cerrada; handoff = transferida', () => {

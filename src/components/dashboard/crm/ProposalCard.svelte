@@ -2,12 +2,14 @@
   // La propuesta de un contacto en su ficha (Ventas §1): primero sus seguimientos (días 2, 5
   // y 10 desde que se envió), después la propuesta con sus opciones (D-02: la recomendada
   // marcada, el precio real y lo mensual, en cuántos trabajos se paga) y lo que se puede hacer
-  // según su estado: un borrador se marca como enviado; una enviada o vencida se decide
-  // (eligió una opción o la rechazó). Aceptar no convierte en cliente: eso es «Ganado».
+  // según su estado: un borrador se corrige, se descarta o se marca como enviado (si le falta
+  // el precio real de un servicio que solo tiene «desde», primero se corrige); una enviada o
+  // vencida se decide (eligió una opción o la rechazó). Aceptar no convierte en cliente: eso es «Ganado».
   import Card from '../ui/Card.svelte';
   import StatusChip from '../ui/StatusChip.svelte';
   import Icon from '../ui/Icon.svelte';
   import ConfirmDialog from '../ui/ConfirmDialog.svelte';
+  import ProposalDialog from './ProposalDialog.svelte';
   import { api } from '../lib/api.js';
   import { toast, toastError } from '../lib/toast.svelte.js';
   import { money, dayLabel, daysBetween, houstonToday, whatsappHref, PROPOSAL_AUTHOR } from './crm.js';
@@ -49,6 +51,10 @@
     } finally { busy = ''; }
   }
   let askReject = $state(false);
+  let askDiscard = $state(false);
+  let editOpen = $state(false);
+  // Los servicios sin precio real (en el catálogo solo tienen «desde»).
+  const pending = $derived(p.options.flatMap((o) => (o.projects || []).filter((x) => x.pending_price).map((x) => x.name)));
 </script>
 
 {#if steps.length}
@@ -92,9 +98,10 @@
           <span class="opt__plan">{o.plan?.name || o.projects?.[0]?.name || `Opción ${i + 1}`}</span>
           {#if isChosen}<StatusChip tone="success" label="La eligió" />{:else if isRec}<span class="opt__tag">recomendada</span>{/if}
         </div>
-        {#if o.plan && o.projects?.length}<span class="opt__with">+ {o.projects.map((x) => x.name).join(' + ')}</span>{/if}
-        <span class="opt__price num">{money(o.project_cents)}</span>
+        {#if o.plan && (o.projects?.length || o.addons?.length)}<span class="opt__with">+ {[...(o.projects || []), ...(o.addons || [])].map((x) => x.name).join(' + ')}</span>{/if}
+        <span class="opt__price num">{o.pending ? 'desde ' : ''}{money(o.project_cents)}</span>
         <span class="opt__sub">{o.monthly_cents ? `+ ${money(o.monthly_cents)}/mes` : 'sin mensualidad'}{o.pays_back_jobs ? ` · se paga con ${o.pays_back_jobs} ${o.pays_back_jobs === 1 ? 'cliente nuevo' : 'clientes nuevos'} al mes` : ''}</span>
+        {#if o.pending}<span class="opt__pend">falta el precio de {(o.projects || []).filter((x) => x.pending_price).map((x) => `«${x.name}»`).join(', ')}</span>{/if}
         {#if open}
           <button type="button" class="b b--mini opt__pick" disabled={!!busy}
             onclick={() => act({ action: 'decide', status: 'accepted', chosen_option: i }, `Eligió ${o.plan?.name || 'la opción ' + (i + 1)}`, 'pick' + i)}>{busy === 'pick' + i ? 'Guardando…' : 'Eligió esta'}</button>
@@ -112,12 +119,24 @@
   <div class="foot">
     <span class="who">{PROPOSAL_AUTHOR[p.created_by] || 'La hiciste tú en Orbit'}{p.sent_on ? `; enviada el ${dayLabel(p.sent_on)}` : ''}.</span>
     {#if eff === 'draft'}
-      <button type="button" class="b b--mini" disabled={!!busy} onclick={() => act({ action: 'send' }, 'Propuesta marcada como enviada', 'send')}>{busy === 'send' ? 'Guardando…' : 'Marcar como enviada'}</button>
+      <span class="acts">
+        <button type="button" class="b b--mini b--ghost" disabled={!!busy} onclick={() => (askDiscard = true)}>Descartar</button>
+        <button type="button" class="b b--mini" disabled={!!busy} onclick={() => (editOpen = true)}>{pending.length ? 'Poner el precio' : 'Corregir'}</button>
+        {#if !pending.length}
+          <button type="button" class="b b--mini acts__send" disabled={!!busy} onclick={() => act({ action: 'send' }, 'Propuesta marcada como enviada', 'send')}>{busy === 'send' ? 'Guardando…' : 'Marcar como enviada'}</button>
+        {/if}
+      </span>
     {:else if open}
       <button type="button" class="b b--mini b--ghost" disabled={!!busy} onclick={() => (askReject = true)}>La rechazó</button>
     {/if}
   </div>
 </Card>
+
+<ConfirmDialog bind:open={askDiscard} title="¿Descartar el borrador?" confirmLabel="Sí, descartarlo" busy={busy === 'dis'}
+  message={p.lead_ref ? 'El borrador se borra y queda apuntado en el historial del contacto. Después puedes hacer otra propuesta.' : 'El borrador se borra. Después puedes hacer otra propuesta.'}
+  onconfirm={async () => { await act({ action: 'discard' }, 'Borrador descartado', 'dis'); askDiscard = false; }} />
+
+{#if eff === 'draft'}<ProposalDialog bind:open={editOpen} proposal={p} onsaved={() => onchanged?.()} />{/if}
 
 <ConfirmDialog bind:open={askReject} title="¿La rechazó?" danger={false} confirmLabel="Sí, la rechazó" busy={busy === 'rej'}
   message="La propuesta queda como rechazada y deja de pedir seguimientos. El contacto sigue en su etapa: si ya no sigue, márcalo como perdido."
@@ -156,6 +175,7 @@
     .opts .opt__with { display: block; }
     .opts .opt__price { display: inline; font-size: var(--dash-card-title); font-weight: 600; margin: 0; letter-spacing: 0; }
     .opts .opt__sub { display: inline; margin: 0 0 0 var(--space-1); }
+    .opts .opt__pend { display: flex; margin-top: var(--space-1); }
     .opts .opt__pick { position: absolute; right: var(--space-3); top: 50%; transform: translateY(-50%); margin: 0; }
   }
   .opt { display: flex; flex-direction: column; gap: 4px; padding: var(--space-3) var(--space-4); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-elevated); min-width: 0; }
@@ -173,4 +193,17 @@
   .value b { color: var(--fg-primary); font-weight: 600; }
   .foot { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--border-subtle); }
   .who { font-size: var(--dash-small); color: var(--fg-subtle); }
+  .acts { display: inline-flex; gap: var(--space-2); flex-wrap: wrap; margin-left: auto; }
+  /* Teléfono: enviar arriba y a lo ancho; corregir y descartar en una fila debajo. */
+  @media (max-width: 719px) {
+    .acts { width: 100%; display: grid; grid-template-columns: 1fr 1fr; margin-left: 0; }
+    .acts .b { justify-content: center; min-height: 44px; }
+    .acts .acts__send { grid-column: 1 / -1; order: -1; }
+  }
+  /* «Por confirmar», con la gramática de las pastillas: el punto lleva el color y el texto se lee. */
+  .opt__pend { display: inline-flex; align-items: baseline; gap: var(--space-2); font-size: var(--dash-caption); color: var(--fg-secondary); line-height: 1.45; }
+  .opt__pend::before { content: ''; flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%; background: var(--color-warning); transform: translateY(-1px); }
+  /* Sobre el fondo de la recomendada, lo mensual necesita más contraste (4,5:1). */
+  .opt--rec .opt__sub { color: var(--fg-secondary); }
+  @media (forced-colors: active) { .opt__pend::before { background: CanvasText; } }
 </style>

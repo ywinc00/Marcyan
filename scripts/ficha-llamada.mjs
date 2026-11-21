@@ -76,6 +76,7 @@ export function seccionVenta(d, ahora = new Date()) {
   const valor = p.client_value_cents == null ? null : Number(p.client_value_cents);
   (Array.isArray(p.options) ? p.options : []).forEach((o, i) => {
     const marcas = [
+      o.pending ? 'precio por confirmar' : '',
       p.options.length > 1 && p.recommended_option === i ? 'recomendada' : '',
       p.chosen_option === i ? 'la eligió' : '',
       valor > 0 && o.monthly_cents > 0 ? `se paga con ${Math.ceil(o.monthly_cents / valor)} clientes nuevos al mes` : '',

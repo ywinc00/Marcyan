@@ -77,6 +77,14 @@ await check('venta: vencida sin respuesta, aceptada con la elegida y perdido con
   assert.match(perdido, /Motivo: Precio · Nota: Le pareció caro/);
   assert.match(perdido, /Sin propuesta todavía/);
 });
+await check('venta: un borrador con un precio por confirmar lo dice y pide ponerlo', () => {
+  const borrador = { ...PROP, status: 'draft', sent_on: null, expires_on: null, next_follow_up_on: null, follow_ups_done: 0, created_at: '2026-11-20T15:00:00Z',
+    options: [{ ...PROP.options[0], pending: true, projects: [{ name: 'Web por ciudades', pending_price: true }] }, PROP.options[1]] };
+  const md = armarFicha({ lead: { ...EN_VENTA, status: 'diagnosed' }, propuestas: [borrador], eventos: [], convs: [], turnos: [], citas: [] }, new Date('2026-11-20T18:00:00Z'));
+  assert.match(md, /Siguiente paso: Poner precio \(hoy\)/);
+  assert.match(md, /- Dominio \+ Web por ciudades: desde \$1,234 \+ \$456\/mes \(precio por confirmar, /);
+  assert.match(md, /- Crecimiento \+ Web que vende: \$789 \+ \$321\/mes \(recomendada/);
+});
 await check('venta: sin el permiso nuevo la ficha sale igual y lo dice', async () => {
   const c = { query: async (t) => {
     if (/stage_changed_at/.test(t) || /FROM proposals/.test(t)) { const e = new Error('permission denied'); e.code = '42501'; throw e; }

@@ -1,12 +1,14 @@
 // /api/admin/proposals/:ref   (ref = PROP-XXX)
 //   PATCH { action: 'send' }                                   borrador → enviada
+//   PATCH { action: 'edit', options, recommended_option?, client_value_cents? }   corregir un borrador
+//   PATCH { action: 'discard' }                                borrar un borrador que vino mal → { discarded }
 //   PATCH { action: 'decide', status: 'accepted'|'rejected', chosen_option?, note? }
 //   PATCH { action: 'follow_up' }                              seguimiento hecho
 //   → { proposal, lead_status? }. 409 si el estado no lo permite; 400 con { field }.
 // Aceptar no convierte al contacto en cliente: eso es POST /api/admin/leads/:id/convert.
 import { requireAdmin } from '../../../lib/auth.mjs';
 import { CrmError } from '../../../lib/finance.mjs';
-import { sendProposal, decideProposal, markFollowUpDone } from '../../../lib/proposals.mjs';
+import { sendProposal, editProposal, discardProposal, decideProposal, markFollowUpDone } from '../../../lib/proposals.mjs';
 
 const normRef = (v) => String(v || '').trim().toUpperCase().slice(0, 40);
 
@@ -27,6 +29,9 @@ export default async function handler(req, res) {
   try {
     let out;
     if (body.action === 'send') out = await sendProposal(ref, deps);
+    else if (body.action === 'edit') {
+      out = await editProposal(ref, { options: body.options, recommended_option: body.recommended_option, client_value_cents: body.client_value_cents }, deps);
+    } else if (body.action === 'discard') out = await discardProposal(ref, deps);
     else if (body.action === 'decide') {
       out = await decideProposal(ref, { status: body.status, chosen_option: body.chosen_option, note: body.note }, deps);
     } else if (body.action === 'follow_up') out = await markFollowUpDone(ref, deps);

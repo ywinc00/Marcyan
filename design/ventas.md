@@ -63,3 +63,32 @@ segmentado de Marcy, monograma blanco de 11 px, negro de la máscara del fundido
 Matriz de anchos en Chrome real (320 a 2560, 390 táctil): sin desbordamiento. Crítica adversarial sobre lo construido
 en 4 rondas, aplicada; lo que quedó por decisión: tarjetas de cifras de Orbit en escritorio, formato de fecha de la
 cabecera de la ficha y contador del menú. Falta el OK del dueño sobre el render.
+
+## Ampliación: borradores que se corrigen y precio por confirmar (2026-11-20, petición de Bases y Estructura)
+Encargo: un borrador de Marcy o del diagnóstico que vino mal se corrige o se descarta, y un servicio que en el
+catálogo solo tiene «desde» queda «por confirmar» y no se puede enviar hasta poner su precio real. Dentro de la
+dirección VALIDADA de arriba: sin pantallas, tokens ni primitivas nuevas.
+- Piezas del catálogo: **D-01** (el «desde $X» se enseña como tal, nunca como precio cerrado), **F-10** (guardar y
+  enviar con su estado de espera y apagados mientras guardan), **E-10** (si se guarda la corrección y falla el envío,
+  lo dice y deja reintentar), **E-08** (al descartar, la tarjeta vacía propone «Nueva propuesta»).
+- Tarjeta del borrador: en teléfono «Marcar como enviada» a lo ancho y Descartar (confirmación roja) y Corregir
+  debajo. Con precio por confirmar, «Corregir» pasa a «Poner el precio», «Marcar como enviada» no sale y la opción dice
+  «desde $X» y «falta el precio de «…»» con el punto ámbar de las pastillas (una señal por hecho, E-19).
+- Diálogo: el mismo de «Nueva propuesta» con lo del borrador puesto; lo que el diálogo no elige (más servicios con su
+  mensual, añadidos) sale en una línea cada uno con «Quitar» y su precio en la columna «Precio real». El foco abre en el
+  campo que falta (borde ámbar; rojo si baja del mínimo, que se dice por línea). La razón de los botones apagados y el
+  error de guardar van en el pie, junto a los botones. El proyecto lleva el precio delante: se corta el nombre, nunca el «desde».
+- Embudo: «desde $X» y «borrador, precio por confirmar»; en teléfono, dos líneas: el paso se corta antes que la cifra
+  y el mensual solo se quita en la fila que no cabe (consulta de contenedor; a 320, solo la cifra del proyecto).
+  Paso «Poner precio», también en la ficha de llamada, con «desde $X (precio por confirmar)».
+- Diálogo bajo 480 px: «Opción N» y «Quitar opción» en la primera línea, «Recomendada» debajo.
+- Brief: la tarjeta de propuesta con su separación (venía pegada a «Negocio» desde el PR #96).
+- NO un botón apagado sin razón → SÍ la razón en el pie. NO texto ámbar de poco contraste → SÍ punto ámbar y texto
+  legible. NO borrar sin rastro → SÍ confirmación y línea en el historial. NO cifra cortada a medias → SÍ se corta el texto.
+
+### Puerta de salida de la ampliación (2026-11-20)
+Bloques: 2 Jerarquía, 3 Tipografía, 4 Color, 5 Espaciado y 6 Componentes (botones, diálogo y estados nuevos), 7
+Accesibilidad y 8 Responsive (siempre), 10 Consistencia (clases nuevas). Saltados: 1 Identidad y 9 Anti-genérico (ni
+página ni sección nueva, sin colores ni fuentes nuevas). Auditoría automática: PASA. Matriz 320 a 2560 (320, 360 y 390
+táctiles) en Chrome real: sin desbordamiento en la página ni en el diálogo; alto contraste mirado. Crítica adversarial:
+rondas 1 a 4 (5, 7, 8 y 8,5 sobre 10, «no sale») con sus arreglos; ronda 5, 9/10, «sale». Falta el OK del dueño.

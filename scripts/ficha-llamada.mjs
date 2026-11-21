@@ -1,7 +1,9 @@
 // Ficha de llamada de un lead, en Markdown y SOLO LECTURA (encargo 2026-11-15).
 // Junta lo que Orbit sabe de un lead antes de llamarle o escribirle: sus datos y notas,
-// el historial, la conversación con Marcy (precio que vio, si pidió una persona), sus
-// citas, su brief, su diagnóstico y, si ya es cliente, sus proyectos. Nada de Finanzas.
+// su etapa y su propuesta (opciones, recomendada, elegida, caducidad y seguimientos;
+// tanda 2 de Ventas, 7b), el historial, la conversación con Marcy (precio que vio, si
+// pidió una persona), sus citas, su brief, su diagnóstico y, si ya es cliente, sus
+// proyectos. Nada de Finanzas: lo propuesto es venta, no cobros.
 //
 // Uso (desde la raíz del repo):
 //   node --env-file=.env.local scripts/ficha-llamada.mjs LEAD-011
@@ -16,7 +18,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createPool, createClient } from '@vercel/postgres';
-import { leadEventText, leadStatus, leadSource, BRIEF_STATUS, PROJECT_STATUS } from '../src/components/dashboard/crm/crm.js';
+import {
+  leadEventText, leadStatus, leadSource, BRIEF_STATUS, PROJECT_STATUS, OPEN_STATUSES,
+  lostReason, dayLabel, houstonToday, nextStepText, optionPrice, money, PROPOSAL_AUTHOR,
+} from '../src/components/dashboard/crm/crm.js';
+import { nextStep, effectiveStatus } from '../lib/proposals.mjs';
 
 const USUARIO = 'orbit_lectura';
 const TZ = 'America/Chicago';
@@ -29,6 +35,63 @@ const corta = (s, n) => { const t = String(s ?? '').replace(/\s+/g, ' ').trim();
 const cita = (s) => String(s ?? '').trim().split(/\r?\n/).map((l) => '> ' + l).join('\n');
 const linea = (pares) => pares.filter(([, v]) => v != null && String(v).trim() !== '').map(([k, v]) => `${k}: ${v}`).join(' · ');
 
+const SEGUIMIENTOS = [2, 5, 10];   // los del catálogo (reglas.seguimientoDias)
+const ESTADO_PROPUESTA = { draft: 'en borrador', sent: 'enviada', accepted: 'aceptada', rejected: 'rechazada', expired: 'vencida' };
+const nombreOpcion = (o) => [o?.plan?.name, ...(o?.projects || []).map((x) => x.name)].filter(Boolean).join(' + ') || 'Opción';
+
+/** «## Etapa y propuesta»: etapa, siguiente paso y la propuesta viva (o la última). Puro. */
+export function seccionVenta(d, ahora = new Date()) {
+  const { lead } = d;
+  const out = ['', '## Etapa y propuesta'];
+  out.push('- ' + linea([['Etapa', leadStatus(lead.status).label], ['Desde', fecha(lead.stage_changed_at)]]));
+  if (lead.status === 'lost') out.push('- ' + linea([['Motivo', lostReason(lead.lost_reason)?.label], ['Nota', corta(lead.lost_note, 200)]]));
+  const props = d.propuestas || [];
+  const viva = props.find((p) => p.status === 'sent' || p.status === 'expired') || null;
+  if (OPEN_STATUSES.includes(lead.status)) {
+    const n = nextStep(lead, viva, { now: ahora });
+    const t = nextStepText(n, { now: ahora });
+    const plazo = n.kind === 'none' ? `desde hace ${Number(n.days) || 0} ${Number(n.days) === 1 ? 'día' : 'días'}`
+      : n.kind === 'waiting' && n.due ? `vence el ${dayLabel(n.due)}`
+      : { late: 'atrasado', today: 'hoy', week: 'esta semana' }[n.bucket] || '';
+    out.push(`- Siguiente paso: ${t.what}${plazo ? ` (${plazo})` : ''}`);
+  }
+  if (d.propuestasSinPermiso) {
+    out.push('- Propuestas: el usuario de lectura todavía no puede verlas (falta aplicar `db/sql/orbit-lectura.sql`, bloque de la migración 029).');
+    return out;
+  }
+  if (!props.length) { out.push('- Sin propuesta todavía.'); return out; }
+  const p = viva || props[0];
+  const hoy = houstonToday(ahora);
+  const eff = effectiveStatus(p, hoy);
+  const partes = [];
+  if (eff === 'draft' || !p.sent_on) partes.push(ESTADO_PROPUESTA[eff] || eff);
+  else {
+    partes.push(`enviada el ${dayLabel(p.sent_on)}`);
+    if (eff === 'sent' && p.expires_on) partes.push(`vale hasta el ${dayLabel(p.expires_on)}`);
+    else if (eff === 'expired') partes.push(p.expires_on ? `venció el ${dayLabel(p.expires_on)} sin respuesta` : 'vencida sin respuesta');
+    else if (eff !== 'sent') partes.push(ESTADO_PROPUESTA[eff] || eff);
+  }
+  out.push('', `**Propuesta ${p.ref_id}**: ${partes.join(', ')}. ${PROPOSAL_AUTHOR[p.created_by] || 'La hiciste tú en Orbit'}.`);
+  const valor = p.client_value_cents == null ? null : Number(p.client_value_cents);
+  (Array.isArray(p.options) ? p.options : []).forEach((o, i) => {
+    const marcas = [
+      p.options.length > 1 && p.recommended_option === i ? 'recomendada' : '',
+      p.chosen_option === i ? 'la eligió' : '',
+      valor > 0 && o.monthly_cents > 0 ? `se paga con ${Math.ceil(o.monthly_cents / valor)} clientes nuevos al mes` : '',
+    ].filter(Boolean);
+    out.push(`- ${nombreOpcion(o)}: ${optionPrice(o)}${marcas.length ? ` (${marcas.join(', ')})` : ''}`);
+  });
+  if (valor > 0) out.push(`- Le vale ${money(valor)} cada cliente nuevo.`);
+  if (eff === 'sent') {
+    const hechos = Number(p.follow_ups_done) || 0;
+    out.push(`- Seguimientos: ${hechos} de ${SEGUIMIENTOS.length} hechos${p.next_follow_up_on ? `; el próximo, el del día ${SEGUIMIENTOS[hechos]}, toca el ${dayLabel(p.next_follow_up_on)}` : ''}.`);
+  }
+  if (p.decision_note) out.push(`- Nota de la decisión: ${corta(p.decision_note, 300)}`);
+  const antes = props.filter((x) => x !== p);
+  if (antes.length) out.push(`- Antes: ${antes.map((x) => `${x.ref_id} (${ESTADO_PROPUESTA[effectiveStatus(x, hoy)] || x.status})`).join(', ')}.`);
+  return out;
+}
+
 /** Texto Markdown de la ficha a partir de lo leído. `d` = { lead, eventos, convs, turnos, citas, brief, diag, cliente, proyectos }. */
 export function armarFicha(d, ahora = new Date()) {
   const { lead } = d;
@@ -39,10 +102,12 @@ export function armarFicha(d, ahora = new Date()) {
   out.push('## Quién es');
   out.push('- ' + linea([['Nombre', lead.name], ['Negocio', lead.business_name], ['Ciudad', lead.city]]));
   out.push('- ' + linea([['Teléfono', lead.phone], ['Correo', lead.email]]));
-  out.push('- ' + linea([['Origen', leadSource(lead.source).label], ['Página de llegada', lead.page_url], ['Estado', leadStatus(lead.status).label]]));
+  out.push('- ' + linea([['Origen', leadSource(lead.source).label], ['Página de llegada', lead.page_url]]));
   out.push('- ' + linea([['Llegó', fecha(lead.created_at)], ['Último cambio', fecha(lead.updated_at)], ['Interés', lead.interest]]));
   if (lead.message) out.push('', '**Lo que escribió**', cita(corta(lead.message, 1200)));
   if (lead.notes) out.push('', '**Notas internas**', cita(corta(lead.notes, 1200)));
+
+  out.push(...seccionVenta(d, ahora));
 
   if (d.eventos?.length) {
     out.push('', '## Historial');
@@ -128,15 +193,35 @@ async function conectar() {
 
 const BRIEF_COLS = 'project_id, status, created_at, business_name, industry, current_website, website_type, main_objective, visitor_action, budget_range, timeline, deadline, summary';
 
+// Sin el permiso nuevo (bloque de la migración 029 en db/sql/orbit-lectura.sql), la base
+// niega esas columnas: la ficha sale igual, sin ellas, y lo dice.
+const sinPermiso = (e) => Boolean(e && (e.code === '42501' || e.code === '42703' || e.code === '42P01'));
+const LEAD_COLS = `ref_id, status, source, name, email, phone, business_name, city, interest, message, converted_brief_id,
+            converted_client_id, notes, page_url, created_at, updated_at`;
+const PROPUESTA_COLS = `ref_id, status, created_by, options, recommended_option, chosen_option, client_value_cents,
+            to_char(sent_at AT TIME ZONE '${TZ}', 'YYYY-MM-DD') AS sent_on, to_char(expires_on, 'YYYY-MM-DD') AS expires_on,
+            follow_ups_done, to_char(next_follow_up_on, 'YYYY-MM-DD') AS next_follow_up_on, decided_at, decision_note, created_at`;
+
 export async function leerLead(c, clave) {
   const k = String(clave || '').trim();
-  const l = await c.query(
-    `SELECT ref_id, status, source, name, email, phone, business_name, city, interest, message, converted_brief_id,
-            converted_client_id, notes, page_url, created_at, updated_at
+  const buscar = (cols) => c.query(
+    `SELECT ${cols}
        FROM leads WHERE ref_id = upper($1) OR lower(email) = lower($1)
       ORDER BY created_at DESC LIMIT 1`, [k]);
+  let l;
+  try { l = await buscar(`${LEAD_COLS}, stage_changed_at, lost_reason, lost_note`); }
+  catch (e) { if (!sinPermiso(e)) throw e; l = await buscar(LEAD_COLS); }
   if (!l.rowCount) return null;
   const lead = l.rows[0];
+  let propuestas = [];
+  let propuestasSinPermiso = false;
+  try {
+    propuestas = (await c.query(
+      `SELECT ${PROPUESTA_COLS} FROM proposals
+        WHERE lead_ref = $1 OR ($2::bigint IS NOT NULL AND client_id = $2::bigint)
+        ORDER BY created_at DESC LIMIT 5`,
+      [lead.ref_id, lead.converted_client_id == null ? null : String(lead.converted_client_id)])).rows;
+  } catch (e) { if (!sinPermiso(e)) throw e; propuestasSinPermiso = true; }
   const [eventos, convs, citas, diag, cliente] = await Promise.all([
     c.query('SELECT event_type, actor_email, data, created_at FROM lead_events WHERE lead_ref = $1 ORDER BY created_at', [lead.ref_id]),
     c.query('SELECT sid, channel, lang, started_at, last_at, turns, lead_kind, takeover_at FROM chat_conversations WHERE lead_ref = $1 ORDER BY started_at', [lead.ref_id]),
@@ -156,7 +241,7 @@ export async function leerLead(c, clave) {
   const proyectos = cli
     ? (await c.query('SELECT project_code, name, service_type, status FROM projects WHERE client_id = $1 ORDER BY started_at NULLS LAST', [cli.id])).rows
     : [];
-  return { lead, eventos: eventos.rows, convs: convs.rows, turnos, citas: citas.rows, brief, diag: diag.rows[0] || null, cliente: cli, proyectos };
+  return { lead, propuestas, propuestasSinPermiso, eventos: eventos.rows, convs: convs.rows, turnos, citas: citas.rows, brief, diag: diag.rows[0] || null, cliente: cli, proyectos };
 }
 
 /** Prueba que el usuario no escribe ni ve Finanzas, IP ni importes. Devuelve las líneas del resultado. */
@@ -169,6 +254,8 @@ export async function comprobar(c) {
     ['no lee sesiones del panel', 'SELECT id FROM admin_sessions LIMIT 1'],
     ['no lee importes de proyectos', 'SELECT agreed_amount_cents FROM projects LIMIT 1'],
     ['no lee la IP de los leads', 'SELECT ip_address FROM leads LIMIT 1'],
+    ['no lee la lista interna de precios', 'SELECT version FROM sales_catalog LIMIT 1'],
+    ['no lee quién preparó cada propuesta en Orbit', 'SELECT actor_email FROM proposals LIMIT 1'],
     ['no escribe', "INSERT INTO lead_events (lead_ref, event_type) VALUES ('LEAD-000', 'prueba_lectura')"],
   ];
   const out = [];
@@ -188,6 +275,8 @@ export async function comprobar(c) {
     }
   }
   try { await c.query('SELECT ref_id FROM leads LIMIT 1'); out.push('PASA · sí lee los leads'); } catch { out.push('NO PASA · no puede leer los leads'); ok = false; }
+  try { await c.query('SELECT ref_id, options, expires_on FROM proposals LIMIT 1'); out.push('PASA · sí lee las propuestas'); } catch { out.push('NO PASA · no puede leer las propuestas'); ok = false; }
+  try { await c.query('SELECT stage_changed_at, lost_reason FROM leads LIMIT 1'); out.push('PASA · sí lee la etapa y el motivo de perdido'); } catch { out.push('NO PASA · no puede leer la etapa ni el motivo de perdido'); ok = false; }
   return { ok, lineas: out };
 }
 

@@ -62,8 +62,8 @@ Diagnóstico (etapa «diagnóstico hecho», §5).
 
 ## Para Marcy y el Diagnóstico (fase 1)
 
-Estado: escrito y probado en `feat/orbit-ventas`, **sin publicar**. Se usa solo cuando esté en producción (aviso de
-Bases y Estructura). Código: `lib/proposals.mjs`; pruebas: `npm run test:proposals`.
+Estado: **en producción** desde el 2026-11-20 (PR #95). Código: `lib/proposals.mjs` (lo cambia solo Panel Admin;
+lo que haga falta se pide por Bases y Estructura); pruebas: `npm run test:proposals`.
 
 ```js
 import { saveProposal, advanceLeadStage } from '../lib/proposals.mjs';

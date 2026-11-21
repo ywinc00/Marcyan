@@ -561,7 +561,8 @@ if (realPath && fs.existsSync(realPath)) {
       'lib/proposals.mjs', 'db/migrations/029_ventas_embudo.sql', 'docs/orbit/plan-ventas-orbit.md', 'design/ventas.md',
       'scripts/test-proposals.mjs', 'scripts/sync-catalogo-orbit.mjs', 'api/admin/leads/[id].mjs',
     ];
-    files.push('scripts/test-crm.mjs', 'src/components/dashboard/LeadsSection.svelte', 'api/admin/proposals.mjs', 'api/cron/finanzas.mjs');
+    files.push('scripts/test-crm.mjs', 'src/components/dashboard/LeadsSection.svelte', 'api/admin/proposals.mjs', 'api/cron/finanzas.mjs',
+      'scripts/ficha-llamada.mjs', 'scripts/test-ficha-llamada.mjs', 'docs/orbit/ficha-llamada.md', 'db/sql/orbit-lectura.sql');
     for (const dir of ['src/components/dashboard/crm', 'src/components/dashboard/ventas']) {
       const abs = path.join(ROOT, dir);
       if (fs.existsSync(abs)) for (const f of fs.readdirSync(abs)) files.push(dir + '/' + f);

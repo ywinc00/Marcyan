@@ -109,7 +109,7 @@
     <p class="note">La aceptó. Para empezar, pásalo a cliente con «Ganado: pasar a cliente».</p>
   {/if}
   <div class="foot">
-    <span class="who">La preparó {PROPOSAL_AUTHOR[p.created_by] || 'Orbit'}{p.sent_on ? `; enviada el ${dayLabel(p.sent_on)}` : ''}.</span>
+    <span class="who">{PROPOSAL_AUTHOR[p.created_by] || 'La hiciste tú en Orbit'}{p.sent_on ? `; enviada el ${dayLabel(p.sent_on)}` : ''}.</span>
     {#if eff === 'draft'}
       <button type="button" class="b b--mini" disabled={!!busy} onclick={() => act({ action: 'send' }, 'Propuesta marcada como enviada', 'send')}>{busy === 'send' ? 'Guardando…' : 'Marcar como enviada'}</button>
     {:else if open}

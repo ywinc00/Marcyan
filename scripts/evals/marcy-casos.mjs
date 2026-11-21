@@ -171,8 +171,10 @@ export const casos = [
   {
     // Ventas §4 y §5: la revisión de su web recomienda un plan por su nombre y su frase, con la
     // regla del diagnóstico (recommendPlan). example.com no tiene forma de contacto: lo más flojo
-    // es que te llamen, así que el plan es Crecimiento. Un solo caso: revisar_sitio tiene cupo
-    // de 5 cada 10 minutos por IP y la batería corre 3 veces cada uno.
+    // es que te llamen, así que el plan es Crecimiento. Con revisar-sitio-ficha-es son 6
+    // revisiones por pasada: el cupo de revisar_sitio es de 5 cada 10 minutos y 20 al día por
+    // conexión. Este caso va al principio y aquel al final, a más de 10 minutos; con 20 al día
+    // caben 3 pasadas completas. Si sale «no pudo revisar», es el cupo: repetir más tarde.
     id: 'revisar-sitio-plan-es', lang: 'es',
     titulo: 'Revisa su web: nombra el plan de la revisión con su frase, sin cifras',
     messages: [u('Tengo una empresa de limpieza en Houston y siento que mi web no me trae clientes. ¿Me la revisas? Es https://example.com')],

@@ -835,6 +835,17 @@ check('revisar_sitio: recomienda un plan con la regla del diagnóstico, por su n
   assert.equal(sitePlan({}), null, 'sin web revisada no hay plan');
   assert.equal('plan_recomendado' in JSON.parse(buildSiteToolResult({}, 'es')), false);
 });
+check('revisar_sitio: la ciudad que dijo llega al análisis, como en el diagnóstico (mismo plan con la misma web)', () => {
+  const src = readFileSync(new URL('../api/chat.mjs', import.meta.url), 'utf8');
+  assert.match(src, /reviewWeb\(g, lang, city\)/);
+  assert.match(src, /analyzeSite\(\{ html: site\.html, https: !!site\.https, hasSite: true, city: city \|\| '' \}\)/);
+  // Una web que no nombra su ciudad: con la ciudad, «que te encuentren» pasa a ser lo más flojo.
+  const html = '<html><head><title>Limpieza</title><script type="application/ld+json">{"@type":"LocalBusiness","name":"X"}</script></head><body><a href="https://wa.me/17135550000">WhatsApp</a><a href="mailto:a@b.co">correo</a></body></html>';
+  const sin = analyzeSite({ html, https: true, hasSite: true });
+  const con = analyzeSite({ html, https: true, hasSite: true, city: 'Houston' });
+  assert.notEqual(sin.scores.seo, con.scores.seo, 'la ciudad cambia el puntaje de SEO local');
+  assert.equal(sitePlan(con), recommendPlan({ scores: con.scores, findings: con.findings }).plan);
+});
 check('revisar_sitio: acepta nombre y ciudad opcionales; solo la url es obligatoria', () => {
   assert.deepEqual(SITE_TOOL.input_schema.required, ['url']);
   assert.ok(SITE_TOOL.input_schema.properties.nombre_negocio && SITE_TOOL.input_schema.properties.ciudad);

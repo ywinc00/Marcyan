@@ -34,9 +34,14 @@ await check('turno: el plan de la revisión se guarda en su conversación; sin l
   const { sql, calls } = fakeSql();
   assert.equal(await recordTurn({ sid: 'abc-123', env: 'preview', userText: 'revisa mi web', reply: 'Listo.', tool: 'revisar_sitio', diagPlan: 'presencia', sqlImpl: sql }), true);
   assert.equal(calls.length, 3);
-  assert.match(calls[2].text, /UPDATE chat_conversations SET diag_plan = \? WHERE sid = \?/);
+  assert.match(calls[2].text, /UPDATE chat_conversations SET diag_plan = \?, diag_plan_at = NOW\(\) WHERE sid = \?/);
   assert.deepEqual(calls[2].values, ['presencia', 'abc-123']);
-  for (const bad of [null, '', 'Presencia', 'x; DROP', 7, 'a'.repeat(21)]) {
+  // Revisó otra web y no salió plan (''): borra el de la anterior.
+  const cl = fakeSql();
+  await recordTurn({ sid: 'abc-123', reply: 'ok', diagPlan: '', sqlImpl: cl.sql });
+  assert.equal(cl.calls.length, 3);
+  assert.deepEqual(cl.calls[2].values, [null, 'abc-123']);
+  for (const bad of [null, undefined, 'Presencia', 'x; DROP', 7, 'a'.repeat(21)]) {
     const f = fakeSql();
     await recordTurn({ sid: 'abc-123', reply: 'ok', diagPlan: bad, sqlImpl: f.sql });
     assert.equal(f.calls.length, 2, String(bad));

@@ -32,10 +32,13 @@ Pruebas: `npm run test:cotizar` y la batería `npm run eval:marcy`.
    - A la medida (`opciones`): hasta tres, cada una con un plan, servicios o los dos. El servidor las
      ordena de la más completa a la de entrada y marca como recomendada la de Crecimiento (o la del medio).
    - **Si revisó su web** en la conversación (`revisar_sitio`), la recomendada es la opción del plan que dio
-     la revisión, con la misma regla que el diagnóstico (`recommendPlan` de `lib/diagnostic-plan.mjs`,
-     «por lo más flojo»): así el chat, el diagnóstico y su propuesta en Orbit dicen lo mismo. La pone el
-     servidor (columna `diag_plan` de la 031), nunca el modelo; si ninguna opción lleva ese plan, vale la
-     regla de arriba. Marcy nombra el plan de la revisión con su frase y sin cifras.
+     la revisión, con la misma regla y los mismos datos que el diagnóstico (`recommendPlan` de
+     `lib/diagnostic-plan.mjs`, «por lo más flojo», con la ciudad si la dijo): el chat, el diagnóstico y
+     su propuesta en Orbit dicen lo mismo, salvo que la web tarde y el chat vea menos (su límite es más
+     corto). La pone el servidor (columnas `diag_plan` y `diag_plan_at` de la 031), nunca el modelo; caduca
+     a los 7 días, como la conversación que ve Marcy, y la revisión de otra web la sustituye. Si ninguna
+     opción lleva ese plan, vale la regla de arriba. Si el plan ya era el recomendado, la cotización es la
+     de siempre (misma clave). Marcy nombra el plan de la revisión con su frase y sin cifras.
    - Con lo que le vale un cliente, dice con cuántos clientes al mes se paga lo mensual. Es una cuenta,
      nunca una promesa.
 4. **El cliente decidido** (señales de compra) no recibe tres opciones ni la pregunta del valor de un

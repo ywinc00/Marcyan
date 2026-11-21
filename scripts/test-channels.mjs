@@ -207,6 +207,10 @@ await aok('el plan de la revisión de su web llega al registro del turno', async
   const t = fresh();
   assert.equal(await processInbound(ROW, deps(t)), 'hecho');
   assert.equal(t.recorded.at(-1).diagPlan, null, 'sin revisión, nada');
+  const v = fresh();
+  v.turn = { ...s.turn, diagPlan: '' };
+  assert.equal(await processInbound(ROW, deps(v)), 'hecho');
+  assert.equal(v.recorded.at(-1).diagPlan, '', 'revisó otra web sin plan: llega vacío para borrar el anterior');
 });
 await aok('si lo lleva el dueño, Marcy calla y avisa', async () => {
   const s = fresh(); s.taken = true;

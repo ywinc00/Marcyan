@@ -469,6 +469,20 @@ await check('con revisión de su web: la recomendada es la del plan del diagnós
   assert.deepEqual(c.visible.opciones.map((x) => x.recomendada), [false, true, false]);
   assert.deepEqual(c.visible.opciones.map((x) => x.etiqueta), ['La completa', 'La recomendada', 'La de entrada']);
 });
+await check('si el plan del diagnóstico ya era el recomendado, es la misma cotización: misma clave y sin marca', () => {
+  const same = (input) => {
+    const a = buildQuote(CAT, input);
+    const b = buildQuote(CAT, input, { planDiagnostico: 'crecimiento' });
+    assert.equal(b.stored.key, a.stored.key, JSON.stringify(input));
+    assert.equal('plan_diagnostico' in b.stored, false, JSON.stringify(input));
+    assert.deepEqual(b.save, a.save, JSON.stringify(input));
+    assert.deepEqual(b.visible, a.visible, JSON.stringify(input));
+  };
+  same({ paquetes: true });
+  same({ paquetes: true, valor_cliente: 300 });
+  same({ opciones: [{ plan: 'crecimiento', servicios: ['web'] }] });                       // el cliente decidido
+  same({ opciones: [{ plan: 'dominio', servicios: ['web'] }, { plan: 'crecimiento', servicios: ['web'] }, { plan: 'presencia', servicios: ['webLanding'] }] });
+});
 await check('plan del diagnóstico no válido o sin opción con ese plan: vale la regla de siempre y la clave no cambia', () => {
   const base = buildQuote(CAT, { paquetes: true });
   for (const bad of ['base', 'toString', '__proto__', 'nada', 7, '']) {
@@ -501,8 +515,8 @@ await check('plan del diagnóstico de la conversación: se lee de la base y nunc
   const calls = [];
   const ok = async (strings, ...values) => { calls.push({ text: strings.join('?'), values }); return { rows: [{ diag_plan: 'dominio' }] }; };
   assert.equal(await diagPlanFor('abc-1', { sqlImpl: ok }), 'dominio');
-  assert.match(calls[0].text, /SELECT diag_plan FROM chat_conversations WHERE sid = \?/);
-  assert.deepEqual(calls[0].values, ['abc-1']);
+  assert.match(calls[0].text, /SELECT diag_plan FROM chat_conversations\s+WHERE sid = \? AND diag_plan_at > NOW\(\) - make_interval\(days => \?\)/);
+  assert.deepEqual(calls[0].values, ['abc-1', 7], 'caduca a los 7 días, como la conversación que ve Marcy');
   assert.equal(await diagPlanFor('x y;--', { sqlImpl: ok }), null, 'sid no válido: ni pregunta');
   assert.equal(calls.length, 1);
   assert.equal(await diagPlanFor('abc-1', { sqlImpl: async () => { const e = new Error('column "diag_plan" does not exist'); e.code = '42703'; throw e; } }), null, 'sin la 031');

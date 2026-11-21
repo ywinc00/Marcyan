@@ -478,16 +478,19 @@ async function reviewListing({ name, city, url, lang }) {
 async function reviewSite(url, lang, { name, city } = {}) {
   const g = await ssrfGuard(url);
   if (!g.ok) return FAIL_RESULT; // bloqueada (IP privada/host interno/esquema) → sin revelar motivo
-  const [web, ficha] = await Promise.all([reviewWeb(g, lang), reviewListing({ name, city, url: g.url, lang })]);
+  const [web, ficha] = await Promise.all([reviewWeb(g, lang, city), reviewListing({ name, city, url: g.url, lang })]);
   if (!web && !ficha) return FAIL_RESULT;
-  return { content: buildSiteToolResult(web || {}, lang, ficha), extraAllow: [], diagPlan: sitePlan(web || {}) };
+  // '' = se revisó y no salió plan: sustituye al de una web revisada antes.
+  return { content: buildSiteToolResult(web || {}, lang, ficha), extraAllow: [], diagPlan: sitePlan(web || {}) || '' };
 }
 
-async function reviewWeb(g, lang) {
+// La ciudad entra al análisis como en el diagnóstico (S2: ¿la web nombra su ciudad?), para
+// que el plan de la revisión y el del diagnóstico salgan iguales con la misma web.
+async function reviewWeb(g, lang, city = '') {
   const site = await fetchSite(g.url, { timeoutMs: 6000, maxBytes: 300_000, maxRedirects: 2 }).catch(() => null);
   const hasSite = !!(site && site.ok && site.html && site.html.length > 0);
   if (!hasSite) return null;
-  let out = analyzeSite({ html: site.html, https: !!site.https, hasSite: true });
+  let out = analyzeSite({ html: site.html, https: !!site.https, hasSite: true, city: city || '' });
   // Follow-up de /contacto (mismo criterio que api/diagnostic.mjs, presupuesto MÁS corto):
   // sin esto, Marcy afirmaría "no tiene formulario" contra sitios que lo tienen en su
   // página de contacto (falso negativo verificado contra movejunkaway.com). Best-effort
@@ -717,7 +720,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
       extraAllow = [...extraAllow, ...(out.extraAllow || [])];
       if (internal.name === CALC_TOOL.name) lossFigures = out.extraAllow || [];
       if (out.quote) quote = out.quote;
-      if (out.diagPlan) diagPlan = out.diagPlan;
+      if (typeof out.diagPlan === 'string') diagPlan = out.diagPlan;
       // La API exige un tool_result por CADA tool_use del turno 1. Solo el interno
       // ejecutado lleva resultado real; cualquier OTRA tool del mismo turno (raro, contra
       // el prompt): si es de UI la honramos vía RESCATE abajo (ok:true = "mostrada"), si es

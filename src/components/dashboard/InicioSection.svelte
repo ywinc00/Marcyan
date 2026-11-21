@@ -178,7 +178,7 @@
   const SOURCES = {
     chat:       { label: 'Chatbot'     },
     diagnostic: { label: 'Diagnóstico' },
-    contact:    { label: 'Contacto'    },
+    contact:    { label: 'Formulario'  },
   };
   function sourceMeta(s) { return SOURCES[s] || SOURCES.contact; }
   function leadTitle(l) { return l.name || l.email || l.phone || 'Sin nombre'; }

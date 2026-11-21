@@ -2,12 +2,15 @@
 //  1. Genera los cargos reales de las suscripciones que tocan hasta hoy (idempotente).
 //  2. Avisa en el panel: cerrar el mes anterior (días 1 a 5) y plazos fiscales
 //     que vencen en los próximos 7 días. Avisos deduplicados por clave.
+//  3. Ventas (Ventas §1): las propuestas enviadas cuya caducidad pasó quedan vencidas y
+//     avisan; el contacto NO pasa a perdido (lo decide el dueño). Si falla, Finanzas sigue.
 // Autorización: Authorization: Bearer <CRON_SECRET> (Vercel lo manda solo).
 import { safeEqual } from '../../lib/auth.mjs';
 import { houstonDate } from '../../lib/dates.mjs';
 import { generateSubscriptionCharges, monthChecklist } from '../../lib/finance-books.mjs';
 import { taxCalendar } from '../../lib/finance-tax.mjs';
 import { notifySystem } from '../../lib/notifications.mjs';
+import { expireDueProposals } from '../../lib/proposals.mjs';
 
 function bearerOk(req) {
   const secret = (process.env.CRON_SECRET || '').trim();
@@ -65,6 +68,21 @@ export default async function handler(req, res) {
         url: '/dashboard#/finanzas/impuestos',
         windowHours: 24 * 8,
       });
+    }
+    try {
+      const exp = await expireDueProposals();
+      for (const it of exp.items) {
+        await notifySystem({
+          key: `ventas-vencida:${it.ref_id}`,
+          title: `Venció sin respuesta la propuesta ${it.ref_id}`,
+          body: 'Pasaron 14 días. En su ficha decide si la eligió, si la rechazó o si haces otra.',
+          url: it.lead_ref ? `/dashboard#/leads/${encodeURIComponent(it.lead_ref)}` : '/dashboard#/leads?vista=hoy',
+          windowHours: 24 * 30,
+        });
+      }
+      out.proposals_expired = exp.expired.length;
+    } catch (e) {
+      console.error('[cron/finanzas] propuestas vencidas:', e.message);
     }
     console.log(`[cron/finanzas] cargos=${out.charges.created} saltados_cerrados=${out.charges.skippedClosed}`);
     return res.status(200).json({ ok: true, ...out });

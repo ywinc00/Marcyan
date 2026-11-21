@@ -33,6 +33,7 @@ import {
   leadFiltersFromQuery, leadQueryPatch, leadApiParams, leadFilterPhrase,
   clientFiltersFromQuery, clientApiParams, clientQueryPatch, money, phoneHref, whatsappHref,
   deleteImpactText, keepsBooks, leadEventText, leadStatus, leadSource, leavingConvertedMessage,
+  isPipelineView, nextStepText, stageGroups, todayGroups, todayCounts, filterPipeline, optionPrice, dayLabel,
 } from '../src/components/dashboard/crm/crm.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -320,10 +321,10 @@ await check('prueba y spam: fuera de "Todos" y de su total, visibles con su past
 // ── crm.js: URL ↔ API ───────────────────────────────────────────
 await check('url leads: estado y origen legibles → valores de la API', () => {
   const f = leadFiltersFromQuery({ estado: 'nuevo', origen: 'diagnostico', q: ' ana ', pagina: '3' });
-  assert.deepEqual(f, { status: 'new', source: 'diagnostic', search: 'ana', page: 3 });
+  assert.deepEqual(f, { status: 'new', all: false, view: 'stages', source: 'diagnostic', search: 'ana', page: 3 });
 });
 await check('url leads: valores desconocidos se ignoran', () => {
-  assert.deepEqual(leadFiltersFromQuery({ estado: 'x', origen: 'y', pagina: '-2' }), { status: '', source: '', search: '', page: 1 });
+  assert.deepEqual(leadFiltersFromQuery({ estado: 'x', origen: 'y', pagina: '-2' }), { status: '', all: false, view: 'stages', source: '', search: '', page: 1 });
 });
 await check('url leads: patch con claves legibles y página 1 sin parámetro', () => {
   assert.deepEqual(leadQueryPatch({ status: 'contacted', source: '', page: 1 }), { estado: 'contactado', origen: '', pagina: '' });
@@ -359,11 +360,63 @@ await check('textos: impacto del borrado dice exactamente qué se pierde', () =>
   assert.equal(keepsBooks({ invoices: 0, issued_invoices: 0, payments: 1 }), true);
   assert.match(deleteImpactText({ projects: 0, invoices: 0, payments: 0 }), /solo se borra su ficha/);
 });
+await check('url leads: sin estado abre En curso; «todos» y «hoy» en palabras', () => {
+  assert.equal(isPipelineView(leadFiltersFromQuery({})), true);
+  assert.equal(isPipelineView(leadFiltersFromQuery({ estado: 'todos' })), false);
+  assert.equal(leadFiltersFromQuery({ vista: 'hoy' }).view, 'today');
+  assert.equal(leadFiltersFromQuery({ estado: 'convertido' }).status, 'converted', 'los enlaces viejos siguen valiendo');
+  assert.equal(leadFiltersFromQuery({ estado: 'ganado' }).status, 'converted');
+  assert.deepEqual(leadQueryPatch({ status: 'all', view: 'today' }), { estado: 'todos', vista: 'hoy' });
+  assert.deepEqual(leadQueryPatch({ status: '', view: 'stages' }), { estado: '', vista: '' });
+});
+const NOW = new Date('2026-11-20T18:00:00Z');
+await check('embudo: textos del siguiente paso, largos y cortos', () => {
+  assert.deepEqual(nextStepText({ kind: 'reply', bucket: 'late' }, { now: NOW }), { long: 'pasó de 24 h', short: '+24 h', tone: 'error', what: 'Contestar' });
+  const sp = nextStepText({ kind: 'send_proposal', bucket: 'late', due: '2026-11-01T17:00:00Z' }, { now: NOW });
+  assert.equal(sp.long, 'propuesta, 19 días tarde');
+  assert.equal(sp.short, '19 d tarde');
+  assert.equal(nextStepText({ kind: 'follow_up', bucket: 'today', due: '2026-11-20', step: 5 }, { now: NOW }).long, 'seguimiento del día 5');
+  assert.equal(nextStepText({ kind: 'follow_up', bucket: 'week', due: '2026-11-21', step: 10 }, { now: NOW }).long, 'seguimiento mañana');
+  assert.equal(nextStepText({ kind: 'follow_up', bucket: 'week', due: '2026-11-24', step: 10 }, { now: NOW }).long, 'seguimiento el 24 nov');
+  assert.equal(nextStepText({ kind: 'waiting', bucket: 'week', due: '2026-11-27' }, { now: NOW }).long, 'esperando respuesta · vence el 27 nov');
+  assert.equal(nextStepText({ kind: 'none', days: 1, bucket: 'week' }, { now: NOW }).long, 'sin siguiente paso, 1 día');
+});
+const PIPE = [
+  { ref_id: 'A', status: 'new', created_at: '2026-11-20T10:00:00Z', source: 'chat', name: 'Ana Cruz', next: { kind: 'reply', bucket: 'today', due: '2026-11-21T10:00:00.000Z' } },
+  { ref_id: 'B', status: 'new', created_at: '2026-11-18T10:00:00Z', source: 'chat', name: 'John Smith', next: { kind: 'reply', bucket: 'late' } },
+  { ref_id: 'C', status: 'contacted', created_at: '2026-11-10T10:00:00Z', source: 'contact', name: 'Megan', next: { kind: 'none', days: 6, bucket: 'week' } },
+  { ref_id: 'D', status: 'proposal', created_at: '2026-11-09T10:00:00Z', source: 'contact', name: 'Daniela', next: { kind: 'follow_up', bucket: 'week', due: '2026-11-21' },
+    proposal: { effective_status: 'sent', project_cents: 51000, monthly_cents: 33000 } },
+  { ref_id: 'E', status: 'proposal', created_at: '2026-11-13T10:00:00Z', source: 'chat', name: 'Camila', next: { kind: 'follow_up', bucket: 'today', due: '2026-11-20' },
+    proposal: { effective_status: 'sent', project_cents: 181000, monthly_cents: 62000 } },
+];
+await check('embudo: grupos por etapa en orden, lo atrasado primero y la suma de lo propuesto', () => {
+  const g = stageGroups(PIPE);
+  assert.deepEqual(g.map((x) => [x.key, x.items.map((r) => r.ref_id)]), [['new', ['B', 'A']], ['contacted', ['C']], ['proposal', ['E', 'D']]]);
+  assert.equal(g[0].note, 'responder en 24 horas');
+  assert.equal(g[2].note, '$2,320 con la opción recomendada y $950/mes');
+});
+await check('embudo: «Para hoy» en atrasado, hoy, esta semana y sin siguiente paso; recuento del botón', () => {
+  const g = todayGroups(PIPE);
+  assert.deepEqual(g.map((x) => [x.key, x.items.map((r) => r.ref_id), !!x.folded]), [['late', ['B'], false], ['today', ['E', 'A'], false], ['week', ['D'], true], ['none', ['C'], true]]);
+  assert.deepEqual(todayCounts(PIPE), { due: 3, late: 1 });
+});
+await check('embudo: búsqueda y origen sobre En curso', () => {
+  assert.deepEqual(filterPipeline(PIPE, { search: 'cami' }).map((r) => r.ref_id), ['E']);
+  assert.deepEqual(filterPipeline(PIPE, { source: 'contact' }).map((r) => r.ref_id), ['C', 'D']);
+  assert.equal(optionPrice({ project_cents: 123400, monthly_cents: 45600 }), '$1,234 + $456/mes');
+  assert.equal(optionPrice({ project_cents: 0, monthly_cents: 45600 }), '$456/mes');
+  assert.equal(dayLabel('2026-11-27'), '27 nov');
+});
 await check('textos: historial y etiquetas legibles (nunca códigos crudos)', () => {
-  assert.equal(leadEventText({ event_type: 'status_changed', data: { from: 'new', to: 'contacted' } }), 'Estado: Nuevo → Contactado');
+  assert.equal(leadEventText({ event_type: 'status_changed', data: { from: 'new', to: 'contacted' } }), 'Etapa: Nuevo → Contactado');
+  assert.equal(leadEventText({ event_type: 'status_changed', data: { from: 'proposal', to: 'lost', lost_reason: 'price' } }), 'Etapa: Propuesta enviada → Perdido, motivo: precio');
+  assert.equal(leadEventText({ event_type: 'status_changed', data: { from: 'new', to: 'diagnosed', by: 'diagnostic' } }), 'Etapa: Nuevo → Diagnóstico hecho (lo movió el diagnóstico)');
+  assert.equal(leadEventText({ event_type: 'proposal_created', data: { proposal: 'PROP-004', sent: true, by: 'marcy' } }), 'Propuesta PROP-004 enviada, la preparó Marcy');
+  assert.equal(leadEventText({ event_type: 'proposal_accepted', data: { proposal: 'PROP-004', option: 1 } }), 'Propuesta PROP-004 aceptada: opción 2');
   assert.equal(leadEventText({ event_type: 'converted_to_brief', data: { project_id: 'MRC-020' } }), 'Brief creado MRC-020');
   assert.equal(leadStatus('raro').label, 'Sin estado');
-  assert.equal(leadSource('raro').label, 'Contacto');
+  assert.equal(leadSource('raro').label, 'Formulario');
 });
 await check('textos: copy sin em-dash ni voseo en crm.js', () => {
   const src = fs.readFileSync(path.join(ROOT, 'src/components/dashboard/crm/crm.js'), 'utf8');
@@ -584,10 +637,58 @@ await check('int1: lead que deja "Convertido" conserva cliente y brief y lo dice
   });
   await LEADS.updateLead('LEAD-031', { status: 'contacted' }, 'equipo@marcyan.test');
   const up = log().find((c) => /^UPDATE leads/.test(c.text.trim()));
-  assert.match(up.text, /SET status = \$1 WHERE/);
+  assert.match(up.text, /SET status = \$1, stage_changed_at = NOW\(\) WHERE/); // 029: con su fecha de etapa
   assert.ok(!/converted_/.test(up.text), 'no toca los vínculos de la conversión');
   const ev = log().find((c) => /INSERT INTO lead_events/.test(c.text));
   assert.deepEqual(JSON.parse(ev.params[3]), { from: 'converted', to: 'contacted', kept: { client_id: 9, brief_id: 'MRC-030' } });
+});
+// ── Embudo (migración 029): «perdido» pide su motivo ────────────
+const LEAD_OPEN = { ref_id: 'LEAD-040', status: 'proposal', notes: null, converted_client_id: null, converted_brief_id: null, lost_reason: null, lost_note: null };
+const leadDb = (lead, { missing = false } = {}) => fakeSql((text) => {
+  if (/SELECT \* FROM leads WHERE ref_id/.test(text)) return [lead];
+  if (/^UPDATE leads/.test(text.trim())) {
+    if (missing && /stage_changed_at|lost_/.test(text)) { const e = new Error('no existe la columna'); e.code = '42703'; throw e; }
+    return [];
+  }
+  if (/INSERT INTO lead_events/.test(text)) return [];
+  throw new Error('consulta inesperada: ' + text.slice(0, 60));
+});
+await check('029: pasar a perdido sin motivo → 400 y no guarda', async () => {
+  const log = leadDb(LEAD_OPEN);
+  await assert.rejects(LEADS.updateLead('LEAD-040', { status: 'lost' }), (e) => e.status === 400 && e.extra.field === 'lost_reason');
+  await assert.rejects(LEADS.updateLead('LEAD-040', { status: 'lost', lost_reason: 'caro' }), (e) => e.status === 400);
+  assert.ok(!log().some((c) => /^UPDATE/.test(c.text.trim())));
+});
+await check('029: perdido con motivo y nota; el historial guarda el motivo', async () => {
+  const log = leadDb(LEAD_OPEN);
+  await LEADS.updateLead('LEAD-040', { status: 'lost', lost_reason: 'price', lost_note: '  le pareció caro  ' }, 'yo@x');
+  const up = log().find((c) => /^UPDATE leads/.test(c.text.trim()));
+  assert.match(up.text, /lost_reason = \$2, lost_note = \$3, stage_changed_at = NOW\(\)/);
+  assert.deepEqual(up.params.slice(0, 3), ['lost', 'price', 'le pareció caro']);
+  const ev = log().find((c) => /INSERT INTO lead_events/.test(c.text));
+  assert.deepEqual(JSON.parse(ev.params[3]), { from: 'proposal', to: 'lost', lost_reason: 'price' });
+});
+await check('029: salir de perdido borra el motivo (queda en el historial)', async () => {
+  const log = leadDb({ ...LEAD_OPEN, status: 'lost', lost_reason: 'timing', lost_note: 'en enero' });
+  await LEADS.updateLead('LEAD-040', { status: 'contacted' });
+  const up = log().find((c) => /^UPDATE leads/.test(c.text.trim()));
+  assert.match(up.text, /lost_reason = NULL, lost_note = NULL/);
+});
+await check('029: cambiar solo el motivo de un perdido', async () => {
+  const log = leadDb({ ...LEAD_OPEN, status: 'lost', lost_reason: 'timing', lost_note: 'en enero' });
+  await LEADS.updateLead('LEAD-040', { lost_reason: 'competitor' });
+  const up = log().find((c) => /^UPDATE leads/.test(c.text.trim()));
+  assert.deepEqual(up.params.slice(0, 2), ['competitor', 'en enero']);
+  assert.ok(!/stage_changed_at/.test(up.text), 'no cambia de etapa');
+});
+await check('029 sin aplicar: un cambio de estado normal se guarda como antes; perdido → 503', async () => {
+  const log = leadDb(LEAD_OPEN, { missing: true });
+  await LEADS.updateLead('LEAD-040', { status: 'contacted' });
+  const ups = log().filter((c) => /^UPDATE leads/.test(c.text.trim()));
+  assert.equal(ups.length, 2);
+  assert.match(ups[1].text, /SET status = \$1 WHERE ref_id = \$2/);
+  leadDb(LEAD_OPEN, { missing: true });
+  await assert.rejects(LEADS.updateLead('LEAD-040', { status: 'lost', lost_reason: 'price' }), (e) => e.status === 503);
 });
 // La base falsa EVALÚA cada COUNT(*) FILTER (WHERE …) de leadStats sobre unas
 // filas en memoria (revisión int1, F3): si el conteo pasara a mirar los
@@ -633,13 +734,13 @@ await check('int1: keptConversionLinks y el aviso del panel', () => {
   assert.equal(keptConversionLinks({ ...conv, converted_client_id: null, converted_brief_id: null }, 'new'), null, 'convertido de etiqueta (antes de la 011)');
   const msg = leavingConvertedMessage(conv, 'contacted');
   assert.match(msg, /conservará su cliente y el brief MRC-030/);
-  assert.match(msg, /Dejará de contar en Convertidos/);
+  assert.match(msg, /Dejará de contar en Ganados/);
   assert.ok(!/—/.test(msg));
   assert.match(leavingConvertedMessage({ ...conv, converted_brief_id: null }, 'archived'), /conservará su cliente:/);
   assert.equal(leavingConvertedMessage(conv, 'converted'), null);
   assert.equal(leavingConvertedMessage({ ...conv, converted_client_id: null, converted_brief_id: null }, 'new'), null);
   assert.equal(leadEventText({ event_type: 'status_changed', data: { from: 'converted', to: 'new', kept: { client_id: 9, brief_id: 'MRC-030' } } }),
-    'Estado: Convertido → Nuevo (conserva su cliente y el brief MRC-030)');
+    'Etapa: Ganado → Nuevo (conserva su cliente y el brief MRC-030)');
   const sel = fs.readFileSync(path.join(ROOT, 'src/components/dashboard/crm/LeadStatusSelect.svelte'), 'utf8');
   assert.match(sel, /ConfirmDialog/);
   assert.match(sel, /crmReady && leavingConvertedMessage\(lead, next\)/, 'solo con la migración 011');

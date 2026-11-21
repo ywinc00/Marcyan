@@ -14,12 +14,17 @@
   import Icon from '../ui/Icon.svelte';
   import LeadStatusSelect from './LeadStatusSelect.svelte';
   import ConvertLeadDialog from './ConvertLeadDialog.svelte';
+  import LeadStages from './LeadStages.svelte';
+  import ProposalCard from './ProposalCard.svelte';
+  import ProposalDialog from './ProposalDialog.svelte';
+  import LostDialog from './LostDialog.svelte';
   import { api, errorMessage, isSessionError } from '../lib/api.js';
   import { toast, toastError } from '../lib/toast.svelte.js';
   import { href, route, setSub } from '../lib/router.svelte.js';
   import { fmtDateTime } from '../lib/dates.js';
   import {
     leadStatus, leadSource, phoneHref, whatsappHref, leadEventText, clientName, BRIEF_STATUS, clientStatus,
+    OPEN_STATUSES,
   } from './crm.js';
 
   let { refId, autoConvert = false, onchanged } = $props();
@@ -40,10 +45,24 @@
   const notesDirty = $derived(lead ? (notes.trim() !== (lead.notes || '').trim()) : false);
   const fullyConverted = $derived(!!(lead?.converted_client_id && lead?.converted_brief_id));
 
+  // Ventas §1: etapas, propuesta y perdido.
+  let proposals = $state([]);
+  let newOpen = $state(false);
+  let lostOpen = $state(false);
+  const inFunnel = $derived(!!lead && (OPEN_STATUSES.includes(lead.status) || lead.status === 'converted' || lead.status === 'lost'));
+  const isOpen = $derived(!!lead && OPEN_STATUSES.includes(lead.status));
+  // La propuesta que se enseña: la viva (enviada, vencida o borrador) o, si no, la última.
+  const current = $derived(proposals.find((p) => ['sent', 'expired', 'draft'].includes(p.status)) || proposals[0] || null);
+  async function loadProposals() {
+    try { proposals = (await api('/api/admin/proposals?lead=' + encodeURIComponent(refId))).proposals || []; }
+    catch (e) { if (!isSessionError(e)) console.warn('[leads] propuestas', e?.message); }
+  }
+  function onProposalChanged() { loadProposals(); onStatusSaved({}); }
+
   async function load() {
     loading = true; error = '';
     try {
-      const j = await api('/api/admin/leads/' + encodeURIComponent(refId));
+      const [j] = await Promise.all([api('/api/admin/leads/' + encodeURIComponent(refId)), loadProposals()]);
       detail = j;
       notes = j.lead?.notes || '';
       if (autoConvert && !autoDone && j.crm_ready) { autoDone = true; convertOpen = true; }
@@ -56,9 +75,9 @@
 
   function onStatusSaved(l) {
     detail = { ...detail, lead: { ...detail.lead, ...l } };
-    // El historial lo escribe el servidor: se recarga en silencio.
+    // El historial (y la etapa, si la movió una propuesta) lo escribe el servidor: se recarga en silencio.
     api('/api/admin/leads/' + encodeURIComponent(refId))
-      .then((j) => { detail = { ...detail, events: j.events }; })
+      .then((j) => { detail = { ...detail, lead: { ...detail.lead, ...j.lead }, events: j.events }; })
       .catch((e) => console.warn('[leads] historial', e?.message));
     onchanged?.();
   }
@@ -108,20 +127,38 @@
   <PageHeader title={refId} />
   <ErrorState title="No se pudo abrir el lead" message={error} onretry={load} />
 {:else if lead}
-  <PageHeader title={name} subtitle={`${lead.ref_id} · Recibido el ${fmtDateTime(lead.created_at)}`}>
+  <!-- La hora no se separa de su «p. m.» al partir la línea en el teléfono. -->
+  <PageHeader title={name} subtitle={`${lead.ref_id} · Recibido el ${fmtDateTime(lead.created_at).replace(/\s+([ap]\.\s?m\.)$/i, (m, x) => '\u00a0' + x.replace(/\s/g, '\u00a0'))}`}>
     {#snippet badge()}<StatusChip tone={leadStatus(lead.status).tone} label={leadStatus(lead.status).label} />{/snippet}
     {#snippet actions()}
-      <button type="button" class="b b--danger" onclick={() => (confirmDelete = true)}>Borrar</button>
+      <button type="button" class="b b--danger" class:hide-ph={isOpen} onclick={() => (confirmDelete = true)}>Borrar</button>
+      {#if isOpen}<button type="button" class="b hide-ph" onclick={() => (lostOpen = true)}>Marcar como perdido</button>{/if}
       {#if !fullyConverted}
-        <button type="button" class="b b--primary" disabled={!crmReady} title={crmReady ? '' : 'Necesita la actualización de la base de datos'} onclick={() => (convertOpen = true)}>
-          {lead.converted_client_id || lead.converted_brief_id ? 'Completar conversión' : 'Convertir'}
+        <button type="button" class="b b--primary" class:hide-ph={isOpen} disabled={!crmReady} title={crmReady ? '' : 'Necesita la actualización de la base de datos'} onclick={() => (convertOpen = true)}>
+          {lead.converted_client_id || lead.converted_brief_id ? 'Completar conversión' : 'Ganado: pasar a cliente'}
         </button>
       {/if}
     {/snippet}
   </PageHeader>
 
-  <div class="grid">
+  {#if inFunnel}<LeadStages {lead} events={detail.events || []} proposal={current} />{/if}
+
+  <!-- En venta (contacto en curso), por debajo de 1100 manda lo que toca hoy: seguimientos y
+       propuesta primero, luego el contacto y luego lo demás. Fuera de venta, como siempre. -->
+  <div class="grid" class:grid--sales={isOpen}>
     <div class="col">
+      {#if current}
+        <div class="sales-top">
+          <ProposalCard proposal={current} {lead} events={detail.events || []} converted={!!lead.converted_client_id} onchanged={onProposalChanged} onnew={isOpen ? () => (newOpen = true) : null} />
+        </div>
+      {:else if isOpen}
+        <div class="sales-top">
+          <Card title="Propuesta">
+            <p class="muted">Sin propuesta todavía. Las que prepare Marcy o el diagnóstico aparecerán aquí; también puedes hacerla tú.</p>
+            <div class="row-end"><span></span><button type="button" class="b" onclick={() => (newOpen = true)}>Nueva propuesta</button></div>
+          </Card>
+        </div>
+      {/if}
       <Card title="Mensaje">
         {#if lead.interest}
           <p class="cap">Interés</p>
@@ -155,11 +192,11 @@
               </li>
             {/if}
           </ul>
-          {#if lead.converted_at}<p class="muted small">Convertido el {fmtDateTime(lead.converted_at)}</p>{/if}
+          {#if lead.converted_at}<p class="muted small">Pasó a cliente el {fmtDateTime(lead.converted_at)}</p>{/if}
         {:else if !crmReady}
           <p class="muted">Convertir en cliente o brief estará disponible cuando se aplique la actualización de la base de datos.</p>
         {:else}
-          <p class="muted">Aún no es cliente ni tiene brief. Usa <strong>Convertir</strong> para crear el cliente, el brief o los dos de una vez.</p>
+          <p class="muted">Aún no es cliente ni tiene brief. Usa <strong>Ganado: pasar a cliente</strong> para crear el cliente, el brief o los dos de una vez.</p>
           {#if detail.client_matches?.length}
             <p class="hint-dup"><Icon name="alert" size={16} /> Su correo o teléfono ya es de {detail.client_matches.length === 1 ? 'un cliente' : 'clientes'}: {detail.client_matches.map((m) => m.client_code + ' ' + clientName(m)).join(', ')}.</p>
           {/if}
@@ -200,7 +237,7 @@
           <div><dt>Origen</dt><dd><StatusChip tone={leadSource(lead.source).tone} label={leadSource(lead.source).label} /></dd></div>
           {#if lead.page_url}<div><dt>Página de origen</dt><dd>{#if /^https?:\/\//i.test(lead.page_url)}<a href={lead.page_url} target="_blank" rel="noopener noreferrer">{lead.page_url.replace(/^https?:\/\//i, '')}</a>{:else}{lead.page_url}{/if}</dd></div>{/if}
           <div><dt>Actualizado</dt><dd>{fmtDateTime(lead.updated_at)}</dd></div>
-          <div class="dl__st"><dt>Estado</dt><dd><LeadStatusSelect {lead} {crmReady} onsaved={onStatusSaved} onconvert={() => (convertOpen = true)} label="Estado del lead" /></dd></div>
+          <div class="dl__st"><dt>Etapa</dt><dd><LeadStatusSelect {lead} {crmReady} onsaved={onStatusSaved} onconvert={() => (convertOpen = true)} label="Etapa del contacto" /></dd></div>
         </dl>
         {#if lead.email || phoneHref(lead.phone)}
           <div class="quick">
@@ -222,7 +259,25 @@
     </aside>
   </div>
 
+  <!-- Teléfono: «Marcar como perdido» y «Borrar» van al final de la ficha, no bajo el nombre. -->
+  {#if isOpen}
+    <div class="end-acts">
+      <button type="button" class="b" onclick={() => (lostOpen = true)}>Marcar como perdido</button>
+      <button type="button" class="b b--danger" onclick={() => (confirmDelete = true)}>Borrar</button>
+    </div>
+  {/if}
+
+  <!-- Teléfono: WhatsApp y «Ganado» siempre a mano, abajo (como la barra de la página del mes). -->
+  {#if isOpen && !fullyConverted}
+    <nav class="sales-bar" aria-label="Acciones del contacto">
+      {#if whatsappHref(lead.phone)}<a class="b" href={whatsappHref(lead.phone)} target="_blank" rel="noopener noreferrer">WhatsApp</a>{:else if lead.email}<a class="b" href={'mailto:' + lead.email}>Escribir</a>{:else}<span></span>{/if}
+      <button type="button" class="b b--primary" disabled={!crmReady} onclick={() => (convertOpen = true)}>Ganado: pasar a cliente</button>
+    </nav>
+  {/if}
+
   <ConvertLeadDialog bind:open={convertOpen} {detail} onconverted={onConverted} />
+  <ProposalDialog bind:open={newOpen} {lead} onsaved={onProposalChanged} />
+  <LostDialog bind:open={lostOpen} {lead} onsaved={onStatusSaved} />
   <ConfirmDialog
     bind:open={confirmDelete}
     title={`Borrar ${lead.ref_id}`}
@@ -276,12 +331,29 @@
   .tech { margin-top: var(--space-4); border-top: 1px solid var(--border-subtle); padding-top: var(--space-3); }
   .tech summary { cursor: pointer; font-size: var(--dash-small); color: var(--fg-secondary); min-height: 32px; display: flex; align-items: center; }
   .tech summary:hover { color: var(--fg-primary); }
+  .sales-top { display: flex; flex-direction: column; gap: var(--space-5); }
+  .sales-bar, .end-acts { display: none; }
   @media (max-width: 1099px) {
     .grid, .sk-grid { grid-template-columns: minmax(0, 1fr); }
     aside.col { order: -1; }
+    /* En venta: seguimientos y propuesta, después el contacto, después lo demás. */
+    .grid--sales { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-5); }
+    .grid--sales .col { display: contents; }
+    .grid--sales .sales-top { order: 1; }
+    .grid--sales aside.col > :global(*) { order: 2; }
+    .grid--sales .col:not(aside) > :global(:not(.sales-top)) { order: 3; }
   }
   @media (max-width: 719px) {
     .dl > div { grid-template-columns: 96px minmax(0, 1fr); }
     .row-end { flex-wrap: wrap; }
+    .sales-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: var(--space-2);
+      padding: var(--space-2) max(var(--space-3), env(safe-area-inset-left, 0px)) calc(var(--space-2) + env(safe-area-inset-bottom, 0px)) max(var(--space-3), env(safe-area-inset-right, 0px));
+      background: var(--bg-2); border-top: 1px solid var(--border); }
+    .sales-bar .b { min-height: 44px; justify-content: center; }
+    .hide-ph { display: none; }
+    .end-acts { display: flex; gap: var(--space-2); flex-wrap: wrap; margin: var(--space-5) 0 0; }
+    .end-acts .b { flex: 1 1 0; justify-content: center; min-height: 44px; }
+    /* Que la barra no tape lo último de la ficha. */
+    .end-acts { padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom, 0px)); }
   }
 </style>

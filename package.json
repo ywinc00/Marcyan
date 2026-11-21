@@ -26,6 +26,7 @@
     "test:briefs-handlers": "node scripts/test-briefs-handlers.mjs",
     "gen:brief-services": "node scripts/build-brief-services.mjs",
     "test:crm": "node scripts/test-crm.mjs",
+    "test:proposals": "node scripts/test-proposals.mjs",
     "test:finance": "node --experimental-test-module-mocks --no-warnings scripts/test-finance.mjs",
     "test:finance-books": "node --experimental-test-module-mocks --no-warnings scripts/test-finance-books.mjs",
     "test:finance-agent": "node --experimental-test-module-mocks --no-warnings scripts/test-finance-agent.mjs",
@@ -41,6 +42,7 @@
     "eval:marcy": "node scripts/evals/run.mjs marcy",
     "costes:chat": "node --env-file=.env.local scripts/chat-costes.mjs",
     "sync:catalogo": "node scripts/sync-catalogo.mjs",
+    "sync:catalogo-orbit": "node --env-file=.env.local scripts/sync-catalogo-orbit.mjs",
     "check:precios": "node scripts/verify-precios.mjs"
   },
   "dependencies": {

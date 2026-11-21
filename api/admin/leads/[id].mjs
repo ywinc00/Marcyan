@@ -50,6 +50,8 @@ export default async function handler(req, res) {
         fields.status = newStatus;
       }
       if (body.notes !== undefined) fields.notes = body.notes;
+      if (body.lost_reason !== undefined) fields.lost_reason = body.lost_reason;
+      if (body.lost_note !== undefined) fields.lost_note = body.lost_note;
       if (!Object.keys(fields).length) {
         return res.status(400).json({ ok: false, error: 'No hay cambios que guardar.' });
       }

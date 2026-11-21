@@ -13,7 +13,11 @@
   import { api } from '../lib/api.js';
   import { toast, toastError } from '../lib/toast.svelte.js';
   import ConfirmDialog from '../ui/ConfirmDialog.svelte';
+  import LostDialog from './LostDialog.svelte';
   import { LEAD_STATUSES, leadStatus, leavingConvertedMessage } from './crm.js';
+  // «Perdido» pide su motivo (Ventas §1): elegirlo abre el diálogo en vez de guardar.
+  let lostMounted = $state(false);
+  let lostOpen = $state(false);
 
   let { lead, crmReady = true, onsaved, onconvert, label = '' } = $props();
   let saving = $state(false);
@@ -33,6 +37,13 @@
     const next = e.currentTarget.value;
     const prev = lead.status;
     if (next === prev) return;
+    if (next === 'lost') {
+      e.currentTarget.value = prev;
+      shown = prev;
+      lostMounted = true;
+      lostOpen = true;
+      return;
+    }
     if (next === 'converted' && crmReady && !hasConversion && onconvert) {
       e.currentTarget.value = prev;
       shown = prev;
@@ -79,9 +90,12 @@
 </select>
 
 {#if askMounted}
-  <ConfirmDialog bind:open={askOpen} title="¿Sacarlo de Convertidos?" message={askMessage}
+  <ConfirmDialog bind:open={askOpen} title="¿Sacarlo de Ganados?" message={askMessage}
     confirmLabel={askNext ? 'Pasar a ' + leadStatus(askNext).label : 'Cambiar estado'} danger={false} busy={saving}
     onconfirm={confirmLeave} />
+{/if}
+{#if lostMounted}
+  <LostDialog bind:open={lostOpen} {lead} onsaved={(l) => { shown = 'lost'; onsaved?.(l); }} />
 {/if}
 
 <style>

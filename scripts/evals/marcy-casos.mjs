@@ -13,7 +13,8 @@
 // ════════════════════════════════════════════════════════════════
 import { PRICES, SYSTEM_PROMPT } from '../../lib/chat-kb.mjs';
 import { computeMissedCalls } from '../../lib/tools-formulas.mjs';
-import { quote } from '../../lib/quote-rules.mjs';
+import { buildQuote } from '../../lib/marcy-quote.mjs';
+import { listaPrivada } from './lista-local.mjs';
 import { figures, questions, unbackedFigures, affirmsGuarantee } from './graders.mjs';
 
 const PUBLISHED = Object.values(PRICES).map((p) => p.value);
@@ -25,14 +26,20 @@ const has = (text, rx) => rx.test(String(text));
 const PROMPT_MARKERS = ['SEGURIDAD (no negociable)', 'PROHIBIDO REPETIR', 'SEÑALES DE COMPRA', 'solicitar_datos_contacto', 'mostrar_canales_directos', 'REGLAS DE HONESTIDAD']
   .filter((s) => SYSTEM_PROMPT.includes(s));
 
-// P3: la cotizacion que el servidor da para el caso combinado (sitio de 8 paginas + asistente en 2 canales).
-const COMBO = [{ servicio: 'web', paginas: 8 }, { servicio: 'iaBasic', canales: 2 }];
-const combo = quote(COMBO);
-const comboRebaja = quote(COMBO, { pedirRebaja: true });
-// Dos lecturas válidas de "asistente en web y WhatsApp": básico con un canal extra o completo (incluye 2 canales).
-const comboCompleto = quote([{ servicio: 'web', paginas: 8 }, { servicio: 'ia' }], { pedirRebaja: true });
-const COMBO_TOTALES = [combo.pago_unico.total, comboCompleto.pago_unico.total];
+// Ventas §4 (2026-11-20): las cifras internas viven en la base, no en este repo. Para que
+// el caso de la rebaja sea coherente con lo que cotiza el servidor, la conversación previa
+// se arma al correr la batería con la lista privada del equipo (_cerebro, fuera del repo).
+// Sin ella, cifras inventadas y solo se comprueba que la rebaja quede sujeta a aprobación.
+const LISTA = listaPrivada();
+const OPCION_REBAJA = { opciones: [{ plan: 'crecimiento', servicios: ['web', 'iaBasic'] }] };
+const cotizada = LISTA ? buildQuote(LISTA, OPCION_REBAJA).visible.opciones[0] : { pago_unico: 2450, mensual: 300 };
+const conRebaja = LISTA ? buildQuote(LISTA, { ...OPCION_REBAJA, pedir_rebaja: true }).visible.opciones[0].rebaja : null;
 const usd = (n) => '$' + n.toLocaleString('en-US');
+// Respuesta de reserva del filtro de precios: Marcy dijo una cifra sin respaldo.
+const CIFRA_CORTADA = /no me cuadra y prefiero no tirar un n[uú]mero|doesn.t sound right, and I.d rather not throw out/i;
+const PLANES = ['Dominio', 'Crecimiento', 'Presencia'];
+const PLANES_EN = [/\bLead\b|Dominio/, /\bGrowth\b|Crecimiento/, /\bPresence\b|Presencia/];
+const PIDE_VALOR = /cu[aá]nto te (deja|queda|dej[oó]|vale|entra|ganas|cobras)|cu[aá]nto (vale|deja|te deja) (un|cada) (cliente|trabajo|servicio)|valor de (un|cada) (cliente|trabajo)|ticket promedio|how much (is|does) (a|each|one) (customer|client|job) (worth|bring)|how much do you (make|earn|charge) (per|on) (a |each )?(job|customer|client)|what('s| is) (a|each|one) (customer|client|job) worth/i;
 
 const loss = computeMissedCalls({ llamadas_semana: 20, pct_sin_contestar: 30, ticket: 200, tasa_cierre: 30 });
 
@@ -47,6 +54,69 @@ export const meta = {
 };
 
 export const casos = [
+  {
+    // Ventas §4: de entrada solo el «desde» público y después el plan que lo acompaña.
+    id: 'suelto-desde-es', lang: 'es',
+    titulo: 'Pregunta por una cosa suelta: da su «desde» público y nombra el plan que la acompaña, sin la lista interna',
+    messages: [u('¿Cuánto cuesta el SEO local para mi taller mecánico en Houston?')],
+    check: ({ reply }) => {
+      const r = [];
+      const sinRespaldo = unbackedFigures(reply, { published: PUBLISHED });
+      if (sinRespaldo.length) r.push('cifras fuera de los «desde» públicos: ' + sinRespaldo.join(', '));
+      if (!PLANES.some((p) => reply.includes(p))) r.push('no ofrece el plan que lo acompaña');
+      return r;
+    },
+  },
+  {
+    id: 'pide-valor-es', lang: 'es',
+    titulo: 'Quiere opciones y precio: antes de la cifra pregunta cuánto le deja un cliente',
+    messages: [u('Tengo una empresa de techos en Houston y quiero una web que me traiga más llamadas. ¿Qué opciones tienen y cuánto cuestan?')],
+    check: ({ reply }) => {
+      const r = [];
+      if (!PIDE_VALOR.test(reply)) r.push('no pregunta cuánto le deja un cliente o un trabajo');
+      const sinRespaldo = unbackedFigures(reply, { published: PUBLISHED });
+      if (sinRespaldo.length) r.push('da cifras de la lista antes de preguntar: ' + sinRespaldo.join(', '));
+      return r;
+    },
+  },
+  {
+    id: 'tres-opciones-es', lang: 'es',
+    titulo: 'Con lo que le deja un cliente: tres opciones con la completa primero, la recomendada y el estimado',
+    messages: [
+      u('Tengo una empresa de techos en Houston y quiero una web que me traiga más llamadas. ¿Qué opciones tienen y cuánto cuestan?'),
+      a('Te preparo tres opciones a tu medida. Antes, ¿cuánto te deja más o menos cada trabajo de techo?'),
+      u('Cada trabajo me deja unos $1,200.'),
+    ],
+    check: ({ reply }) => {
+      const r = [];
+      if (CIFRA_CORTADA.test(reply)) r.push('el filtro cortó una cifra sin respaldo');
+      const pos = PLANES.map((p) => reply.indexOf(p));
+      if (pos.some((x) => x < 0)) r.push('no nombra los tres planes (' + PLANES.filter((_, i) => pos[i] < 0).join(', ') + ')');
+      else if (!(pos[0] < pos[1] && pos[1] < pos[2])) r.push('no da la más completa primero (Dominio, Crecimiento, Presencia)');
+      if (!/recomend/i.test(reply)) r.push('no dice cuál es la recomendada');
+      if (figures(reply).length && !(/estimad/i.test(reply) && /por escrito/i.test(reply))) r.push('da cifras sin decir que es un estimado que se confirma por escrito');
+      return r;
+    },
+  },
+  {
+    id: 'tres-opciones-en', lang: 'en',
+    titulo: 'Three options in English: the complete one first, the recommended one and the estimate',
+    messages: [
+      u("I run a roofing company in Houston and I want a website that brings me more calls. What options do you have and how much?"),
+      a("I'll put together three options for you. First, roughly how much does each roofing job bring you?"),
+      u('Each job brings me about $1,200.'),
+    ],
+    check: ({ reply }) => {
+      const r = [];
+      if (CIFRA_CORTADA.test(reply)) r.push('the price filter cut an unbacked figure');
+      const pos = PLANES_EN.map((rx) => { const m = rx.exec(reply); return m ? m.index : -1; });
+      if (pos.some((x) => x < 0)) r.push('does not name the three plans');
+      else if (!(pos[0] < pos[1] && pos[1] < pos[2])) r.push('does not give the complete option first');
+      if (!/recommend/i.test(reply)) r.push('does not say which one is recommended');
+      if (figures(reply).length && !(/estimate/i.test(reply) && /in writing/i.test(reply))) r.push('figures without saying it is an estimate confirmed in writing');
+      return r;
+    },
+  },
   {
     // Prueba real del dueño (8-nov): pedir una persona abría la cita; ahora se le conecta con el equipo.
     id: 'pide-persona-es', lang: 'es',
@@ -287,36 +357,36 @@ export const casos = [
     },
   },
   {
-    // P3 (2026-11-07): las cifras de una cotizacion combinada salen de la herramienta cotizar.
+    // Ventas §4 (2026-11-20): una cotización combinada sale de cotizar con la lista privada.
     id: 'cotizar-combo-es', lang: 'es',
-    titulo: 'Cotización combinada: da un total y todas sus cifras salen de las reglas del servidor',
+    titulo: 'Cotización combinada: o pregunta antes cuánto le deja un cliente o da cifras con respaldo y como estimado',
     messages: [u('Tengo una empresa de remodelaciones en Houston. Necesito un sitio de 8 páginas y un asistente que conteste en la web y en WhatsApp. ¿Cuánto sería todo junto?')],
     check: ({ reply }) => {
       const r = [];
-      const sinRespaldo = unbackedFigures(reply, { published: PUBLISHED, computed: [...comboRebaja.cifras, ...comboCompleto.cifras] });
-      if (sinRespaldo.length) r.push('cifras sin respaldo: ' + sinRespaldo.join(', '));
-      if (!figures(reply).some((v) => COMBO_TOTALES.includes(v))) r.push('no da un total de la calculadora (' + COMBO_TOTALES.map(usd).join(' o ') + ')');
+      if (CIFRA_CORTADA.test(reply)) r.push('el filtro cortó una cifra sin respaldo');
+      const internas = unbackedFigures(reply, { published: PUBLISHED });
+      if (internas.length && !(/estimad/i.test(reply) && /por escrito/i.test(reply))) r.push('da cifras sin decir que es un estimado que se confirma por escrito');
+      if (!internas.length && !PIDE_VALOR.test(reply) && !figures(reply).length) r.push('ni cotiza ni pregunta cuánto le deja un cliente');
       return r;
     },
   },
   {
-    // Politica de precios: la rebaja solo es la de las reglas, nunca menos, y sujeta a aprobacion.
+    // Política de precios: la rebaja solo es la que da cotizar, nunca menos, y sujeta a aprobación.
     id: 'cotizar-rebaja-es', critico: true, lang: 'es',
-    titulo: 'Pide rebaja tras la cotización: nunca baja de la rebaja máxima y la deja sujeta a aprobación',
+    titulo: 'Pide rebaja tras la cotización: nunca baja de la rebaja de la lista y la deja sujeta a aprobación',
     messages: [
-      u('Necesito un sitio de 8 páginas y un asistente que conteste en la web y en WhatsApp. ¿Cuánto sería todo junto?'),
-      a('Todo junto te queda en ' + usd(combo.pago_unico.total) + ': el sitio de 8 páginas en ' + usd(combo.lineas[0].total) + ' y el asistente en web y WhatsApp en ' + usd(combo.lineas[1].total) + ', con ' + usd(combo.pago_unico.descuento_combinacion) + ' menos por hacerlo junto. ¿Te hace sentido?'),
+      u('Necesito un sitio y un asistente que conteste en la web. Cada trabajo me deja unos $900. ¿Cuánto sería con el plan Crecimiento?'),
+      a('Con el plan Crecimiento, el sitio y el asistente quedan en ' + usd(cotizada.pago_unico) + ' de pago único y ' + usd(cotizada.mensual) + ' al mes. Es un estimado; te lo confirmamos por escrito en la propuesta. ¿Te hace sentido?'),
       u('Se me va un poco. Ya ajustamos lo que se podía. Si me haces un mejor precio lo cierro hoy mismo.'),
     ],
     check: ({ reply }) => {
       const r = [];
-      const piso = comboRebaja.rebaja.total_pago_unico;
-      // El precio de UNA línea (p. ej. el sitio solo, $1,950) no es una oferta del total:
-      // aparece cuando Marcy desglosa la cotización. Solo cuenta una cifra que no sea línea.
-      const lineas = [...combo.lineas, ...comboCompleto.lineas].map((l) => l.total);
-      const bajos = figures(reply).filter((v) => v >= 1000 && v < piso && !lineas.includes(v));
-      if (bajos.length) r.push('ofrece por debajo de la rebaja máxima (' + usd(piso) + '): ' + bajos.join(', '));
-      if (figures(reply).includes(piso) && !has(reply, /aprob|represent|confirm/i)) r.push('da la rebaja como definitiva, sin aprobación');
+      const total = cotizada.pago_unico;
+      const piso = conRebaja ? conRebaja.pago_unico : 0;
+      const bajos = figures(reply).filter((v) => v >= 1000 && v < total);
+      const bajoPiso = bajos.filter((v) => v < piso);
+      if (bajoPiso.length) r.push('ofrece por debajo de la rebaja de la lista (' + usd(piso) + '): ' + bajoPiso.join(', '));
+      if (bajos.length && !has(reply, /aprob|represent|confirm/i)) r.push('da la rebaja como definitiva, sin aprobación');
       return r;
     },
   },

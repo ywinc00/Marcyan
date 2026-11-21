@@ -29,7 +29,7 @@
 // ════════════════════════════════════════════════════════════════
 import Anthropic from '@anthropic-ai/sdk';
 import { SYSTEM_PROMPT, LIMITS, MESSAGES, brandPostFilter, pricePostFilter, estimateNote, CONTACT_TOOL, CHANNELS_TOOL, LINK_TOOL, CHAT_TOOLS, LINK_PAGES, INTERNAL_TOOLS, CALC_TOOL, SITE_TOOL, QUOTE_TOOL, historyFigures, blockedFigures } from '../lib/chat-kb.mjs';
-import { quote } from '../lib/quote-rules.mjs';
+import { buildQuote, salesCatalog } from '../lib/marcy-quote.mjs';
 import { computeMissedCalls, computeNoShows } from '../lib/tools-formulas.mjs';
 // SSRF + descarga endurecida (SIN Postgres) y motor determinista del diagnóstico.
 // ⚠️ NUNCA importar api/diagnostic.mjs desde aquí (arrastra @vercel/postgres y rompe
@@ -421,14 +421,14 @@ export function computeLossToolResult(input) {
   return FAIL_RESULT; // modo ausente/inválido o faltan los números esenciales → no computa
 }
 
-// cotizar — puro y testeable. Las reglas viven en lib/quote-rules.mjs; Marcy solo
-// repite las cifras devueltas (van al allowlist dinámico del filtro de precios).
-export function quoteToolResult(input, lang = 'es') {
-  const inp = input || {};
-  const q = quote(Array.isArray(inp.servicios) ? inp.servicios : [], { pedirRebaja: inp.pedir_rebaja === true, lang });
-  if (!q.ok) return FAIL_RESULT;
-  const { cifras, ...visible } = q;
-  return { content: JSON.stringify(visible), extraAllow: cifras.flatMap(priceAllowVariants) };
+// cotizar — puro y testeable. Las opciones y sus precios salen de la lista PRIVADA de
+// Ventas (la de Orbit, en la base) con lib/marcy-quote.mjs; Marcy solo repite las cifras
+// devueltas (van al allowlist dinámico del filtro de precios). `quote` es lo que se
+// guarda en Orbit cuando la conversación tenga contacto.
+export function quoteToolResult(input, lang = 'es', catalog = null) {
+  const q = buildQuote(catalog, input || {}, { lang });
+  if (!q.ok) return { content: JSON.stringify({ ok: false, motivo: q.motivo }), extraAllow: [] };
+  return { content: JSON.stringify(q.visible), extraAllow: q.figures.flatMap(priceAllowVariants), quote: q.save };
 }
 
 // revisar_sitio — tool_result SOLO con enteros + labels de NUESTRO catálogo
@@ -500,7 +500,7 @@ async function reviewWeb(g, lang) {
 // request (cap 1 iteración): la llama el handler con el primer tool_use interno.
 async function runInternalTool(toolUse, { lang, ip, sid }) {
   if (toolUse.name === CALC_TOOL.name) return computeLossToolResult(toolUse.input || {});
-  if (toolUse.name === QUOTE_TOOL.name) return quoteToolResult(toolUse.input || {}, lang);
+  if (toolUse.name === QUOTE_TOOL.name) return quoteToolResult(toolUse.input || {}, lang, await salesCatalog());
   if (toolUse.name === SITE_TOOL.name) {
     if (!(await siteReviewAllowed(sid, ip))) return FAIL_RESULT;    // límites primero
     const inp = toolUse.input || {};
@@ -619,7 +619,7 @@ export default async function handler(req, res) {
 
 ${dateCtx}` : dateCtx, tools: [...CHAT_TOOLS, ch.SLOTS_TOOL], extraInternal: webSlots });
     // Orbit (migración 018): el turno tal como lo vio el visitante, para el historial y la vista en vivo.
-    await recordTurn({ sid, env: chatEnv(), lang, userText: lastUserText(messages), reply: t.reply, action: t.action, tool: t.tool, cortadas: t.cortadas, fallback: t.fallback, costMicro: t.costMicro });
+    await recordTurn({ sid, env: chatEnv(), lang, userText: lastUserText(messages), reply: t.reply, action: t.action, tool: t.tool, cortadas: t.cortadas, fallback: t.fallback, costMicro: t.costMicro, quote: t.quote });
     return res.status(200).json(t.action ? { reply: t.reply, action: t.action } : { reply: t.reply });
   } catch (err) {
     // Nunca filtrar el error del SDK al cliente; detalle solo en logs del servidor.
@@ -680,6 +680,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
     // turno anterior): Marcy puede repetirlas sin que el filtro estricto las corte.
     let extraAllow = historyFigures(messages);
     let lossFigures = [];   // cifras de calcular_perdida: pérdidas del cliente, no precios (estimateNote)
+    let quote = null;       // cotización de cotizar, para guardarla en Orbit (lib/marcy-quote.mjs)
 
     // ¿Pidió una herramienta INTERNA (cómputo/revisión)? Ejecútala server-side y haz UNA
     // 2ª llamada (cap 1 iteración). El visitante no ve estas tools ni sus resultados.
@@ -693,6 +694,7 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
         : await runInternalTool(internal, { lang, ip, sid });
       extraAllow = [...extraAllow, ...(out.extraAllow || [])];
       if (internal.name === CALC_TOOL.name) lossFigures = out.extraAllow || [];
+      if (out.quote) quote = out.quote;
       // La API exige un tool_result por CADA tool_use del turno 1. Solo el interno
       // ejecutado lleva resultado real; cualquier OTRA tool del mismo turno (raro, contra
       // el prompt): si es de UI la honramos vía RESCATE abajo (ok:true = "mostrada"), si es
@@ -773,7 +775,8 @@ export async function marcyTurn({ messages, lang = 'es', sid, ip = null, extraCo
     console.log(usageLogLine({ model, env: chatEnv(), firstTurn, u: usage, costMicro }));
     await recordUsage({ model, env: chatEnv(), firstTurn, u: usage, costMicro });
 
-    return { reply, action, tool: internal ? [internal.name, ...extraTools].join('+').slice(0, 40) : null, cortadas, fallback, empty: !text, toolOnly: !!(action && text === toolOnlyFallback(action, lang)), costMicro, model };
+    // La cotización solo se guarda si el cliente la vio (el filtro no cortó la respuesta).
+    return { reply, action, tool: internal ? [internal.name, ...extraTools].join('+').slice(0, 40) : null, cortadas, fallback, empty: !text, toolOnly: !!(action && text === toolOnlyFallback(action, lang)), costMicro, model, quote: fallback ? null : quote };
   }
 }
 

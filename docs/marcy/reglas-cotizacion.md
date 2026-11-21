@@ -1,48 +1,75 @@
-# Reglas de cotización de Marcy (P3, opción A)
+# Reglas de cotización de Marcy (Ventas §4, planes y paquetes)
 
-Estado: **aprobadas por el dueño el 2026-11-07.** Marcy ya no calcula precios:
-le pasa al servidor lo que pide el cliente y repite la cifra que sale. Si dice una cifra de 100
-dólares o más que no sale de aquí, de los precios publicados o de lo que dijo el propio cliente,
-el servidor la corta antes de que el cliente la vea.
+Estado: **plan de Ventas aprobado por el dueño (18-nov-2026), con la corrección del 19-nov.**
+Sustituye a las reglas del 7-nov (P3, opción A), que cotizaban con la lista vieja de 14 servicios.
 
-Código: `lib/quote-rules.mjs` (mantener esta tabla igual al código).
+Marcy no calcula precios: le pasa al servidor qué opciones quiere dar y repite las cifras que salen.
+Si dice una cifra de 100 dólares o más que no sale de aquí, de los precios publicados o de lo que dijo
+el propio cliente, el servidor la corta antes de que el cliente la vea.
 
-## Precio base = precio publicado, con lo que incluye
+Código: `lib/marcy-quote.mjs` (opciones y precios), `lib/chat-kb.mjs` (guion y herramienta `cotizar`).
+Pruebas: `npm run test:cotizar` y la batería `npm run eval:marcy`.
 
-| Servicio | Base | Incluye | Extras propuestos |
-|---|---|---|---|
-| Landing Page | $400 | 1 página, 1 idioma | segundo idioma +$150 |
-| Rediseño de sitio | $500 | hasta 5 páginas, 1 idioma | página extra +$100 · segundo idioma +$200 |
-| Sitio a medida completo | $1,500 | hasta 5 páginas, bilingüe | página extra +$150 |
-| Asistente básico | $500 | 1 tarea, 1 canal | tarea extra +$200 · canal extra +$250 |
-| Asistente completo | $900 | hasta 3 tareas, 2 canales | tarea extra +$200 · canal extra +$250 |
-| Tienda esencial | $900 | hasta 25 productos, 1 idioma | cada 25 productos más +$150 · segundo idioma +$300 |
-| Tienda a medida | $2,900 | hasta 100 productos, bilingüe | cada 50 productos más +$200 |
-| Optimización inicial SEO local | $300 | 1 ubicación | ubicación extra +$150 |
-| SEO local continuo | $600/mes | 1 ubicación | ubicación extra +$200/mes |
-| Cimientos AEO | $500 | | |
-| Monitoreo en IA | $200/mes | | |
-| Logo | $150 | | |
-| Branding completo | $750 | | |
-| Mantenimiento | $120/mes | | |
+## De dónde salen las cifras
 
-"Tarea" del asistente = contestar, agendar, cotizar, captar datos… "Canal" = web, WhatsApp, Instagram…
+- **Públicas** («desde»): bloque `preciosPublicos` del catálogo de Ventas, copiado al código con
+  `npm run sync:catalogo`. Es lo único que Marcy dice **de entrada**.
+- **Internas** (planes, paquetes y lista de servicios): solo en la base, tabla `sales_catalog`, la misma
+  que usa Orbit. Este repo es público: aquí no hay ni una cifra interna. Marcy las da solo al cotizar,
+  y el servidor les pone precio con `priceOption` de `lib/proposals.mjs`, así lo que dice en el chat y la
+  propuesta que queda en Orbit son lo mismo.
 
-## Reglas generales
+## Cómo cotiza
 
-1. **Descuento por combinación:** 2 o más proyectos de pago único en la misma cotización = 10 % menos
-   sobre esos proyectos. Lo mensual nunca se descuenta.
-2. **Rebaja si el cliente insiste:** solo después de ajustar el alcance, hasta un 10 % más, y siempre
-   "sujeta a aprobación de un representante" (te llega como contacto para que la confirmes).
-3. **Piso:** el pago único nunca baja del 85 % de la suma de los precios base.
-4. Totales redondeados a múltiplos de 50.
+1. **De entrada**, si preguntan por una cosa suelta: su «desde» público y, en una frase, el plan que la
+   acompaña (página o web: Presencia o Crecimiento; SEO local: Presencia o Crecimiento; asistente con IA
+   o que la IA te recomiende: Dominio). No recita la lista interna.
+2. **Antes de la cifra** de un plan o de las opciones, pregunta cuánto le deja un cliente o un trabajo.
+3. **Al cotizar**, tres opciones, la más completa primero:
+   - Paquetes de siempre (`paquetes: true`): Dominio con la web de servicios por ciudades, Crecimiento con
+     la Web que vende (la recomendada) y Presencia con la página web y la ficha de Google.
+   - A la medida (`opciones`): hasta tres, cada una con un plan, servicios o los dos. El servidor las
+     ordena de la más completa a la de entrada y marca como recomendada la de Crecimiento (o la del medio).
+   - Con lo que le vale un cliente, dice con cuántos clientes al mes se paga lo mensual. Es una cuenta,
+     nunca una promesa.
+4. **El cliente decidido** no recibe tres opciones: se cierra con lo que pidió.
 
-## Ejemplo
+## Reglas de la lista (las hace cumplir el servidor)
 
-Sitio de 8 páginas + asistente que contesta en la web y en WhatsApp:
-sitio $1,500 + 3 páginas × $150 = $1,950 · asistente $500 + 1 canal × $250 = $750 ·
-subtotal $2,700 · combinación −$250 · **total $2,450**. Si insiste: **$2,200 sujeto a aprobación.**
+1. **Planes:** se ofrecen Presencia, Crecimiento y Dominio. Base no se ofrece en propuestas.
+2. **Lo mensual** (plan, cuota de los asistentes, Seguimiento en IA) va tal cual la lista: nunca se descuenta.
+   En Dominio, la cuota del asistente con IA va incluida.
+3. **Combinación:** dos o más proyectos de pago único en la misma opción = el descuento de la lista
+   (`reglas.comboDescuentoProyectos`), redondeado (`reglas.redondeoProyectos`).
+4. **Mínimo:** ningún proyecto baja de su precio público ni del mínimo de la lista (`reglas.pisoSobreBase`).
+5. **Rebaja si el cliente insiste:** solo después de ajustar el alcance, hasta un 10 % más, nunca bajo el
+   mínimo, y siempre «sujeta a aprobación de un representante» (le llega al equipo como contacto). Un
+   servicio «desde» no se rebaja.
+6. **Más alcance** (más páginas, otro idioma, más canales): se cotiza lo que hay y el ajuste va en la
+   propuesta escrita. El rediseño en dos idiomas sí se cotiza (`segundoIdioma` de la lista).
+7. **Todo precio o plazo** va como estimado que se confirma por escrito en la propuesta (Legal, 15-nov).
+
+## Condiciones que puede decir (Legal, `05-condiciones-comerciales.md`, tal cual)
+
+- «Mes a mes, sin permanencia, salvo con la web en tres pagos.»
+- «Si un mes no hacemos lo que dice tu plan, ese mes no se cobra. Garantizamos el trabajo, no el resultado.»
+- «Paga el año por adelantado y tienes un mes de regalo.»
+- «Tu web en 3 pagos sin recargo si eliges 6 meses de plan.» (solo en el paquete que lo lleva)
+- Nada sobre impuestos (pendiente del contador). Los textos en inglés son traducción de Marcy, sin revisar por Legal.
+
+## Dónde queda la cotización
+
+- En la conversación (columna `quote` de `chat_conversations`), con los ids de plan, servicio y añadido,
+  la recomendada y lo que le vale un cliente.
+- En Orbit, como **borrador** (`created_by: 'marcy'`, `send: false`) unido al contacto, en cuanto la
+  conversación tiene un lead (`LEAD-…`): al dejar su contacto, al agendar o por WhatsApp e Instagram. La
+  envía el dueño desde Orbit. `source_ref` = la conversación más una clave de la cotización: el reintento
+  no duplica.
+- El cliente decidido va al brief (`MRC-…`), que Orbit todavía no admite en una propuesta: su cotización
+  queda en la conversación hasta que exista la forma (pedido a Bases y Estructura el 20-nov).
+- Pendiente (Orbit fase 2): si quien escribe ya es cliente, saber su plan y ofrecer el siguiente.
 
 ## Cambios
 
-Cualquier cifra se cambia solo con el OK del dueño, en el código y en esta tabla a la vez.
+Una cifra se cambia solo en el catálogo de Ventas (`_cerebro/ventas/catalogo.json`), con el OK del dueño, y
+se carga en la base con `npm run sync:catalogo-orbit`. Este documento y el código no llevan cifras.

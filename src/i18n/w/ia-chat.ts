@@ -43,16 +43,16 @@ const base = (city: IaCity) => {
           pedir: 'Reservar mesa',
           campos: ['Nombre', 'Personas', 'Mensaje'],
           ventanas: [
-            { canal: 'whatsapp' as const, x: 36, y: 50, w: 300, quien: 'Mariela R.', texto: '¿Tienen mesa para seis el sábado?', hora: '10:47 p. m.' },
-            { canal: 'instagram' as const, x: 318, y: 74, w: 290, quien: 'lucia.mia', texto: 'Hola, ¿hacen comida para una fiesta en Doral?', hora: '10:52 p. m.' },
-            { canal: 'form' as const, x: 584, y: 46, w: 300, quien: 'Javier M.', texto: '¿Se puede reservar el local para un evento?', hora: '11:02 p. m.' },
-            { canal: 'messenger' as const, x: 862, y: 66, w: 290, quien: 'Kate L.', texto: 'Hi! Can we book a table for four on Friday?', hora: '11:06 p. m.', enLang: true },
-            { canal: 'web' as const, x: 1104, y: 44, w: 250, quien: 'Visitante', texto: 'Hola, ¿abren mañana para el almuerzo?', hora: '11:10 p. m.' },
-            { canal: 'llamada' as const, x: 1030, y: 318, w: 318, quien: '(305) 555-0142', texto: 'No dejó mensaje', hora: '11:14 p. m.' },
-            { canal: 'whatsapp' as const, x: 110, y: 352, w: 300, quien: 'Yoel T.', texto: 'Buenas, ¿tienen platos sin gluten?', hora: '11:21 p. m.', extra: true },
-            { canal: 'instagram' as const, x: 402, y: 400, w: 290, quien: 'andrea.gm', texto: '¿Llevan pedidos a Brickell mañana?', hora: '11:33 p. m.', extra: true },
-            { canal: 'sms' as const, x: 1030, y: 452, w: 318, quien: '(786) 555-0187', texto: '¿Aceptan reservas para diez?', hora: '11:41 p. m.', extra: true },
-            { canal: 'web' as const, x: 714, y: 404, w: 290, quien: 'Visitante', texto: 'Hi, is there parking nearby?', hora: '11:52 p. m.', extra: true, enLang: true },
+            { canal: 'whatsapp' as const, x: 36, y: 50, w: 300, quien: 'Mariela R.', texto: '¿Tienen mesa para seis el sábado?', hora: '10:47 p. m.' },
+            { canal: 'instagram' as const, x: 318, y: 74, w: 290, quien: 'lucia.mia', texto: 'Hola, ¿hacen comida para una fiesta en Doral?', hora: '10:52 p. m.' },
+            { canal: 'form' as const, x: 584, y: 46, w: 300, quien: 'Javier M.', texto: '¿Se puede reservar el local para un evento?', hora: '11:02 p. m.' },
+            { canal: 'messenger' as const, x: 862, y: 66, w: 290, quien: 'Kate L.', texto: 'Hi! Can we book a table for four on Friday?', hora: '11:06 p. m.', enLang: true },
+            { canal: 'web' as const, x: 1104, y: 44, w: 250, quien: 'Visitante', texto: 'Hola, ¿abren mañana para el almuerzo?', hora: '11:10 p. m.' },
+            { canal: 'llamada' as const, x: 1030, y: 318, w: 318, quien: '(305) 555-0142', texto: 'No dejó mensaje', hora: '11:14 p. m.' },
+            { canal: 'whatsapp' as const, x: 110, y: 352, w: 300, quien: 'Yoel T.', texto: 'Buenas, ¿tienen platos sin gluten?', hora: '11:21 p. m.', extra: true },
+            { canal: 'instagram' as const, x: 402, y: 400, w: 290, quien: 'andrea.gm', texto: '¿Llevan pedidos a Brickell mañana?', hora: '11:33 p. m.', extra: true },
+            { canal: 'sms' as const, x: 1030, y: 452, w: 318, quien: '(786) 555-0187', texto: '¿Aceptan reservas para diez?', hora: '11:41 p. m.', extra: true },
+            { canal: 'web' as const, x: 714, y: 404, w: 290, quien: 'Visitante', texto: 'Hi, is there parking nearby?', hora: '11:52 p. m.', extra: true, enLang: true },
           ],
           filas: [
             { canal: 'whatsapp' as const, txt: 'Mariela R. y Yoel T.', est: 'ok' as const },
@@ -77,31 +77,31 @@ const base = (city: IaCity) => {
       labels: ['Sin Marcy', 'Con Marcy'] as [string, string],
       sin: (H
         ? [
-            { text: '¿Tienen cita para el sábado?', from: 'WhatsApp', time: '9:40 p. m.' },
-            { text: '¿Cuánto cuesta el servicio?', from: 'Instagram', time: '10:15 p. m.' },
-            { text: 'Llamada perdida', kind: 'notice', time: '8:05 a. m.' },
-            { text: '¿Siguen abiertos?', from: 'Web', time: '11:02 p. m.' },
-            { text: 'Mensaje de voz sin escuchar', kind: 'notice', time: '7:48 a. m.' },
-            { text: '¿Hacen presupuestos en Pearland?', from: 'WhatsApp', time: '7:12 p. m.' },
-            { text: '¿Me pueden llamar mañana temprano?', from: 'WhatsApp', time: '10:51 p. m.' },
+            { text: '¿Tienen cita para el sábado?', from: 'WhatsApp', time: '9:40 p. m.' },
+            { text: '¿Cuánto cuesta el servicio?', from: 'Instagram', time: '10:15 p. m.' },
+            { text: 'Llamada perdida', kind: 'notice', time: '8:05 a. m.' },
+            { text: '¿Siguen abiertos?', from: 'Web', time: '11:02 p. m.' },
+            { text: 'Mensaje de voz sin escuchar', kind: 'notice', time: '7:48 a. m.' },
+            { text: '¿Hacen presupuestos en Pearland?', from: 'WhatsApp', time: '7:12 p. m.' },
+            { text: '¿Me pueden llamar mañana temprano?', from: 'WhatsApp', time: '10:51 p. m.' },
             { text: 'Formulario sin respuesta', kind: 'notice', time: 'Ayer' },
-            { text: 'Sigo esperando, ¿me contestan?', from: 'Instagram', time: '9:30 a. m.' },
+            { text: 'Sigo esperando, ¿me contestan?', from: 'Instagram', time: '9:30 a. m.' },
           ]
         : [
-            { text: '¿Tienen mesa para seis el sábado?', from: 'WhatsApp', time: '9:40 p. m.' },
-            { text: '¿Hacen menú para eventos?', from: 'Instagram', time: '10:15 p. m.' },
-            { text: 'Llamada perdida', kind: 'notice', time: '8:05 a. m.' },
-            { text: '¿Abren mañana para el almuerzo?', from: 'Web', time: '11:02 p. m.' },
-            { text: 'Mensaje de voz sin escuchar', kind: 'notice', time: '7:48 a. m.' },
-            { text: '¿Llevan pedidos a Brickell?', from: 'WhatsApp', time: '7:12 p. m.' },
-            { text: 'Hi, do you take reservations?', from: 'WhatsApp', time: '10:51 p. m.', en: true },
+            { text: '¿Tienen mesa para seis el sábado?', from: 'WhatsApp', time: '9:40 p. m.' },
+            { text: '¿Hacen menú para eventos?', from: 'Instagram', time: '10:15 p. m.' },
+            { text: 'Llamada perdida', kind: 'notice', time: '8:05 a. m.' },
+            { text: '¿Abren mañana para el almuerzo?', from: 'Web', time: '11:02 p. m.' },
+            { text: 'Mensaje de voz sin escuchar', kind: 'notice', time: '7:48 a. m.' },
+            { text: '¿Llevan pedidos a Brickell?', from: 'WhatsApp', time: '7:12 p. m.' },
+            { text: 'Hi, do you take reservations?', from: 'WhatsApp', time: '10:51 p. m.', en: true },
             { text: 'Formulario sin respuesta', kind: 'notice', time: 'Ayer' },
-            { text: 'Sigo esperando, ¿me contestan?', from: 'Instagram', time: '9:30 a. m.' },
+            { text: 'Sigo esperando, ¿me contestan?', from: 'Instagram', time: '9:30 a. m.' },
           ]) as MsgSin[],
       conTitle: 'Todo contestado',
       con: H
         ? [
-            { label: 'Respondido', kind: 'ok' as Kind, note: '¿Tienen cita para el sábado? Apartó las 10:00 a. m.' },
+            { label: 'Respondido', kind: 'ok' as Kind, note: '¿Tienen cita para el sábado? Apartó las 10:00 a. m.' },
             { label: 'Respondido', kind: 'ok' as Kind, note: '¿Siguen abiertos? Agendó la primera visita' },
             { label: 'Te lo pasa', kind: 'mid' as Kind, note: '¿Cuánto cuesta? Te pide la propuesta' },
             { label: 'Respondido', kind: 'ok' as Kind, note: '¿Presupuestos en Pearland? Sí, está en tu zona' },
@@ -148,40 +148,40 @@ const base = (city: IaCity) => {
               canal: 'WhatsApp', logo: 'whatsapp', quien: 'Luis T.', ini: 'LT', color: ['#E9DCCB', '#6B4E2E'],
               responder: 'Responder a Luis T.',
               msgs: [
-                { h: '11:21 p. m.', t: 'Buenas noches, ¿cuánto tarda una cotización?' },
-                { m: true, h: '11:21 p. m.', t: 'Hola, Luis. Depende del trabajo: si me mandas una foto, el dueño te la prepara. ¿Te aparto una visita?' },
-                { h: '11:22 p. m.', t: 'Sí, el sábado en la mañana.' },
-                { m: true, h: '11:22 p. m.', t: 'Listo: sábado a las 10:00 a. m. Te llega la confirmación por aquí.' },
+                { h: '11:21 p. m.', t: 'Buenas noches, ¿cuánto tarda una cotización?' },
+                { m: true, h: '11:21 p. m.', t: 'Hola, Luis. Depende del trabajo: si me mandas una foto, el dueño te la prepara. ¿Te aparto una visita?' },
+                { h: '11:22 p. m.', t: 'Sí, el sábado en la mañana.' },
+                { m: true, h: '11:22 p. m.', t: 'Listo: sábado a las 10:00 a. m. Te llega la confirmación por aquí.' },
               ],
             },
             {
               canal: 'Instagram', logo: 'instagram', quien: 'marisol.hz', ini: 'MH', color: ['#F3DCE4', '#8C3A5B'],
               responder: 'Responder a marisol.hz',
               msgs: [
-                { h: '10:52 p. m.', t: `¿Hacen visitas en ${zone}? Quiero cambiar el fregadero.` },
-                { m: true, h: '10:52 p. m.', t: `Sí, ${zone} está en nuestra zona. Tengo el lunes a las 9:00 a. m. o el martes a las 4:00 p. m.` },
-                { h: '10:53 p. m.', t: 'El martes me va mejor.' },
-                { m: true, h: '10:53 p. m.', t: 'Apartado el martes a las 4:00 p. m. Si te surge algo, escríbeme aquí.' },
+                { h: '10:52 p. m.', t: `¿Hacen visitas en ${zone}? Quiero cambiar el fregadero.` },
+                { m: true, h: '10:52 p. m.', t: `Sí, ${zone} está en nuestra zona. Tengo el lunes a las 9:00 a. m. o el martes a las 4:00 p. m.` },
+                { h: '10:53 p. m.', t: 'El martes me va mejor.' },
+                { m: true, h: '10:53 p. m.', t: 'Apartado el martes a las 4:00 p. m. Si te surge algo, escríbeme aquí.' },
               ],
             },
             {
               canal: 'Messenger', logo: 'messenger', quien: 'Rosa G.', ini: 'RG', color: ['#DCE6F5', '#2F5689'], en: true,
               responder: 'Responder a Rosa G.',
               msgs: [
-                { h: '11:06 p. m.', t: 'Hi! Could someone come by this week for an estimate?' },
-                { m: true, h: '11:06 p. m.', t: 'Hi Rosa! Sure. I have Thursday at 11:00 AM or Friday at 3:00 PM. Which works for you?' },
-                { h: '11:07 p. m.', t: 'Friday works.' },
-                { m: true, h: '11:07 p. m.', t: "Booked: Friday at 3:00 PM. You'll get a reminder the day before." },
+                { h: '11:06 p. m.', t: 'Hi! Could someone come by this week for an estimate?' },
+                { m: true, h: '11:06 p. m.', t: 'Hi Rosa! Sure. I have Thursday at 11:00 AM or Friday at 3:00 PM. Which works for you?' },
+                { h: '11:07 p. m.', t: 'Friday works.' },
+                { m: true, h: '11:07 p. m.', t: "Booked: Friday at 3:00 PM. You'll get a reminder the day before." },
               ],
             },
             {
               canal: 'Tu web', logo: undefined, quien: 'Carlos P.', ini: 'CP', color: ['#DDEBDF', '#2F6B45'],
               responder: 'Responder a Carlos P.',
               msgs: [
-                { h: '11:02 p. m.', t: '¿Pueden venir esta semana a ver la casa?' },
-                { m: true, h: '11:02 p. m.', t: 'Hola, Carlos. Sí: tengo el miércoles a las 5:00 p. m. ¿Te lo aparto?' },
-                { h: '11:03 p. m.', t: 'Sí. ¿Y cuánto costaría pintarla entera?' },
-                { m: true, h: '11:03 p. m.', t: 'Eso lo cotiza el dueño al verla. Ya le pasé tu mensaje con el resumen.' },
+                { h: '11:02 p. m.', t: '¿Pueden venir esta semana a ver la casa?' },
+                { m: true, h: '11:02 p. m.', t: 'Hola, Carlos. Sí: tengo el miércoles a las 5:00 p. m. ¿Te lo aparto?' },
+                { h: '11:03 p. m.', t: 'Sí. ¿Y cuánto costaría pintarla entera?' },
+                { m: true, h: '11:03 p. m.', t: 'Eso lo cotiza el dueño al verla. Ya le pasé tu mensaje con el resumen.' },
               ],
             },
           ]
@@ -190,40 +190,40 @@ const base = (city: IaCity) => {
               canal: 'WhatsApp', logo: 'whatsapp', quien: 'Mariela R.', ini: 'MR', color: ['#E9DCCB', '#6B4E2E'],
               responder: 'Responder a Mariela R.',
               msgs: [
-                { h: '10:47 p. m.', t: '¿Tienen mesa para seis el sábado en la noche?' },
-                { m: true, h: '10:47 p. m.', t: 'Hola, Mariela. Sí: tengo a las 7:30\u00a0p.\u00a0m. o a las 9:00\u00a0p.\u00a0m. ¿Cuál te aparto?' },
-                { h: '10:48 p. m.', t: 'A las 7:30, por favor. Es un cumpleaños.' },
-                { m: true, h: '10:48 p. m.', t: 'Listo: sábado a las 7:30\u00a0p.\u00a0m., mesa para seis. Te llega la confirmación por aquí.' },
+                { h: '10:47 p. m.', t: '¿Tienen mesa para seis el sábado en la noche?' },
+                { m: true, h: '10:47 p. m.', t: 'Hola, Mariela. Sí: tengo a las 7:30\u00a0p.\u00a0m. o a las 9:00\u00a0p.\u00a0m. ¿Cuál te aparto?' },
+                { h: '10:48 p. m.', t: 'A las 7:30, por favor. Es un cumpleaños.' },
+                { m: true, h: '10:48 p. m.', t: 'Listo: sábado a las 7:30\u00a0p.\u00a0m., mesa para seis. Te llega la confirmación por aquí.' },
               ],
             },
             {
               canal: 'Instagram', logo: 'instagram', quien: 'lucia.mia', ini: 'LM', color: ['#F3DCE4', '#8C3A5B'],
               responder: 'Responder a lucia.mia',
               msgs: [
-                { h: '10:52 p. m.', t: `¿Hacen comida para una fiesta en ${zone}? Seríamos unas 30 personas.` },
-                { m: true, h: '10:52 p. m.', t: `Sí, ${zone} está en nuestra zona. El dueño te prepara la propuesta: ¿para qué día sería?` },
-                { h: '10:53 p. m.', t: 'Para el sábado 14.' },
-                { m: true, h: '10:53 p. m.', t: 'Anotado: 30 personas, el sábado 14. Ya le pasé tu pedido con el resumen.' },
+                { h: '10:52 p. m.', t: `¿Hacen comida para una fiesta en ${zone}? Seríamos unas 30 personas.` },
+                { m: true, h: '10:52 p. m.', t: `Sí, ${zone} está en nuestra zona. El dueño te prepara la propuesta: ¿para qué día sería?` },
+                { h: '10:53 p. m.', t: 'Para el sábado 14.' },
+                { m: true, h: '10:53 p. m.', t: 'Anotado: 30 personas, el sábado 14. Ya le pasé tu pedido con el resumen.' },
               ],
             },
             {
               canal: 'Messenger', logo: 'messenger', quien: 'Kate L.', ini: 'KL', color: ['#DCE6F5', '#2F5689'], en: true,
               responder: 'Responder a Kate L.',
               msgs: [
-                { h: '11:06 p. m.', t: "Hi! We're visiting Miami. Can we book a table for four on Friday?" },
-                { m: true, h: '11:06 p. m.', t: 'Hi Kate! Sure. I have Friday at 7:00 PM or 8:30 PM. Which works for you?' },
-                { h: '11:07 p. m.', t: '8:30 works.' },
-                { m: true, h: '11:07 p. m.', t: "Booked: Friday at 8:30 PM, table for four. You'll get a reminder that morning." },
+                { h: '11:06 p. m.', t: "Hi! We're visiting Miami. Can we book a table for four on Friday?" },
+                { m: true, h: '11:06 p. m.', t: 'Hi Kate! Sure. I have Friday at 7:00 PM or 8:30 PM. Which works for you?' },
+                { h: '11:07 p. m.', t: '8:30 works.' },
+                { m: true, h: '11:07 p. m.', t: "Booked: Friday at 8:30 PM, table for four. You'll get a reminder that morning." },
               ],
             },
             {
               canal: 'Tu web', logo: undefined, quien: 'Javier M.', ini: 'JM', color: ['#DDEBDF', '#2F6B45'],
               responder: 'Responder a Javier M.',
               msgs: [
-                { h: '11:02 p. m.', t: '¿Se puede reservar el local entero para un evento?' },
-                { m: true, h: '11:02 p. m.', t: 'Hola, Javier. Sí, para grupos grandes. ¿Qué fecha y cuántas personas serían?' },
-                { h: '11:03 p. m.', t: 'El viernes 20, unas 50. ¿Cuánto costaría?' },
-                { m: true, h: '11:03 p. m.', t: 'Eso te lo cotiza el dueño según el menú. Ya le pasé tu mensaje con el resumen.' },
+                { h: '11:02 p. m.', t: '¿Se puede reservar el local entero para un evento?' },
+                { m: true, h: '11:02 p. m.', t: 'Hola, Javier. Sí, para grupos grandes. ¿Qué fecha y cuántas personas serían?' },
+                { h: '11:03 p. m.', t: 'El viernes 20, unas 50. ¿Cuánto costaría?' },
+                { m: true, h: '11:03 p. m.', t: 'Eso te lo cotiza el dueño según el menú. Ya le pasé tu mensaje con el resumen.' },
               ],
             },
           ]) as Hilo[],
@@ -252,7 +252,7 @@ const base = (city: IaCity) => {
       ask: H ? '¿Me pueden ver el sábado por una fuga en el baño? Estoy en Katy.' : '¿Tienen mesa para dos el domingo a la 1:30?',
       actions: (H
         ? [
-            ['agenda', 'sábado · libre 10:00 a. m.'],
+            ['agenda', 'sábado · libre 10:00 a. m.'],
             ['servicio', 'fuga · plomería'],
             ['zona', `${zone} · dentro de tu área`],
           ]
@@ -301,7 +301,7 @@ const base = (city: IaCity) => {
       fixedNote: 'Siempre activas',
       fixed: (H
         ? [
-            ['ok', 'Sí', 'Agendar lun a sáb · 9:00 a. m. a 7:00 p. m.'],
+            ['ok', 'Sí', 'Agendar lun a sáb · 9:00 a. m. a 7:00 p. m.'],
             ['ok', 'Sí', `Zona · ${zone} y alrededores`],
             ['mid', 'Te lo pasa', 'Fuera de zona · te pregunta'],
             ['off', 'No', 'Dar precios por chat'],
@@ -339,7 +339,7 @@ const base = (city: IaCity) => {
       rows: H
         ? [
             { icon: 'lucide:message-circle', label: 'Mensaje de WhatsApp', chip: 'Respondido', tone: 'ok' as const },
-            { icon: 'lucide:calendar', label: 'Cita sábado 10:00 a. m.', chip: 'Agendada', tone: 'ok' as const },
+            { icon: 'lucide:calendar', label: 'Cita sábado 10:00 a. m.', chip: 'Agendada', tone: 'ok' as const },
             { icon: 'lucide:help-circle', label: 'Pregunta de precio', chip: 'Te lo pasa', tone: 'pass' as const },
             { icon: 'lucide:moon', label: 'Fuera de horario', chip: 'Respondido', tone: 'ok' as const },
             { icon: 'lucide:user', label: 'Quiere hablar con alguien', chip: 'Te lo pasa', tone: 'pass' as const },
@@ -383,23 +383,23 @@ const base = (city: IaCity) => {
       escribe: 'Escribe un mensaje',
       chat: (H
         ? [
-            { t: '¿Me pueden ver el sábado? Tengo una fuga en el baño.', h: '9:58 p. m.' },
-            { m: true, o: 'a', t: 'Sí. Te aparté el sábado a las 10:00 a. m. Te llega la confirmación aquí.', h: '9:58 p. m.' },
-            { t: 'Y tengo una duda con la factura pasada.', h: '9:59 p. m.' },
-            { m: true, o: 'b', t: 'Se la paso al dueño con el resumen para que te conteste él.', h: '9:59 p. m.' },
+            { t: '¿Me pueden ver el sábado? Tengo una fuga en el baño.', h: '9:58 p. m.' },
+            { m: true, o: 'a', t: 'Sí. Te aparté el sábado a las 10:00 a. m. Te llega la confirmación aquí.', h: '9:58 p. m.' },
+            { t: 'Y tengo una duda con la factura pasada.', h: '9:59 p. m.' },
+            { m: true, o: 'b', t: 'Se la paso al dueño con el resumen para que te conteste él.', h: '9:59 p. m.' },
           ]
         : [
-            { t: '¿Tienen mesa para dos el domingo a la 1:30?', h: '9:58 p. m.' },
-            { m: true, o: 'a', t: 'Sí. Te aparté la mesa el domingo a la 1:30\u00a0p.\u00a0m. Te llega la confirmación aquí.', h: '9:58 p. m.' },
-            { t: 'Y quería preguntar por un almuerzo de empresa el mes que viene.', h: '9:59 p. m.' },
-            { m: true, o: 'b', t: 'Se lo paso al dueño con el resumen para que te conteste él.', h: '9:59 p. m.' },
+            { t: '¿Tienen mesa para dos el domingo a la 1:30?', h: '9:58 p. m.' },
+            { m: true, o: 'a', t: 'Sí. Te aparté la mesa el domingo a la 1:30\u00a0p.\u00a0m. Te llega la confirmación aquí.', h: '9:58 p. m.' },
+            { t: 'Y quería preguntar por un almuerzo de empresa el mes que viene.', h: '9:59 p. m.' },
+            { m: true, o: 'b', t: 'Se lo paso al dueño con el resumen para que te conteste él.', h: '9:59 p. m.' },
           ]) as { m?: boolean; o?: 'a' | 'b'; t: string; h: string }[],
       mail: H
-        ? { channel: 'Correo', from: 'Marcy · Tu Negocio', subject: 'Nueva cita: sábado, 10:00 a. m.', body: 'Ana · fuga en el baño · ' + zone, time: '9:58 p. m.' }
-        : { channel: 'Correo', from: 'Marcy · Tu Negocio', subject: 'Nueva reserva: domingo, 1:30\u00a0p.\u00a0m.', body: 'Ana · mesa para dos', time: '9:58 p. m.' },
+        ? { channel: 'Correo', from: 'Marcy · Tu Negocio', subject: 'Nueva cita: sábado, 10:00 a. m.', body: 'Ana · fuga en el baño · ' + zone, time: '9:58 p. m.' }
+        : { channel: 'Correo', from: 'Marcy · Tu Negocio', subject: 'Nueva reserva: domingo, 1:30\u00a0p.\u00a0m.', body: 'Ana · mesa para dos', time: '9:58 p. m.' },
       wa: H
-        ? { channel: 'WhatsApp', body: 'Ana tiene una duda con su factura pasada. Te dejé el resumen.', time: '9:59 p. m.' }
-        : { channel: 'WhatsApp', body: 'Ana pregunta por un almuerzo de empresa el mes que viene. Te dejé el resumen.', time: '9:59 p. m.' },
+        ? { channel: 'WhatsApp', body: 'Ana tiene una duda con su factura pasada. Te dejé el resumen.', time: '9:59 p. m.' }
+        : { channel: 'WhatsApp', body: 'Ana pregunta por un almuerzo de empresa el mes que viene. Te dejé el resumen.', time: '9:59 p. m.' },
       destA: H
         ? { title: 'Por correo', text: 'Las citas y los contactos nuevos, con todos sus datos.' }
         : { title: 'Por correo', text: 'Las reservas y los contactos nuevos, con todos sus datos.' },
@@ -438,7 +438,7 @@ const base = (city: IaCity) => {
         : 'No tienes que configurarla tú entre servicio y servicio. Lo hacemos contigo y Marcy queda contestando con los datos de tu local.',
       sr: 'Ejemplo de cómo empiezas con Marcy: la conoces, revisas el horario y los idiomas de tu negocio, conectas tus canales y queda lista para contestar.',
       /** Horario del negocio de ejemplo dentro de la pieza de alta (AltaMarcy); el mismo de las reglas y de los hilos. */
-      horario: H ? 'Lun a sáb · 9:00 a. m. a 7:00 p. m.' : 'Mar a dom · mediodía a 10\u00a0p.\u00a0m.',
+      horario: H ? 'Lun a sáb · 9:00 a. m. a 7:00 p. m.' : 'Mar a dom · mediodía a 10\u00a0p.\u00a0m.',
       steps: (H
         ? [
             ['Nos cuentas tu negocio', 'Horario, servicios, zona y cómo quieres que conteste.'],
